@@ -3,23 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>daegon charts - Seus Charts do Last.fm</title>
+    <title>daegon charts - DIAGNÓSTICO</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #dc2626;
-            --secondary: #9333ea;
-            --accent: #3b82f6;
-        }
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            background-color: #f8fafc;
         }
         .loader {
             border: 4px solid #e5e7eb;
-            border-top: 4px solid var(--primary);
+            border-top: 4px solid #dc2626;
             border-radius: 50%;
             width: 50px;
             height: 50px;
@@ -29,8 +28,15 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .history-view {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .chart-nav-btn.active {
-            background-color: var(--primary);
+            background-color: #dc2626;
             color: white;
         }
         .chart-row {
@@ -44,13 +50,13 @@
             color: #16a34a;
         }
         .diff-down {
-            color: var(--primary);
+            color: #dc2626;
         }
         .diff-new {
-            color: var(--secondary);
+            color: #9333ea;
         }
         .placeholder-art {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #9333ea 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -59,15 +65,28 @@
             color: white;
             font-size: 1.5rem;
         }
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 8px;
+            background-color: #1f2937;
+            color: white;
+            border-radius: 4px;
+            white-space: nowrap;
+            z-index: 100;
+            font-size: 12px;
+        }
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
         .gradient-text {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            background: linear-gradient(135deg, #dc2626 0%, #9333ea 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -91,13 +110,9 @@
             transform: translateY(-3px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-        .demo-notice {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .certification {
+            font-size: 1.2rem;
+            margin-left: 0.25rem;
         }
     </style>
 </head>
@@ -107,153 +122,71 @@
             <h1 class="text-2xl md:text-3xl font-extrabold text-center">
                 <span class="gradient-text cursor-pointer" id="mainTitle">daegon charts</span>
             </h1>
-            <p class="text-center text-gray-500 text-sm mt-2">Seus charts pessoais do Last.fm</p>
+            <p class="text-center text-gray-500 text-sm mt-2">Chart generated based on dantaswt's Last.fm data</p>
         </div>
     </header>
 
     <main id="app" class="flex-grow container mx-auto p-4 md:p-6">
-        <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden fade-in card-hover">
-            <div class="p-6">
-                <div class="text-center mb-8">
-                    <div class="demo-notice inline-block bg-gradient-to-r from-red-500 to-purple-600 text-white font-bold py-2 px-6 rounded-full mb-4">
-                        <i class="fas fa-music mr-2"></i>Demonstração
-                    </div>
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Bem-vindo ao daegon charts!</h2>
-                    <p class="text-gray-600">Esta é uma demonstração da interface. Para usar com seus dados reais, siga as instruções abaixo.</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-red-50 p-6 rounded-lg border border-red-200 text-center">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
-                            <i class="fas fa-music text-red-600 text-2xl"></i>
-                        </div>
-                        <h3 class="font-semibold text-red-800 mb-2">Hot 100</h3>
-                        <p class="text-sm text-red-700">Top 100 músicas mais tocadas</p>
-                    </div>
-                    
-                    <div class="bg-purple-50 p-6 rounded-lg border border-purple-200 text-center">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-100 flex items-center justify-center">
-                            <i class="fas fa-user text-purple-600 text-2xl"></i>
-                        </div>
-                        <h3 class="font-semibold text-purple-800 mb-2">Artist 50</h3>
-                        <p class="text-sm text-purple-700">Top 50 artistas mais ouvidos</p>
-                    </div>
-                    
-                    <div class="bg-blue-50 p-6 rounded-lg border border-blue-200 text-center">
-                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="fas fa-compact-disc text-blue-600 text-2xl"></i>
-                        </div>
-                        <h3 class="font-semibold text-blue-800 mb-2">Top Albums</h3>
-                        <p class="text-sm text-blue-700">Top álbuns mais reproduzidos</p>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 p-6 rounded-lg">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800">Como configurar seu próprio daegon charts</h3>
-                    <ol class="list-decimal pl-5 space-y-3 text-gray-600">
-                        <li>Faça um fork deste projeto no GitHub</li>
-                        <li>Substitua as URLs no arquivo JavaScript pelos links das suas planilhas Google</li>
-                        <li>Ative o GitHub Pages nas configurações do seu repositório</li>
-                        <li>Seu site estará disponível em https://seuusuario.github.io</li>
-                    </ol>
-                    
-                    <div class="mt-6 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                        <h4 class="font-semibold text-yellow-800 mb-2 flex items-center">
-                            <i class="fas fa-exclamation-circle mr-2"></i>Importante
-                        </h4>
-                        <p class="text-sm text-yellow-700">Para visualizar esta demonstração funcionando com dados reais, é necessário configurar as planilhas do Google Sheets com suas informações do Last.fm.</p>
-                    </div>
-
-                    <button id="loadDemoData" class="mt-6 w-full bg-gradient-to-r from-red-500 to-purple-600 hover:from-red-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <i class="fas fa-play-circle mr-2"></i>Carregar Dados de Demonstração
-                    </button>
-                </div>
-            </div>
-        </div>
+        <!-- Conteúdo será carregado aqui -->
     </main>
 
     <footer class="bg-white mt-8 py-6 border-t border-gray-200">
         <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-            <p>Chart generated based on your Last.fm data</p>
+            <p>Chart generated based on dantaswt's Last.fm data</p>
             <p class="mt-2">Desenvolvido com <i class="fas fa-heart text-red-500"></i> usando HTML, CSS e JavaScript</p>
         </div>
     </footer>
 
     <script>
-        // Dados de demonstração
-        const demoData = {
-            songs: {
-                "01/01/2023": [
-                    { position: 1, artist: "Taylor Swift", song: "Anti-Hero", diff: "NEW", lastWeek: "-", peak: 1, weeks: 1, units: "12.5M", totalUnits: "12.5M", certification: "🥇" },
-                    { position: 2, artist: "Sam Smith", song: "Unholy", diff: "▼1", lastWeek: 1, peak: 1, weeks: 12, units: "10.2M", totalUnits: "98.7M", certification: "💎" },
-                    { position: 3, artist: "SZA", song: "Kill Bill", diff: "▲2", lastWeek: 5, peak: 3, weeks: 8, units: "9.8M", totalUnits: "65.4M", certification: "🥈" }
-                ],
-                "08/01/2023": [
-                    { position: 1, artist: "Miley Cyrus", song: "Flowers", diff: "NEW", lastWeek: "-", peak: 1, weeks: 1, units: "15.7M", totalUnits: "15.7M", certification: "🥇" },
-                    { position: 2, artist: "Taylor Swift", song: "Anti-Hero", diff: "▼1", lastWeek: 1, peak: 1, weeks: 2, units: "11.3M", totalUnits: "23.8M", certification: "🥇" },
-                    { position: 3, artist: "Sam Smith", song: "Unholy", diff: "▼1", lastWeek: 2, peak: 1, weeks: 13, units: "9.5M", totalUnits: "108.2M", certification: "💎" }
-                ]
-            },
-            artists: {
-                "01/01/2023": [
-                    { position: 1, artist: "Taylor Swift", diff: "▲2", lastWeek: 3, peak: 1, weeks: 45, units: "48.7M", totalUnits: "1.2B", certification: "💎" },
-                    { position: 2, artist: "Bad Bunny", diff: "▼1", lastWeek: 1, peak: 1, weeks: 62, units: "45.3M", totalUnits: "985M", certification: "💎" },
-                    { position: 3, artist: "The Weeknd", diff: "▼1", lastWeek: 2, peak: 1, weeks: 58, units: "41.8M", totalUnits: "923M", certification: "💎" }
-                ],
-                "08/01/2023": [
-                    { position: 1, artist: "Taylor Swift", diff: "-", lastWeek: 1, peak: 1, weeks: 46, units: "52.1M", totalUnits: "1.25B", certification: "💎" },
-                    { position: 2, artist: "Miley Cyrus", diff: "NEW", lastWeek: "-", peak: 2, weeks: 1, units: "49.8M", totalUnits: "49.8M", certification: "🥈" },
-                    { position: 3, artist: "Bad Bunny", diff: "▼1", lastWeek: 2, peak: 1, weeks: 63, units: "43.6M", totalUnits: "1.03B", certification: "💎" }
-                ]
-            },
-            albums: {
-                "01/01/2023": [
-                    { position: 1, artist: "Taylor Swift", album: "Midnights", diff: "-", lastWeek: 1, peak: 1, weeks: 10, units: "78.5K", totalUnits: "2.1M", certification: "💎" },
-                    { position: 2, artist: "SZA", album: "SOS", diff: "▲1", lastWeek: 3, peak: 2, weeks: 5, units: "65.3K", totalUnits: "985K", certification: "🥈" },
-                    { position: 3, artist: "Drake", album: "Her Loss", diff: "▼1", lastWeek: 2, peak: 1, weeks: 8, units: "61.7K", totalUnits: "1.4M", certification: "💎" }
-                ],
-                "08/01/2023": [
-                    { position: 1, artist: "Miley Cyrus", album: "Endless Summer Vacation", diff: "NEW", lastWeek: "-", peak: 1, weeks: 1, units: "120.8K", totalUnits: "120.8K", certification: "🥇" },
-                    { position: 2, artist: "Taylor Swift", album: "Midnights", diff: "▼1", lastWeek: 1, peak: 1, weeks: 11, units: "72.4K", totalUnits: "2.18M", certification: "💎" },
-                    { position: 3, artist: "SZA", album: "SOS", diff: "▼1", lastWeek: 2, peak: 2, weeks: 6, units: "60.1K", totalUnits: "1.05M", certification: "💎" }
-                ]
-            }
-        };
-
-        // Configuração dos charts
+        // --- CONFIGURAÇÃO COM SEUS DADOS REAIS ---
         const chartsConfig = {
             songs: {
+                url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=904867620',
                 title: 'Hot 100',
                 entityType: 'song',
-                icon: 'fa-music'
+                icon: 'fa-music',
+                loaded: false
             },
             artists: {
+                url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1090187257',
                 title: 'Artist 50',
                 entityType: 'artist',
-                icon: 'fa-user'
+                icon: 'fa-user',
+                loaded: false
             },
             albums: {
-                title: 'Top Albums',
+                url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=916902523',
+                title: 'Top 100 Albums',
                 entityType: 'album',
-                icon: 'fa-compact-disc'
+                icon: 'fa-compact-disc',
+                loaded: false
             }
         };
 
-        // Estado da aplicação
+        // --- ESTADO DA APLICAÇÃO ---
         let appState = {
             activeChart: 'songs',
-            chartData: demoData,
+            chartData: {
+                songs: {},
+                artists: {},
+                albums: {}
+            },
             currentDate: null,
             isLoading: false,
             currentView: 'main',
             currentArtist: null,
-            artistStats: {}
+            artistStats: {},
+            colMaps: {
+                songs: {},
+                artists: {},
+                albums: {}
+            }
         };
 
-        // Elementos do DOM
+        // --- ELEMENTOS DO DOM ---
         const appContainer = document.getElementById('app');
 
-        // Função para mostrar mensagens
+        // --- FUNÇÕES PRINCIPAIS ---
         function showMessage(type, text, container = appContainer) {
             if (!container) return;
             
@@ -284,10 +217,116 @@
             }
         }
 
-        // Função para renderizar a interface principal
+        function parseCsvRow(text) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            result.push(current.trim());
+            return result;
+        }
+
+        async function fetchAndProcessChartData(chartType) {
+            if (chartsConfig[chartType].loaded) return;
+            
+            const config = chartsConfig[chartType];
+            const url = `${config.url}&_=${new Date().getTime()}`;
+            
+            showMessage('loading', `Carregando ${config.title}...`, appContainer);
+            
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`Não foi possível acessar a planilha para ${config.title}.`);
+                }
+                
+                let csvText = await response.text();
+                if (csvText.charCodeAt(0) === 0xFEFF) {
+                    csvText = csvText.substring(1);
+                }
+
+                const rows = csvText.trim().split('\n').map(row => parseCsvRow(row));
+                if (rows.length < 2) {
+                    throw new Error(`A planilha para ${config.title} não contém dados suficientes.`);
+                }
+                
+                const header = rows[0].map(h => h.toLowerCase().trim());
+                const data = rows.slice(1);
+                
+                const findIndex = (keys) => {
+                    for (const key of keys) {
+                        const index = header.indexOf(key);
+                        if (index !== -1) return index;
+                    }
+                    return -1;
+                };
+
+                appState.colMaps[chartType] = {
+                    date: findIndex(['date', 'chart date']),
+                    position: findIndex(['position', 'rank']),
+                    diff: findIndex(['dif', 'diff', '▲▼']),
+                    song: findIndex(['song']),
+                    album: findIndex(['album']),
+                    artist: findIndex(['artist', 'artists']),
+                    lastWeek: findIndex(['last week', 'lw']),
+                    peak: findIndex(['peak']),
+                    weeks: findIndex(['weeks']),
+                    units: findIndex(['units']),
+                    totalUnits: findIndex(['total units']),
+                    certification: findIndex(['certification'])
+                };
+                
+                if (appState.colMaps[chartType].position === -1) {
+                    throw new Error(`Coluna de posição não encontrada para ${config.title}.`);
+                }
+                if (appState.colMaps[chartType].date === -1) {
+                    throw new Error(`Coluna de data não encontrada para ${config.title}.`);
+                }
+                if (appState.colMaps[chartType].artist === -1) {
+                    throw new Error(`Coluna de artista não encontrada para ${config.title}.`);
+                }
+
+                const sortedDates = [...new Set(data.map(row => row[appState.colMaps[chartType].date]))]
+                    .sort((a, b) => new Date(a.split('/').reverse().join('-')) - new Date(b.split('/').reverse().join('-')));
+
+                sortedDates.forEach(date => {
+                    appState.chartData[chartType][date] = [];
+                });
+
+                data.forEach(row => {
+                    const date = row[appState.colMaps[chartType].date];
+                    if (appState.chartData[chartType][date]) {
+                        appState.chartData[chartType][date].push(row);
+                    }
+                });
+                
+                chartsConfig[chartType].loaded = true;
+                return true;
+            } catch (error) {
+                console.error(`Erro processando dados ${chartType}:`, error);
+                showMessage('error', error.message, appContainer);
+                return false;
+            }
+        }
+
         function renderMainUI() {
+            appState.currentView = 'main';
+            appState.currentArtist = null;
+            
             const dates = Object.keys(appState.chartData[appState.activeChart]);
-            const mostRecentDate = dates.length > 0 ? dates[0] : null;
+            const mostRecentDate = dates.length > 0 ? dates[dates.length - 1] : null;
             appState.currentDate = mostRecentDate;
             
             appContainer.innerHTML = `
@@ -333,7 +372,6 @@
             setupEventListeners();
         }
 
-        // Função para renderizar os itens do chart
         function renderChartItems() {
             if (!appState.currentDate || !appState.chartData[appState.activeChart][appState.currentDate]) {
                 return '<div class="text-center p-8 text-gray-500">Nenhum dado disponível para esta semana</div>';
@@ -341,21 +379,36 @@
             
             const items = appState.chartData[appState.activeChart][appState.currentDate];
             const chartType = appState.activeChart;
+            const colMap = appState.colMaps[chartType];
             
-            return items.map(item => {
-                const diff = item.diff || '';
+            // Ordenar por posição
+            const sortedItems = [...items].sort((a, b) => {
+                return parseInt(a[colMap.position]) - parseInt(b[colMap.position]);
+            });
+            
+            return sortedItems.map(row => {
+                const position = row[colMap.position] || 0;
+                const artist = row[colMap.artist] || 'Desconhecido';
+                const diff = colMap.diff !== -1 ? row[colMap.diff] : null;
+                const lastWeek = colMap.lastWeek !== -1 ? row[colMap.lastWeek] : null;
+                const peak = colMap.peak !== -1 ? row[colMap.peak] : null;
+                const weeks = colMap.weeks !== -1 ? row[colMap.weeks] : null;
+                const units = colMap.units !== -1 ? row[colMap.units] : null;
+                const totalUnits = colMap.totalUnits !== -1 ? row[colMap.totalUnits] : null;
+                const certification = colMap.certification !== -1 ? row[colMap.certification] : null;
+                
+                const name = chartType === 'songs' ? row[colMap.song] : 
+                            chartType === 'albums' ? row[colMap.album] : 
+                            artist;
+                
                 const diffClass = getDiffClass(diff);
                 const diffSymbol = getDiffSymbol(diff);
-                
-                const name = chartType === 'songs' ? item.song : 
-                            chartType === 'albums' ? item.album : 
-                            item.artist;
                 
                 return `
                     <div class="chart-row py-4 px-2 border-b border-gray-200">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 w-12 text-center">
-                                <span class="text-2xl font-bold">${item.position}</span>
+                                <span class="text-2xl font-bold">${position}</span>
                                 ${diffSymbol ? `<span class="diff-indicator ml-1 font-semibold ${diffClass}">${diffSymbol}</span>` : ''}
                             </div>
                             <div class="flex-shrink-0 mx-4">
@@ -369,16 +422,16 @@
                                         <p class="font-bold truncate">${name || 'Desconhecido'}</p>
                                         <p class="text-gray-600 truncate">
                                             ${chartType !== 'artists' ? 
-                                                `<span class="artist-link cursor-pointer hover:text-red-600 transition-colors" data-artist="${item.artist}">${item.artist}</span>` : 
+                                                `<span class="artist-link cursor-pointer hover:text-red-600 transition-colors" data-artist="${artist}">${artist}</span>` : 
                                                 ''}
                                         </p>
-                                        ${renderUnitsInfo(item)}
+                                        ${renderUnitsInfo(units, totalUnits, certification)}
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                                    ${item.lastWeek ? `<span>LW: ${item.lastWeek}</span>` : ''}
-                                    ${item.peak ? `<span>PK: ${item.peak}</span>` : ''}
-                                    ${item.weeks ? `<span>WOC: ${item.weeks}</span>` : ''}
+                                    ${lastWeek ? `<span>LW: ${lastWeek}</span>` : ''}
+                                    ${peak ? `<span>PK: ${peak}</span>` : ''}
+                                    ${weeks ? `<span>WOC: ${weeks}</span>` : ''}
                                 </div>
                             </div>
                         </div>
@@ -387,26 +440,24 @@
             }).join('');
         }
 
-        // Renderizar informações de unidades e certificação
-        function renderUnitsInfo(item) {
+        function renderUnitsInfo(units, totalUnits, certification) {
             let html = '';
             
-            if (item.units) {
-                html += `<span class="text-xs text-gray-500 mt-1 block">${item.units} unidades esta semana</span>`;
+            if (units) {
+                html += `<span class="text-xs text-gray-500 mt-1 block">${units} unidades esta semana</span>`;
             }
             
-            if (item.totalUnits) {
-                html += `<span class="text-xs text-gray-500">${item.totalUnits} unidades no total</span>`;
+            if (totalUnits) {
+                html += `<span class="text-xs text-gray-500">${totalUnits} unidades totais</span>`;
             }
             
-            if (item.certification) {
-                html += `<span class="text-lg ml-2">${item.certification}</span>`;
+            if (certification) {
+                html += `<span class="text-lg ml-2">${certification}</span>`;
             }
             
             return html ? `<div class="mt-1">${html}</div>` : '';
         }
 
-        // Função para determinar a classe CSS da diferença
         function getDiffClass(diff) {
             if (!diff) return '';
             if (diff.toString().includes('▲') || diff.toString().includes('+')) return 'diff-up';
@@ -415,7 +466,6 @@
             return '';
         }
 
-        // Função para determinar o símbolo da diferença
         function getDiffSymbol(diff) {
             if (!diff) return '';
             if (diff.toString().includes('▲') || diff.toString().includes('+')) return '▲';
@@ -424,14 +474,29 @@
             return diff;
         }
 
-        // Configurar event listeners
         function setupEventListeners() {
             // Navegação entre charts
             document.querySelectorAll('.chart-nav-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', async function() {
                     const chartType = this.dataset.chart;
-                    appState.activeChart = chartType;
-                    renderMainUI();
+                    
+                    if (appState.activeChart === chartType) return;
+                    
+                    try {
+                        appState.isLoading = true;
+                        showMessage('loading', `Carregando ${chartsConfig[chartType].title}...`);
+                        
+                        if (!chartsConfig[chartType].loaded) {
+                            await fetchAndProcessChartData(chartType);
+                        }
+                        
+                        appState.activeChart = chartType;
+                        renderMainUI();
+                    } catch (error) {
+                        showMessage('error', error.message);
+                    } finally {
+                        appState.isLoading = false;
+                    }
                 });
             });
             
@@ -446,28 +511,22 @@
             }
             
             // Navegação entre semanas
-            document.getElementById('prevWeekBtn').addEventListener('click', goToPreviousWeek);
-            document.getElementById('nextWeekBtn').addEventListener('click', goToNextWeek);
+            const prevBtn = document.getElementById('prevWeekBtn');
+            const nextBtn = document.getElementById('nextWeekBtn');
+            
+            if (prevBtn) {
+                prevBtn.addEventListener('click', goToPreviousWeek);
+            }
+            
+            if (nextBtn) {
+                nextBtn.addEventListener('click', goToNextWeek);
+            }
             
             // Atualizar estado dos botões de navegação
             updateWeekNavButtons();
         }
 
-        // Navegar para a semana anterior
         function goToPreviousWeek() {
-            const dates = Object.keys(appState.chartData[appState.activeChart]);
-            const currentIndex = dates.indexOf(appState.currentDate);
-            
-            if (currentIndex < dates.length - 1) {
-                appState.currentDate = dates[currentIndex + 1];
-                document.getElementById('weekSelector').value = appState.currentDate;
-                document.getElementById('chartContainer').innerHTML = renderChartItems();
-                updateWeekNavButtons();
-            }
-        }
-
-        // Navegar para a próxima semana
-        function goToNextWeek() {
             const dates = Object.keys(appState.chartData[appState.activeChart]);
             const currentIndex = dates.indexOf(appState.currentDate);
             
@@ -479,7 +538,18 @@
             }
         }
 
-        // Atualizar estado dos botões de navegação de semana
+        function goToNextWeek() {
+            const dates = Object.keys(appState.chartData[appState.activeChart]);
+            const currentIndex = dates.indexOf(appState.currentDate);
+            
+            if (currentIndex < dates.length - 1) {
+                appState.currentDate = dates[currentIndex + 1];
+                document.getElementById('weekSelector').value = appState.currentDate;
+                document.getElementById('chartContainer').innerHTML = renderChartItems();
+                updateWeekNavButtons();
+            }
+        }
+
         function updateWeekNavButtons() {
             const dates = Object.keys(appState.chartData[appState.activeChart]);
             const currentIndex = dates.indexOf(appState.currentDate);
@@ -487,41 +557,43 @@
             const prevBtn = document.getElementById('prevWeekBtn');
             const nextBtn = document.getElementById('nextWeekBtn');
             
-            if (prevBtn) prevBtn.disabled = currentIndex >= dates.length - 1;
-            if (nextBtn) nextBtn.disabled = currentIndex <= 0;
+            if (prevBtn) prevBtn.disabled = currentIndex <= 0;
+            if (nextBtn) nextBtn.disabled = currentIndex >= dates.length - 1;
         }
 
-        // Inicializar a aplicação
-        function initializeApp() {
-            // Configurar evento para o botão de carregar dados de demonstração
-            document.getElementById('loadDemoData').addEventListener('click', () => {
+        async function initializeApp() {
+            showMessage('loading', 'Carregando dados dos charts...');
+            
+            try {
+                // Carregar dados iniciais (songs)
+                await fetchAndProcessChartData('songs');
+                
+                // Renderizar UI
                 renderMainUI();
-            });
+                
+                // Carregar outros dados em background
+                setTimeout(async () => {
+                    await Promise.all([
+                        fetchAndProcessChartData('artists'),
+                        fetchAndProcessChartData('albums')
+                    ]);
+                }, 1000);
+                
+            } catch (error) {
+                showMessage('error', error.message);
+            }
         }
-
-        // Event listener para o título principal
-        document.getElementById('mainTitle').addEventListener('click', () => {
-            appContainer.innerHTML = `
-                <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden fade-in">
-                    <div class="p-6">
-                        <div class="text-center mb-8">
-                            <div class="demo-notice inline-block bg-gradient-to-r from-red-500 to-purple-600 text-white font-bold py-2 px-6 rounded-full mb-4">
-                                <i class="fas fa-music mr-2"></i>Demonstração
-                            </div>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Bem-vindo ao daegon charts!</h2>
-                            <p class="text-gray-600">Esta é uma demonstração da interface.</p>
-                        </div>
-                        <button id="loadDemoData" class="w-full bg-gradient-to-r from-red-500 to-purple-600 hover:from-red-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300">
-                            <i class="fas fa-play-circle mr-2"></i>Carregar Dados de Demonstração
-                        </button>
-                    </div>
-                </div>
-            `;
-            initializeApp();
-        });
 
         // Iniciar a aplicação quando o DOM estiver pronto
         document.addEventListener('DOMContentLoaded', initializeApp);
+
+        // Event listener para o título principal
+        document.getElementById('mainTitle').addEventListener('click', () => {
+            if (appState.currentView !== 'main') {
+                appState.currentView = 'main';
+                renderMainUI();
+            }
+        });
     </script>
 </body>
 </html>
