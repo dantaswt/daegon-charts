@@ -33,7 +33,6 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* Style for the active chart button */
         .chart-nav-btn.active {
             background-color: #dc2626; /* red-600 */
             color: white;
@@ -82,9 +81,9 @@
         };
 
         // --- SPOTIFY CREDENTIALS ---
-        // IMPORTANTE: Troque pelos seus próprios Client ID e Client Secret do Spotify Developer Dashboard
-        const spotifyClientId = '08a6cea61aaa4828b173bf2b40e14134';
-        const spotifyClientSecret = '24da1ad56cf34cd8b6731a2bda503fdb';
+        // Suas credenciais foram inseridas abaixo
+        const spotifyClientId = '60d65b0ac9f14d6aa91c08a66894cea9';
+        const spotifyClientSecret = 'caf3f20ae798475e8dec65697f210c2a';
         
         // --- DOM ELEMENTS ---
         const appContainer = document.getElementById('app');
@@ -230,16 +229,13 @@
 
         async function fetchAndProcessChartData(chartType) {
             if (chartsConfig[chartType].loaded) return;
-
             const config = chartsConfig[chartType];
             const url = `${config.url}&_=${new Date().getTime()}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Could not access the spreadsheet for ${config.title}.`);
             
             let csvText = await response.text();
-            if (csvText.charCodeAt(0) === 0xFEFF) {
-                csvText = csvText.substring(1);
-            }
+            if (csvText.charCodeAt(0) === 0xFEFF) { csvText = csvText.substring(1); }
 
             const rows = csvText.trim().split('\n').map(row => parseCsvRow(row));
             if (rows.length < 2) throw new Error(`The spreadsheet for ${config.title} does not contain enough data.`);
@@ -289,7 +285,6 @@
                     const entityName = row[colMaps[chartType][config.entityType]];
                     const entityKey = config.entityType === 'artist' ? artist : `${artist}|${entityName}`;
                     const position = row[colMaps[chartType].position];
-
                     if (!allHistories[chartType][entityKey]) allHistories[chartType][entityKey] = [];
                     allHistories[chartType][entityKey].push({ date, position });
                 }
@@ -337,7 +332,10 @@
                         'client_secret': spotifyClientSecret
                     })
                 });
-                if (!response.ok) throw new Error('Failed to get Spotify token');
+                if (!response.ok) {
+                    console.error('Failed to get Spotify token:', response.status, await response.text());
+                    throw new Error('Failed to get Spotify token');
+                }
                 const data = await response.json();
                 spotifyToken = data.access_token;
                 setTimeout(() => { spotifyToken = null; }, (data.expires_in - 60) * 1000);
@@ -370,9 +368,6 @@
                     searchType = 'track';
                 }
                 
-                // =================================================================================
-                // CORREÇÃO DEFINITIVA: A URL ABAIXO É A OFICIAL E CORRETA DA API DO SPOTIFY
-                // =================================================================================
                 const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${searchType}&limit=1`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -381,13 +376,9 @@
                 const data = await response.json();
 
                 let imageUrl;
-                if (type === 'artist') {
-                    imageUrl = data.artists?.items[0]?.images[0]?.url;
-                } else if (type === 'album') {
-                    imageUrl = data.albums?.items[0]?.images[0]?.url;
-                } else {
-                    imageUrl = data.tracks?.items[0]?.album?.images[0]?.url;
-                }
+                if (type === 'artist') { imageUrl = data.artists?.items[0]?.images[0]?.url; } 
+                else if (type === 'album') { imageUrl = data.albums?.items[0]?.images[0]?.url; } 
+                else { imageUrl = data.tracks?.items[0]?.album?.images[0]?.url; }
                 
                 if (imageUrl) {
                     artworkCache[key] = imageUrl;
@@ -416,8 +407,7 @@
             
             chartContainer.innerHTML = '';
 
-            let maxSales = 0;
-            let maxStreams = 0;
+            let maxSales = 0, maxStreams = 0;
             if (activeChart === 'albums' || activeChart === 'songs') {
                 const salesValues = displayData.map(row => parseInt(row[colMaps[activeChart].sales]?.replace(/,/g, '')) || 0);
                 const streamsValues = displayData.map(row => parseInt(row[colMaps[activeChart].streaming]?.replace(/,/g, '')) || 0);
@@ -443,14 +433,9 @@
         function createChartRow(row, options = {}) {
             const config = chartsConfig[activeChart];
             const colMap = colMaps[activeChart];
-
-            const pos = row[colMap.position];
-            const diff = row[colMap.diff];
-            const artist = row[colMap.artist];
+            const pos = row[colMap.position], diff = row[colMap.diff], artist = row[colMap.artist];
             const name = config.entityType !== 'artist' ? row[colMap[config.entityType]] : null;
-            const lastWeek = row[colMap.lastWeek] || '-';
-            const peak = row[colMap.peak] || '-';
-            const weeks = row[colMap.weeks] || '-';
+            const lastWeek = row[colMap.lastWeek] || '-', peak = row[colMap.peak] || '-', weeks = row[colMap.weeks] || '-';
             const entityKey = name ? `${artist}|${name}` : artist;
 
             const { colorClass, icon } = getDiffStyle(diff);
@@ -464,20 +449,14 @@
             
             let extraInfo = '';
             if (config.entityType === 'albums' || config.entityType === 'songs') {
-                const units = row[colMap.units] || null;
-                const totalUnits = row[colMap.totalUnits] || null;
+                const units = row[colMap.units] || null, totalUnits = row[colMap.totalUnits] || null;
                 const certText = row[colMap.certification] || '';
                 const { emoji, title } = getCertificationEmoji(certText);
                 const certEmojiSpan = emoji ? `<span class="ml-2" title="${title}">${emoji}</span>` : '';
 
                 let certInfo = '';
                 if (units && totalUnits) {
-                    certInfo = `
-                        <div class="flex items-center text-xs text-gray-500 mt-1">
-                            <span>Units: <strong class="text-gray-700">${units} / ${totalUnits}</strong></span>
-                            ${certEmojiSpan}
-                        </div>
-                    `;
+                    certInfo = `<div class="flex items-center text-xs text-gray-500 mt-1"><span>Units: <strong class="text-gray-700">${units} / ${totalUnits}</strong></span>${certEmojiSpan}</div>`;
                 } else if (certEmojiSpan) {
                      certInfo = `<div class="flex items-center text-xs text-gray-500 mt-1">${certEmojiSpan}</div>`
                 }
@@ -487,43 +466,12 @@
                 const salesAward = (sales > 0 && sales === options.maxSales) ? '<span title="Top Sales">🏆</span>' : '';
                 const streamsAward = (streams > 0 && streams === options.maxStreams) ? '<span title="Top Streamer">🔥</span>' : '';
                 
-                extraInfo = `
-                    <div class="flex justify-between items-start w-full">
-                        ${certInfo}
-                        <div class="ml-auto text-base flex-shrink-0">${salesAward} ${streamsAward}</div>
-                    </div>
-                `;
+                extraInfo = `<div class="flex justify-between items-start w-full">${certInfo}<div class="ml-auto text-base flex-shrink-0">${salesAward} ${streamsAward}</div></div>`;
             }
 
-            const statsBlock = `
-                <div class="flex items-center text-center text-xs sm:text-sm">
-                    <div class="px-2 sm:px-3 md:px-4"><p class="font-semibold text-gray-800">${lastWeek}</p><p class="text-gray-500">Last Week</p></div>
-                    <div class="px-2 sm:px-3 md:px-4"><p class="font-semibold text-gray-800">${peak}</p><p class="text-gray-500">Peak</p></div>
-                    <div class="px-2 sm:px-3 md:px-4 week-history-trigger cursor-pointer"><p class="font-bold text-base sm:text-lg text-gray-800">${weeks}</p><p class="text-gray-500">Weeks</p></div>
-                </div>
-            `;
+            const statsBlock = `<div class="flex items-center text-center text-xs sm:text-sm"><div class="px-2 sm:px-3 md:px-4"><p class="font-semibold text-gray-800">${lastWeek}</p><p class="text-gray-500">Last Week</p></div><div class="px-2 sm:px-3 md:px-4"><p class="font-semibold text-gray-800">${peak}</p><p class="text-gray-500">Peak</p></div><div class="px-2 sm:px-3 md:px-4 week-history-trigger cursor-pointer"><p class="font-bold text-base sm:text-lg text-gray-800">${weeks}</p><p class="text-gray-500">Weeks</p></div></div>`;
 
-            const mainContent = `
-                <div class="flex items-center w-full">
-                    <div class="flex-shrink-0 flex items-center w-12 sm:w-16 text-center">
-                        <span class="text-2xl sm:text-3xl font-bold text-gray-800">${pos}</span>
-                        <span class="text-base sm:text-lg ${colorClass} ml-1" title="${diff}">${icon}</span>
-                    </div>
-                    <div class="flex-shrink-0 mx-2 sm:mx-4 image-container">${imagePlaceholder}</div>
-                    <div class="flex-grow min-w-0">
-                        <p class="text-gray-900 font-bold text-base sm:text-lg truncate">${name || artist}</p>
-                        <p class="text-gray-600 text-sm sm:text-base truncate">${config.entityType !== 'artist' ? artist : ''}</p>
-                        ${extraInfo}
-                        <div class="sm:hidden mt-2">
-                            ${statsBlock}
-                        </div>
-                    </div>
-                    <div class="flex-shrink-0 ml-2 hidden sm:flex">
-                        ${statsBlock}
-                    </div>
-                </div>
-            `;
-            chartRow.innerHTML = mainContent;
+            chartRow.innerHTML = `<div class="flex items-center w-full"><div class="flex-shrink-0 flex items-center w-12 sm:w-16 text-center"><span class="text-2xl sm:text-3xl font-bold text-gray-800">${pos}</span><span class="text-base sm:text-lg ${colorClass} ml-1" title="${diff}">${icon}</span></div><div class="flex-shrink-0 mx-2 sm:mx-4 image-container">${imagePlaceholder}</div><div class="flex-grow min-w-0"><p class="text-gray-900 font-bold text-base sm:text-lg truncate">${name || artist}</p><p class="text-gray-600 text-sm sm:text-base truncate">${config.entityType !== 'artist' ? artist : ''}</p>${extraInfo}<div class="sm:hidden mt-2">${statsBlock}</div></div><div class="flex-shrink-0 ml-2 hidden sm:flex">${statsBlock}</div></div>`;
             
             const imageContainer = chartRow.querySelector('.image-container');
             loadAndSetImage(imageContainer, artist, name, config.entityType);
@@ -534,9 +482,7 @@
             } else {
                 chartRow.classList.add('cursor-pointer', 'hover:bg-gray-50');
                 chartRow.addEventListener('click', (e) => {
-                    if (!e.target.closest('.week-history-trigger')) {
-                        renderArtistPage(artist);
-                    }
+                    if (!e.target.closest('.week-history-trigger')) { renderArtistPage(artist); }
                 });
                 chartRow.querySelectorAll('.week-history-trigger').forEach(trigger => {
                     trigger.addEventListener('click', (e) => {
@@ -545,7 +491,6 @@
                     });
                 });
             }
-
             return chartRow;
         }
 
@@ -581,12 +526,7 @@
             
             let historyHtml = '<h4 class="font-bold text-gray-800 mb-2">Chart History</h4><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 text-sm">';
             filteredHistory.forEach(entry => {
-                historyHtml += `
-                    <a href="#" data-date="${entry.date}" class="history-link flex justify-between items-center p-2 bg-gray-200 rounded-md hover:bg-red-100">
-                        <span class="text-gray-600">${entry.date}</span>
-                        <span class="font-bold text-gray-800">#${entry.position}</span>
-                    </a>
-                `;
+                historyHtml += `<a href="#" data-date="${entry.date}" class="history-link flex justify-between items-center p-2 bg-gray-200 rounded-md hover:bg-red-100"><span class="text-gray-600">${entry.date}</span><span class="font-bold text-gray-800">#${entry.position}</span></a>`;
             });
             historyHtml += '</div>';
             historyDiv.innerHTML = historyHtml;
@@ -595,9 +535,8 @@
             historyDiv.querySelectorAll('.history-link').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const weekSelector = document.getElementById('weekSelector');
-                    weekSelector.value = e.currentTarget.dataset.date;
-                    weekSelector.dispatchEvent(new Event('change'));
+                    document.getElementById('weekSelector').value = e.currentTarget.dataset.date;
+                    document.getElementById('weekSelector').dispatchEvent(new Event('change'));
                 });
             });
         }
@@ -656,32 +595,13 @@
         function createArtistHistoryRow(artist, itemData, type) {
             const { name, peak, weeks, history } = itemData;
             const chartRun = history.sort((a,b) => new Date(a.date.split('/').reverse().join('-')) - new Date(b.date.split('/').reverse().join('-'))).map(h => h.position).join(' - ');
-            
             const itemDiv = document.createElement('div');
             itemDiv.className = 'py-4 border-b border-gray-200';
-            
             const initials = artist.split(' ').map(n => n[0]).join('').substring(0, 2);
             const imagePlaceholder = `<div class="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center font-bold text-gray-500 text-lg shadow-md">${initials}</div>`;
-            
-            itemDiv.innerHTML = `
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 mr-4 image-container">${imagePlaceholder}</div>
-                    <div class="flex-grow">
-                        <p class="text-lg font-bold text-gray-900">${name}</p>
-                        <div class="flex gap-6 text-sm mt-1">
-                            <div><span class="font-semibold">${peak}</span> <span class="text-gray-600">Peak</span></div>
-                            <div><span class="font-semibold">${weeks}</span> <span class="text-gray-600">Weeks</span></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-2 text-gray-700 text-sm bg-gray-50 p-2 rounded">
-                    <span class="font-semibold">Chart Run:</span> ${chartRun}
-                </div>
-            `;
-            
+            itemDiv.innerHTML = `<div class="flex items-center"><div class="flex-shrink-0 mr-4 image-container">${imagePlaceholder}</div><div class="flex-grow"><p class="text-lg font-bold text-gray-900">${name}</p><div class="flex gap-6 text-sm mt-1"><div><span class="font-semibold">${peak}</span> <span class="text-gray-600">Peak</span></div><div><span class="font-semibold">${weeks}</span> <span class="text-gray-600">Weeks</span></div></div></div></div><div class="mt-2 text-gray-700 text-sm bg-gray-50 p-2 rounded"><span class="font-semibold">Chart Run:</span> ${chartRun}</div>`;
             const imageContainer = itemDiv.querySelector('.image-container');
             loadAndSetImage(imageContainer, artist, name, type);
-            
             return itemDiv;
         }
 
@@ -691,15 +611,9 @@
             try {
                 await fetchAndProcessChartData('songs');
                 renderMainPage();
-                
-                await Promise.all([
-                    fetchAndProcessChartData('artists'),
-                    fetchAndProcessChartData('albums')
-                ]);
+                await Promise.all([ fetchAndProcessChartData('artists'), fetchAndProcessChartData('albums') ]);
                 computeArtistStats();
-            } catch (error) {
-                showMessage('error', error.message, appContainer);
-            }
+            } catch (error) { showMessage('error', error.message, appContainer); }
         }
         
         async function switchChart(chartType) {
@@ -707,8 +621,7 @@
             const chartTitleEl = document.getElementById('chartTitle');
             chartTitleEl.textContent = chartsConfig[activeChart].title;
             
-            const chartNavButtons = document.querySelectorAll('.chart-nav-btn');
-            chartNavButtons.forEach(btn => {
+            document.querySelectorAll('.chart-nav-btn').forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.chart === chartType);
             });
 
@@ -717,10 +630,7 @@
                     showMessage('loading', `Loading ${chartsConfig[chartType].title} chart data...`);
                     await fetchAndProcessChartData(chartType);
                     computeArtistStats();
-                } catch (error) {
-                    showMessage('error', error.message);
-                    return;
-                }
+                } catch (error) { showMessage('error', error.message); return; }
             }
 
             populateWeekSelector();
@@ -733,59 +643,49 @@
             const selectedWeek = weekSelector.value || weekSelector.options[0]?.value;
             lastSelectedWeeks[activeChart] = selectedWeek;
 
-            if (selectedWeek) {
-                await displayActiveChart(selectedWeek);
-            } else {
-                showMessage('info', `No data found for the ${chartsConfig[activeChart].title} chart.`);
-            }
+            if (selectedWeek) { await displayActiveChart(selectedWeek); } 
+            else { showMessage('info', `No data found for the ${chartsConfig[activeChart].title} chart.`); }
             updateWeekNavButtons();
         }
 
         function updateWeekNavButtons() {
             const weekSelector = document.getElementById('weekSelector');
-            const prevWeekBtn = document.getElementById('prevWeekBtn');
-            const nextWeekBtn = document.getElementById('nextWeekBtn');
+            const prevWeekBtn = document.getElementById('prevWeekBtn'), nextWeekBtn = document.getElementById('nextWeekBtn');
             if (!weekSelector || !prevWeekBtn || !nextWeekBtn) return;
-            
             const currentIndex = weekSelector.selectedIndex;
-            
             nextWeekBtn.disabled = currentIndex === 0;
             prevWeekBtn.disabled = currentIndex === weekSelector.options.length - 1;
         }
         
         function setupMainPageListeners() {
-            const chartNavButtons = document.querySelectorAll('.chart-nav-btn');
-            const weekSelector = document.getElementById('weekSelector');
-            const prevWeekBtn = document.getElementById('prevWeekBtn');
-            const nextWeekBtn = document.getElementById('nextWeekBtn');
-
-            chartNavButtons.forEach(btn => {
-                btn.addEventListener('click', () => switchChart(btn.dataset.chart));
-            });
-
-            weekSelector.addEventListener('change', (event) => {
-                lastSelectedWeeks[activeChart] = event.target.value;
-                displayActiveChart(event.target.value);
-                updateWeekNavButtons();
-            });
-
-            prevWeekBtn.addEventListener('click', () => {
-                if (weekSelector.selectedIndex < weekSelector.options.length - 1) {
-                    weekSelector.selectedIndex++;
-                    weekSelector.dispatchEvent(new Event('change'));
+            document.addEventListener('click', function(e) {
+                if (e.target.matches('.chart-nav-btn')) {
+                    switchChart(e.target.dataset.chart);
+                } else if (e.target.id === 'prevWeekBtn') {
+                    const selector = document.getElementById('weekSelector');
+                    if (selector.selectedIndex < selector.options.length - 1) {
+                        selector.selectedIndex++;
+                        selector.dispatchEvent(new Event('change'));
+                    }
+                } else if (e.target.id === 'nextWeekBtn') {
+                    const selector = document.getElementById('weekSelector');
+                    if (selector.selectedIndex > 0) {
+                        selector.selectedIndex--;
+                        selector.dispatchEvent(new Event('change'));
+                    }
                 }
             });
 
-            nextWeekBtn.addEventListener('click', () => {
-                if (weekSelector.selectedIndex > 0) {
-                    weekSelector.selectedIndex--;
-                    weekSelector.dispatchEvent(new Event('change'));
+            document.addEventListener('change', function(e) {
+                if (e.target.id === 'weekSelector') {
+                    lastSelectedWeeks[activeChart] = e.target.value;
+                    displayActiveChart(e.target.value);
+                    updateWeekNavButtons();
                 }
             });
         }
 
         document.addEventListener('DOMContentLoaded', initialize);
-
     </script>
 </body>
 </html>
