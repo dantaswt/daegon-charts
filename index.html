@@ -597,6 +597,89 @@
             background: var(--accent);
             color: #111827;
         }
+        
+        /* NOVOS ESTILOS ADICIONADOS */
+        /* Estilo para botão voltar ao topo */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--accent);
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 99;
+            box-shadow: 0 4px 12px rgba(0, 206, 209, 0.3);
+            border: none;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .back-to-top:hover {
+            background: var(--accent-dark);
+            transform: scale(1.1);
+        }
+        
+        /* Estilo para dropouts */
+        .dropout-item {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+        }
+        
+        /* Melhor quebra de texto para página de artistas */
+        .artist-page-content .break-text {
+            word-break: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+        }
+        
+        /* Estilo para unidades vendidas */
+        .units-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+        }
+        
+        /* Estilo para datas de entrada/pico */
+        .date-badge {
+            background: rgba(0, 206, 209, 0.1);
+            color: var(--accent);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .date-badge:hover {
+            background: rgba(0, 206, 209, 0.2);
+            text-decoration: underline;
+        }
+        
+        /* Melhorias de performance para imagens */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .lazy-image.loaded {
+            opacity: 1;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -639,6 +722,7 @@
         const SPOTIFY_CLIENT_SECRET = 'caf3f20ae798475e8dec65697f210c2a';
         let SPOTIFY_ACCESS_TOKEN = '';
         let imageCache = {};
+        let pendingImageRequests = {};
 
         // --- CORREÇÃO PARA IMAGENS ESPECÍFICAS ---
         const artistImageCorrections = {
@@ -814,7 +898,8 @@
             },
             currentBlog: 'hot100',
             sharedDate: null,
-            artistDetailsData: {}
+            artistDetailsData: {},
+            chartHistoryData: {}
         };
 
         // --- DOM ELEMENTS ---
@@ -863,13 +948,33 @@
                 }
             }
             
-            const cacheKey = `${type}:${correctedQuery}`;
-            if (imageCache[`spotify:${cacheKey}`]) {
-                return imageCache[`spotify:${cacheKey}`];
+            const cacheKey = `${type}:${correctedQuery}`.toLowerCase();
+            
+            // Verificar se já está em cache
+            if (imageCache[cacheKey]) {
+                return imageCache[cacheKey];
             }
             
+            // Verificar se já há uma requisição pendente para esta imagem
+            if (pendingImageRequests[cacheKey]) {
+                return new Promise((resolve) => {
+                    const checkInterval = setInterval(() => {
+                        if (imageCache[cacheKey]) {
+                            clearInterval(checkInterval);
+                            resolve(imageCache[cacheKey]);
+                        }
+                    }, 50);
+                });
+            }
+            
+            // Marcar como requisição pendente
+            pendingImageRequests[cacheKey] = true;
+            
             const token = await getSpotifyAccessToken();
-            if (!token) return null;
+            if (!token) {
+                delete pendingImageRequests[cacheKey];
+                return null;
+            }
             
             try {
                 const searchType = type === 'artist' ? 'artist' : 'album';
@@ -896,12 +1001,18 @@
                 }
                 
                 if (imageUrl) {
-                    imageCache[`spotify:${cacheKey}`] = imageUrl;
+                    imageCache[cacheKey] = imageUrl;
+                    
+                    // Pré-carregar a imagem
+                    const img = new Image();
+                    img.src = imageUrl;
                 }
                 
+                delete pendingImageRequests[cacheKey];
                 return imageUrl;
             } catch (error) {
                 console.error('Error fetching Spotify image:', error);
+                delete pendingImageRequests[cacheKey];
                 return null;
             }
         }
@@ -1008,7 +1119,10 @@
                     year: findIndex(['year', 'ano']),
                     chart: findIndex(['chart']),
                     item: findIndex(['item']),
-                    record: findIndex(['record'])
+                    record: findIndex(['record']),
+                    firstEntry: findIndex(['first entry', 'first', 'debut']),
+                    peakDate: findIndex(['peak date', 'peakdate', 'date peak']),
+                    unitsSold: findIndex(['units sold', 'sales', 'total sales'])
                 };
                 
                 if (chartType === 'artistStats') {
@@ -1020,6 +1134,9 @@
                         const itemName = row[appState.colMaps.artistStats.item];
                         const peak = parseInt(row[appState.colMaps.artistStats.peak]);
                         const weeks = parseInt(row[appState.colMaps.artistStats.weeks]);
+                        const unitsSold = row[appState.colMaps.artistStats.unitsSold] || null;
+                        const firstEntry = row[appState.colMaps.artistStats.firstEntry] || null;
+                        const peakDate = row[appState.colMaps.artistStats.peakDate] || null;
 
                         if (!appState.artistDetailsData[artistName]) {
                             appState.artistDetailsData[artistName] = {
@@ -1033,7 +1150,11 @@
                             appState.artistDetailsData[artistName][chartTypeEntry].push({
                                 item: itemName,
                                 peak: peak,
-                                weeks: weeks
+                                weeks: weeks,
+                                unitsSold: unitsSold,
+                                firstEntry: firstEntry,
+                                peakDate: peakDate,
+                                chartType: chartTypeEntry
                             });
                         }
                     });
@@ -1461,6 +1582,7 @@
             });
 
             loadCircleCardImages();
+            setupBackToTopButton();
         }
 
         function renderCircleCard(chartType, title) {
@@ -1638,11 +1760,22 @@
                         </button>
                     </div>
                     ` : ''}
+                    
+                    ${!isYearEnd && !isGoat ? renderDropouts(chartType) : ''}
+                    
+                    ${!isYearEnd && !isGoat ? `
+                    <div class="text-center mt-6">
+                        <button id="backToTopBtn" class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-dark transition-colors btn-hover">
+                            <i class="fas fa-arrow-up mr-2"></i> Back to Top
+                        </button>
+                    </div>
+                    ` : ''}
                 </div>
             `;
             
             setupChartPageListeners();
             loadSpotifyImages();
+            setupBackToTopButton();
             
             if (!isYearEnd && !isGoat) {
                 const dates = Object.keys(appState.chartData[chartType]);
@@ -1865,6 +1998,95 @@
             `;
         }
 
+        function renderDropouts(chartType) {
+            if (!appState.currentDate || !appState.chartData[chartType]) {
+                return '';
+            }
+            
+            const dates = Object.keys(appState.chartData[chartType]).sort();
+            const currentIndex = dates.indexOf(appState.currentDate);
+            
+            if (currentIndex <= 0) {
+                return '';
+            }
+            
+            const previousDate = dates[currentIndex - 1];
+            const currentItems = appState.chartData[chartType][appState.currentDate] || [];
+            const previousItems = appState.chartData[chartType][previousDate] || [];
+            
+            const colMap = appState.colMaps[chartType];
+            const currentPositions = new Set();
+            
+            // Coletar todos os itens da semana atual
+            currentItems.forEach(row => {
+                const name = chartType.includes('Songs') ? row[colMap.song] : 
+                             chartType.includes('Albums') ? row[colMap.album] : 
+                             row[colMap.artist];
+                const artist = row[colMap.artist];
+                const key = `${name}:${artist}`.toLowerCase();
+                currentPositions.add(key);
+            });
+            
+            // Encontrar itens da semana anterior que não estão na atual
+            const dropouts = previousItems.filter(row => {
+                const name = chartType.includes('Songs') ? row[colMap.song] : 
+                             chartType.includes('Albums') ? row[colMap.album] : 
+                             row[colMap.artist];
+                const artist = row[colMap.artist];
+                const key = `${name}:${artist}`.toLowerCase();
+                return !currentPositions.has(key);
+            });
+            
+            if (dropouts.length === 0) {
+                return '';
+            }
+            
+            // Ordenar por posição anterior
+            dropouts.sort((a, b) => {
+                const posA = parseInt(a[colMap.position]);
+                const posB = parseInt(b[colMap.position]);
+                return posA - posB;
+            });
+            
+            const dropoutsHtml = dropouts.map(row => {
+                const position = parseInt(row[colMap.position]) || 0;
+                const artist = row[colMap.artist] || 'Unknown';
+                const name = chartType.includes('Songs') ? row[colMap.song] : 
+                             chartType.includes('Albums') ? row[colMap.album] : 
+                             row[colMap.artist];
+                const weeks = colMap.weeks !== -1 ? parseInt(row[colMap.weeks]) : null;
+                const peak = colMap.peak !== -1 ? parseInt(row[colMap.peak]) : null;
+                
+                return `
+                    <div class="chart-row py-3 px-4 border-b border-gray-700 last:border-b-0 dropout-item">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 w-10 text-center">
+                                <span class="text-lg font-bold text-gray-500">${position}</span>
+                            </div>
+                            <div class="flex-grow ml-4">
+                                <p class="font-medium text-gray-400">${name}</p>
+                                <p class="text-sm text-gray-500">${artist}</p>
+                                <div class="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                                    ${peak ? `<span>Peak: #${peak}</span>` : ''}
+                                    ${weeks ? `<span>Weeks: ${weeks}</span>` : ''}
+                                    <span class="text-red-400 font-semibold">DROPPED OUT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            return `
+                <div class="mt-8 pt-6 border-t border-gray-700">
+                    <h4 class="text-lg font-bold mb-4 text-gray-400">Dropouts from Previous Week</h4>
+                    <div class="bg-gray-800 rounded-lg border border-gray-700">
+                        ${dropoutsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
         function showChartRunModal(chartType, itemKey) {
             const chartRun = appState.chartRunData[chartType]?.[itemKey] || [];
             const [name, artist] = itemKey.split(':');
@@ -2003,7 +2225,7 @@
             }
         }
 
-        // --- ALL ENTRIES PAGE FUNCTIONS (CORRIGIDAS) ---
+        // --- ALL ENTRIES PAGE FUNCTIONS ---
         function showAllEntriesPage() {
             appState.currentView = 'allEntries';
             
@@ -2050,6 +2272,8 @@
             document.getElementById('allSongsBtn').addEventListener('click', () => showAllEntriesList('songs'));
             document.getElementById('allArtistsBtn').addEventListener('click', showAllArtistsPage);
             document.getElementById('allAlbumsBtn').addEventListener('click', () => showAllEntriesList('albums'));
+            
+            setupBackToTopButton();
         }
 
         function showAllEntriesList(entryType) {
@@ -2082,7 +2306,7 @@
                 showAllEntriesPage();
             });
             
-            // CORREÇÃO: Configurar o evento de busca corretamente
+            // Configurar o evento de busca corretamente
             const searchInput = document.getElementById('entriesSearch');
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
@@ -2092,7 +2316,7 @@
                 );
                 document.getElementById('entriesList').innerHTML = renderEntriesList(entryType, filteredEntries);
                 
-                // CORREÇÃO: Reconfigurar os listeners de artist-link após atualizar a lista
+                // Reconfigurar os listeners de artist-link após atualizar a lista
                 setTimeout(() => {
                     document.querySelectorAll('.artist-link').forEach(link => {
                         link.addEventListener('click', function() {
@@ -2106,6 +2330,8 @@
                     });
                 }, 10);
             });
+            
+            setupBackToTopButton();
         }
 
         function renderEntriesList(entryType, entries) {
@@ -2244,6 +2470,7 @@
             `;
             
             setupChartBeatListeners();
+            setupBackToTopButton();
         }
 
         function renderArticleModal(articleIndex) {
@@ -2383,6 +2610,14 @@
                 document.getElementById('bottomPrevWeekBtn').addEventListener('click', navigateToPrevWeek);
                 document.getElementById('bottomNextWeekBtn').addEventListener('click', navigateToNextWeek);
                 
+                // Botão voltar ao topo
+                document.getElementById('backToTopBtn').addEventListener('click', function() {
+                    window.scrollTo({
+                        top: 0,
+                        behavior: 'smooth'
+                    });
+                });
+                
                 updateWeekNavButtons();
             }
             
@@ -2420,7 +2655,7 @@
             const prevBtn = document.getElementById('prevWeekBtn');
             const nextBtn = document.getElementById('nextWeekBtn');
             const bottomPrevBtn = document.getElementById('bottomPrevWeekBtn');
-            const bottomNextBtn = document.getElementById('bottomNextBtn');
+            const bottomNextBtn = document.getElementById('bottomNextWeekBtn');
             
             if (prevBtn) prevBtn.disabled = currentIndex <= 0;
             if (nextBtn) nextBtn.disabled = currentIndex >= dates.length - 1;
@@ -2486,6 +2721,49 @@
             }
         }
 
+        // --- FUNÇÃO PARA BOTÃO VOLTAR AO TOPO ---
+        function setupBackToTopButton() {
+            // Remover botão existente
+            const existingButton = document.querySelector('.back-to-top');
+            if (existingButton) {
+                existingButton.remove();
+            }
+            
+            // Criar novo botão
+            const backToTopButton = document.createElement('button');
+            backToTopButton.className = 'back-to-top';
+            backToTopButton.innerHTML = '<i class="fas fa-arrow-up"></i>';
+            backToTopButton.title = 'Back to top';
+            backToTopButton.style.display = 'none';
+            
+            document.body.appendChild(backToTopButton);
+            
+            // Mostrar/ocultar botão baseado no scroll
+            window.addEventListener('scroll', function() {
+                if (window.scrollY > 300) {
+                    backToTopButton.style.display = 'flex';
+                    setTimeout(() => {
+                        backToTopButton.classList.add('visible');
+                    }, 10);
+                } else {
+                    backToTopButton.classList.remove('visible');
+                    setTimeout(() => {
+                        if (!backToTopButton.classList.contains('visible')) {
+                            backToTopButton.style.display = 'none';
+                        }
+                    }, 300);
+                }
+            });
+            
+            // Rolagem suave ao topo
+            backToTopButton.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
         function renderArtistPage(artistName) {
             appState.currentView = 'artist';
             appState.currentArtist = artistName;
@@ -2503,6 +2781,7 @@
                     </div>
                 `;
                 document.getElementById('backButton').addEventListener('click', navigateBack);
+                setupBackToTopButton();
                 return;
             }
 
@@ -2522,15 +2801,48 @@
                 
                 if (isArtistChart) return `<div class="mb-8">${chartHeader}</div>`;
 
-                const chartEntriesHtml = chartData.entries.map(entry => `
-                    <div class="flex justify-between items-center py-2 px-4 border-b border-gray-700 last:border-b-0">
-                        <span class="font-medium text-white truncate break-text">${entry.item}</span>
-                        <div class="flex items-center space-x-4 text-sm text-gray-400 flex-shrink-0 ml-4">
-                            <span>Peak <span class="font-semibold text-white">#${entry.peak}</span></span>
-                            <span><span class="font-semibold text-white">${entry.weeks}</span> Weeks</span>
+                const chartEntriesHtml = chartData.entries.map(entry => {
+                    // Determinar qual chart mostrar baseado no tipo
+                    let chartToShow = 'songs';
+                    let dateToShow = entry.peakDate || entry.firstEntry;
+                    
+                    if (chartName.includes('Albums')) {
+                        chartToShow = 'albums';
+                    }
+                    
+                    const firstEntryLink = entry.firstEntry ? `
+                        <button class="date-badge" onclick="goToChartWeek('${chartToShow}', '${entry.firstEntry}')">
+                            First: ${entry.firstEntry}
+                        </button>
+                    ` : '';
+                    
+                    const peakDateLink = entry.peakDate && entry.peakDate !== entry.firstEntry ? `
+                        <button class="date-badge" onclick="goToChartWeek('${chartToShow}', '${entry.peakDate}')">
+                            Peak: ${entry.peakDate}
+                        </button>
+                    ` : '';
+                    
+                    const unitsBadge = entry.unitsSold && entry.unitsSold !== '0' ? `
+                        <span class="units-badge">${entry.unitsSold} units</span>
+                    ` : '';
+                    
+                    return `
+                        <div class="flex justify-between items-center py-2 px-4 border-b border-gray-700 last:border-b-0">
+                            <div class="flex-grow min-w-0">
+                                <span class="font-medium text-white truncate break-text">${entry.item}</span>
+                                <div class="flex flex-wrap gap-1 mt-1">
+                                    ${firstEntryLink}
+                                    ${peakDateLink}
+                                    ${unitsBadge}
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-4 text-sm text-gray-400 flex-shrink-0 ml-4">
+                                <span>Peak <span class="font-semibold text-white">#${entry.peak}</span></span>
+                                <span><span class="font-semibold text-white">${entry.weeks}</span> Weeks</span>
+                            </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
 
                 return `
                     <div class="mb-8">
@@ -2561,7 +2873,7 @@
                         </div>
                     </div>
                     
-                    <div id="artistPageContent">
+                    <div id="artistPageContent" class="artist-page-content">
                         ${top50ArtistsHtml}
                         ${hot100Html}
                         ${top100AlbumsHtml}
@@ -2571,6 +2883,7 @@
             
             document.getElementById('backButton').addEventListener('click', navigateBack);
             loadArtistImage(artistName);
+            setupBackToTopButton();
         }
 
         async function loadArtistImage(artistName) {
@@ -2612,7 +2925,7 @@
                 navigateBack();
             });
             
-            // CORREÇÃO: Configurar o evento de busca corretamente
+            // Configurar o evento de busca corretamente
             document.getElementById('artistsSearch').addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
                 const filteredArtists = Object.keys(appState.artistDetailsData).filter(artist => 
@@ -2646,6 +2959,8 @@
                     });
                 });
             }, 100);
+            
+            setupBackToTopButton();
         }
 
         function renderArtistsList(artists = null) {
@@ -2716,6 +3031,7 @@
                 }
 
                 renderHomePage();
+                setupBackToTopButton();
                 
             } catch (error) {
                 showMessage('error', 'Error loading data: ' + error.message);
@@ -2749,6 +3065,9 @@
                     itemDetailsModal.classList.remove('active');
                 }
             });
+            
+            // Inicializar botão voltar ao topo
+            setupBackToTopButton();
         });
     </script>
 </body>
