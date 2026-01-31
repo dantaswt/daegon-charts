@@ -1776,33 +1776,41 @@
             loadSpotifyImages();
             setupBackToTopButton();
             
-            if (!isYearEnd && !isGoat) {
-                const dates = Object.keys(appState.chartData[chartType]);
-                if (dates.length > 0) {
-                    const datePicker = flatpickr("#weekSelector", {
-                        enable: dates,
-                        defaultDate: appState.currentDate,
-                        dateFormat: "Y-m-d",
-                        onChange: function(selectedDates, dateStr, instance) {
-                            if (dateStr) {
-                                appState.currentDate = dateStr;
-                                appState.sharedDate = dateStr;
-                                
-                                const otherCharts = ['songs', 'artists', 'albums'].filter(c => c !== chartType);
-                                for(const otherChart of otherCharts) {
-                                    if (appState.chartData[otherChart][dateStr]) {
-                                        appState.chartData[otherChart].activeDate = dateStr;
-                                    }
-                                }
-
-                                document.getElementById('chartContainer').innerHTML = renderChartItems();
-                                updateWeekNavButtons();
-                                loadSpotifyImages();
-                            }
+          if (!isYearEnd && !isGoat) {
+    const dates = Object.keys(appState.chartData[chartType]);
+    if (dates.length > 0) {
+        const datePicker = flatpickr("#weekSelector", {
+            enable: dates,
+            defaultDate: appState.currentDate,
+            dateFormat: "Y-m-d",
+            theme: "dark", // Forçar tema escuro
+            position: "auto", // Posicionamento automático
+            animate: true, // Animações
+            showMonths: 1, // Mostrar apenas 1 mês
+            static: false, // Calendário não estático
+            closeOnSelect: true, // Fechar ao selecionar
+            nextArrow: '<i class="fas fa-chevron-right"></i>',
+            prevArrow: '<i class="fas fa-chevron-left"></i>',
+            onChange: function(selectedDates, dateStr, instance) {
+                if (dateStr) {
+                    appState.currentDate = dateStr;
+                    appState.sharedDate = dateStr;
+                    
+                    const otherCharts = ['songs', 'artists', 'albums'].filter(c => c !== chartType);
+                    for(const otherChart of otherCharts) {
+                        if (appState.chartData[otherChart][dateStr]) {
+                            appState.chartData[otherChart].activeDate = dateStr;
                         }
-                    });
+                    }
+
+                    document.getElementById('chartContainer').innerHTML = renderChartItems();
+                    updateWeekNavButtons();
+                    loadSpotifyImages();
                 }
             }
+        });
+    }
+}
             
             if (isYearEnd) {
                 document.querySelectorAll('.year-btn').forEach(btn => {
@@ -3071,4 +3079,5 @@
     </script>
 </body>
 </html>
+
 
