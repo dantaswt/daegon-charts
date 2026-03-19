@@ -51,38 +51,7 @@
             <div id="modalContent"></div>
         </div>
     </div>
-<!-- ADICIONAR no final do body, antes dos scripts -->
-<div id="globalLoader" class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50 hidden">
-    <div class="text-center">
-        <div class="loader mb-4"></div>
-        <p class="text-white" id="loaderMessage">Loading...</p>
-    </div>
-</div>
 
-<script>
-// NOVO: Sistema de loading global
-window.showGlobalLoader = (message) => {
-    const loader = document.getElementById('globalLoader');
-    document.getElementById('loaderMessage').textContent = message;
-    loader.classList.remove('hidden');
-};
-
-window.hideGlobalLoader = () => {
-    document.getElementById('globalLoader').classList.add('hidden');
-};
-
-// NOVO: Mostrar loading apenas quando necessário
-document.addEventListener('click', (e) => {
-    if (e.target.closest('[data-chart]') || e.target.closest('.circle-card-container')) {
-        showGlobalLoader('Loading chart data...');
-    }
-});
-
-// Esconder loading quando a página terminar de renderizar
-window.addEventListener('load', () => {
-    setTimeout(hideGlobalLoader, 500);
-});
-</script>
     <!-- JavaScript Modules -->
     <script src="js/config.js"></script>
     <script src="js/spotify.js"></script>
