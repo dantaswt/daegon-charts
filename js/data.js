@@ -1,5 +1,4 @@
-// data.js - VERSÃO SEM DEPENDÊNCIAS EXTERNAS
-
+// --- DATA PROCESSING FUNCTIONS ---
 async function fetchAndProcessChartData(chartType) {
     if (chartsConfig?.[chartType]?.loaded) return true;
     
@@ -380,4 +379,6 @@ async function fetchAndProcessChartBeatData() {
             appState.chartBeatData[key] = [];
         }
     }
+    
+    await loadBlogImages();
 }
