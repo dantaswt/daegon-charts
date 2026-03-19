@@ -24,10 +24,10 @@
             --bg-color: #000000;
             --bg-secondary: #0A0A0A;
             --text-color: #F9FAFB;
-            --card-bg: #0A0A0A;
-            --card-bg-hover: #111111;
-            --border-color: rgba(249, 250, 251, 0.15);
-            --muted-text: #9CA3AF;
+            --card-bg: #FFFFFF;
+            --card-bg-hover: #F5F5F5;
+            --border-color: #E5E5E5;
+            --muted-text: #6B7280;
         }
 
         body {
@@ -58,34 +58,57 @@
             background-color: var(--gold);
             color: var(--secondary);
         }
-        .chart-row {
+        
+        /* Estilo dos cards do chart */
+        .chart-card-item {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             transition: all 0.2s ease;
-            border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 0.5rem;
+            color: #111827;
         }
+        
         @media (min-width: 768px) {
-            .chart-row {
-                padding: 1rem 1rem;
+            .chart-card-item {
+                padding: 1.25rem;
+                margin-bottom: 1.25rem;
             }
         }
-        .chart-row:hover {
-            background-color: rgba(0, 206, 209, 0.05);
+        
+        .chart-card-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            background-color: #FAFAFA;
         }
+        
+        .chart-card-item.rank-1 {
+            border-left: 6px solid var(--accent);
+            border-radius: 12px 12px 12px 12px;
+        }
+        
+        .chart-card-item.rank-1.goat {
+            border-left: 6px solid var(--gold);
+        }
+        
         .diff-up {
-            color: var(--accent);
+            color: #10B981;
         }
         .diff-down {
-            color: #FF6B6B;
+            color: #EF4444;
         }
         .diff-new {
             color: var(--accent);
             font-weight: bold;
         }
+        
         .placeholder-art {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
+            background: linear-gradient(135deg, #E5E5E5 0%, #F5F5F5 100%);
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #9CA3AF;
         }
         .fade-in {
             animation: fadeIn 0.5s ease-in-out;
@@ -116,65 +139,33 @@
         }
         .spotify-image {
             transition: all 0.3s ease;
-            width: 48px;
-            height: 48px;
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
         @media (min-width: 768px) {
             .spotify-image {
-                width: 60px;
-                height: 60px;
+                width: 80px;
+                height: 80px;
             }
         }
         .spotify-image:hover {
             transform: scale(1.05);
         }
-        .rank-1 {
-            background: rgba(0, 206, 209, 0.1);
-            border-left: 5px solid var(--accent);
-            border-radius: 5px;
-            margin-left: -5px;
-            padding-left: 15px;
-            transition: all 0.3s ease;
+        .rank-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #111827;
+            min-width: 3rem;
+            text-align: center;
         }
-        .rank-1.goat {
-            background: rgba(255, 215, 0, 0.1);
-            border-left: 5px solid var(--gold);
-        }
-        .rank-1 .text-muted {
-            color: var(--muted-text) !important;
-        }
-        .award {
-            position: relative;
-        }
-        .award-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--gold);
-            color: #000;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .chart-run-mini {
-            display: flex;
-            height: 4px;
-            margin-top: 5px;
-            gap: 2px;
-        }
-        .chart-run-bar {
-            flex: 1;
-            background: rgba(249, 250, 251, 0.2);
-            border-radius: 2px;
-        }
-        .chart-run-bar.active {
-            background: var(--accent);
+        @media (min-width: 768px) {
+            .rank-number {
+                font-size: 1.875rem;
+                min-width: 3.5rem;
+            }
         }
         .artist-link {
             cursor: pointer;
@@ -302,7 +293,7 @@
             position: relative;
             transform: translateY(20px);
             transition: transform 0.3s ease;
-            color: var(--text-color);
+            color: #111827;
         }
         .item-details-modal.active .modal-content {
             transform: translateY(0);
@@ -315,12 +306,12 @@
             border: none;
             font-size: 1.5rem;
             cursor: pointer;
-            color: var(--text-color);
+            color: #111827;
         }
         .bottom-nav {
             margin-top: 2rem;
             padding-top: 1rem;
-            border-top: 1px solid var(--border-color);
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
         .search-container {
             position: relative;
@@ -332,8 +323,8 @@
             border: 1px solid var(--border-color);
             border-radius: 0.5rem;
             font-size: 0.875rem;
-            background-color: var(--card-bg);
-            color: var(--text-color);
+            background-color: white;
+            color: #111827;
         }
         .search-input:focus {
             outline: none;
@@ -345,16 +336,16 @@
             left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--muted-text);
+            color: #9CA3AF;
         }
         .flatpickr-input {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+            background-color: white;
+            border: 1px solid #E5E5E5;
             border-radius: 0.375rem;
             padding: 0.5rem 0.75rem;
             width: 150px;
             text-align: center;
-            color: var(--text-color);
+            color: #111827;
         }
         
        /* Estilos para o Chart Beat */
@@ -788,10 +779,6 @@ button {
                 font-size: 1.5rem;
             }
             
-            .chart-row {
-                padding: 0.75rem 0.5rem;
-            }
-            
             .circle-cards-grid {
                 gap: 1rem;
             }
@@ -800,6 +787,16 @@ button {
                 font-size: 0.65rem;
                 padding: 0.15rem 0.35rem;
                 margin-left: 0.25rem;
+            }
+            
+            .rank-number {
+                font-size: 1.25rem;
+                min-width: 2.5rem;
+            }
+            
+            .spotify-image {
+                width: 56px;
+                height: 56px;
             }
         }
 
@@ -841,14 +838,15 @@ button {
             }
         }
 
-        /* Estilo para as estatísticas verticais */
+        /* Estilo para as estatísticas verticais - agora com texto preto */
         .chart-stats-vertical {
             display: flex;
             flex-direction: column;
             gap: 0.25rem;
             font-size: 0.7rem;
-            color: var(--muted-text);
+            color: #6B7280;
             text-align: right;
+            font-weight: 500;
         }
         
         @media (min-width: 768px) {
@@ -863,9 +861,41 @@ button {
         }
         
         .chart-stats-vertical .stat-value {
-            color: white;
-            font-weight: 500;
+            color: #111827;
+            font-weight: 700;
             margin-left: 0.25rem;
+        }
+
+        /* Container do chart com fundo preto */
+        .chart-container {
+            background-color: #000;
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Texto preto nos cards */
+        .chart-card-item p, 
+        .chart-card-item span:not(.badge):not(.stat-value):not(.artist-link) {
+            color: #111827;
+        }
+        
+        .artist-link {
+            color: #111827;
+            font-weight: 600;
+        }
+        
+        .artist-link:hover {
+            color: var(--accent);
+        }
+        
+        .text-muted-item {
+            color: #6B7280;
         }
     </style>
 </head>
@@ -2041,7 +2071,7 @@ button {
 </div>
 `}
                     
-                    <div id="chartContainer" class="bg-black rounded-lg overflow-hidden border border-gray-800 shadow-sm">
+                    <div class="chart-container">
                         ${renderChartItems()}
                     </div>
                     
@@ -2218,51 +2248,52 @@ button {
                 let unitsDisplay = '';
                 if (units && units !== '0') {
                     if (chartType === 'radioSongs') {
-                        unitsDisplay = `<span class="text-xs text-gray-400">Spins: ${units}</span>`;
+                        unitsDisplay = `<span class="text-xs text-muted-item">Spins: <span class="font-semibold text-gray-900">${units}</span></span>`;
                     } else if (chartType === 'topStreamingAlbums') {
-                        unitsDisplay = `<span class="text-xs text-gray-400">Streams: ${units}</span>`;
+                        unitsDisplay = `<span class="text-xs text-muted-item">Streams: <span class="font-semibold text-gray-900">${units}</span></span>`;
                     } else if (chartType === 'topAlbumSales') {
-                        unitsDisplay = `<span class="text-xs text-gray-400">Sales: ${units}</span>`;
+                        unitsDisplay = `<span class="text-xs text-muted-item">Sales: <span class="font-semibold text-gray-900">${units}</span></span>`;
                     } else {
-                        unitsDisplay = `<span class="text-xs text-gray-400">Units: ${units}</span>`;
+                        unitsDisplay = `<span class="text-xs text-muted-item">Units: <span class="font-semibold text-gray-900">${units}</span></span>`;
                     }
                 }
                 
                 let totalUnitsDisplay = '';
                 if (totalUnits && totalUnits !== '0') {
-                    totalUnitsDisplay = `<span class="text-xs text-gray-400">Total: ${totalUnits}</span>`;
+                    totalUnitsDisplay = `<span class="text-xs text-muted-item">Total: <span class="font-semibold text-gray-900">${totalUnits}</span></span>`;
                 }
 
+                const rankClass = position === 1 ? (isGoat ? 'rank-1 goat' : 'rank-1') : '';
+
                 return `
-                    <div class="chart-row py-2 md:py-4 px-2 md:px-4 ${position === 1 ? (isGoat ? 'rank-1 goat pulse-animation' : 'rank-1 pulse-animation') : ''}">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 w-8 md:w-10 text-center relative text-white">
-                                <span class="text-base md:text-xl font-bold">${position}</span>
-                                ${!isYearEnd && !isGoat && diffSymbol ? `<span class="diff-indicator ml-1 text-xs font-semibold ${diffClass}">${diffSymbol}</span>` : ''}
+                    <div class="chart-card-item ${rankClass}">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 rank-number text-gray-900">
+                                ${position}
                             </div>
-                            <div class="flex-shrink-0 mx-2 md:mx-4">
-                                <div class="w-12 h-12 md:w-16 md:h-16 rounded-md shadow-md overflow-hidden spotify-image" id="image-${chartType}-${index}">
+                            <div class="flex-shrink-0 mx-3 md:mx-4">
+                                <div class="spotify-image" id="image-${chartType}-${index}">
                                     <div class="w-full h-full placeholder-art">
                                         <i class="fas ${chartsConfig[chartType]?.icon || 'fa-music'} text-gray-600"></i>
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex-grow min-w-0 text-white">
+                            <div class="flex-grow min-w-0">
                                 <div class="flex items-start justify-between">
                                     <div class="break-text flex-grow pr-2">
-                                        <div class="flex flex-wrap items-center gap-1">
-                                            <p class="font-bold text-sm md:text-base item-name break-text">
-                                                <span class="artist-link cursor-pointer hover:text-accent" data-artist="${artist}" data-item="${name}" data-type="${chartType.includes('Albums') || chartType.includes('topStreaming') || chartType.includes('topAlbumSales') ? 'album' : 'song'}">${name}</span>
+                                        <div class="flex flex-wrap items-center gap-1 mb-1">
+                                            <p class="font-bold text-base md:text-lg item-name break-text">
+                                                <span class="artist-link cursor-pointer" data-artist="${artist}" data-item="${name}" data-type="${chartType.includes('Albums') || chartType.includes('topStreaming') || chartType.includes('topAlbumSales') ? 'album' : 'song'}">${name}</span>
                                             </p>
                                         </div>
-                                        <p class="text-gray-400 text-xs md:text-sm mt-1">
-                                            <span class="artist-link" data-artist="${artist}">${artist}</span>
+                                        <p class="text-gray-600 text-sm md:text-base mb-2">
+                                            <span class="artist-link font-medium" data-artist="${artist}">${artist}</span>
                                         </p>
-                                        <div class="flex flex-wrap gap-1 mt-1">
+                                        <div class="flex flex-wrap gap-2 mb-2">
                                             ${weeksAt1Badge}
                                             ${newPeakBadge}
                                         </div>
-                                        <div class="flex flex-col gap-1 mt-1">
+                                        <div class="flex flex-col gap-1">
                                             ${unitsDisplay}
                                             ${totalUnitsDisplay}
                                         </div>
@@ -2318,7 +2349,7 @@ button {
             if (!chartRun || chartRun.length === 0 || chartType.includes('yearEnd') || chartType.includes('goat')) return '';
             const key = `${(name || '').toLowerCase().trim()}:${(artist || '').toLowerCase().trim()}`;
             return `
-                <div class="mt-2 text-xs font-semibold">
+                <div class="mt-3 text-xs font-semibold">
                     <button class="text-accent hover:text-accent-dark transition-colors chart-run-link-btn" data-chart="${chartType}" data-key="${key.replace(/"/g, '')}">
                         View Chart Run <i class="fas fa-arrow-right text-xs ml-1"></i>
                     </button>
