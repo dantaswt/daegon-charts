@@ -339,96 +339,123 @@
             color: var(--text-color);
         }
         
-        /* Estilos para o Chart Beat */
-        .blog-card {
-            transition: all 0.3s ease;
-            border-left: 4px solid transparent;
-        }
-        .blog-card:hover {
-            transform: translateY(-3px);
-            border-left-color: var(--accent);
-        }
-        .article-image {
-            transition: transform 0.3s ease;
-        }
-        .article-image:hover {
-            transform: scale(1.05);
-        }
-        .chart-beat-nav-btn.active {
-            border-bottom: 2px solid var(--accent);
-            color: var(--accent);
-        }
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        /* Melhorias para botões e interatividade */
-        button {
-            touch-action: manipulation;
-            user-select: none;
-        }
-        
-        .btn-hover {
-            transition: all 0.2s ease;
-        }
-        
-        .btn-hover:active {
-            transform: scale(0.97);
-        }
-        
-        /* Animações para os top cards */
-        @keyframes slideInTopCards {
-            0% {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .top-card-animated {
-            animation: slideInTopCards 0.6s ease-out forwards;
-        }
-        
-        .top-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-        
-        .top-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        
-        .top-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-        
-        /* Animação para os cards do Chart Beat */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .blog-card-animated {
-            animation: fadeInUp 0.5s ease-out forwards;
-            opacity: 0;
-        }
-        
-        .blog-card-animated:nth-child(1) { animation-delay: 0.1s; }
-        .blog-card-animated:nth-child(2) { animation-delay: 0.2s; }
-        .blog-card-animated:nth-child(3) { animation-delay: 0.3s; }
-        .blog-card-animated:nth-child(4) { animation-delay: 0.4s; }
-        .blog-card-animated:nth-child(5) { animation-delay: 0.5s; }
+       /* Estilos para o Chart Beat */
+.blog-card {
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.blog-card:hover {
+    transform: translateY(-3px);
+    border-left-color: var(--accent);
+}
+
+/* ✅ Imagem sem corte */
+.article-image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.article-image:hover {
+    transform: scale(1.05);
+}
+
+/* ✅ Texto justificado */
+.article-content {
+    text-align: justify;
+    text-justify: inter-word;
+    line-height: 1.7;
+}
+
+/* ✅ Negrito (artista/álbum) */
+.article-content strong {
+    font-weight: 700;
+}
+
+/* ✅ Itálico (números) */
+.article-content em {
+    font-style: italic;
+    color: #374151;
+}
+
+.chart-beat-nav-btn.active {
+    border-bottom: 2px solid var(--accent);
+    color: var(--accent);
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Melhorias para botões e interatividade */
+button {
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.btn-hover {
+    transition: all 0.2s ease;
+}
+
+.btn-hover:active {
+    transform: scale(0.97);
+}
+
+/* Animações para os top cards */
+@keyframes slideInTopCards {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.top-card-animated {
+    animation: slideInTopCards 0.6s ease-out forwards;
+}
+
+.top-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.top-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.top-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+/* Animação para os cards do Chart Beat */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.blog-card-animated {
+    animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+.blog-card-animated:nth-child(1) { animation-delay: 0.1s; }
+.blog-card-animated:nth-child(2) { animation-delay: 0.2s; }
+.blog-card-animated:nth-child(3) { animation-delay: 0.3s; }
+.blog-card-animated:nth-child(4) { animation-delay: 0.4s; }
+.blog-card-animated:nth-child(5) { animation-delay: 0.5s; }
         
         /* Novos estilos para GOAT */
         .goat-title::after {
