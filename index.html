@@ -969,7 +969,8 @@ button {
             },
             chartBeatData: {
                 hot100: [],
-                top100Albums: []
+                top100Albums: [],
+                top50artists: []
             },
             currentBlog: 'hot100',
             sharedDate: null,
@@ -2450,9 +2451,11 @@ button {
             
             const hot100Articles = appState.chartBeatData.hot100 || [];
             const top100Articles = appState.chartBeatData.top100Albums || [];
+            const top50Articles = appState.chartBeatData.top50Artists || [];
             
             const featuredHot100 = hot100Articles?.[0];
             const featuredTop100 = top100Articles?.[0];
+            const featuredTop50 = top50Articles?.[0];
             
             appContainer.innerHTML = `
                 <div class="max-w-6xl mx-auto">
@@ -2471,6 +2474,9 @@ button {
                         </button>
                         <button class="chart-beat-nav-btn px-4 py-2 font-medium ${appState.currentBlog === 'top100Albums' ? 'text-accent border-b-2 border-accent' : 'text-gray-400'}" data-blog="top100Albums">
                             Top 100 Albums
+                        </button>
+                        <button class="chart-beat-nav-btn px-4 py-2 font-medium ${appState.currentBlog === 'top50Artists' ? 'text-accent border-b-2 border-accent' : 'text-gray-400'}" data-blog="top100Albums">
+                            Top 50 Artists
                         </button>
                     </div>
                     
@@ -2508,6 +2514,24 @@ button {
                                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-800 to-transparent p-4">
                                             <span class="text-xs text-accent font-semibold">${featuredTop100.publicationDate}</span>
                                             <h4 class="font-bold text-lg mt-1 text-white truncate">${featuredTop100.title}</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            ` : ''}
+
+                             ${featuredTop50 ? `
+                                <div class="blog-card-animated blog-card bg-gray-800 rounded-lg overflow-hidden border border-gray-700 shadow-sm cursor-pointer" onclick="showChartBeatPage()">
+                                    <div class="h-48 overflow-hidden relative">
+                                        ${featuredTop50.imageUrl ? `
+                                            <img src="${featuredTop50.imageUrl}" alt="${featuredTop50.artist}" class="w-full h-full object-cover article-image">
+                                        ` : `
+                                            <div class="w-full h-48 placeholder-art">
+                                                <i class="fas fa-newspaper text-3xl text-gray-400"></i>
+                                            </div>
+                                        `}
+                                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-800 to-transparent p-4">
+                                            <span class="text-xs text-accent font-semibold">${featuredTop50.publicationDate}</span>
+                                            <h4 class="font-bold text-lg mt-1 text-white truncate">${featuredTop50.title}</h4>
                                         </div>
                                     </div>
                                 </div>
