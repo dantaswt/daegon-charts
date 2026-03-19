@@ -26,7 +26,7 @@
             --text-color: #F9FAFB;
             --card-bg: #0A0A0A;
             --card-bg-hover: #111111;
-            --border-color: rgba(249, 250, 251, 0.1);
+            --border-color: rgba(249, 250, 251, 0.15);
             --muted-text: #9CA3AF;
         }
 
@@ -61,6 +61,12 @@
         .chart-row {
             transition: all 0.2s ease;
             border-bottom: 1px solid var(--border-color);
+            padding: 0.75rem 0.5rem;
+        }
+        @media (min-width: 768px) {
+            .chart-row {
+                padding: 1rem 1rem;
+            }
         }
         .chart-row:hover {
             background-color: rgba(0, 206, 209, 0.05);
@@ -110,6 +116,14 @@
         }
         .spotify-image {
             transition: all 0.3s ease;
+            width: 48px;
+            height: 48px;
+        }
+        @media (min-width: 768px) {
+            .spotify-image {
+                width: 60px;
+                height: 60px;
+            }
         }
         .spotify-image:hover {
             transform: scale(1.05);
@@ -788,6 +802,71 @@ button {
                 margin-left: 0.25rem;
             }
         }
+
+        /* Estilo para os títulos dos charts na navegação */
+        .chart-title-block {
+            background-color: #000;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-title-block {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+        }
+        
+        .chart-title-block:hover {
+            border-color: var(--accent);
+            background-color: #111;
+        }
+
+        /* Grid de 3x2 para os charts */
+        .weekly-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .weekly-charts-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+        }
+
+        /* Estilo para as estatísticas verticais */
+        .chart-stats-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            font-size: 0.7rem;
+            color: var(--muted-text);
+            text-align: right;
+        }
+        
+        @media (min-width: 768px) {
+            .chart-stats-vertical {
+                font-size: 0.75rem;
+                gap: 0.35rem;
+            }
+        }
+        
+        .chart-stats-vertical span {
+            white-space: nowrap;
+        }
+        
+        .chart-stats-vertical .stat-value {
+            color: white;
+            font-weight: 500;
+            margin-left: 0.25rem;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -863,6 +942,27 @@ button {
                 title: 'Top 100 Albums',
                 entityType: 'album',
                 icon: 'fa-compact-disc',
+                loaded: false
+            },
+            radioSongs: {
+                url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1681272096',
+                title: 'Radio Songs',
+                entityType: 'song',
+                icon: 'fa-radio',
+                loaded: false
+            },
+            topStreamingAlbums: {
+                url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1028545573',
+                title: 'Top Streaming Albums',
+                entityType: 'album',
+                icon: 'fa-headphones',
+                loaded: false
+            },
+            topAlbumSales: {
+                url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1111633725',
+                title: 'Top Album Sales',
+                entityType: 'album',
+                icon: 'fa-chart-simple',
                 loaded: false
             },
             yearEndSongs: {
@@ -966,6 +1066,9 @@ button {
                 songs: {},
                 artists: {},
                 albums: {},
+                radioSongs: {},
+                topStreamingAlbums: {},
+                topAlbumSales: {},
                 yearEndSongs: {},
                 yearEndArtists: {},
                 yearEndAlbums: {},
@@ -983,6 +1086,9 @@ button {
                 songs: {},
                 artists: {},
                 albums: {},
+                radioSongs: {},
+                topStreamingAlbums: {},
+                topAlbumSales: {},
                 yearEndSongs: {},
                 yearEndArtists: {},
                 yearEndAlbums: {},
@@ -995,6 +1101,9 @@ button {
                 songs: [],
                 artists: [],
                 albums: [],
+                radioSongs: [],
+                topStreamingAlbums: [],
+                topAlbumSales: [],
                 yearEndSongs: [],
                 yearEndArtists: [],
                 yearEndAlbums: [],
@@ -1003,7 +1112,14 @@ button {
                 goatAlbums: []
             },
             artistData: {},
-            chartRunData: {},
+            chartRunData: {
+                songs: {},
+                artists: {},
+                albums: {},
+                radioSongs: {},
+                topStreamingAlbums: {},
+                topAlbumSales: {}
+            },
             artistStatsData: {},
             weeksAtNumberOne: {},
             itemDetails: {},
@@ -1011,7 +1127,10 @@ button {
             allEntries: {
                 songs: [],
                 artists: [],
-                albums: []
+                albums: [],
+                radioSongs: [],
+                topStreamingAlbums: [],
+                topAlbumSales: []
             },
             chartBeatData: {
                 hot100: [],
@@ -1239,8 +1358,8 @@ button {
                     peak: findIndex(['peak']),
                     weeks: findIndex(['weeks', 'wks']),
                     weeksAt1: findIndex(['weeks at 1', 'wks at 1']),
-                    units: findIndex(['units']),
-                    totalUnits: findIndex(['total units']),
+                    units: findIndex(['units', 'spins', 'sales', 'streams']),
+                    totalUnits: findIndex(['total units', 'total']),
                     certification: findIndex(['certification']),
                     year: findIndex(['year', 'ano']),
                     chart: findIndex(['chart']),
@@ -1269,6 +1388,9 @@ button {
                                 'Hot 100 Songs': [],
                                 'Top 100 Albums': [],
                                 'Top 50 Artists': [],
+                                'Radio Songs': [],
+                                'Top Streaming Albums': [],
+                                'Top Album Sales': []
                             };
                         }
 
@@ -1421,15 +1543,15 @@ button {
                         appState.chartData[chartType][date] = dateGroups[date];
                     });
 
-                    if (['songs', 'artists', 'albums'].includes(chartType)) {
+                    if (['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'].includes(chartType)) {
                         appState.allEntries[chartType] = [];
                         const uniqueEntries = new Set();
                         
                         sortedDates.forEach(date => {
                             dateGroups[date].forEach(row => {
                                 const colMap = appState.colMaps[chartType];
-                                const name = chartType === 'songs' ? row[colMap.song] : 
-                                          chartType === 'albums' ? row[colMap.album] : 
+                                const name = chartType === 'songs' || chartType === 'radioSongs' ? row[colMap.song] : 
+                                          chartType === 'albums' || chartType === 'topStreamingAlbums' || chartType === 'topAlbumSales' ? row[colMap.album] : 
                                           row[colMap.artist];
                                 const artist = row[colMap.artist] || 'Unknown';
                                 
@@ -1495,14 +1617,16 @@ button {
                                 .sort((a, b) => parseInt(a[colMap.position]) - parseInt(b[colMap.position]))
                                 .slice(0, 3)
                                 .map(row => {
-                                    const name = chartType === 'songs' ? row[colMap.song] : 
-                                                 chartType === 'albums' ? row[colMap.album] : 
+                                    const name = chartType === 'songs' || chartType === 'radioSongs' ? row[colMap.song] : 
+                                                 chartType === 'albums' || chartType === 'topStreamingAlbums' || chartType === 'topAlbumSales' ? row[colMap.album] : 
                                                  row[colMap.artist];
                                     return {
                                         position: row[colMap.position] || 0,
                                         artist: row[colMap.artist] || 'Unknown',
                                         name: name || 'Unknown',
-                                        weeksAt1: row[colMap.weeksAt1] || 0
+                                        weeksAt1: row[colMap.weeksAt1] || 0,
+                                        units: row[colMap.units] || null,
+                                        totalUnits: row[colMap.totalUnits] || null
                                     };
                                 });
                         }
@@ -1623,6 +1747,9 @@ button {
                         ${renderCircleCard('songs', 'Hot 100')}
                         ${renderCircleCard('artists', 'Artist 50')}
                         ${renderCircleCard('albums', 'Top Albums')}
+                        ${renderCircleCard('radioSongs', 'Radio Songs')}
+                        ${renderCircleCard('topStreamingAlbums', 'Top Streaming Albums')}
+                        ${renderCircleCard('topAlbumSales', 'Top Album Sales')}
                     </div>
                     
                     ${(featuredHot100 || featuredArtists || featuredTop100) ? `
@@ -1688,16 +1815,19 @@ button {
                     
                     <div class="mb-12 md:mb-16">
                         <h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Weekly Charts</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                        <div class="weekly-charts-grid">
                             ${renderChartCard('songs', 'Hot 100')}
                             ${renderChartCard('artists', 'Artist 50')}
                             ${renderChartCard('albums', 'Top 100 Albums')}
+                            ${renderChartCard('radioSongs', 'Radio Songs')}
+                            ${renderChartCard('topStreamingAlbums', 'Top Streaming Albums')}
+                            ${renderChartCard('topAlbumSales', 'Top Album Sales')}
                         </div>
                     </div>
                     
                     <div class="mb-12 md:mb-16">
                         <h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Year-End Charts</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                        <div class="weekly-charts-grid">
                             ${renderChartCard('yearEndSongs', 'Year-End Songs')}
                             ${renderChartCard('yearEndArtists', 'Year-End Artists')}
                             ${renderChartCard('yearEndAlbums', 'Year-End Albums')}
@@ -1706,7 +1836,7 @@ button {
 
                     <div class="mb-12 md:mb-16">
                         <h3 class="text-xl md:text-2xl font-bold mb-6 section-title goat-title text-white">Greatest of All Time</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                        <div class="weekly-charts-grid">
                             ${renderChartCard('goatSongs', 'GOAT Songs')}
                             ${renderChartCard('goatArtists', 'GOAT Artists')}
                             ${renderChartCard('goatAlbums', 'GOAT Albums')}
@@ -1782,17 +1912,17 @@ button {
         }
 
         async function loadCircleCardImages() {
-            for (const chartType of ['songs', 'artists', 'albums']) {
+            for (const chartType of ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales']) {
                 const topItem = appState.top3Data[chartType]?.[0];
                 if (!topItem) continue;
                 
                 let query = '';
                 let type = '';
                 
-                if (chartType === 'songs') {
+                if (chartType === 'songs' || chartType === 'radioSongs') {
                     query = topItem.artist;
                     type = 'artist';
-                } else if (chartType === 'albums') {
+                } else if (chartType === 'albums' || chartType === 'topStreamingAlbums' || chartType === 'topAlbumSales') {
                     const album = topItem.name?.includes('(') ? topItem.name.substring(0, topItem.name.indexOf('(')).trim() : topItem.name;
                     query = `${topItem.artist} ${album}`;
                     type = 'album';
@@ -1876,9 +2006,9 @@ button {
                     
                     <div class="mb-4 md:mb-6">
                         <h2 class="text-xl md:text-3xl font-bold text-center mb-2 text-white">${headerTitle}</h2>
-                        <div id="chartNav" class="flex flex-wrap justify-center border-b border-gray-800">
+                        <div id="chartNav" class="flex flex-wrap justify-center gap-2 border-b border-gray-800 pb-3">
                             ${navCharts.map(([key, config]) => `
-                                <button data-chart="${key}" class="chart-nav-btn btn-hover ${appState.activeChart === key ? (isGoat ? 'goat-active' : 'active') : ''} text-xs md:text-sm font-semibold py-2 px-2 md:px-4 text-gray-400 hover:text-white focus:outline-none transition-all">
+                                <button data-chart="${key}" class="chart-nav-btn btn-hover ${appState.activeChart === key ? (isGoat ? 'goat-active' : 'active') : ''} text-xs md:text-sm font-semibold py-2 px-3 rounded-md transition-all">
                                     ${config.title}
                                 </button>
                             `).join('')}
@@ -1967,7 +2097,7 @@ button {
                     appState.currentDate = dateStr;
                     appState.sharedDate = dateStr;
                     
-                    const otherCharts = ['songs', 'artists', 'albums'].filter(c => c !== chartType);
+                    const otherCharts = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'].filter(c => c !== chartType);
                     for(const otherChart of otherCharts) {
                         if (appState.chartData[otherChart]?.[dateStr]) {
                             appState.chartData[otherChart].activeDate = dateStr;
@@ -2060,8 +2190,8 @@ button {
                 const totalUnits = colMap.totalUnits !== -1 ? row[colMap.totalUnits] : null;
                 const certification = colMap.certification !== -1 ? row[colMap.certification] : null;
                 
-                const name = chartType.includes('Songs') || chartType === 'songs' ? (row[colMap.song] || 'Unknown') : 
-                             chartType.includes('Albums') || chartType === 'albums' ? (row[colMap.album] || 'Unknown') : 
+                const name = chartType.includes('Songs') || chartType === 'songs' || chartType === 'radioSongs' ? (row[colMap.song] || 'Unknown') : 
+                             chartType.includes('Albums') || chartType === 'albums' || chartType === 'topStreamingAlbums' || chartType === 'topAlbumSales' ? (row[colMap.album] || 'Unknown') : 
                              (row[colMap.artist] || 'Unknown');
                 
                 const diffClass = getDiffClass(diff);
@@ -2084,6 +2214,25 @@ button {
                 const chartRunKey = `${(name || '').toLowerCase().trim()}:${(artist || '').toLowerCase().trim()}`;
                 const chartRun = appState.chartRunData[chartType]?.[chartRunKey] || [];
 
+                // Formatar unidades para exibição
+                let unitsDisplay = '';
+                if (units && units !== '0') {
+                    if (chartType === 'radioSongs') {
+                        unitsDisplay = `<span class="text-xs text-gray-400">Spins: ${units}</span>`;
+                    } else if (chartType === 'topStreamingAlbums') {
+                        unitsDisplay = `<span class="text-xs text-gray-400">Streams: ${units}</span>`;
+                    } else if (chartType === 'topAlbumSales') {
+                        unitsDisplay = `<span class="text-xs text-gray-400">Sales: ${units}</span>`;
+                    } else {
+                        unitsDisplay = `<span class="text-xs text-gray-400">Units: ${units}</span>`;
+                    }
+                }
+                
+                let totalUnitsDisplay = '';
+                if (totalUnits && totalUnits !== '0') {
+                    totalUnitsDisplay = `<span class="text-xs text-gray-400">Total: ${totalUnits}</span>`;
+                }
+
                 return `
                     <div class="chart-row py-2 md:py-4 px-2 md:px-4 ${position === 1 ? (isGoat ? 'rank-1 goat pulse-animation' : 'rank-1 pulse-animation') : ''}">
                         <div class="flex items-center">
@@ -2092,47 +2241,49 @@ button {
                                 ${!isYearEnd && !isGoat && diffSymbol ? `<span class="diff-indicator ml-1 text-xs font-semibold ${diffClass}">${diffSymbol}</span>` : ''}
                             </div>
                             <div class="flex-shrink-0 mx-2 md:mx-4">
-                                <div class="w-10 h-10 md:w-12 md:h-12 rounded-md shadow-md overflow-hidden spotify-image" id="image-${chartType}-${index}">
+                                <div class="w-12 h-12 md:w-16 md:h-16 rounded-md shadow-md overflow-hidden spotify-image" id="image-${chartType}-${index}">
                                     <div class="w-full h-full placeholder-art">
                                         <i class="fas ${chartsConfig[chartType]?.icon || 'fa-music'} text-gray-600"></i>
                                     </div>
                                 </div>
                             </div>
                             <div class="flex-grow min-w-0 text-white">
-                                <div class="flex items-center justify-between">
-                                    <div class="break-text w-full">
+                                <div class="flex items-start justify-between">
+                                    <div class="break-text flex-grow pr-2">
                                         <div class="flex flex-wrap items-center gap-1">
                                             <p class="font-bold text-sm md:text-base item-name break-text">
-                                                <span class="artist-link cursor-pointer hover:text-accent" data-artist="${artist}" data-item="${name}" data-type="${chartType.includes('Albums') ? 'album' : 'song'}">${name}</span>
+                                                <span class="artist-link cursor-pointer hover:text-accent" data-artist="${artist}" data-item="${name}" data-type="${chartType.includes('Albums') || chartType.includes('topStreaming') || chartType.includes('topAlbumSales') ? 'album' : 'song'}">${name}</span>
                                             </p>
-                                            ${weeksAt1Badge}
-                                            ${newPeakBadge}
                                         </div>
                                         <p class="text-gray-400 text-xs md:text-sm mt-1">
                                             <span class="artist-link" data-artist="${artist}">${artist}</span>
                                         </p>
-                                        ${renderUnitsInfo(units, totalUnits, certification, weeksAt1, chartType)}
+                                        <div class="flex flex-wrap gap-1 mt-1">
+                                            ${weeksAt1Badge}
+                                            ${newPeakBadge}
+                                        </div>
+                                        <div class="flex flex-col gap-1 mt-1">
+                                            ${unitsDisplay}
+                                            ${totalUnitsDisplay}
+                                        </div>
                                     </div>
+                                    
+                                    ${!isYearEnd && !isGoat ? `
+                                    <div class="chart-stats-vertical flex-shrink-0">
+                                        ${lastWeek !== undefined ? `<span>LW<span class="stat-value">${lastWeek === '0' || lastWeek?.toLowerCase() === 're' ? '-' : lastWeek}</span></span>` : ''}
+                                        ${peak ? `<span>PK<span class="stat-value">${peak}</span></span>` : ''}
+                                        ${weeks ? `<span>WOC<span class="stat-value">${weeks}</span></span>` : ''}
+                                    </div>
+                                    ` : ''}
+                                    
+                                    ${isGoat || isYearEnd ? `
+                                    <div class="chart-stats-vertical flex-shrink-0">
+                                        ${peak ? `<span>PK<span class="stat-value">${peak}</span></span>` : ''}
+                                        ${weeks ? `<span>WKS<span class="stat-value">${weeks}</span></span>` : ''}
+                                    </div>
+                                    ` : ''}
                                 </div>
-                                ${!isYearEnd && !isGoat ? `
-                                <div class="flex items-center gap-2 md:gap-4 mt-1 text-xs text-gray-400">
-                                    <span>LW: ${lastWeek === '0' || lastWeek?.toLowerCase() === 're' ? '-' : lastWeek}</span>
-                                    ${peak ? `<span>PK: ${peak}</span>` : ''}
-                                    ${weeks ? `<span>WOC: ${weeks}</span>` : ''}
-                                </div>
-                                ` : ''}
-                                ${isGoat ? `
-                                <div class="flex items-center gap-2 md:gap-4 mt-1 text-xs text-gray-400">
-                                    ${peak ? `<span>Peak: #${peak}</span>` : ''}
-                                    ${weeks ? `<span>Weeks: ${weeks}</span>` : ''}
-                                </div>
-                                ` : ''}
-                                ${isYearEnd ? `
-                                <div class="flex items-center gap-2 md:gap-4 mt-1 text-xs text-gray-400">
-                                    ${peak ? `<span>Peak: #${peak}</span>` : ''}
-                                    ${weeks ? `<span>Weeks: ${weeks}</span>` : ''}
-                                </div>
-                                ` : ''}
+                                
                                 ${renderChartRunLink(chartRun, chartType, name, artist)}
                             </div>
                         </div>
@@ -2167,7 +2318,7 @@ button {
             if (!chartRun || chartRun.length === 0 || chartType.includes('yearEnd') || chartType.includes('goat')) return '';
             const key = `${(name || '').toLowerCase().trim()}:${(artist || '').toLowerCase().trim()}`;
             return `
-                <div class="mt-1 md:mt-2 text-xs font-semibold">
+                <div class="mt-2 text-xs font-semibold">
                     <button class="text-accent hover:text-accent-dark transition-colors chart-run-link-btn" data-chart="${chartType}" data-key="${key.replace(/"/g, '')}">
                         View Chart Run <i class="fas fa-arrow-right text-xs ml-1"></i>
                     </button>
@@ -2382,10 +2533,10 @@ button {
                 let query = '';
                 let type = '';
                 
-                if (chartType?.includes('Songs') || chartType === 'songs') {
+                if (chartType?.includes('Songs') || chartType === 'songs' || chartType === 'radioSongs') {
                     query = artist;
                     type = 'artist';
-                } else if (chartType?.includes('Albums') || chartType === 'albums') {
+                } else if (chartType?.includes('Albums') || chartType === 'albums' || chartType === 'topStreamingAlbums' || chartType === 'topAlbumSales') {
                     const album = row[colMap.album] || '';
                     query = `${artist} ${album}`;
                     type = 'album';
@@ -2426,9 +2577,9 @@ button {
                         <div class="cursor-pointer bg-black border border-gray-800 rounded-lg p-3 md:p-4 transition-all duration-300 hover:border-accent shadow-sm" id="allSongsBtn">
                             <div class="flex items-center justify-between mb-2 md:mb-3">
                                 <h4 class="font-semibold text-sm md:text-base text-white">All Songs</h4>
-                                <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">${appState.allEntries.songs.length} entries</span>
+                                <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">${appState.allEntries.songs.length + appState.allEntries.radioSongs.length} entries</span>
                             </div>
-                            <p class="text-xs md:text-sm text-gray-400">Browse all song entries from the Hot 100 chart</p>
+                            <p class="text-xs md:text-sm text-gray-400">Browse all song entries from Hot 100 and Radio Songs</p>
                         </div>
                         
                         <div class="cursor-pointer bg-black border border-gray-800 rounded-lg p-3 md:p-4 transition-all duration-300 hover:border-accent shadow-sm" id="allArtistsBtn">
@@ -2442,9 +2593,9 @@ button {
                         <div class="cursor-pointer bg-black border border-gray-800 rounded-lg p-3 md:p-4 transition-all duration-300 hover:border-accent shadow-sm" id="allAlbumsBtn">
                             <div class="flex items-center justify-between mb-2 md:mb-3">
                                 <h4 class="font-semibold text-sm md:text-base text-white">All Albums</h4>
-                                <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">${appState.allEntries.albums.length} entries</span>
+                                <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">${appState.allEntries.albums.length + appState.allEntries.topStreamingAlbums.length + appState.allEntries.topAlbumSales.length} entries</span>
                             </div>
-                            <p class="text-xs md:text-sm text-gray-400">Browse all album entries from the Top Albums chart</p>
+                            <p class="text-xs md:text-sm text-gray-400">Browse all album entries from Top Albums, Top Streaming and Top Sales</p>
                         </div>
                     </div>
                 </div>
@@ -2454,19 +2605,33 @@ button {
                 navigateBack();
             });
             
-            document.getElementById('allSongsBtn').addEventListener('click', () => showAllEntriesList('songs'));
+            document.getElementById('allSongsBtn').addEventListener('click', () => showAllSongsCombinedPage());
             document.getElementById('allArtistsBtn').addEventListener('click', showAllArtistsPage);
-            document.getElementById('allAlbumsBtn').addEventListener('click', () => showAllEntriesList('albums'));
+            document.getElementById('allAlbumsBtn').addEventListener('click', () => showAllAlbumsCombinedPage());
             
             setupBackToTopButton();
         }
 
-        function showAllEntriesList(entryType) {
-            appState.currentView = 'allEntriesList';
-            appState.currentEntryType = entryType;
+        function showAllSongsCombinedPage() {
+            const allSongs = [
+                ...(appState.allEntries.songs || []),
+                ...(appState.allEntries.radioSongs || [])
+            ];
             
-            const entries = appState.allEntries[entryType] || [];
-            const title = entryType === 'songs' ? 'All Songs' : 'All Albums';
+            // Remover duplicatas (mesmo nome e artista)
+            const uniqueSongs = [];
+            const seen = new Set();
+            
+            allSongs.forEach(song => {
+                const key = `${song.name}:${song.artist}`.toLowerCase();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    uniqueSongs.push(song);
+                }
+            });
+            
+            appState.currentView = 'allEntriesList';
+            appState.currentEntryType = 'songs';
             
             appContainer.innerHTML = `
                 <div class="max-w-6xl mx-auto">
@@ -2474,15 +2639,15 @@ button {
                         <i class="fas fa-arrow-left mr-2"></i> Back to All Entries
                     </button>
                     
-                    <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 section-title text-white">${title}</h2>
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 section-title text-white">All Songs (Hot 100 + Radio Songs)</h2>
                     
                     <div class="search-container mb-4 md:mb-6">
                         <i class="fas fa-search search-icon text-sm md:text-base"></i>
-                        <input type="text" id="entriesSearch" class="search-input text-sm" placeholder="Search ${entryType}...">
+                        <input type="text" id="entriesSearch" class="search-input text-sm" placeholder="Search songs...">
                     </div>
                     
                     <div id="entriesList" class="bg-black rounded-lg border border-gray-800 shadow-sm">
-                        ${renderEntriesList(entryType, entries)}
+                        ${renderEntriesList('songs', uniqueSongs)}
                     </div>
                 </div>
             `;
@@ -2495,11 +2660,11 @@ button {
             const searchInput = document.getElementById('entriesSearch');
             searchInput.addEventListener('input', function() {
                 const searchTerm = this.value.toLowerCase();
-                const filteredEntries = entries.filter(entry => 
+                const filteredEntries = uniqueSongs.filter(entry => 
                     (entry.name && entry.name.toLowerCase().includes(searchTerm)) || 
                     (entry.artist && entry.artist.toLowerCase().includes(searchTerm))
                 );
-                document.getElementById('entriesList').innerHTML = renderEntriesList(entryType, filteredEntries);
+                document.getElementById('entriesList').innerHTML = renderEntriesList('songs', filteredEntries);
                 
                 // Reconfigurar os listeners de artist-link após atualizar a lista
                 setTimeout(() => {
@@ -2509,7 +2674,81 @@ button {
                             const artist = this.dataset.artist;
                             appState.navigationHistory.push({
                                 view: 'allEntriesList',
-                                entryType: entryType
+                                entryType: 'songs'
+                            });
+                            renderArtistPage(artist);
+                        });
+                    });
+                }, 10);
+            });
+            
+            setupBackToTopButton();
+        }
+
+        function showAllAlbumsCombinedPage() {
+            const allAlbums = [
+                ...(appState.allEntries.albums || []),
+                ...(appState.allEntries.topStreamingAlbums || []),
+                ...(appState.allEntries.topAlbumSales || [])
+            ];
+            
+            // Remover duplicatas (mesmo nome e artista)
+            const uniqueAlbums = [];
+            const seen = new Set();
+            
+            allAlbums.forEach(album => {
+                const key = `${album.name}:${album.artist}`.toLowerCase();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    uniqueAlbums.push(album);
+                }
+            });
+            
+            appState.currentView = 'allEntriesList';
+            appState.currentEntryType = 'albums';
+            
+            appContainer.innerHTML = `
+                <div class="max-w-6xl mx-auto">
+                    <button id="backButton" class="back-button mb-4 md:mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors text-sm md:text-base">
+                        <i class="fas fa-arrow-left mr-2"></i> Back to All Entries
+                    </button>
+                    
+                    <h2 class="text-2xl md:text-3xl font-bold mb-4 md:mb-6 section-title text-white">All Albums (Top Albums + Top Streaming + Top Sales)</h2>
+                    
+                    <div class="search-container mb-4 md:mb-6">
+                        <i class="fas fa-search search-icon text-sm md:text-base"></i>
+                        <input type="text" id="entriesSearch" class="search-input text-sm" placeholder="Search albums...">
+                    </div>
+                    
+                    <div id="entriesList" class="bg-black rounded-lg border border-gray-800 shadow-sm">
+                        ${renderEntriesList('albums', uniqueAlbums)}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('backButton').addEventListener('click', function() {
+                showAllEntriesPage();
+            });
+            
+            // Configurar o evento de busca
+            const searchInput = document.getElementById('entriesSearch');
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const filteredEntries = uniqueAlbums.filter(entry => 
+                    (entry.name && entry.name.toLowerCase().includes(searchTerm)) || 
+                    (entry.artist && entry.artist.toLowerCase().includes(searchTerm))
+                );
+                document.getElementById('entriesList').innerHTML = renderEntriesList('albums', filteredEntries);
+                
+                // Reconfigurar os listeners de artist-link após atualizar a lista
+                setTimeout(() => {
+                    document.querySelectorAll('.artist-link').forEach(link => {
+                        link.addEventListener('click', function(e) {
+                            e.stopPropagation();
+                            const artist = this.dataset.artist;
+                            appState.navigationHistory.push({
+                                view: 'allEntriesList',
+                                entryType: 'albums'
                             });
                             renderArtistPage(artist);
                         });
@@ -2872,7 +3111,7 @@ button {
                 appState.currentDate = dates[currentIndex - 1];
                 appState.sharedDate = appState.currentDate;
                 
-                const otherCharts = ['songs', 'artists', 'albums'].filter(c => c !== chartType);
+                const otherCharts = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'].filter(c => c !== chartType);
                 for(const otherChart of otherCharts) {
                     if (appState.chartData[otherChart]?.[appState.sharedDate]) {
                         appState.chartData[otherChart].activeDate = appState.sharedDate;
@@ -2901,7 +3140,7 @@ button {
                 appState.currentDate = dates[currentIndex + 1];
                 appState.sharedDate = appState.currentDate;
                 
-                const otherCharts = ['songs', 'artists', 'albums'].filter(c => c !== chartType);
+                const otherCharts = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'].filter(c => c !== chartType);
                 for(const otherChart of otherCharts) {
                     if (appState.chartData[otherChart]?.[appState.sharedDate]) {
                         appState.chartData[otherChart].activeDate = appState.sharedDate;
@@ -3008,6 +3247,12 @@ button {
                     
                     if (chartName.includes('Albums')) {
                         chartToShow = 'albums';
+                    } else if (chartName.includes('Radio')) {
+                        chartToShow = 'radioSongs';
+                    } else if (chartName.includes('Streaming')) {
+                        chartToShow = 'topStreamingAlbums';
+                    } else if (chartName.includes('Sales')) {
+                        chartToShow = 'topAlbumSales';
                     }
                     
                     const firstEntryLink = entry.firstEntry ? `
@@ -3061,7 +3306,10 @@ button {
             };
 
             const hot100Html = getChartSectionHtml('Hot 100 Songs', artistData['Hot 100 Songs']);
+            const radioSongsHtml = getChartSectionHtml('Radio Songs', artistData['Radio Songs']);
             const top100AlbumsHtml = getChartSectionHtml('Top 100 Albums', artistData['Top 100 Albums']);
+            const topStreamingAlbumsHtml = getChartSectionHtml('Top Streaming Albums', artistData['Top Streaming Albums']);
+            const topAlbumSalesHtml = getChartSectionHtml('Top Album Sales', artistData['Top Album Sales']);
             const top50ArtistsHtml = getChartSectionHtml('Top 50 Artists', artistData['Top 50 Artists']);
 
             appContainer.innerHTML = `
@@ -3082,7 +3330,10 @@ button {
                     <div id="artistPageContent" class="artist-page-content">
                         ${top50ArtistsHtml}
                         ${hot100Html}
+                        ${radioSongsHtml}
                         ${top100AlbumsHtml}
+                        ${topStreamingAlbumsHtml}
+                        ${topAlbumSalesHtml}
                     </div>
                 </div>
             `;
@@ -3227,9 +3478,9 @@ button {
             
             return sortedArtists.map(artist => {
                 const stats = appState.artistDetailsData[artist] || {};
-                const totalSongs = stats['Hot 100 Songs']?.count || 0;
-                const totalAlbums = stats['Top 100 Albums']?.count || 0;
-                const numberOneHits = (stats['Hot 100 Songs']?.numberOnes || 0) + (stats['Top 100 Albums']?.numberOnes || 0);
+                const totalSongs = (stats['Hot 100 Songs']?.count || 0) + (stats['Radio Songs']?.count || 0);
+                const totalAlbums = (stats['Top 100 Albums']?.count || 0) + (stats['Top Streaming Albums']?.count || 0) + (stats['Top Album Sales']?.count || 0);
+                const numberOneHits = (stats['Hot 100 Songs']?.numberOnes || 0) + (stats['Radio Songs']?.numberOnes || 0) + (stats['Top 100 Albums']?.numberOnes || 0) + (stats['Top Streaming Albums']?.numberOnes || 0) + (stats['Top Album Sales']?.numberOnes || 0);
 
                 return `
                     <div class="chart-row py-2 md:py-4 px-2 md:px-4 cursor-pointer" data-artist="${artist}">
@@ -3265,6 +3516,15 @@ button {
                 
                 console.log('Loading albums...');
                 await fetchAndProcessChartData('albums');
+                
+                console.log('Loading radio songs...');
+                await fetchAndProcessChartData('radioSongs');
+                
+                console.log('Loading top streaming albums...');
+                await fetchAndProcessChartData('topStreamingAlbums');
+                
+                console.log('Loading top album sales...');
+                await fetchAndProcessChartData('topAlbumSales');
                 
                 console.log('Loading year-end songs...');
                 await fetchAndProcessChartData('yearEndSongs');
@@ -3306,6 +3566,9 @@ button {
                 console.log('Songs data:', Object.keys(appState.chartData.songs).length);
                 console.log('Artists data:', Object.keys(appState.chartData.artists).length);
                 console.log('Albums data:', Object.keys(appState.chartData.albums).length);
+                console.log('Radio Songs data:', Object.keys(appState.chartData.radioSongs).length);
+                console.log('Top Streaming Albums data:', Object.keys(appState.chartData.topStreamingAlbums).length);
+                console.log('Top Album Sales data:', Object.keys(appState.chartData.topAlbumSales).length);
 
                 // Renderizar home page
                 renderHomePage();
