@@ -1,42 +1,7 @@
-// MODIFIQUE a função fetchAndProcessChartData no seu data.js
-// Use esta versão que não depende de funções externas:
+// data.js - VERSÃO SEM DEPENDÊNCIAS EXTERNAS
 
 async function fetchAndProcessChartData(chartType) {
-    // SE JÁ CARREGOU, RETORNA
     if (chartsConfig?.[chartType]?.loaded) return true;
-    
-    // TENTAR CARREGAR DO LOCALSTORAGE DIRETAMENTE
-    try {
-        const cached = localStorage.getItem(`daegon_chart_${chartType}`);
-        if (cached) {
-            const { data, timestamp } = JSON.parse(cached);
-            // Cache válido por 1 hora
-            if (Date.now() - timestamp < 3600000) {
-                console.log(`Carregando ${chartType} do localStorage`);
-                
-                // Restaurar dados
-                if (chartType === 'songs' || chartType === 'artists' || chartType === 'albums') {
-                    appState.chartData[chartType] = data.chartData || {};
-                    appState.colMaps[chartType] = data.colMap || {};
-                    appState.top3Data[chartType] = data.top3 || [];
-                    appState.allEntries[chartType] = data.allEntries || [];
-                    appState.chartRunData[chartType] = data.chartRunData || {};
-                } else {
-                    appState.chartData[chartType] = data.chartData || {};
-                    appState.colMaps[chartType] = data.colMap || {};
-                    appState.top3Data[chartType] = data.top3 || [];
-                }
-                
-                chartsConfig[chartType].loaded = true;
-                return true;
-            }
-        }
-    } catch (e) {
-        console.log('Erro ao ler cache:', e);
-    }
-    
-    // SE NÃO TEM CACHE, CARREGA DA INTERNET
-    console.log(`Carregando ${chartType} da internet...`);
     
     const config = chartsConfig?.[chartType];
     const url = `${config.url}&_=${new Date().getTime()}`;
@@ -348,33 +313,71 @@ async function fetchAndProcessChartData(chartType) {
             }
         }
         
-        // SALVAR NO LOCALSTORAGE
-        try {
-            const dataToCache = {
-                colMap: appState.colMaps[chartType],
-                top3: appState.top3Data[chartType]
-            };
-            
-            if (chartType === 'songs' || chartType === 'artists' || chartType === 'albums') {
-                dataToCache.chartData = appState.chartData[chartType];
-                dataToCache.allEntries = appState.allEntries[chartType];
-                dataToCache.chartRunData = appState.chartRunData[chartType];
-            } else {
-                dataToCache.chartData = appState.chartData[chartType];
-            }
-            
-            localStorage.setItem(`daegon_chart_${chartType}`, JSON.stringify({
-                data: dataToCache,
-                timestamp: Date.now()
-            }));
-        } catch (e) {
-            console.log('Erro ao salvar cache:', e);
-        }
-        
         chartsConfig[chartType].loaded = true;
         return true;
     } catch (error) {
         console.error(`Error processing ${chartType} data:`, error);
         return false;
+    }
+}
+
+async function fetchAndProcessChartBeatData() {
+    for (const [key, config] of Object.entries(chartBeatConfig)) {
+        try {
+            const response = await fetch(config.url);
+            if (!response.ok) {
+                throw new Error(`Could not access spreadsheet for ${config.title}.`);
+            }
+            
+            let csvText = await response.text();
+            if (csvText.charCodeAt(0) === 0xFEFF) {
+                csvText = csvText.substring(1);
+            }
+
+            const rows = csvText.trim().split('\n').map(row => parseCsvRow(row));
+            if (rows.length < 2) {
+                throw new Error(`Spreadsheet for ${config.title} doesn't have enough data.`);
+            }
+            
+            const header = rows[0].map(h => h.toLowerCase().trim());
+            const data = rows.slice(1);
+            
+            const processedData = data.map(row => {
+                const findIndex = (keys) => {
+                    for (const k of keys) {
+                        const index = header.indexOf(k);
+                        if (index !== -1) return index;
+                    }
+                    return -1;
+                };
+
+                const dateIndex = findIndex(config.colMap.date);
+                const titleIndex = findIndex(config.colMap.title);
+                const textIndex = findIndex(config.colMap.text);
+                const artistIndex = findIndex(config.colMap.artist);
+                const chartLinkIndex = findIndex(config.colMap.chartLink);
+                
+                const publicationDate = row[dateIndex] || 'NO DATE';
+                const title = row[titleIndex] || 'NO TITLE';
+                const fullText = row[textIndex] || 'No content available.';
+                const artist = row[artistIndex] || null;
+                const chartLink = row[chartLinkIndex] || null;
+                
+                return {
+                    title,
+                    publicationDate,
+                    artist,
+                    fullText,
+                    chartLink,
+                    imageUrl: null
+                };
+            });
+            
+            appState.chartBeatData[key] = processedData.reverse();
+            
+        } catch (error) {
+            console.error(`Error processing ${key} blog data:`, error);
+            appState.chartBeatData[key] = [];
+        }
     }
 }
