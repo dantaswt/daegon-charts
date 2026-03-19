@@ -1,35 +1,107 @@
+// --- APPLICATION STATE ---
+let appState = {
+    activeChart: 'songs',
+    chartData: {
+        songs: {},
+        artists: {},
+        albums: {},
+        yearEndSongs: {},
+        yearEndArtists: {},
+        yearEndAlbums: {},
+        goatSongs: {},
+        goatArtists: {},
+        goatAlbums: {},
+        artistStats: {}
+    },
+    currentDate: null,
+    isLoading: false,
+    currentView: 'home',
+    currentArtist: null,
+    currentYear: new Date().getFullYear().toString(),
+    colMaps: {
+        songs: {},
+        artists: {},
+        albums: {},
+        yearEndSongs: {},
+        yearEndArtists: {},
+        yearEndAlbums: {},
+        goatSongs: {},
+        goatArtists: {},
+        goatAlbums: {},
+        artistStats: {}
+    },
+    top3Data: {
+        songs: [],
+        artists: [],
+        albums: [],
+        yearEndSongs: [],
+        yearEndArtists: [],
+        yearEndAlbums: [],
+        goatSongs: [],
+        goatArtists: [],
+        goatAlbums: []
+    },
+    artistData: {},
+    chartRunData: {},
+    artistStatsData: {},
+    weeksAtNumberOne: {},
+    itemDetails: {},
+    navigationHistory: [],
+    allEntries: {
+        songs: [],
+        artists: [],
+        albums: []
+    },
+    chartBeatData: {
+        hot100: [],
+        top100Albums: []
+    },
+    currentBlog: 'hot100',
+    sharedDate: null,
+    artistDetailsData: {},
+    chartHistoryData: {}
+};
+
+// --- DOM ELEMENTS ---
+const appContainer = document.getElementById('app');
+const itemDetailsModal = document.getElementById('itemDetailsModal');
+const modalContent = document.getElementById('modalContent');
+const closeModal = document.getElementById('closeModal');
+
+// --- INITIALIZATION ---
 async function initializeApp() {
     showMessage('loading', 'Loading charts data...');
     
     try {
-        // 1️⃣ PRIMEIRO: Carregar apenas o ESSENCIAL para a página inicial
-        console.log('Carregando dados essenciais...');
-        
-        // Carregar apenas os TOP 3 de cada chart (dados leves)
-        await Promise.all([
-            fetchTop3Data('songs'),
-            fetchTop3Data('artists'),
-            fetchTop3Data('albums'),
-            fetchTop3Data('yearEndSongs'),
-            fetchTop3Data('yearEndArtists'),
-            fetchTop3Data('yearEndAlbums'),
-            fetchTop3Data('goatSongs'),
-            fetchTop3Data('goatArtists'),
-            fetchTop3Data('goatAlbums'),
-            fetchChartBeatPreview() // Apenas últimos 3 artigos
+        const results = await Promise.allSettled([
+            fetchAndProcessChartData('songs'),
+            fetchAndProcessChartData('artists'),
+            fetchAndProcessChartData('albums'),
+            fetchAndProcessChartData('yearEndSongs'),
+            fetchAndProcessChartData('yearEndArtists'),
+            fetchAndProcessChartData('yearEndAlbums'),
+            fetchAndProcessChartData('goatSongs'),
+            fetchAndProcessChartData('goatArtists'),
+            fetchAndProcessChartData('goatAlbums'),
+            fetchAndProcessChartData('artistStats'),
+            fetchAndProcessChartBeatData()
         ]);
         
-        // Renderizar a página imediatamente (2-3 segundos mais rápido!)
+        const failedCharts = results.filter(result => result.status === 'rejected');
+        if (failedCharts.length > 0) {
+            console.error('Some charts failed to load:', failedCharts);
+        }
+        
+        const yearEndCharts = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
+        for (const chartType of yearEndCharts) {
+            const years = Object.keys(appState.chartData[chartType]).sort((a, b) => b - a);
+            if (years.length > 0) {
+                appState.currentYear = years[0];
+                break;
+            }
+        }
+
         renderHomePage();
-        
-        // 2️⃣ DEPOIS: Carregar o restante dos dados em BACKGROUND
-        console.log('Carregando dados completos em background...');
-        
-        // Carregar sem bloquear a interface
-        setTimeout(() => {
-            loadFullDataInBackground();
-        }, 100);
-        
         setupBackToTopButton();
         
     } catch (error) {
@@ -37,189 +109,306 @@ async function initializeApp() {
     }
 }
 
-// NOVA FUNÇÃO: Carregar apenas TOP 3
-async function fetchTop3Data(chartType) {
-    try {
-        const config = chartsConfig[chartType];
-        const url = `${config.url}&_=${new Date().getTime()}`;
-        
-        const response = await fetch(url);
-        if (!response.ok) return;
-        
-        let csvText = await response.text();
-        if (csvText.charCodeAt(0) === 0xFEFF) {
-            csvText = csvText.substring(1);
-        }
-
-        const rows = csvText.trim().split('\n').map(row => parseCsvRow(row));
-        if (rows.length < 2) return;
-        
-        const header = rows[0].map(h => h.toLowerCase().trim());
-        const data = rows.slice(1);
-        
-        // Processar apenas para pegar os TOP 3
-        if (chartType.includes('yearEnd')) {
-            const yearIndex = header.indexOf('year');
-            if (yearIndex === -1) return;
-            
-            const dataByYear = {};
-            data.forEach(row => {
-                const year = row[yearIndex];
-                if (!year) return;
-                if (!dataByYear[year]) dataByYear[year] = [];
-                dataByYear[year].push(row);
-            });
-            
-            const years = Object.keys(dataByYear).sort((a, b) => b - a);
-            const mostRecentYear = years[0];
-            
-            if (mostRecentYear && dataByYear[mostRecentYear]) {
-                const positionIndex = header.indexOf('position');
-                const artistIndex = header.indexOf('artist');
-                const songIndex = header.indexOf('song');
-                const albumIndex = header.indexOf('album');
-                
-                appState.top3Data[chartType] = dataByYear[mostRecentYear]
-                    .slice(0, 3)
-                    .map(row => ({
-                        position: row[positionIndex] || 0,
-                        artist: row[artistIndex] || 'Unknown',
-                        name: chartType === 'yearEndSongs' ? row[songIndex] : 
-                              chartType === 'yearEndAlbums' ? row[albumIndex] : 
-                              row[artistIndex] || 'Unknown',
-                        year: mostRecentYear
-                    }));
-            }
-        } else {
-            // Para charts normais, pegar a data mais recente
-            const dateIndex = header.indexOf('date');
-            if (dateIndex === -1) return;
-            
-            // Agrupar por data
-            const dateGroups = {};
-            data.forEach(row => {
-                const date = row[dateIndex];
-                if (!date) return;
-                if (!dateGroups[date]) dateGroups[date] = [];
-                dateGroups[date].push(row);
-            });
-            
-            const sortedDates = Object.keys(dateGroups).sort((a, b) => new Date(b) - new Date(a));
-            const mostRecentDate = sortedDates[0];
-            
-            if (mostRecentDate && dateGroups[mostRecentDate]) {
-                const positionIndex = header.indexOf('position');
-                const artistIndex = header.indexOf('artist');
-                const songIndex = header.indexOf('song');
-                const albumIndex = header.indexOf('album');
-                
-                appState.top3Data[chartType] = dateGroups[mostRecentDate]
-                    .sort((a, b) => parseInt(a[positionIndex]) - parseInt(b[positionIndex]))
-                    .slice(0, 3)
-                    .map(row => ({
-                        position: row[positionIndex] || 0,
-                        artist: row[artistIndex] || 'Unknown',
-                        name: chartType === 'songs' ? row[songIndex] : 
-                              chartType === 'albums' ? row[albumIndex] : 
-                              row[artistIndex] || 'Unknown'
-                    }));
-            }
-        }
-        
-        // Guardar URL para carregamento posterior
-        if (!appState.pendingCharts) appState.pendingCharts = {};
-        appState.pendingCharts[chartType] = url;
-        
-    } catch (error) {
-        console.error(`Error fetching top3 for ${chartType}:`, error);
+// --- CHART PAGE FUNCTIONS ---
+function showChartPage(chartType, dateToSet = null) {
+    if (appState.currentView === 'chart' && appState.activeChart) {
+        appState.navigationHistory.push({
+            view: 'chart',
+            chart: appState.activeChart,
+            date: appState.currentDate,
+            year: appState.currentYear
+        });
     }
-}
+    
+    appState.activeChart = chartType;
+    appState.currentView = 'chart';
+    
+    const isYearEnd = chartType.includes('yearEnd');
+    const isGoat = chartType.includes('goat');
+    
+    if (isYearEnd) {
+        const yearsData = appState.chartData[chartType];
+        const years = Object.keys(yearsData).sort((a, b) => b - a);
+        const mostRecentYear = years?.[0] || new Date().getFullYear().toString();
+        appState.currentYear = mostRecentYear;
+    } else {
+        const dates = Object.keys(appState.chartData[chartType]);
+        const mostRecentDate = dates.length > 0 ? dates[dates.length - 1] : null;
+        
+        appState.currentDate = dateToSet || appState.sharedDate || mostRecentDate;
+        
+        if (!appState.chartData[chartType][appState.currentDate] && !isGoat) {
+            appState.currentDate = mostRecentDate;
+            appState.sharedDate = mostRecentDate;
+        }
+    }
+    
+    const headerTitle = isYearEnd ? 'Year-End Charts' : isGoat ? 'Greatest of All Time' : 'Weekly Charts';
+    const navCharts = isYearEnd ? 
+        Object.entries(chartsConfig).filter(([key]) => key.includes('yearEnd')) :
+        isGoat ? 
+        Object.entries(chartsConfig).filter(([key]) => key.includes('goat')) :
+        Object.entries(chartsConfig).filter(([key]) => !key.includes('yearEnd') && !key.includes('goat') && key !== 'artistStats');
 
-// NOVA FUNÇÃO: Carregar preview do Chart Beat
-async function fetchChartBeatPreview() {
-    try {
-        // Carregar apenas o primeiro artigo de cada blog
-        for (const [key, config] of Object.entries(chartBeatConfig)) {
-            const response = await fetch(config.url);
-            if (!response.ok) continue;
+    appContainer.innerHTML = `
+        <div class="max-w-4xl mx-auto">
+            <button id="backButton" class="back-button mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </button>
             
-            let csvText = await response.text();
-            if (csvText.charCodeAt(0) === 0xFEFF) {
-                csvText = csvText.substring(1);
-            }
-
-            const rows = csvText.trim().split('\n').map(row => parseCsvRow(row));
-            if (rows.length < 2) continue;
+            <div class="mb-6">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2 text-white">${headerTitle}</h2>
+                <div id="chartNav" class="flex flex-wrap justify-center border-b border-gray-700">
+                    ${navCharts.map(([key, config]) => `
+                        <button data-chart="${key}" class="chart-nav-btn btn-hover ${appState.activeChart === key ? (isGoat ? 'goat-active' : 'active') : ''} text-sm font-semibold py-2 px-4 text-gray-400 hover:text-white focus:outline-none transition-all">
+                            ${config.title}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
             
-            const header = rows[0].map(h => h.toLowerCase().trim());
-            const data = rows.slice(1).reverse(); // Mais recentes primeiro
-            
-            // Processar apenas o primeiro artigo
-            if (data.length > 0) {
-                const row = data[0];
+            <div id="chartHeader" class="mb-6">
+                <h3 id="chartTitle" class="text-xl font-bold text-center mb-4 text-white">
+                    ${chartsConfig[appState.activeChart].title}
+                </h3>
                 
-                const findIndex = (keys) => {
-                    for (const k of keys) {
-                        const index = header.indexOf(k);
-                        if (index !== -1) return index;
+                ${isYearEnd ? `
+                    <div class="flex justify-center items-center mb-4">
+                        <div class="year-selector flex gap-2 flex-wrap justify-center">
+                            ${getYearButtons(chartType)}
+                        </div>
+                    </div>
+                ` : isGoat ? '' : `
+                    <div class="flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-4">
+                        <div class="flex items-center gap-2 text-white">
+                            <label for="weekSelector" class="text-gray-400 font-medium">Select Week:</label>
+                            <button id="prevWeekBtn" class="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors btn-hover" title="Previous Week">
+                                <i class="fas fa-chevron-left text-sm"></i>
+                            </button>
+                            <input type="text" id="weekSelector" class="flatpickr-input" placeholder="Select date">
+                            <button id="nextWeekBtn" class="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors btn-hover" title="Next Week">
+                                <i class="fas fa-chevron-right text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                `}
+            </div>
+            
+            <div id="chartContainer" class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 shadow-sm">
+                ${renderChartItems()}
+            </div>
+            
+            ${!isYearEnd && !isGoat ? `
+                <div class="bottom-nav flex justify-center items-center gap-3 mt-6">
+                    <button id="bottomPrevWeekBtn" class="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors btn-hover" title="Previous Week">
+                        <i class="fas fa-chevron-left text-sm mr-1"></i> Previous Week
+                    </button>
+                    <button id="bottomNextWeekBtn" class="p-2 rounded-md bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors btn-hover" title="Next Week">
+                        Next Week <i class="fas fa-chevron-right text-sm ml-1"></i>
+                    </button>
+                </div>
+            ` : ''}
+            
+            ${!isYearEnd && !isGoat ? renderDropouts(chartType) : ''}
+            
+            ${!isYearEnd && !isGoat ? `
+                <div class="text-center mt-6">
+                    <button id="backToTopBtn" class="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-dark transition-colors btn-hover">
+                        <i class="fas fa-arrow-up mr-2"></i> Back to Top
+                    </button>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    setupChartPageListeners();
+    loadSpotifyImages();
+    setupBackToTopButton();
+    
+    if (!isYearEnd && !isGoat) {
+        const dates = Object.keys(appState.chartData[chartType]);
+        if (dates.length > 0) {
+            const datePicker = flatpickr("#weekSelector", {
+                enable: dates,
+                defaultDate: appState.currentDate,
+                dateFormat: "Y-m-d",
+                theme: "dark",
+                position: "auto",
+                animate: true,
+                showMonths: 1,
+                static: false,
+                closeOnSelect: true,
+                nextArrow: '<i class="fas fa-chevron-right"></i>',
+                prevArrow: '<i class="fas fa-chevron-left"></i>',
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (dateStr) {
+                        appState.currentDate = dateStr;
+                        appState.sharedDate = dateStr;
+                        
+                        const otherCharts = ['songs', 'artists', 'albums'].filter(c => c !== chartType);
+                        for(const otherChart of otherCharts) {
+                            if (appState.chartData[otherChart][dateStr]) {
+                                appState.chartData[otherChart].activeDate = dateStr;
+                            }
+                        }
+
+                        document.getElementById('chartContainer').innerHTML = renderChartItems();
+                        updateWeekNavButtons();
+                        loadSpotifyImages();
                     }
-                    return -1;
-                };
-
-                const dateIndex = findIndex(config.colMap.date);
-                const titleIndex = findIndex(config.colMap.title);
-                const textIndex = findIndex(config.colMap.text);
-                const artistIndex = findIndex(config.colMap.artist);
-                
-                const article = {
-                    title: row[titleIndex] || 'NO TITLE',
-                    publicationDate: row[dateIndex] || 'NO DATE',
-                    artist: row[artistIndex] || null,
-                    fullText: row[textIndex] || 'No content available.',
-                    imageUrl: null
-                };
-                
-                // Tentar carregar imagem do artista
-                if (article.artist) {
-                    getSpotifyImage(article.artist, 'artist').then(url => {
-                        article.imageUrl = url;
-                    }).catch(() => {});
                 }
-                
-                if (!appState.chartBeatData) appState.chartBeatData = {};
-                appState.chartBeatData[key] = [article];
-            }
+            });
         }
-    } catch (error) {
-        console.error('Error fetching chart beat preview:', error);
+    }
+    
+    if (isYearEnd) {
+        document.querySelectorAll('.year-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                appState.currentYear = this.dataset.year;
+                document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('chartContainer').innerHTML = renderChartItems();
+                loadSpotifyImages();
+            });
+        });
     }
 }
 
-// NOVA FUNÇÃO: Carregar dados completos em background
-async function loadFullDataInBackground() {
-    try {
-        // Carregar charts principais primeiro (mais importantes)
-        await Promise.allSettled([
-            fetchAndProcessChartData('songs'),
-            fetchAndProcessChartData('artists'),
-            fetchAndProcessChartData('albums')
-        ]);
-        
-        // Depois carregar o resto
-        setTimeout(() => {
-            Promise.allSettled([
-                fetchAndProcessChartData('yearEndSongs'),
-                fetchAndProcessChartData('yearEndArtists'),
-                fetchAndProcessChartData('yearEndAlbums'),
-                fetchAndProcessChartData('goatSongs'),
-                fetchAndProcessChartData('goatArtists'),
-                fetchAndProcessChartData('goatAlbums'),
-                fetchAndProcessChartData('artistStats'),
-                fetchAndProcessChartBeatData() // Carregar todos os artigos
-            ]);
-        }, 1000);
-        
-    } catch (error) {
-        console.error('Background loading error:', error);
-    }
+function getYearButtons(chartType) {
+    const yearsData = appState.chartData[chartType];
+    if (!yearsData) return '';
+    
+    const years = Object.keys(yearsData).sort((a, b) => b - a);
+    const currentYear = appState.currentYear;
+    
+    return years.map(year => `
+        <button class="year-btn px-3 py-1 rounded ${year === currentYear ? 'active' : ''}" data-year="${year}">${year}</button>
+    `).join('');
 }
+
+function showChartBeatPage() {
+    if (appState.currentView === 'chart' && appState.activeChart) {
+        appState.navigationHistory.push({
+            view: 'chart',
+            chart: appState.activeChart,
+            date: appState.currentDate,
+            year: appState.currentYear
+        });
+    }
+    
+    appState.currentView = 'chartBeat';
+    renderChartBeatPage();
+}
+
+function setupChartBeatListeners() {
+    document.getElementById('backButton').addEventListener('click', function() {
+        navigateBack();
+    });
+    
+    document.querySelectorAll('.chart-beat-nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const blogType = this.dataset.blog;
+            appState.currentBlog = blogType;
+            renderChartBeatPage();
+        });
+    });
+    
+    document.querySelectorAll('.read-more-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const articleIndex = parseInt(this.dataset.articleIndex);
+            renderArticleModal(articleIndex);
+        });
+    });
+}
+
+function setupChartPageListeners() {
+    document.getElementById('backButton').addEventListener('click', navigateBack);
+    
+    document.querySelectorAll('.chart-nav-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const chartType = this.dataset.chart;
+            showChartPage(chartType);
+        });
+    });
+    
+    const isYearEnd = appState.activeChart.includes('yearEnd');
+    const isGoat = appState.activeChart.includes('goat');
+
+    if (!isYearEnd && !isGoat) {
+        const dates = Object.keys(appState.chartData[appState.activeChart]).sort();
+        const currentIndex = dates.indexOf(appState.currentDate);
+
+        document.getElementById('prevWeekBtn').addEventListener('click', navigateToPrevWeek);
+        document.getElementById('nextWeekBtn').addEventListener('click', navigateToNextWeek);
+        document.getElementById('bottomPrevWeekBtn').addEventListener('click', navigateToPrevWeek);
+        document.getElementById('bottomNextWeekBtn').addEventListener('click', navigateToNextWeek);
+        
+        // Botão voltar ao topo
+        document.getElementById('backToTopBtn').addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+        
+        updateWeekNavButtons();
+    }
+    
+    setTimeout(() => {
+        document.querySelectorAll('.artist-link, .artist-page-link').forEach(link => {
+            link.addEventListener('click', function() {
+                const artist = this.dataset.artist;
+                appState.navigationHistory.push({
+                    view: 'chart',
+                    chart: appState.activeChart,
+                    date: appState.currentDate,
+                    year: appState.currentYear
+                });
+                renderArtistPage(artist);
+            });
+        });
+    }, 100);
+
+    setTimeout(() => {
+        document.querySelectorAll('.chart-run-link-btn').forEach(btn => {
+            const chartType = btn.dataset.chart;
+            const itemKey = btn.dataset.key;
+            btn.addEventListener('click', function() {
+                 showChartRunModal(chartType, itemKey);
+            });
+        });
+    }, 100);
+}
+
+// --- EVENT LISTENERS ---
+document.addEventListener('DOMContentLoaded', () => {
+    initializeApp();
+    
+    document.getElementById('mainTitle').addEventListener('click', () => {
+        if (appState.currentView !== 'home') {
+            appState.navigationHistory = [];
+            renderHomePage();
+        }
+    });
+    
+    document.getElementById('navAllEntries').addEventListener('click', () => {
+        renderAllEntriesPage();
+    });
+    
+    document.getElementById('navChartBeat').addEventListener('click', () => {
+        showChartBeatPage();
+    });
+    
+    closeModal.addEventListener('click', () => {
+        itemDetailsModal.classList.remove('active');
+    });
+    
+    itemDetailsModal.addEventListener('click', (e) => {
+        if (e.target === itemDetailsModal) {
+            itemDetailsModal.classList.remove('active');
+        }
+    });
+    
+    // Inicializar botão voltar ao topo
+    setupBackToTopButton();
+});
