@@ -60,55 +60,5 @@
     <script src="js/renderers.js"></script>
     <script src="js/navigation.js"></script>
     <script src="js/app.js"></script>
-
-<!-- Adicione antes do fechamento do </body> -->
-<script>
-    // Registrar Service Worker
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(registration => {
-                    console.log('ServiceWorker registered');
-                })
-                .catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-        });
-    }
-</script>
-    <!-- Adicione antes do fechamento do </body> -->
-<div id="progressLoader" class="fixed top-0 left-0 w-full h-1 bg-gray-800 z-50 hidden">
-    <div id="progressBar" class="h-full bg-accent transition-all duration-300" style="width: 0%"></div>
-</div>
-
-<script>
-// Sistema de progresso
-let loadingProgress = 0;
-const progressBar = document.getElementById('progressBar');
-const progressLoader = document.getElementById('progressLoader');
-
-window.updateProgress = (percent, message) => {
-    loadingProgress = percent;
-    if (progressBar) {
-        progressBar.style.width = percent + '%';
-    }
-    if (percent >= 100) {
-        setTimeout(() => {
-            progressLoader.classList.add('hidden');
-        }, 500);
-    } else {
-        progressLoader.classList.remove('hidden');
-    }
-};
-
-// Mostrar progresso durante o carregamento
-window.showGlobalLoader = (message) => {
-    updateProgress(0);
-};
-
-window.hideGlobalLoader = () => {
-    updateProgress(100);
-};
-</script>
 </body>
 </html>
