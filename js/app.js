@@ -1,3 +1,5 @@
+// app.js - Versão SEM declarações duplicadas
+
 // --- APPLICATION STATE ---
 let appState = {
     activeChart: 'songs',
@@ -235,14 +237,14 @@ function goToChartWeek(chartType, date) {
 // ========== FUNÇÕES DO SPOTIFY ==========
 
 async function getSpotifyAccessToken() {
-    if (SPOTIFY_ACCESS_TOKEN) return SPOTIFY_ACCESS_TOKEN;
+    if (window.SPOTIFY_ACCESS_TOKEN) return window.SPOTIFY_ACCESS_TOKEN;
     
     try {
         const response = await fetch('https://accounts.spotify.com/api/token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET)
+                'Authorization': 'Basic ' + btoa(window.SPOTIFY_CLIENT_ID + ':' + window.SPOTIFY_CLIENT_SECRET)
             },
             body: 'grant_type=client_credentials'
         });
@@ -250,8 +252,8 @@ async function getSpotifyAccessToken() {
         if (!response.ok) throw new Error('Failed to get Spotify token');
         
         const data = await response.json();
-        SPOTIFY_ACCESS_TOKEN = data.access_token;
-        return SPOTIFY_ACCESS_TOKEN;
+        window.SPOTIFY_ACCESS_TOKEN = data.access_token;
+        return window.SPOTIFY_ACCESS_TOKEN;
     } catch (error) {
         console.error('Error getting Spotify token:', error);
         return null;
@@ -261,7 +263,7 @@ async function getSpotifyAccessToken() {
 async function getSpotifyImage(query, type) {
     let correctedQuery = query;
     if (type === 'artist') {
-        for (const [wrongName, correctName] of Object.entries(artistImageCorrections)) {
+        for (const [wrongName, correctName] of Object.entries(window.artistImageCorrections || {})) {
             if (query.toLowerCase().includes(wrongName.toLowerCase())) {
                 correctedQuery = correctName;
                 break;
@@ -271,24 +273,25 @@ async function getSpotifyImage(query, type) {
     
     const cacheKey = `${type}:${correctedQuery}`.toLowerCase();
     
-    if (imageCache[cacheKey]) return imageCache[cacheKey];
+    if (window.imageCache && window.imageCache[cacheKey]) return window.imageCache[cacheKey];
     
-    if (pendingImageRequests[cacheKey]) {
+    if (window.pendingImageRequests && window.pendingImageRequests[cacheKey]) {
         return new Promise((resolve) => {
             const checkInterval = setInterval(() => {
-                if (imageCache[cacheKey]) {
+                if (window.imageCache && window.imageCache[cacheKey]) {
                     clearInterval(checkInterval);
-                    resolve(imageCache[cacheKey]);
+                    resolve(window.imageCache[cacheKey]);
                 }
             }, 50);
         });
     }
     
-    pendingImageRequests[cacheKey] = true;
+    if (!window.pendingImageRequests) window.pendingImageRequests = {};
+    window.pendingImageRequests[cacheKey] = true;
     
     const token = await getSpotifyAccessToken();
     if (!token) {
-        delete pendingImageRequests[cacheKey];
+        delete window.pendingImageRequests[cacheKey];
         return null;
     }
     
@@ -311,16 +314,17 @@ async function getSpotifyImage(query, type) {
         }
         
         if (imageUrl) {
-            imageCache[cacheKey] = imageUrl;
+            if (!window.imageCache) window.imageCache = {};
+            window.imageCache[cacheKey] = imageUrl;
             const img = new Image();
             img.src = imageUrl;
         }
         
-        delete pendingImageRequests[cacheKey];
+        delete window.pendingImageRequests[cacheKey];
         return imageUrl;
     } catch (error) {
         console.error('Error fetching Spotify image:', error);
-        delete pendingImageRequests[cacheKey];
+        delete window.pendingImageRequests[cacheKey];
         return null;
     }
 }
@@ -511,7 +515,7 @@ function renderHomePage() {
 }
 
 function renderCircleCard(chartType, title) {
-    const icon = chartsConfig[chartType]?.icon || 'fa-music';
+    const icon = window.chartsConfig?.[chartType]?.icon || 'fa-music';
     
     return `
         <div class="circle-card-container" data-chart="${chartType}">
@@ -628,7 +632,7 @@ function renderChartItems() {
                     <div class="flex-shrink-0 mx-4">
                         <div class="w-12 h-12 rounded-md shadow-md overflow-hidden spotify-image" id="image-${chartType}-${index}">
                             <div class="w-full h-full placeholder-art">
-                                <i class="fas ${chartsConfig[chartType]?.icon || 'fa-music'} text-gray-400"></i>
+                                <i class="fas ${window.chartsConfig?.[chartType]?.icon || 'fa-music'} text-gray-400"></i>
                             </div>
                         </div>
                     </div>
@@ -1108,39 +1112,90 @@ function setupChartPageListeners() {
     }, 100);
 }
 
+function showChartPage(chartType, dateToSet = null) {
+    if (appState.currentView === 'chart' && appState.activeChart) {
+        appState.navigationHistory.push({
+            view: 'chart',
+            chart: appState.activeChart,
+            date: appState.currentDate,
+            year: appState.currentYear
+        });
+    }
+    
+    appState.activeChart = chartType;
+    appState.currentView = 'chart';
+    
+    const isYearEnd = chartType.includes('yearEnd');
+    const isGoat = chartType.includes('goat');
+    
+    if (isYearEnd) {
+        const yearsData = appState.chartData[chartType];
+        const years = Object.keys(yearsData || {}).sort((a, b) => b - a);
+        appState.currentYear = years?.[0] || new Date().getFullYear().toString();
+    } else {
+        const dates = Object.keys(appState.chartData[chartType] || {});
+        const mostRecentDate = dates.length > 0 ? dates[dates.length - 1] : null;
+        appState.currentDate = dateToSet || appState.sharedDate || mostRecentDate;
+    }
+    
+    const headerTitle = isYearEnd ? 'Year-End Charts' : isGoat ? 'Greatest of All Time' : 'Weekly Charts';
+    const chartTitle = window.chartsConfig?.[chartType]?.title || chartType;
+    
+    appContainer.innerHTML = `
+        <div class="max-w-4xl mx-auto">
+            <button id="backButton" class="back-button mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Home
+            </button>
+            
+            <div class="mb-6">
+                <h2 class="text-2xl sm:text-3xl font-bold text-center mb-2 text-white">${headerTitle}</h2>
+                <h3 class="text-xl font-bold text-center mb-4 text-white">${chartTitle}</h3>
+            </div>
+            
+            <div id="chartContainer" class="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 shadow-sm">
+                ${renderChartItems()}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('backButton').addEventListener('click', navigateBack);
+    setTimeout(loadSpotifyImages, 100);
+    setupBackToTopButton();
+}
+
+function showChartBeatPage() {
+    if (appState.currentView === 'chart' && appState.activeChart) {
+        appState.navigationHistory.push({
+            view: 'chart',
+            chart: appState.activeChart,
+            date: appState.currentDate,
+            year: appState.currentYear
+        });
+    }
+    renderChartBeatPage();
+}
+
 // ========== INITIALIZATION ==========
 
 async function initializeApp() {
+    console.log('App inicializando...');
     showMessage('loading', 'Loading charts data...');
     
     try {
-        await Promise.allSettled([
-            fetchAndProcessChartData('songs'),
-            fetchAndProcessChartData('artists'),
-            fetchAndProcessChartData('albums'),
-            fetchAndProcessChartData('yearEndSongs'),
-            fetchAndProcessChartData('yearEndArtists'),
-            fetchAndProcessChartData('yearEndAlbums'),
-            fetchAndProcessChartData('goatSongs'),
-            fetchAndProcessChartData('goatArtists'),
-            fetchAndProcessChartData('goatAlbums'),
-            fetchAndProcessChartData('artistStats'),
-            fetchAndProcessChartBeatData()
-        ]);
-        
-        const yearEndCharts = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
-        for (const chartType of yearEndCharts) {
-            const years = Object.keys(appState.chartData[chartType] || {}).sort((a, b) => b - a);
-            if (years.length) {
-                appState.currentYear = years[0];
-                break;
-            }
+        // Verificar se as funções existem
+        if (typeof fetchAndProcessChartData === 'function') {
+            await Promise.allSettled([
+                fetchAndProcessChartData('songs'),
+                fetchAndProcessChartData('artists'),
+                fetchAndProcessChartData('albums')
+            ]);
         }
-
+        
         renderHomePage();
         setupBackToTopButton();
         
     } catch (error) {
+        console.error('Erro:', error);
         showMessage('error', 'Error loading data: ' + error.message);
     }
 }
@@ -1148,20 +1203,21 @@ async function initializeApp() {
 // ========== EVENT LISTENERS ==========
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM carregado');
     initializeApp();
     
-    document.getElementById('mainTitle').addEventListener('click', () => {
+    document.getElementById('mainTitle')?.addEventListener('click', () => {
         if (appState.currentView !== 'home') {
             appState.navigationHistory = [];
             renderHomePage();
         }
     });
     
-    document.getElementById('navAllEntries').addEventListener('click', renderAllEntriesPage);
-    document.getElementById('navChartBeat').addEventListener('click', showChartBeatPage);
+    document.getElementById('navAllEntries')?.addEventListener('click', renderAllEntriesPage);
+    document.getElementById('navChartBeat')?.addEventListener('click', showChartBeatPage);
     
-    closeModal.addEventListener('click', () => itemDetailsModal.classList.remove('active'));
-    itemDetailsModal.addEventListener('click', (e) => {
+    closeModal?.addEventListener('click', () => itemDetailsModal?.classList.remove('active'));
+    itemDetailsModal?.addEventListener('click', (e) => {
         if (e.target === itemDetailsModal) itemDetailsModal.classList.remove('active');
     });
     
