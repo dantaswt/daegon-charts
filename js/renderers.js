@@ -1,3 +1,104 @@
+// ADICIONAR no início do arquivo:
+const imageCache = new Map();
+
+// MODIFICAR renderChartItems para usar lazy loading nas imagens
+function renderChartItems() {
+    const chartType = appState.activeChart;
+    const colMap = appState.colMaps[chartType];
+    
+    let items = [];
+    // ... existing code to get items ...
+    
+    const displayItems = sortedItems.slice(0, 100);
+    
+    // Usar virtual scrolling para grandes listas
+    if (displayItems.length > 50) {
+        return renderVirtualizedList(displayItems, chartType, colMap);
+    }
+    
+    return displayItems.map((row, index) => {
+        // ... existing rendering code ...
+        
+        // MODIFICAR a parte da imagem para usar Intersection Observer
+        const imageHtml = `
+            <div class="w-12 h-12 rounded-md shadow-md overflow-hidden spotify-image" 
+                 id="image-${chartType}-${index}"
+                 data-src-type="${chartType}"
+                 data-src-index="${index}"
+                 data-src-artist="${artist}">
+                <div class="w-full h-full placeholder-art">
+                    <i class="fas ${chartsConfig[chartType].icon} text-gray-400"></i>
+                </div>
+            </div>
+        `;
+        
+        // ... rest of rendering ...
+    }).join('');
+}
+
+// NOVA FUNÇÃO: Virtual scrolling para lists grandes
+function renderVirtualizedList(items, chartType, colMap) {
+    // Renderizar apenas os primeiros 30 itens
+    const visibleItems = items.slice(0, 30);
+    
+    const html = visibleItems.map((row, index) => {
+        // ... render item ...
+    }).join('');
+    
+    // Adicionar um placeholder para o resto
+    html += `
+        <div class="text-center py-4 text-gray-400" id="loadMoreTrigger">
+            <i class="fas fa-spinner fa-spin mr-2"></i> Loading more...
+        </div>
+    `;
+    
+    // Setup Intersection Observer para carregar mais
+    setTimeout(() => {
+        setupInfiniteScroll(items, chartType, colMap);
+    }, 100);
+    
+    return html;
+}
+
+// NOVA FUNÇÃO: Infinite scroll
+function setupInfiniteScroll(allItems, chartType, colMap) {
+    const trigger = document.getElementById('loadMoreTrigger');
+    if (!trigger) return;
+    
+    let currentIndex = 30;
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && currentIndex < allItems.length) {
+                // Carregar próximos 20 itens
+                const nextItems = allItems.slice(currentIndex, currentIndex + 20);
+                const container = document.getElementById('chartContainer');
+                
+                nextItems.forEach((row, offset) => {
+                    const actualIndex = currentIndex + offset;
+                    const itemHtml = renderSingleItem(row, actualIndex, chartType, colMap);
+                    container.insertAdjacentHTML('beforeend', itemHtml);
+                });
+                
+                currentIndex += 20;
+                
+                // Atualizar trigger
+                if (currentIndex >= allItems.length) {
+                    trigger.remove();
+                }
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    observer.observe(trigger);
+}
+
+// NOVA FUNÇÃO: Renderizar item único (para infinite scroll)
+function renderSingleItem(row, index, chartType, colMap) {
+    // Mesmo código de renderização de item, mas sem depender do loop
+    // ... copy the item rendering code from renderChartItems ...
+}
+
 // --- RENDER FUNCTIONS ---
 function renderHomePage() {
     appState.currentView = 'home';
