@@ -16,8 +16,8 @@
         :root {
             --primary: #000000;
             --secondary: #F9FAFB;
-            --accent: #00CED1;
-            --accent-dark: #008B8B;
+            --accent: #FFD700;
+            --accent-dark: #DAA520;
             --gold: #FFD700;
             --silver: #C0C0C0;
             --bronze: #CD7F32;
@@ -52,11 +52,11 @@
         }
         .chart-nav-btn.active {
             background-color: var(--accent);
-            color: var(--secondary);
+            color: #000000;
         }
         .chart-nav-btn.goat-active {
             background-color: var(--gold);
-            color: var(--secondary);
+            color: #000000;
         }
         
         /* Estilo dos cards do chart */
@@ -223,12 +223,12 @@
         }
         .accent-badge {
             background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            color: white;
+            color: #000;
         }
         .progress-bar {
             height: 8px;
             border-radius: 4px;
-            background: rgba(0, 206, 209, 0.2);
+            background: rgba(255, 215, 0, 0.2);
             overflow: hidden;
         }
         .progress-fill {
@@ -248,7 +248,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .year-selector {
-            background: rgba(0, 206, 209, 0.1);
+            background: rgba(255, 215, 0, 0.1);
             border-radius: 8px;
             padding: 0.5rem;
         }
@@ -257,7 +257,7 @@
         }
         .year-btn.active {
             background: var(--accent);
-            color: white;
+            color: #000;
         }
         .top-card {
             cursor: pointer;
@@ -329,7 +329,7 @@
         .search-input:focus {
             outline: none;
             border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(0, 206, 209, 0.2);
+            box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.2);
         }
         .search-icon {
             position: absolute;
@@ -476,7 +476,7 @@ button {
         }
         .goat-nav-btn.active {
             background-color: var(--gold) !important;
-            color: var(--secondary) !important;
+            color: #000 !important;
         }
         .goat-text {
             color: var(--gold);
@@ -524,9 +524,9 @@ button {
         
         /* Efeito de brilho para títulos */
         @keyframes glow {
-            0% { text-shadow: 0 0 5px rgba(0, 206, 209, 0.5); }
-            50% { text-shadow: 0 0 20px rgba(0, 206, 209, 0.8); }
-            100% { text-shadow: 0 0 5px rgba(0, 206, 209, 0.5); }
+            0% { text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(255, 215, 0, 0.8); }
+            100% { text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
         }
         
         .glow-text {
@@ -577,7 +577,7 @@ button {
         
         .circle-card:hover {
             transform: scale(1.1);
-            box-shadow: 0 15px 30px rgba(0, 206, 209, 0.3);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.3);
         }
         
         .circle-card-content {
@@ -663,7 +663,7 @@ button {
 
 /* Dia selecionado */
 .flatpickr-day.selected {
-    background: #22c55e; /* verde */
+    background: #22c55e;
     color: #ffffff;
 }
 
@@ -696,7 +696,7 @@ button {
             bottom: 2rem;
             right: 2rem;
             background: var(--accent);
-            color: white;
+            color: #000;
             width: 3rem;
             height: 3rem;
             border-radius: 50%;
@@ -708,7 +708,7 @@ button {
             transform: translateY(20px);
             transition: all 0.3s ease;
             z-index: 99;
-            box-shadow: 0 4px 12px rgba(0, 206, 209, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
             border: none;
         }
         
@@ -748,7 +748,7 @@ button {
         
         /* Estilo para datas de entrada/pico */
         .date-badge {
-            background: rgba(0, 206, 209, 0.1);
+            background: rgba(255, 215, 0, 0.1);
             color: var(--accent);
             font-size: 0.7rem;
             padding: 0.2rem 0.5rem;
@@ -760,7 +760,7 @@ button {
         }
         
         .date-badge:hover {
-            background: rgba(0, 206, 209, 0.2);
+            background: rgba(255, 215, 0, 0.2);
             text-decoration: underline;
         }
         
@@ -798,33 +798,42 @@ button {
                 width: 56px;
                 height: 56px;
             }
+            
+            /* Weekly charts em lista no mobile */
+            .weekly-charts-grid {
+                grid-template-columns: 1fr !important;
+            }
         }
 
-        /* Estilo para os títulos dos charts na navegação */
-        .chart-title-block {
-            background-color: #000;
-            color: white;
-            padding: 0.5rem 1rem;
+        /* Estilo para os títulos dos charts na navegação - agora brancos com texto preto */
+        .chart-nav-btn {
+            background-color: white;
+            color: #111827;
+            border: 1px solid #E5E5E5;
             border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
             font-weight: 600;
-            font-size: 0.875rem;
-            border: 1px solid var(--border-color);
             transition: all 0.2s ease;
         }
         
-        @media (min-width: 768px) {
-            .chart-title-block {
-                padding: 0.75rem 1.5rem;
-                font-size: 1rem;
-            }
+        .chart-nav-btn:hover {
+            background-color: #F5F5F5;
+            border-color: var(--accent);
         }
         
-        .chart-title-block:hover {
+        .chart-nav-btn.active {
+            background-color: var(--accent);
+            color: #000;
             border-color: var(--accent);
-            background-color: #111;
+        }
+        
+        .chart-nav-btn.goat-active {
+            background-color: var(--gold);
+            color: #000;
+            border-color: var(--gold);
         }
 
-        /* Grid de 3x2 para os charts */
+        /* Grid de 3x2 para os charts (desktop) */
         .weekly-charts-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -896,6 +905,20 @@ button {
         
         .text-muted-item {
             color: #6B7280;
+        }
+
+        /* Estilo para o indicador de diff */
+        .diff-indicator {
+            display: inline-block;
+            margin-left: 0.25rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        @media (min-width: 768px) {
+            .diff-indicator {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -1306,7 +1329,7 @@ button {
                     <div class="flex flex-col items-center justify-center p-8 text-secondary">
                         <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-4"></i>
                         <p class="text-center text-red-500 font-semibold">${text}</p>
-                        <button id="retryButton" class="mt-4 px-4 py-2 bg-accent text-secondary rounded-md hover:bg-accent-dark transition-colors">
+                        <button id="retryButton" class="mt-4 px-4 py-2 bg-accent text-black rounded-md hover:bg-accent-dark transition-colors">
                             Try Again
                         </button>
                     </div>
@@ -2090,7 +2113,7 @@ button {
                     
                     ${!isYearEnd && !isGoat ? `
                     <div class="text-center mt-4 md:mt-6">
-                        <button id="backToTopBtn" class="px-3 md:px-4 py-1 md:py-2 bg-accent text-white rounded-md hover:bg-accent-dark transition-colors btn-hover text-xs md:text-sm">
+                        <button id="backToTopBtn" class="px-3 md:px-4 py-1 md:py-2 bg-accent text-black rounded-md hover:bg-accent-dark transition-colors btn-hover text-xs md:text-sm">
                             <i class="fas fa-arrow-up mr-1 md:mr-2"></i> Back to Top
                         </button>
                     </div>
@@ -2270,6 +2293,7 @@ button {
                         <div class="flex items-start">
                             <div class="flex-shrink-0 rank-number text-gray-900">
                                 ${position}
+                                ${!isYearEnd && !isGoat && diffSymbol ? `<span class="diff-indicator ${diffClass}">${diffSymbol}</span>` : ''}
                             </div>
                             <div class="flex-shrink-0 mx-3 md:mx-4">
                                 <div class="spotify-image" id="image-${chartType}-${index}">
@@ -2962,7 +2986,7 @@ button {
             
             const chartLinkHtml = article.chartLink ? `
                 <div class="mt-6 md:mt-8 text-center">
-                    <button class="px-3 md:px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-dark transition-colors text-sm md:text-base" onclick="showChartPage('${article.chartLink}', '${article.publicationDate}')">
+                    <button class="px-3 md:px-4 py-2 bg-accent text-black rounded-md hover:bg-accent-dark transition-colors text-sm md:text-base" onclick="showChartPage('${article.chartLink}', '${article.publicationDate}')">
                         See the full chart here <i class="fas fa-arrow-right ml-2"></i>
                     </button>
                 </div>
