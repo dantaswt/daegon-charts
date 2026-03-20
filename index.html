@@ -226,7 +226,7 @@
             if (!query) return null;
             let searchQuery = query;
             if (type === 'artist') {
-                searchQuery = `${query} cantora cantor`;
+                searchQuery = `${query} SINGER`;
             } else if (type === 'album') {
                 searchQuery = `${query} album`;
             }
