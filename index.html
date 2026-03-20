@@ -48,7 +48,7 @@
         .spotify-image { width: 64px; height: 64px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.3s ease; }
         @media (min-width: 768px) { .spotify-image { width: 80px; height: 80px; } }
         .spotify-image:hover { transform: scale(1.05); }
-        .rank-number { font-size: 1.5rem; font-weight: 800; color: #111827; min-width: 3rem; text-align: center; }
+        .rank-number { font-size: 1.5rem; font-weight: 800; color: #111827; min-width: 3rem; text-align: center; display: inline-flex; align-items: center; gap: 0.25rem; }
         @media (min-width: 768px) { .rank-number { font-size: 1.875rem; min-width: 3.5rem; } }
         .artist-link { cursor: pointer; transition: color 0.2s; color: #111827; font-weight: 600; }
         .artist-link:hover { color: var(--accent); }
@@ -102,6 +102,7 @@
         .artist-list-header { background-color: #f8f9fa; padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; }
         .artist-list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; }
         .artist-list-item:hover { background-color: #fafafa; }
+        .artist-list-item .item-name { color: #111827; font-weight: 500; }
         .units-badge { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 0.25rem; margin-left: 0.5rem; white-space: nowrap; }
         .artists-icons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
         @media (min-width: 640px) { .artists-icons-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 2rem; } }
@@ -132,6 +133,10 @@
         .year-btn.active { background: var(--accent); color: #000; }
         .year-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
         .back-button { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; transition: color 0.2s; }
+        .artist-list-card .text-gray-800 { color: #1f2937; }
+        .artist-list-card .font-medium { color: #111827; }
+        .rank-symbol { font-size: 0.8rem; font-weight: 600; display: inline-block; margin-left: 0.25rem; }
+        @media (min-width: 768px) { .rank-symbol { font-size: 1rem; } }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -165,7 +170,20 @@
         try { const saved = localStorage.getItem('daegon_image_cache'); if(saved) imageCache = JSON.parse(saved); } catch(e) {}
         function saveImageCache() { try { localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache)); } catch(e) {} }
 
-        // 6 WEEKLY CHARTS + YEAR-END + GOAT
+        // Correções específicas para artistas com imagens erradas
+        const artistImageCorrections = {
+            'Anitta': 'Anitta cantora',
+            'anitta': 'Anitta cantora',
+            'Jão': 'Jão cantor',
+            'jão': 'Jão cantor',
+            'João': 'Jão cantor',
+            'joão': 'Jão cantor'
+        };
+
+        const weeklyChartList = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'];
+        const yearEndList = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
+        const goatList = ['goatSongs', 'goatArtists', 'goatAlbums'];
+
         const chartsConfig = {
             songs: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=904867620', title: 'Hot 100', icon: 'fa-music', loaded: false },
             artists: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1568177610', title: 'Artist 50', icon: 'fa-user', loaded: false },
@@ -181,10 +199,6 @@
             goatAlbums: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1548244755', title: 'Albums', icon: 'fa-trophy', loaded: false },
             artistStats: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1519606558', title: 'Artist Statistics', icon: 'fa-chart-bar', loaded: false }
         };
-        
-        const weeklyChartList = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'];
-        const yearEndList = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
-        const goatList = ['goatSongs', 'goatArtists', 'goatAlbums'];
 
         const chartBeatConfig = {
             hot100: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1019123057', title: 'Hot 100 Songs' },
@@ -195,7 +209,7 @@
         let appState = {
             activeChart: 'songs', chartData: {}, currentDate: null, currentView: 'home', currentArtist: null, currentYear: new Date().getFullYear().toString(),
             colMaps: {}, top3Data: {}, chartRunData: {}, navigationHistory: [], chartBeatData: { hot100: [], artists: [], top100Albums: [] },
-            currentBlog: 'hot100', sharedDate: null, artistDetailsData: {}, activeTag: null, allArtistsList: []
+            currentBlog: 'hot100', sharedDate: null, artistDetailsData: {}, activeTag: null, allArtistsList: [], lastChart: null, lastChartDate: null, lastChartYear: null
         };
 
         const appContainer = document.getElementById('app'), modal = document.getElementById('itemDetailsModal'), modalContent = document.getElementById('modalContent'), closeModal = document.getElementById('closeModal');
@@ -216,12 +230,25 @@
         
         async function getSpotifyImage(query, type) {
             if (!query) return null;
-            const key = `${type}:${query}`.toLowerCase();
+            
+            // Aplicar correções específicas para artistas
+            let correctedQuery = query;
+            if (type === 'artist') {
+                for (const [wrongName, correctName] of Object.entries(artistImageCorrections)) {
+                    if (query.toLowerCase().includes(wrongName.toLowerCase())) {
+                        correctedQuery = correctName;
+                        break;
+                    }
+                }
+            }
+            
+            const key = `${type}:${correctedQuery}`.toLowerCase();
             if (imageCache[key]) return imageCache[key];
             const token = await getSpotifyToken();
             if (!token) return null;
             try {
-                const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${type}&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const searchType = type === 'artist' ? 'artist' : 'album';
+                const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(correctedQuery)}&type=${searchType}&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 let url = null;
                 if (type === 'artist' && data.artists?.items?.[0]) url = data.artists.items[0].images?.[0]?.url;
@@ -451,6 +478,11 @@
         }
         
         function showChart(ct, dateToSet=null){
+            // Salvar o chart atual para voltar depois
+            appState.lastChart = appState.activeChart;
+            appState.lastChartDate = appState.currentDate;
+            appState.lastChartYear = appState.currentYear;
+            
             appState.activeChart = ct;
             const isYear = ct.includes('yearEnd'), isGoat = ct.includes('goat');
             if(isYear){
@@ -465,13 +497,12 @@
                 appState.sharedDate = appState.currentDate;
             }
             const nav = isYear?Object.entries(chartsConfig).filter(([k])=>k.includes('yearEnd')):isGoat?Object.entries(chartsConfig).filter(([k])=>k.includes('goat')):Object.entries(chartsConfig).filter(([k])=>!k.includes('yearEnd')&&!k.includes('goat')&&k!=='artistStats');
-            appContainer.innerHTML = `<div class="max-w-4xl mx-auto"><button id="backBtn" class="back-button mb-4 md:mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors text-sm md:text-base"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button>
+            appContainer.innerHTML = `<div class="max-w-4xl mx-auto"><button id="backBtn" class="back-button mb-4 md:mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors text-sm md:text-base"><i class="fas fa-arrow-left mr-2"></i> Back to ${appState.lastChart ? chartsConfig[appState.lastChart]?.title || 'Chart' : 'Home'}</button>
             <div class="mb-4 md:mb-6"><h2 class="text-xl md:text-3xl font-bold text-center mb-2 text-white">${isYear?'Year-End Charts':isGoat?'Greatest of All Time':'Weekly Charts'}</h2><div id="chartNav" class="flex flex-wrap justify-center gap-2 border-b border-gray-800 pb-3">${nav.map(([k,c])=>`<button data-chart="${k}" class="chart-nav-btn btn-hover ${appState.activeChart===k?(isGoat?'goat-active':'active'):''} text-xs md:text-sm font-semibold py-2 px-3 rounded-md transition-all">${c.title}</button>`).join('')}</div></div>
             <div class="mb-4 md:mb-6"><h3 class="text-lg md:text-xl font-bold text-center mb-3 md:mb-4 text-white">${chartsConfig[appState.activeChart]?.title||''}</h3>
             ${isYear?`<div class="flex justify-center mb-4"><div class="year-selector">${Object.keys(appState.chartData[ct]||{}).sort((a,b)=>b-a).map(y=>`<button class="year-btn ${y===appState.currentYear?'active':''}" data-year="${y}">${y}</button>`).join('')}</div></div>`:isGoat?'':`<div class="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4"><div class="flex items-center gap-2 text-white"><label class="text-xs md:text-sm text-gray-400 font-medium">Week:</label><button id="prevBtn" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover"><i class="fas fa-chevron-left text-xs md:text-sm"></i></button><input type="text" id="weekPicker" class="flatpickr-input text-xs md:text-sm" placeholder="Select date"><button id="nextBtn" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover"><i class="fas fa-chevron-right text-xs md:text-sm"></i></button></div></div>`}
             <div class="chart-container" id="chartContainer">${renderChartItems()}</div>
             ${!isYear&&!isGoat?`<div class="bottom-nav flex justify-center items-center gap-2 md:gap-3 mt-4 md:mt-6"><button id="bottomPrev" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover text-xs md:text-sm"><i class="fas fa-chevron-left text-xs mr-1"></i> Previous</button><button id="bottomNext" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover text-xs md:text-sm">Next <i class="fas fa-chevron-right text-xs ml-1"></i></button></div>`:''}
-            ${!isYear&&!isGoat?renderDropouts():''}
             ${!isYear&&!isGoat?`<div class="text-center mt-4 md:mt-6"><button id="topBtn" class="px-3 md:px-4 py-1 md:py-2 bg-accent text-black rounded-md hover:bg-accent-dark btn-hover text-xs md:text-sm"><i class="fas fa-arrow-up mr-1 md:mr-2"></i> Back to Top</button></div>`:''}</div>`;
             setupChartListeners();
             setTimeout(()=>loadImages(),50);
@@ -520,7 +551,13 @@
                 let w1=cm.weeksAt1!==-1?parseInt(row[cm.weeksAt1]):null, units=cm.units!==-1?row[cm.units]:null, total=cm.totalUnits!==-1?row[cm.totalUnits]:null;
                 let name = (ct.includes('Songs')||ct==='songs'||ct==='radioSongs')?(row[cm.song]||'Unknown'):(ct.includes('Albums')||ct==='albums'||ct==='topStreamingAlbums'||ct==='topAlbumSales')?(row[cm.album]||'Unknown'):(row[cm.artist]||'Unknown');
                 let diffClass='', diffSym='';
-                if(diff){ let l=diff.toString().toLowerCase(); if(l.includes('▲')||l.includes('+')){ diffClass='diff-up'; diffSym='▲'; } else if(l.includes('▼')||l.includes('-')){ diffClass='diff-down'; diffSym='▼'; } else if(l.includes('new')){ diffClass='diff-new'; diffSym='NEW'; } else if(l.includes('re')){ diffClass='diff-new'; diffSym='RE'; } else if(l==='0') diffSym='='; }
+                if(diff){ let l=diff.toString().toLowerCase(); 
+                    if(l.includes('▲')||l.includes('+')){ diffClass='diff-up'; diffSym='▲'; } 
+                    else if(l.includes('▼')||l.includes('-')){ diffClass='diff-down'; diffSym='▼'; } 
+                    else if(l.includes('new')){ diffClass='diff-new'; diffSym='NEW'; } 
+                    else if(l.includes('re')){ diffClass='diff-new'; diffSym='RE'; } 
+                    else if(l==='0') diffSym='='; 
+                }
                 let newPeak='', w1badge='';
                 if(!isYear&&!isGoat&&pk&&pos<pk){ let isNew=(diff?.toLowerCase()==='new'||diff?.toLowerCase()==='re'||lw?.toString()==='0'); if(!isNew) newPeak='<span class="badge badge-new-peak">NEW PEAK</span>'; }
                 if(w1&&w1>0) w1badge=`<span class="badge badge-weeks-at-1">${w1} WK${w1>1?'S':''} AT #1</span>`;
@@ -539,22 +576,14 @@
             }).join('');
         }
         
-        function renderDropouts(){
-            let ct=appState.activeChart, cm=appState.colMaps[ct]||{};
-            if(!appState.currentDate) return '';
-            let dates = Object.keys(appState.chartData[ct]||{}).sort();
-            let idx = dates.indexOf(appState.currentDate);
-            if(idx<=0) return '';
-            let prev=dates[idx-1], cur=appState.chartData[ct][appState.currentDate]||[], pre=appState.chartData[ct][prev]||[];
-            let curSet = new Set();
-            cur.forEach(r=>{ let n=ct.includes('Songs')?r[cm.song]:ct.includes('Albums')?r[cm.album]:r[cm.artist]; let a=r[cm.artist]; if(n&&a) curSet.add(`${n}:${a}`.toLowerCase()); });
-            let drop = pre.filter(r=>{ let n=ct.includes('Songs')?r[cm.song]:ct.includes('Albums')?r[cm.album]:r[cm.artist]; let a=r[cm.artist]; return n&&a && !curSet.has(`${n}:${a}`.toLowerCase()); }).slice(0,20);
-            if(!drop.length) return '';
-            return `<div class="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-gray-800"><h4 class="text-base md:text-lg font-bold mb-3 md:mb-4 text-gray-400">Dropouts from Previous Week</h4><div class="bg-black rounded-lg border border-gray-800">${drop.map(r=>`<div class="chart-row py-2 md:py-3 px-2 md:px-4 border-b border-gray-800 last:border-b-0 dropout-item"><div class="flex items-center"><div class="flex-shrink-0 w-8 md:w-10 text-center"><span class="text-base md:text-lg font-bold text-gray-500">${parseInt(r[cm.position])||0}</span></div><div class="flex-grow ml-2 md:ml-4"><p class="font-medium text-sm md:text-base text-gray-400 break-text">${ct.includes('Songs')?r[cm.song]:ct.includes('Albums')?r[cm.album]:r[cm.artist]}</p><p class="text-xs text-gray-500">${r[cm.artist]||'Unknown'}</p></div></div></div>`).join('')}</div></div>`;
-        }
-        
         function setupChartListeners(){
-            document.getElementById('backBtn')?.addEventListener('click',()=>navigateBack());
+            document.getElementById('backBtn')?.addEventListener('click',()=>{
+                if(appState.lastChart && appState.lastChart !== appState.activeChart){
+                    showChart(appState.lastChart, appState.lastChartDate);
+                } else {
+                    navigateBack();
+                }
+            });
             document.querySelectorAll('.chart-nav-btn').forEach(b=>b.addEventListener('click',()=>showChart(b.dataset.chart)));
             setTimeout(()=>{
                 document.querySelectorAll('.artist-link, .artist-page-link').forEach(l=>l.addEventListener('click',(e)=>{ e.stopPropagation(); renderArtistPage(l.dataset.artist); }));
@@ -595,16 +624,26 @@
         
         function renderArtistPage(artist){
             let data = appState.artistDetailsData[artist];
-            if(!data){ appContainer.innerHTML=`<div class="max-w-4xl mx-auto text-center p-6"><button id="backBtn" class="mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back</button><i class="fas fa-user-circle text-5xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Artist not found</h2></div>`; document.getElementById('backBtn')?.addEventListener('click',navigateBack); return; }
+            if(!data){ 
+                appContainer.innerHTML = `<div class="max-w-4xl mx-auto text-center p-6"><button id="backBtn" class="back-button mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back</button><i class="fas fa-user-circle text-5xl text-gray-600 mb-4"></i><h2 class="text-2xl font-bold text-white">Artist not found</h2></div>`;
+                document.getElementById('backBtn')?.addEventListener('click',()=>{
+                    if(appState.lastChart) showChart(appState.lastChart, appState.lastChartDate);
+                    else navigateBack();
+                });
+                return; 
+            }
             getSpotifyImage(artist,'artist').then(img=>{
                 let sections = ['Top 50 Artists','Hot 100 Songs','Radio Songs','Top 100 Albums','Top Streaming Albums','Top Album Sales'].map(name=>{
                     let cd = data[name];
                     if(!cd||cd.count===0) return '';
                     let isArtist = name==='Top 50 Artists';
-                    return `<div class="artist-list-card mb-6"><div class="artist-list-header"><h3 class="font-bold text-gray-800">${name}</h3><p class="text-xs text-gray-500">${isArtist?`Peak #${cd.entries[0]?.peak||0} / ${cd.entries[0]?.weeks||0} Weeks`:`${cd.count} Entries / ${cd.numberOnes} #1's / ${cd.topTens} Top 10's`}</p></div>${!isArtist?`<div class="divide-y">${cd.entries.slice(0,20).map(e=>`<div class="artist-list-item"><div><span class="font-medium">${e.item}</span>${e.unitsSold?`<span class="text-xs text-gray-500 ml-2">${e.unitsSold}</span>`:''}${e.totalUnits?`<span class="units-badge text-xs">${e.totalUnits} total</span>`:''}</div><div class="flex gap-3"><span class="text-xs text-gray-500">Peak #${e.peak}</span><span class="text-xs text-gray-500">${e.weeks} wks</span></div></div>`).join('')}${cd.entries.length>20?`<div class="text-center py-2 text-xs text-gray-400">... and ${cd.entries.length-20} more</div>`:''}</div>`:''}</div>`;
+                    return `<div class="artist-list-card mb-6"><div class="artist-list-header"><h3 class="font-bold text-gray-800">${name}</h3><p class="text-xs text-gray-500">${isArtist?`Peak #${cd.entries[0]?.peak||0} / ${cd.entries[0]?.weeks||0} Weeks`:`${cd.count} Entries / ${cd.numberOnes} #1's / ${cd.topTens} Top 10's`}</p></div>${!isArtist?`<div class="divide-y">${cd.entries.slice(0,20).map(e=>`<div class="artist-list-item"><div><span class="font-medium text-gray-800">${e.item}</span>${e.unitsSold?`<span class="text-xs text-gray-500 ml-2">${e.unitsSold}</span>`:''}${e.totalUnits?`<span class="units-badge text-xs">${e.totalUnits} total</span>`:''}</div><div class="flex gap-3"><span class="text-xs text-gray-500">Peak #${e.peak}</span><span class="text-xs text-gray-500">${e.weeks} wks</span></div></div>`).join('')}${cd.entries.length>20?`<div class="text-center py-2 text-xs text-gray-400">... and ${cd.entries.length-20} more</div>`:''}</div>`:''}</div>`;
                 }).join('');
                 appContainer.innerHTML = `<div class="max-w-4xl mx-auto"><button id="backBtn" class="back-button mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back</button>${img?`<img src="${img}" class="artist-header-image">`:`<div class="artist-header-image placeholder-art flex items-center justify-center"><i class="fas fa-user text-4xl text-gray-500"></i></div>`}<h1 class="artist-name-large">${artist}</h1><p class="text-gray-400 text-sm mb-6">Detailed Chart History</p><div>${sections}</div></div>`;
-                document.getElementById('backBtn')?.addEventListener('click',navigateBack);
+                document.getElementById('backBtn')?.addEventListener('click',()=>{
+                    if(appState.lastChart) showChart(appState.lastChart, appState.lastChartDate);
+                    else navigateBack();
+                });
                 setupBackToTop();
             });
         }
@@ -658,13 +697,11 @@
         async function init(){
             showMessage('loading','Loading charts data...');
             try{
-                // Carregar todos os charts
                 const allCharts = [...weeklyChartList, ...yearEndList, ...goatList, 'artistStats'];
                 for(let ct of allCharts) await fetchChartData(ct);
                 await fetchChartBeat();
                 let years = Object.keys(appState.chartData.yearEndSongs||{}).sort((a,b)=>b-a);
                 if(years.length) appState.currentYear = years[0];
-                // Definir data padrão para weekly charts
                 for(let ct of weeklyChartList) {
                     let dates = Object.keys(appState.chartData[ct]||{});
                     if(dates.length) {
