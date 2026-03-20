@@ -209,7 +209,8 @@
         let appState = {
             activeChart: 'songs', chartData: {}, currentDate: null, currentView: 'home', currentArtist: null, currentYear: new Date().getFullYear().toString(),
             colMaps: {}, top3Data: {}, chartRunData: {}, navigationHistory: [], chartBeatData: { hot100: [], artists: [], top100Albums: [] },
-            currentBlog: 'hot100', sharedDate: null, artistDetailsData: {}, activeTag: null, allArtistsList: [], lastChart: null, lastChartDate: null, lastChartYear: null
+            currentBlog: 'hot100', sharedDate: null, artistDetailsData: {}, activeTag: null, allArtistsList: [], lastChart: null, lastChartDate: null, lastChartYear: null,
+            positionHistory: {}
         };
 
         const appContainer = document.getElementById('app'), modal = document.getElementById('itemDetailsModal'), modalContent = document.getElementById('modalContent'), closeModal = document.getElementById('closeModal');
@@ -261,6 +262,77 @@
         // ==================== DATA PROCESSING ====================
         function parseCsvRow(t) { if(!t) return []; let r=[], c='', q=false; for(let i=0;i<t.length;i++){ const ch=t[i]; if(ch==='"') q=!q; else if(ch===','&&!q){ r.push(c.trim()); c=''; } else c+=ch; } r.push(c.trim()); return r; }
         
+        // Função para calcular diff comparando com a semana anterior
+        function calculateDiffForChart(ct, currentData, currentDate) {
+            if (!ct.includes('songs') && !ct.includes('radioSongs')) return currentData;
+            
+            const dates = Object.keys(appState.chartData[ct] || {}).sort();
+            const currentIndex = dates.indexOf(currentDate);
+            if (currentIndex <= 0) return currentData;
+            
+            const previousDate = dates[currentIndex - 1];
+            const previousData = appState.chartData[ct][previousDate];
+            
+            // Criar mapa de posições anteriores por nome+artista
+            const previousPositions = new Map();
+            previousData.forEach(row => {
+                const cm = appState.colMaps[ct];
+                const name = (ct === 'songs' || ct === 'radioSongs') ? (row[cm.song] || '') : (row[cm.album] || '');
+                const artist = row[cm.artist] || '';
+                const key = `${name.toLowerCase()}:${artist.toLowerCase()}`;
+                const position = parseInt(row[cm.position]) || 0;
+                previousPositions.set(key, { position, row });
+            });
+            
+            // Adicionar diff a cada item atual
+            return currentData.map(row => {
+                const cm = appState.colMaps[ct];
+                const name = (ct === 'songs' || ct === 'radioSongs') ? (row[cm.song] || '') : (row[cm.album] || '');
+                const artist = row[cm.artist] || '';
+                const key = `${name.toLowerCase()}:${artist.toLowerCase()}`;
+                const currentPos = parseInt(row[cm.position]) || 0;
+                
+                const previous = previousPositions.get(key);
+                let diffValue = '';
+                
+                if (!previous) {
+                    // Não estava na semana anterior - é NEW ou RE
+                    // Verificar se já apareceu antes em semanas anteriores
+                    let hasAppearedBefore = false;
+                    for (let i = 0; i < currentIndex; i++) {
+                        const weekData = appState.chartData[ct][dates[i]];
+                        const found = weekData.some(r => {
+                            const rName = (ct === 'songs' || ct === 'radioSongs') ? (r[cm.song] || '') : (r[cm.album] || '');
+                            const rArtist = r[cm.artist] || '';
+                            return `${rName.toLowerCase()}:${rArtist.toLowerCase()}` === key;
+                        });
+                        if (found) {
+                            hasAppearedBefore = true;
+                            break;
+                        }
+                    }
+                    diffValue = hasAppearedBefore ? 'RE' : 'NEW';
+                } else {
+                    const prevPos = previous.position;
+                    const diff = prevPos - currentPos;
+                    if (diff > 0) {
+                        diffValue = `▲${diff}`;
+                    } else if (diff < 0) {
+                        diffValue = `▼${Math.abs(diff)}`;
+                    } else {
+                        diffValue = '=';
+                    }
+                }
+                
+                // Adicionar diff ao row se não existir ou sobrescrever
+                const newRow = [...row];
+                if (cm.diff !== -1) {
+                    newRow[cm.diff] = diffValue;
+                }
+                return newRow;
+            });
+        }
+
         async function fetchChartData(ct) {
             if(chartsConfig[ct]?.loaded) return true;
             const cfg = chartsConfig[ct]; if(!cfg) return false;
@@ -334,6 +406,16 @@
                     const sorted = Object.keys(groups).sort((a,b)=>new Date(a)-new Date(b));
                     appState.chartData[ct] = {};
                     sorted.forEach(d=>{ appState.chartData[ct][d]=groups[d]; });
+                    
+                    // Após carregar todos os dados, calcular diffs para songs e radioSongs
+                    if (ct === 'songs' || ct === 'radioSongs') {
+                        const newGroups = {};
+                        for (const [date, weekData] of Object.entries(appState.chartData[ct])) {
+                            newGroups[date] = calculateDiffForChart(ct, weekData, date);
+                        }
+                        appState.chartData[ct] = newGroups;
+                    }
+                    
                     appState.chartRunData[ct] = {};
                     data.forEach(r=>{
                         const d=r[di]; if(!d) return;
@@ -551,12 +633,30 @@
                 let w1=cm.weeksAt1!==-1?parseInt(row[cm.weeksAt1]):null, units=cm.units!==-1?row[cm.units]:null, total=cm.totalUnits!==-1?row[cm.totalUnits]:null;
                 let name = (ct.includes('Songs')||ct==='songs'||ct==='radioSongs')?(row[cm.song]||'Unknown'):(ct.includes('Albums')||ct==='albums'||ct==='topStreamingAlbums'||ct==='topAlbumSales')?(row[cm.album]||'Unknown'):(row[cm.artist]||'Unknown');
                 let diffClass='', diffSym='';
-                if(diff){ let l=diff.toString().toLowerCase(); 
-                    if(l.includes('▲')||l.includes('+')){ diffClass='diff-up'; diffSym='▲'; } 
-                    else if(l.includes('▼')||l.includes('-')){ diffClass='diff-down'; diffSym='▼'; } 
-                    else if(l.includes('new')){ diffClass='diff-new'; diffSym='NEW'; } 
-                    else if(l.includes('re')){ diffClass='diff-new'; diffSym='RE'; } 
-                    else if(l==='0') diffSym='='; 
+                if(diff){
+                    let l=diff.toString().toLowerCase();
+                    if(l.includes('▲')||l.includes('+')){ 
+                        diffClass='diff-up'; 
+                        diffSym=diff;
+                    } 
+                    else if(l.includes('▼')||l.includes('-')){ 
+                        diffClass='diff-down'; 
+                        diffSym=diff;
+                    } 
+                    else if(l.includes('new')){ 
+                        diffClass='diff-new'; 
+                        diffSym='NEW';
+                    } 
+                    else if(l.includes('re')){ 
+                        diffClass='diff-new'; 
+                        diffSym='RE';
+                    } 
+                    else if(l==='=' || l==='0') diffSym='=';
+                    else if(l && !isNaN(parseInt(l))) {
+                        let num = parseInt(l);
+                        if(num > 0) { diffClass='diff-up'; diffSym=`▲${num}`; }
+                        else if(num < 0) { diffClass='diff-down'; diffSym=`▼${Math.abs(num)}`; }
+                    }
                 }
                 let newPeak='', w1badge='';
                 if(!isYear&&!isGoat&&pk&&pos<pk){ let isNew=(diff?.toLowerCase()==='new'||diff?.toLowerCase()==='re'||lw?.toString()==='0'); if(!isNew) newPeak='<span class="badge badge-new-peak">NEW PEAK</span>'; }
@@ -568,7 +668,7 @@
                     else if(ct==='topAlbumSales') unitsDisplay=`<span class="text-xs text-muted-item">Sales: <span class="font-semibold">${units}</span></span>`;
                     else unitsDisplay=`<span class="text-xs text-muted-item">Units: <span class="font-semibold">${units}</span></span>`;
                 }
-                let totalDisplay = total?`<span class="text-xs text-muted-item">Total: <span class="font-semibold">${total}</span></span>`:'';
+                let totalDisplay = total ? `<span class="text-xs text-muted-item">Total: <span class="font-semibold">${total}</span></span>` : '';
                 let artistDisplay = (ct==='artists'||ct==='yearEndArtists'||ct==='goatArtists')?`<p class="text-gray-600 text-sm mb-2"><button class="text-accent hover:text-accent-dark text-xs font-semibold artist-page-link" data-artist="${artist}">View Artist Page <i class="fas fa-arrow-right text-xs ml-1"></i></button></p>`:`<p class="text-gray-600 text-sm mb-2"><span class="artist-link font-medium" data-artist="${artist}">${artist}</span></p>`;
                 let runKey = `${name.toLowerCase()}:${artist.toLowerCase()}`;
                 let run = appState.chartRunData[ct]?.[runKey]||[];
