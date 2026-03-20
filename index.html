@@ -28,6 +28,13 @@
             --card-bg-hover: #F5F5F5;
             --border-color: #E5E5E5;
             --muted-text: #6B7280;
+            
+            /* Cores para chart run */
+            --run-up: #10B981;
+            --run-down: #EF4444;
+            --run-new: #FBBF24;
+            --run-peak: #8B5CF6;
+            --run-steady: #9CA3AF;
         }
 
         body {
@@ -170,6 +177,8 @@
         .artist-link {
             cursor: pointer;
             transition: color 0.2s;
+            color: #111827;
+            font-weight: 600;
         }
         .artist-link:hover {
             color: var(--accent);
@@ -284,7 +293,7 @@
             pointer-events: all;
         }
         .modal-content {
-            background: var(--card-bg);
+            background: white;
             border-radius: 12px;
             max-width: 90%;
             max-height: 90%;
@@ -348,6 +357,12 @@
             color: #111827;
         }
         
+        /* Centralizar calendário no mobile */
+        .flatpickr-calendar {
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+        }
+        
        /* Estilos para o Chart Beat */
 .blog-card {
     transition: all 0.3s ease;
@@ -376,17 +391,6 @@
     text-align: justify;
     text-justify: inter-word;
     line-height: 1.7;
-}
-
-/* ✅ Negrito (artista/álbum) */
-.article-content strong {
-    font-weight: 700;
-}
-
-/* ✅ Itálico (números) */
-.article-content em {
-    font-style: italic;
-    color: #374151;
 }
 
 .chart-beat-nav-btn.active {
@@ -634,61 +638,6 @@ button {
             text-align: center;
         }
         
-/* Container principal */
-.flatpickr-calendar {
-    background: #ffffff;
-    color: #111827;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-/* Cabeçalho */
-.flatpickr-months,
-.flatpickr-weekdays {
-    background: #ffffff;
-    color: #374151;
-}
-
-/* Dias */
-.flatpickr-day {
-    color: #111827;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
-
-/* Hover */
-.flatpickr-day:hover {
-    background: #f3f4f6;
-}
-
-/* Dia selecionado */
-.flatpickr-day.selected {
-    background: #22c55e;
-    color: #ffffff;
-}
-
-/* Hover no selecionado */
-.flatpickr-day.selected:hover {
-    background: #16a34a;
-}
-
-/* Hoje */
-.flatpickr-day.today {
-    border: 1px solid #22c55e;
-}
-
-/* Dias desabilitados */
-.flatpickr-day.disabled,
-.flatpickr-day.prevMonthDay,
-.flatpickr-day.nextMonthDay {
-    color: #9ca3af;
-}
-
-/* Intervalo */
-.flatpickr-day.inRange {
-    background: #dcfce7;
-}
-        
         /* NOVOS ESTILOS ADICIONADOS */
         /* Estilo para botão voltar ao topo */
         .back-to-top {
@@ -802,6 +751,12 @@ button {
             /* Weekly charts em lista no mobile */
             .weekly-charts-grid {
                 grid-template-columns: 1fr !important;
+            }
+            
+            /* Ajustes para o calendário no mobile */
+            .flatpickr-calendar {
+                width: 90% !important;
+                max-width: 350px !important;
             }
         }
 
@@ -920,6 +875,125 @@ button {
                 font-size: 0.8rem;
             }
         }
+
+        /* Estilo para o modal do Chart Beat */
+        .modal-content p {
+            text-align: justify;
+            text-justify: inter-word;
+        }
+        
+        .modal-content strong {
+            font-weight: 700;
+        }
+        
+        .modal-content em {
+            font-style: italic;
+        }
+
+        /* Estilo para o Chart Run - Caixas coloridas */
+        .chart-run-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        
+        .chart-run-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            min-width: 120px;
+            flex: 1 1 auto;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid transparent;
+            transition: transform 0.2s ease;
+        }
+        
+        .chart-run-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Cores condicionais para o Chart Run */
+        .chart-run-card.run-up {
+            border-left-color: var(--run-up);
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+        
+        .chart-run-card.run-down {
+            border-left-color: var(--run-down);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+        
+        .chart-run-card.run-new {
+            border-left-color: var(--run-new);
+            background-color: rgba(251, 191, 36, 0.05);
+        }
+        
+        .chart-run-card.run-peak {
+            border-left-color: var(--run-peak);
+            background-color: rgba(139, 92, 246, 0.05);
+        }
+        
+        .chart-run-card.run-steady {
+            border-left-color: var(--run-steady);
+            background-color: rgba(156, 163, 175, 0.05);
+        }
+        
+        .chart-run-card.run-number-one {
+            border-left-color: var(--accent);
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+        
+        .chart-run-date {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+        
+        .chart-run-position {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #111827;
+        }
+        
+        .chart-run-peak-badge {
+            font-size: 0.7rem;
+            background-color: var(--run-peak);
+            color: white;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+        
+        .chart-run-new-badge {
+            font-size: 0.7rem;
+            background-color: var(--run-new);
+            color: #000;
+            padding: 0.15rem 0.5rem;
+            border-radius: 9999px;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        /* Texto branco para itens na página de artistas */
+        .artist-page-content .text-white {
+            color: white !important;
+        }
+        
+        .artist-page-content .artist-link {
+            color: white !important;
+        }
+        
+        .artist-page-content .artist-link:hover {
+            color: var(--accent) !important;
+        }
+        
+        .artist-page-content .text-gray-400 {
+            color: #9CA3AF !important;
+        }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -957,12 +1031,20 @@ button {
     </div>
 
     <script>
-        // --- SPOTIFY CONFIGURATION ---
+        // --- SPOTIFY CONFIGURAÇÃO COM CACHE INTELIGENTE ---
         const SPOTIFY_CLIENT_ID = '60d65b0ac9f14d6aa91c08a66894cea9';
         const SPOTIFY_CLIENT_SECRET = 'caf3f20ae798475e8dec65697f210c2a';
         let SPOTIFY_ACCESS_TOKEN = '';
+        
+        // Cache de imagens em memória
         let imageCache = {};
+        // Cache de requisições pendentes
         let pendingImageRequests = {};
+        // Cache de imagens já buscadas para evitar repetição
+        let spotifySearchCache = new Map();
+        // Contador de requisições para evitar excesso
+        let spotifyRequestCount = 0;
+        const MAX_REQUESTS_PER_BATCH = 10; // Aumentado para melhor performance
 
         // --- CORREÇÃO PARA IMAGENS ESPECÍFICAS ---
         const artistImageCorrections = {
@@ -1193,7 +1275,8 @@ button {
             currentBlog: 'hot100',
             sharedDate: null,
             artistDetailsData: {},
-            chartHistoryData: {}
+            chartHistoryData: {},
+            yearEndYears: {} // Armazenar anos disponíveis para year-end
         };
 
         // --- DOM ELEMENTS ---
@@ -1202,7 +1285,7 @@ button {
         const modalContent = document.getElementById('modalContent');
         const closeModal = document.getElementById('closeModal');
 
-        // --- SPOTIFY FUNCTIONS ---
+        // --- SPOTIFY FUNCTIONS COM CACHE OTIMIZADO ---
         async function getSpotifyAccessToken() {
             if (SPOTIFY_ACCESS_TOKEN) return SPOTIFY_ACCESS_TOKEN;
             
@@ -1229,6 +1312,7 @@ button {
             }
         }
 
+        // Função para buscar imagem com cache agressivo
         async function getSpotifyImage(query, type) {
             if (!query) return null;
             
@@ -1262,12 +1346,35 @@ button {
                 });
             }
             
+            // Verificar cache do Spotify Search
+            if (spotifySearchCache.has(cacheKey)) {
+                const cachedUrl = spotifySearchCache.get(cacheKey);
+                if (cachedUrl) {
+                    imageCache[cacheKey] = cachedUrl;
+                    return cachedUrl;
+                }
+            }
+            
+            // Limitar requisições simultâneas
+            if (spotifyRequestCount >= MAX_REQUESTS_PER_BATCH) {
+                // Adicionar à fila para processar depois
+                setTimeout(() => {
+                    if (pendingImageRequests[cacheKey]) {
+                        getSpotifyImage(query, type);
+                    }
+                }, 200);
+                return null;
+            }
+            
+            spotifyRequestCount++;
+            
             // Marcar como requisição pendente
             pendingImageRequests[cacheKey] = true;
             
             const token = await getSpotifyAccessToken();
             if (!token) {
                 delete pendingImageRequests[cacheKey];
+                spotifyRequestCount--;
                 return null;
             }
             
@@ -1297,6 +1404,7 @@ button {
                 
                 if (imageUrl) {
                     imageCache[cacheKey] = imageUrl;
+                    spotifySearchCache.set(cacheKey, imageUrl);
                     
                     // Pré-carregar a imagem
                     const img = new Image();
@@ -1304,11 +1412,56 @@ button {
                 }
                 
                 delete pendingImageRequests[cacheKey];
+                spotifyRequestCount--;
                 return imageUrl;
             } catch (error) {
                 console.error('Error fetching Spotify image:', error);
                 delete pendingImageRequests[cacheKey];
+                spotifyRequestCount--;
                 return null;
+            }
+        }
+
+        // Função para carregar imagens em lote (evita sobrecarga)
+        async function loadImagesBatch(items, chartType, colMap) {
+            const batchSize = 10; // Aumentado para melhor performance
+            for (let i = 0; i < items.length; i += batchSize) {
+                const batch = items.slice(i, i + batchSize);
+                await Promise.all(batch.map(async (row, batchIndex) => {
+                    const globalIndex = i + batchIndex;
+                    const artist = row[colMap.artist] || 'Unknown';
+                    
+                    let query = '';
+                    let type = '';
+                    
+                    if (chartType?.includes('Songs') || chartType === 'songs' || chartType === 'radioSongs') {
+                        query = artist;
+                        type = 'artist';
+                    } else if (chartType?.includes('Albums') || chartType === 'albums' || chartType === 'topStreamingAlbums' || chartType === 'topAlbumSales') {
+                        const album = row[colMap.album] || '';
+                        query = `${artist} ${album}`;
+                        type = 'album';
+                    } else {
+                        query = artist;
+                        type = 'artist';
+                    }
+                    
+                    if (query && query !== 'Unknown') {
+                        try {
+                            const imageUrl = await getSpotifyImage(query, type);
+                            const imageElement = document.getElementById(`image-${chartType}-${globalIndex}`);
+                            
+                            if (imageElement && imageUrl) {
+                                imageElement.innerHTML = `<img src="${imageUrl}" alt="${query}" class="w-full h-full object-cover">`;
+                                imageElement.classList.remove('placeholder-art');
+                            }
+                        } catch (error) {
+                            console.error('Error loading image:', error);
+                        }
+                    }
+                }));
+                // Pequena pausa entre lotes
+                await new Promise(resolve => setTimeout(resolve, 50));
             }
         }
 
@@ -1511,7 +1664,10 @@ button {
                     
                     appState.chartData[chartType] = dataByYear;
                     
-                    const years = Object.keys(dataByYear).sort((a, b) => b - a);
+                    // Salvar anos disponíveis
+                    appState.yearEndYears[chartType] = Object.keys(dataByYear).sort((a, b) => b - a);
+                    
+                    const years = appState.yearEndYears[chartType];
                     const mostRecentYear = years?.[0] || new Date().getFullYear().toString();
                     
                     if (mostRecentYear && dataByYear[mostRecentYear]) {
@@ -2094,7 +2250,7 @@ button {
 </div>
 `}
                     
-                    <div class="chart-container">
+                    <div class="chart-container" id="chartContainer">
                         ${renderChartItems()}
                     </div>
                     
@@ -2133,18 +2289,10 @@ button {
           if (!isYearEnd && !isGoat) {
     const dates = Object.keys(appState.chartData[chartType] || {});
     if (dates.length > 0) {
-        flatpickr("#weekSelector", {
+        const picker = flatpickr("#weekSelector", {
             enable: dates,
             defaultDate: appState.currentDate,
             dateFormat: "Y-m-d",
-            theme: "dark",
-            position: "auto",
-            animate: true,
-            showMonths: 1,
-            static: false,
-            closeOnSelect: true,
-            nextArrow: '<i class="fas fa-chevron-right"></i>',
-            prevArrow: '<i class="fas fa-chevron-left"></i>',
             onChange: function(selectedDates, dateStr, instance) {
                 if (dateStr) {
                     appState.currentDate = dateStr;
@@ -2163,6 +2311,13 @@ button {
                 }
             }
         });
+        
+        // Garantir que o flatpickr seja inicializado corretamente
+        setTimeout(() => {
+            if (picker) {
+                picker.setDate(appState.currentDate);
+            }
+        }, 100);
     }
 }
             
@@ -2177,6 +2332,12 @@ button {
                     });
                 });
             }
+
+            // Configurar listeners dos botões de navegação
+            document.getElementById('prevWeekBtn')?.addEventListener('click', navigateToPrevWeek);
+            document.getElementById('nextWeekBtn')?.addEventListener('click', navigateToNextWeek);
+            document.getElementById('bottomPrevWeekBtn')?.addEventListener('click', navigateToPrevWeek);
+            document.getElementById('bottomNextWeekBtn')?.addEventListener('click', navigateToNextWeek);
         }
         
         function getYearButtons(chartType) {
@@ -2288,6 +2449,17 @@ button {
 
                 const rankClass = position === 1 ? (isGoat ? 'rank-1 goat' : 'rank-1') : '';
 
+                // Para o chart de artistas, não mostrar o nome do artista duplicado
+                const artistDisplay = chartType === 'artists' ? 
+                    `<p class="text-gray-600 text-sm md:text-base mb-2">
+                        <button class="text-accent hover:text-accent-dark text-xs font-semibold chart-run-link-artist" data-artist="${artist}">
+                            View Artist Page <i class="fas fa-arrow-right text-xs ml-1"></i>
+                        </button>
+                    </p>` : 
+                    `<p class="text-gray-600 text-sm md:text-base mb-2">
+                        <span class="artist-link font-medium" data-artist="${artist}">${artist}</span>
+                    </p>`;
+
                 return `
                     <div class="chart-card-item ${rankClass}">
                         <div class="flex items-start">
@@ -2310,9 +2482,7 @@ button {
                                                 <span class="artist-link cursor-pointer" data-artist="${artist}" data-item="${name}" data-type="${chartType.includes('Albums') || chartType.includes('topStreaming') || chartType.includes('topAlbumSales') ? 'album' : 'song'}">${name}</span>
                                             </p>
                                         </div>
-                                        <p class="text-gray-600 text-sm md:text-base mb-2">
-                                            <span class="artist-link font-medium" data-artist="${artist}">${artist}</span>
-                                        </p>
+                                        ${artistDisplay}
                                         <div class="flex flex-wrap gap-2 mb-2">
                                             ${weeksAt1Badge}
                                             ${newPeakBadge}
@@ -2484,34 +2654,66 @@ button {
             if (chartRun.length === 0) {
                 modalContent.innerHTML = '<p class="text-center text-gray-400">No chart run data available.</p>';
             } else {
-                const listItems = chartRun.map(run => {
+                // Determinar a classe para cada item baseado na mudança de posição
+                const listItems = chartRun.map((run, index, array) => {
                     const isPeak = run.position === run.peak;
                     const isNumberOne = run.position === 1;
-
-                    let highlightClass = '';
-                    if (isNumberOne) {
-                        highlightClass = 'text-accent font-bold';
-                    } else if (isPeak) {
-                        highlightClass = 'text-green-500 font-semibold';
+                    
+                    // Determinar classe baseada na mudança em relação à semana anterior
+                    let runClass = 'run-steady';
+                    let changeType = 'steady';
+                    
+                    if (index > 0) {
+                        const prevRun = array[index - 1];
+                        if (run.position < prevRun.position) {
+                            runClass = 'run-up';
+                            changeType = 'up';
+                        } else if (run.position > prevRun.position) {
+                            runClass = 'run-down';
+                            changeType = 'down';
+                        }
                     }
                     
-                    // Data como link para a semana específica
+                    // Se for novo pico (posição melhor que o pico anterior)
+                    if (isPeak && index > 0 && run.position < array[index - 1].peak) {
+                        runClass = 'run-peak';
+                        changeType = 'peak';
+                    }
+                    
+                    // Se for número 1
+                    if (isNumberOne) {
+                        runClass = 'run-number-one';
+                        changeType = 'number-one';
+                    }
+                    
+                    // Se for estreia (primeira semana)
+                    if (index === 0 && array.length > 0) {
+                        runClass = 'run-new';
+                        changeType = 'new';
+                    }
+                    
+                    const changeIcon = changeType === 'up' ? '▲' : changeType === 'down' ? '▼' : '';
+                    
                     return `
-                        <div class="flex justify-between items-center py-2 px-4 border-b border-gray-800">
-                            <span class="font-medium text-sm md:text-base text-white">
+                        <div class="chart-run-card ${runClass}">
+                            <div class="chart-run-date">
                                 <button class="date-link" onclick="goToChartWeek('${chartType}', '${run.date}')">
-                                    Week of ${run.date}
+                                    ${run.date}
                                 </button>
-                            </span>
-                            <span class="text-xs md:text-sm font-semibold ${highlightClass}">#${run.position}</span>
-                            ${isPeak && run.weeks > 1 ? `<span class="bg-yellow-400 text-black text-xs font-bold px-2 py-0.5 rounded-full ml-2">NEW PEAK</span>` : ''}
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="chart-run-position">#${run.position}</span>
+                                ${changeIcon ? `<span class="text-xs font-bold">${changeIcon}</span>` : ''}
+                                ${isPeak && index > 0 ? '<span class="chart-run-peak-badge">NEW PEAK</span>' : ''}
+                                ${index === 0 ? '<span class="chart-run-new-badge">DEBUT</span>' : ''}
+                            </div>
                         </div>
                     `;
                 }).join('');
 
                 modalContent.innerHTML = `
-                    <h3 class="text-xl md:text-2xl font-bold mb-4 text-white break-text">${name} by ${artist} - Chart Run</h3>
-                    <div class="bg-gray-800 rounded-lg overflow-hidden">
+                    <h3 class="text-xl md:text-2xl font-bold mb-4 text-black break-text">${name} by ${artist} - Chart Run</h3>
+                    <div class="chart-run-grid">
                         ${listItems}
                     </div>
                 `;
@@ -2579,41 +2781,8 @@ button {
                 items = appState.chartData[chartType][appState.currentDate];
             }
             
-            // Carregar todas as imagens
-            for (let i = 0; i < items.length; i++) {
-                const row = items[i];
-                if (!row) continue;
-                const artist = row[colMap.artist] || 'Unknown';
-                
-                let query = '';
-                let type = '';
-                
-                if (chartType?.includes('Songs') || chartType === 'songs' || chartType === 'radioSongs') {
-                    query = artist;
-                    type = 'artist';
-                } else if (chartType?.includes('Albums') || chartType === 'albums' || chartType === 'topStreamingAlbums' || chartType === 'topAlbumSales') {
-                    const album = row[colMap.album] || '';
-                    query = `${artist} ${album}`;
-                    type = 'album';
-                } else {
-                    query = artist;
-                    type = 'artist';
-                }
-                
-                if (query && query !== 'Unknown') {
-                    try {
-                        const imageUrl = await getSpotifyImage(query, type);
-                        const imageElement = document.getElementById(`image-${chartType}-${i}`);
-                        
-                        if (imageElement && imageUrl) {
-                            imageElement.innerHTML = `<img src="${imageUrl}" alt="${query}" class="w-full h-full object-cover">`;
-                            imageElement.classList.remove('placeholder-art');
-                        }
-                    } catch (error) {
-                        console.error('Error loading image:', error);
-                    }
-                }
-            }
+            // Carregar imagens em lote para não sobrecarregar
+            await loadImagesBatch(items, chartType, colMap);
         }
 
         // --- ALL ENTRIES PAGE FUNCTIONS ---
@@ -2984,6 +3153,18 @@ button {
             
             if (!article) return;
             
+            // Processar o texto para aplicar formatação especial
+            let formattedText = article.fullText;
+            
+            // Aplicar negrito em palavras com 's (ex: "Taylor's", "Album's")
+            formattedText = formattedText.replace(/\b(\w+'\w+)\b/g, '<strong>$1</strong>');
+            
+            // Aplicar negrito em números (opcional)
+            formattedText = formattedText.replace(/\b(\d+)\b/g, '<em>$1</em>');
+            
+            // Destacar padrões: palavra antes e depois de "by" ficam em negrito
+            formattedText = formattedText.replace(/\b(\w+(?:\s+\w+)*)\s+by\s+(\w+(?:\s+\w+)*)\b/gi, '<strong>$1</strong> by <strong>$2</strong>');
+            
             const chartLinkHtml = article.chartLink ? `
                 <div class="mt-6 md:mt-8 text-center">
                     <button class="px-3 md:px-4 py-2 bg-accent text-black rounded-md hover:bg-accent-dark transition-colors text-sm md:text-base" onclick="showChartPage('${article.chartLink}', '${article.publicationDate}')">
@@ -3003,9 +3184,9 @@ button {
                             </div>
                         `}
                         <span class="text-xs md:text-sm text-accent font-semibold">${article.publicationDate}</span>
-                        <h3 class="text-xl md:text-2xl font-bold mt-1 mb-3 text-white break-text">${article.title}</h3>
+                        <h3 class="text-xl md:text-2xl font-bold mt-1 mb-3 text-black break-text">${article.title}</h3>
                         <div class="prose max-w-none">
-                            <p class="text-gray-300 text-sm md:text-base whitespace-pre-line">${article.fullText}</p>
+                            <p class="text-gray-800 text-sm md:text-base whitespace-pre-line" style="text-align: justify;">${formattedText}</p>
                         </div>
                         ${chartLinkHtml}
                     </div>
@@ -3124,6 +3305,21 @@ button {
                             date: appState.currentDate,
                             year: appState.currentYear,
                             entryType: appState.currentEntryType
+                        });
+                        renderArtistPage(artist);
+                    });
+                });
+                
+                // Adicionar listeners para os botões "View Artist Page" no Artist 50
+                document.querySelectorAll('.chart-run-link-artist').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const artist = this.dataset.artist;
+                        appState.navigationHistory.push({
+                            view: appState.currentView,
+                            chart: appState.activeChart,
+                            date: appState.currentDate,
+                            year: appState.currentYear
                         });
                         renderArtistPage(artist);
                     });
