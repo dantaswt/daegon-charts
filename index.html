@@ -162,6 +162,34 @@
     <div class="item-details-modal" id="itemDetailsModal"><div class="modal-content w-full max-w-2xl"><button class="close-modal" id="closeModal">×</button><div id="modalContent"></div></div></div>
 
     <script>
+        const requestQueue = [];
+let activeRequests = 0;
+const MAX_REQUESTS = 4; // ideal
+
+async function enqueueRequest(fn) {
+    return new Promise((resolve) => {
+        requestQueue.push({ fn, resolve });
+        processQueue();
+    });
+}
+
+async function processQueue() {
+    if (activeRequests >= MAX_REQUESTS || requestQueue.length === 0) return;
+
+    activeRequests++;
+
+    const { fn, resolve } = requestQueue.shift();
+
+    try {
+        const result = await fn();
+        resolve(result);
+    } catch {
+        resolve(null);
+    }
+
+    activeRequests--;
+    processQueue();
+}
         // ==================== CONFIG ====================
         const SPOTIFY_CLIENT_ID = '60d65b0ac9f14d6aa91c08a66894cea9';
         const SPOTIFY_CLIENT_SECRET = 'caf3f20ae798475e8dec65697f210c2a';
@@ -218,8 +246,9 @@
         async function getSpotifyToken() {
             if (SPOTIFY_ACCESS_TOKEN) return SPOTIFY_ACCESS_TOKEN;
             try {
-                const res = await fetch('https://accounts.spotify.com/api/token', {
-                    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET) },
+                const res = await enqueueRequest(() =>
+                    fetch('https://accounts.spotify.com/api/token', {
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Basic ' + btoa(SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET) },
                     body: 'grant_type=client_credentials'
                 });
                 const data = await res.json();
