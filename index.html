@@ -228,35 +228,73 @@
             } catch(e) { return null; }
         }
         
-        async function getSpotifyImage(query, type) {
-            if (!query) return null;
-            
-            let correctedQuery = query;
-            if (type === 'artist') {
-                for (const [wrongName, correctName] of Object.entries(artistImageCorrections)) {
-                    if (query.toLowerCase().includes(wrongName.toLowerCase())) {
-                        correctedQuery = correctName;
-                        break;
-                    }
-                }
-            }
-            
-            const key = `${type}:${correctedQuery}`.toLowerCase();
-            if (imageCache[key]) return imageCache[key];
-            const token = await getSpotifyToken();
-            if (!token) return null;
-            try {
-                const searchType = type === 'artist' ? 'artist' : 'album';
-                const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(correctedQuery)}&type=${searchType}&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } });
-                const data = await res.json();
-                let url = null;
-                if (type === 'artist' && data.artists?.items?.[0]) url = data.artists.items[0].images?.[0]?.url;
-                else if (type === 'album' && data.albums?.items?.[0]) url = data.albums.items[0].images?.[0]?.url;
-                if (url) { imageCache[key] = url; saveImageCache(); }
-                return url;
-            } catch(e) { return null; }
+       async function getSpotifyImage(query, type, extra = {}) {
+    if (!query) return null;
+
+    const { artist = '', track = '', album = '' } = extra;
+
+    const key = `${type}:${query}:${artist}:${track}:${album}`.toLowerCase();
+
+    // cache
+    if (imageCache[key]) return imageCache[key];
+
+    const token = await getSpotifyToken();
+    if (!token) return null;
+
+    let url = null;
+
+    try {
+        // 🔥 1. MAIS PRECISO → track + artist
+        if (track && artist) {
+            const res = await fetch(
+                `https://api.spotify.com/v1/search?q=${encodeURIComponent(`track:${track} artist:${artist}`)}&type=track&limit=1`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const data = await res.json();
+            url = data.tracks?.items?.[0]?.album?.images?.[0]?.url;
         }
 
+        // 🔁 2. fallback → album + artist
+        if (!url && album && artist) {
+            const res = await fetch(
+                `https://api.spotify.com/v1/search?q=${encodeURIComponent(`album:${album} artist:${artist}`)}&type=album&limit=1`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            const data = await res.json();
+            url = data.albums?.items?.[0]?.images?.[0]?.url;
+        }
+
+        // 🔁 3. fallback → busca original
+        if (!url) {
+            const searchType = type === 'artist' ? 'artist' : 'album';
+
+            const res = await fetch(
+                `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${searchType}&limit=1`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            const data = await res.json();
+
+            if (type === 'artist') {
+                url = data.artists?.items?.[0]?.images?.[0]?.url;
+            } else {
+                url = data.albums?.items?.[0]?.images?.[0]?.url;
+            }
+        }
+
+        // salvar cache
+        if (url) {
+            imageCache[key] = url;
+            localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache));
+        }
+
+        return url;
+
+    } catch (e) {
+        console.error("Erro imagem:", e);
+        return null;
+    }
+}
         // ==================== DATA PROCESSING ====================
         function parseCsvRow(t) { if(!t) return []; let r=[], c='', q=false; for(let i=0;i<t.length;i++){ const ch=t[i]; if(ch==='"') q=!q; else if(ch===','&&!q){ r.push(c.trim()); c=''; } else c+=ch; } r.push(c.trim()); return r; }
         
