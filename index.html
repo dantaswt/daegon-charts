@@ -48,10 +48,8 @@
         .spotify-image { width: 64px; height: 64px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.3s ease; }
         @media (min-width: 768px) { .spotify-image { width: 80px; height: 80px; } }
         .spotify-image:hover { transform: scale(1.05); }
-        .rank-number { font-size: 1.5rem; font-weight: 800; color: #111827; min-width: 3rem; text-align: center; display: flex; align-items: center; gap: 0.25rem; justify-content: center; }
+        .rank-number { font-size: 1.5rem; font-weight: 800; color: #111827; min-width: 3rem; text-align: center; }
         @media (min-width: 768px) { .rank-number { font-size: 1.875rem; min-width: 3.5rem; } }
-        .diff-indicator { font-size: 0.7rem; font-weight: 600; display: inline-block; }
-        @media (min-width: 768px) { .diff-indicator { font-size: 0.8rem; } }
         .artist-link { cursor: pointer; transition: color 0.2s; color: #111827; font-weight: 600; }
         .artist-link:hover { color: var(--accent); }
         .section-title { position: relative; display: inline-block; margin-bottom: 2rem; color: var(--secondary); }
@@ -87,6 +85,7 @@
         .chart-stats-vertical .stat-value { color: #111827; font-weight: 700; margin-left: 0.25rem; }
         .chart-container { background-color: #000; padding: 1rem; border-radius: 1rem; }
         @media (min-width: 768px) { .chart-container { padding: 1.5rem; } }
+        .diff-indicator { display: inline-block; margin-left: 0.25rem; font-size: 0.7rem; font-weight: 600; }
         .chart-run-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
         .chart-run-card { background-color: white; border-radius: 8px; padding: 0.75rem 1rem; min-width: 120px; flex: 1 1 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid transparent; transition: transform 0.2s ease; }
         .chart-run-card.run-up { border-left-color: var(--run-up); background-color: rgba(16,185,129,0.05); }
@@ -101,9 +100,8 @@
         @media (min-width: 768px) { .artist-name-large { font-size: 3rem; } }
         .artist-list-card { background-color: white; border-radius: 12px; overflow: hidden; margin-bottom: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .artist-list-header { background-color: #f8f9fa; padding: 0.75rem 1rem; border-bottom: 1px solid #e5e7eb; }
-        .artist-list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; color: #111827; }
+        .artist-list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; border-bottom: 1px solid #f0f0f0; }
         .artist-list-item:hover { background-color: #fafafa; }
-        .artist-list-item .font-medium { color: #111827; font-weight: 500; }
         .units-badge { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 0.25rem; margin-left: 0.5rem; white-space: nowrap; }
         .artists-icons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
         @media (min-width: 640px) { .artists-icons-grid { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 2rem; } }
@@ -134,12 +132,6 @@
         .year-btn.active { background: var(--accent); color: #000; }
         .year-selector { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
         .back-button { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; transition: color 0.2s; }
-        .artist-list-item .text-gray-500 { color: #6B7280; }
-        .artist-list-item .text-xs { color: #6B7280; }
-        .about-card { background: linear-gradient(135deg, #0a0a0a 0%, #111 100%); border-radius: 24px; padding: 2rem; margin-bottom: 2rem; border: 1px solid rgba(255,215,0,0.2); }
-        .about-icon { font-size: 2rem; color: var(--accent); margin-bottom: 1rem; }
-        .formula-box { background: rgba(255,215,0,0.1); border-left: 4px solid var(--accent); padding: 1rem; border-radius: 8px; margin: 1rem 0; font-family: monospace; }
-        .chart-badge { display: inline-block; background: var(--accent); color: #000; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; margin-right: 0.5rem; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -150,7 +142,6 @@
         <div class="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
             <h1 class="text-xl md:text-3xl font-extrabold"><span class="gold-title" id="mainTitle">daegon charts</span></h1>
             <nav class="flex space-x-2 md:space-x-4">
-                <button id="navAbout" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">About</button>
                 <button id="navAllArtists" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">All Artists Entries</button>
                 <button id="navChartBeat" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">Chart Beat</button>
             </nav>
@@ -174,10 +165,7 @@
         try { const saved = localStorage.getItem('daegon_image_cache'); if(saved) imageCache = JSON.parse(saved); } catch(e) {}
         function saveImageCache() { try { localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache)); } catch(e) {} }
 
-        const weeklyChartList = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'];
-        const yearEndList = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
-        const goatList = ['goatSongs', 'goatArtists', 'goatAlbums'];
-
+        // 6 WEEKLY CHARTS + YEAR-END + GOAT
         const chartsConfig = {
             songs: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=904867620', title: 'Hot 100', icon: 'fa-music', loaded: false },
             artists: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1568177610', title: 'Artist 50', icon: 'fa-user', loaded: false },
@@ -193,6 +181,10 @@
             goatAlbums: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1548244755', title: 'Albums', icon: 'fa-trophy', loaded: false },
             artistStats: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1519606558', title: 'Artist Statistics', icon: 'fa-chart-bar', loaded: false }
         };
+        
+        const weeklyChartList = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'];
+        const yearEndList = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
+        const goatList = ['goatSongs', 'goatArtists', 'goatAlbums'];
 
         const chartBeatConfig = {
             hot100: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1019123057', title: 'Hot 100 Songs' },
@@ -224,19 +216,12 @@
         
         async function getSpotifyImage(query, type) {
             if (!query) return null;
-            let searchQuery = query;
-            if (type === 'artist') {
-                searchQuery = `${query} SINGER`;
-            } else if (type === 'album') {
-                searchQuery = `${query} album`;
-            }
             const key = `${type}:${query}`.toLowerCase();
             if (imageCache[key]) return imageCache[key];
             const token = await getSpotifyToken();
             if (!token) return null;
             try {
-                const searchType = type === 'artist' ? 'artist' : 'album';
-                const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=${searchType}&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } });
+                const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${type}&limit=1`, { headers: { 'Authorization': `Bearer ${token}` } });
                 const data = await res.json();
                 let url = null;
                 if (type === 'artist' && data.artists?.items?.[0]) url = data.artists.items[0].images?.[0]?.url;
@@ -400,87 +385,6 @@
             </div>`;
         }
         
-        function renderAboutPage() {
-            appState.currentView = 'about';
-            appContainer.innerHTML = `
-                <div class="max-w-4xl mx-auto">
-                    <button id="backBtn" class="back-button mb-6 flex items-center text-accent hover:text-accent-dark font-semibold"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button>
-                    
-                    <div class="about-card">
-                        <div class="text-center mb-8">
-                            <i class="fas fa-chart-line about-icon"></i>
-                            <h1 class="text-3xl md:text-4xl font-bold text-white">About the Charts</h1>
-                            <p class="text-gray-400 mt-2">How daegon charts are calculated</p>
-                        </div>
-                        
-                        <div class="space-y-6">
-                            <div>
-                                <h2 class="text-xl font-bold text-accent mb-3"><i class="fas fa-music mr-2"></i> Hot 100 & Radio Songs</h2>
-                                <p class="text-gray-300 leading-relaxed">Based on <strong class="text-accent">play count</strong> from Last.fm data. Each play counts equally, with no weighting for recency. The chart updates weekly, reflecting the most played songs in the tracking period.</p>
-                                <div class="formula-box mt-3">
-                                    <span class="chart-badge">Formula</span>
-                                    <code class="text-accent">Position = Total Plays (weekly)</code>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h2 class="text-xl font-bold text-accent mb-3"><i class="fas fa-headphones mr-2"></i> Top Streaming Albums</h2>
-                                <p class="text-gray-300 leading-relaxed">Ranked by <strong class="text-accent">total streams</strong> of all tracks from the album during the tracking week. Each stream contributes equally to the album's performance.</p>
-                                <div class="formula-box mt-3">
-                                    <span class="chart-badge">Formula</span>
-                                    <code class="text-accent">Points = Σ (Streams per track)</code>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h2 class="text-xl font-bold text-accent mb-3"><i class="fas fa-chart-simple mr-2"></i> Top Album Sales</h2>
-                                <p class="text-gray-300 leading-relaxed">Based on <strong class="text-accent">sales units</strong> (physical + digital). Each unit sold counts as one point.</p>
-                                <div class="formula-box mt-3">
-                                    <span class="chart-badge">Formula</span>
-                                    <code class="text-accent">Points = Total Sales Units</code>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h2 class="text-xl font-bold text-accent mb-3"><i class="fas fa-user mr-2"></i> Artist 50</h2>
-                                <p class="text-gray-300 leading-relaxed">Aggregates performance across <strong class="text-accent">all songs</strong> by the artist. Combines streaming, sales, and radio spins for a comprehensive ranking.</p>
-                                <div class="formula-box mt-3">
-                                    <span class="chart-badge">Formula</span>
-                                    <code class="text-accent">Points = Σ (Song Performance)</code>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h2 class="text-xl font-bold text-accent mb-3"><i class="fas fa-trophy mr-2"></i> Greatest of All Time</h2>
-                                <p class="text-gray-300 leading-relaxed">Cumulative ranking based on <strong class="text-accent">historical performance</strong>. Points are awarded based on peak position and weeks on chart, with bonuses for weeks at #1.</p>
-                                <div class="formula-box mt-3">
-                                    <span class="chart-badge">Formula</span>
-                                    <code class="text-accent">GOAT Points = Σ (Position Points × Weeks) + (Bonus × Weeks at #1)</code>
-                                </div>
-                            </div>
-                            
-                            <div>
-                                <h2 class="text-xl font-bold text-accent mb-3"><i class="fas fa-calendar mr-2"></i> Year-End Charts</h2>
-                                <p class="text-gray-300 leading-relaxed">Cumulative performance across the entire calendar year. Uses the same metrics as weekly charts but aggregated annually.</p>
-                                <div class="formula-box mt-3">
-                                    <span class="chart-badge">Formula</span>
-                                    <code class="text-accent">Year-End Points = Σ (Weekly Points) / Weeks Active</code>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-8 p-4 bg-black/50 rounded-lg border border-accent/20">
-                            <p class="text-sm text-gray-400 text-center">
-                                <i class="fas fa-database mr-1"></i> Data source: Last.fm scrobbles • Chart updates: Weekly • Methodology based on Billboard-style tracking
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('backBtn')?.addEventListener('click', () => { appState.navigationHistory = []; renderHome(); });
-            setupBackToTop();
-        }
-        
         function renderHome() {
             appState.currentView = 'home';
             const h100=appState.chartBeatData.hot100[0], a50=appState.chartBeatData.artists[0], a100=appState.chartBeatData.top100Albums[0];
@@ -547,11 +451,7 @@
         }
         
         function showChart(ct, dateToSet=null){
-            if(appState.currentView === 'chart' && appState.activeChart) {
-                appState.navigationHistory.push({ view: 'chart', chart: appState.activeChart, date: appState.currentDate, year: appState.currentYear });
-            }
             appState.activeChart = ct;
-            appState.currentView = 'chart';
             const isYear = ct.includes('yearEnd'), isGoat = ct.includes('goat');
             if(isYear){
                 let years = Object.keys(appState.chartData[ct]||{}).sort((a,b)=>b-a);
@@ -565,11 +465,13 @@
                 appState.sharedDate = appState.currentDate;
             }
             const nav = isYear?Object.entries(chartsConfig).filter(([k])=>k.includes('yearEnd')):isGoat?Object.entries(chartsConfig).filter(([k])=>k.includes('goat')):Object.entries(chartsConfig).filter(([k])=>!k.includes('yearEnd')&&!k.includes('goat')&&k!=='artistStats');
-            appContainer.innerHTML = `<div class="max-w-4xl mx-auto"><button id="backBtn" class="back-button mb-4 md:mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors text-sm md:text-base"><i class="fas fa-arrow-left mr-2"></i> Back</button>
+            appContainer.innerHTML = `<div class="max-w-4xl mx-auto"><button id="backBtn" class="back-button mb-4 md:mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors text-sm md:text-base"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button>
             <div class="mb-4 md:mb-6"><h2 class="text-xl md:text-3xl font-bold text-center mb-2 text-white">${isYear?'Year-End Charts':isGoat?'Greatest of All Time':'Weekly Charts'}</h2><div id="chartNav" class="flex flex-wrap justify-center gap-2 border-b border-gray-800 pb-3">${nav.map(([k,c])=>`<button data-chart="${k}" class="chart-nav-btn btn-hover ${appState.activeChart===k?(isGoat?'goat-active':'active'):''} text-xs md:text-sm font-semibold py-2 px-3 rounded-md transition-all">${c.title}</button>`).join('')}</div></div>
             <div class="mb-4 md:mb-6"><h3 class="text-lg md:text-xl font-bold text-center mb-3 md:mb-4 text-white">${chartsConfig[appState.activeChart]?.title||''}</h3>
             ${isYear?`<div class="flex justify-center mb-4"><div class="year-selector">${Object.keys(appState.chartData[ct]||{}).sort((a,b)=>b-a).map(y=>`<button class="year-btn ${y===appState.currentYear?'active':''}" data-year="${y}">${y}</button>`).join('')}</div></div>`:isGoat?'':`<div class="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-4"><div class="flex items-center gap-2 text-white"><label class="text-xs md:text-sm text-gray-400 font-medium">Week:</label><button id="prevBtn" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover"><i class="fas fa-chevron-left text-xs md:text-sm"></i></button><input type="text" id="weekPicker" class="flatpickr-input text-xs md:text-sm" placeholder="Select date"><button id="nextBtn" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover"><i class="fas fa-chevron-right text-xs md:text-sm"></i></button></div></div>`}
             <div class="chart-container" id="chartContainer">${renderChartItems()}</div>
+            ${!isYear&&!isGoat?`<div class="bottom-nav flex justify-center items-center gap-2 md:gap-3 mt-4 md:mt-6"><button id="bottomPrev" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover text-xs md:text-sm"><i class="fas fa-chevron-left text-xs mr-1"></i> Previous</button><button id="bottomNext" class="p-1 md:p-2 rounded-md bg-gray-800 hover:bg-gray-700 disabled:opacity-50 btn-hover text-xs md:text-sm">Next <i class="fas fa-chevron-right text-xs ml-1"></i></button></div>`:''}
+            ${!isYear&&!isGoat?renderDropouts():''}
             ${!isYear&&!isGoat?`<div class="text-center mt-4 md:mt-6"><button id="topBtn" class="px-3 md:px-4 py-1 md:py-2 bg-accent text-black rounded-md hover:bg-accent-dark btn-hover text-xs md:text-sm"><i class="fas fa-arrow-up mr-1 md:mr-2"></i> Back to Top</button></div>`:''}</div>`;
             setupChartListeners();
             setTimeout(()=>loadImages(),50);
@@ -581,7 +483,7 @@
                 }
             }
             if(isYear) document.querySelectorAll('.year-btn').forEach(b=>b.addEventListener('click',function(){ appState.currentYear=this.dataset.year; document.querySelectorAll('.year-btn').forEach(x=>x.classList.remove('active')); this.classList.add('active'); document.getElementById('chartContainer').innerHTML=renderChartItems(); setTimeout(()=>loadImages(),50); }));
-            ['prevBtn','nextBtn'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>navigateWeek(id.includes('prev')?-1:1)));
+            ['prevBtn','nextBtn','bottomPrev','bottomNext'].forEach(id=>document.getElementById(id)?.addEventListener('click',()=>navigateWeek(id.includes('prev')?-1:1)));
         }
         
         function navigateWeek(delta){
@@ -601,8 +503,8 @@
         function updateNavButtons(){
             let dates = Object.keys(appState.chartData[appState.activeChart]||{}).sort();
             let idx = dates.indexOf(appState.currentDate);
-            ['prevBtn'].forEach(id=>{ let b=document.getElementById(id); if(b) b.disabled = idx<=0; });
-            ['nextBtn'].forEach(id=>{ let b=document.getElementById(id); if(b) b.disabled = idx>=dates.length-1; });
+            ['prevBtn','bottomPrev'].forEach(id=>{ let b=document.getElementById(id); if(b) b.disabled = idx<=0; });
+            ['nextBtn','bottomNext'].forEach(id=>{ let b=document.getElementById(id); if(b) b.disabled = idx>=dates.length-1; });
         }
         
         function renderChartItems(){
@@ -618,21 +520,14 @@
                 let w1=cm.weeksAt1!==-1?parseInt(row[cm.weeksAt1]):null, units=cm.units!==-1?row[cm.units]:null, total=cm.totalUnits!==-1?row[cm.totalUnits]:null;
                 let name = (ct.includes('Songs')||ct==='songs'||ct==='radioSongs')?(row[cm.song]||'Unknown'):(ct.includes('Albums')||ct==='albums'||ct==='topStreamingAlbums'||ct==='topAlbumSales')?(row[cm.album]||'Unknown'):(row[cm.artist]||'Unknown');
                 let diffClass='', diffSym='';
-                if(diff){ 
-                    let l=diff.toString().toLowerCase(); 
-                    if(l.includes('▲')||l.includes('+')){ diffClass='diff-up'; diffSym='▲'; } 
-                    else if(l.includes('▼')||l.includes('-')){ diffClass='diff-down'; diffSym='▼'; } 
-                    else if(l.includes('new')){ diffClass='diff-new'; diffSym='NEW'; } 
-                    else if(l.includes('re')){ diffClass='diff-new'; diffSym='RE'; } 
-                    else if(l==='0') diffSym='='; 
-                }
+                if(diff){ let l=diff.toString().toLowerCase(); if(l.includes('▲')||l.includes('+')){ diffClass='diff-up'; diffSym='▲'; } else if(l.includes('▼')||l.includes('-')){ diffClass='diff-down'; diffSym='▼'; } else if(l.includes('new')){ diffClass='diff-new'; diffSym='NEW'; } else if(l.includes('re')){ diffClass='diff-new'; diffSym='RE'; } else if(l==='0') diffSym='='; }
                 let newPeak='', w1badge='';
                 if(!isYear&&!isGoat&&pk&&pos<pk){ let isNew=(diff?.toLowerCase()==='new'||diff?.toLowerCase()==='re'||lw?.toString()==='0'); if(!isNew) newPeak='<span class="badge badge-new-peak">NEW PEAK</span>'; }
                 if(w1&&w1>0) w1badge=`<span class="badge badge-weeks-at-1">${w1} WK${w1>1?'S':''} AT #1</span>`;
                 let unitsDisplay='';
                 if(units && units!=='0'){
                     if(ct==='radioSongs') unitsDisplay='';
-                    else if(ct==='topStreamingAlbums') unitsDisplay=`<span class="text-xs text-muted-item">Streaming: <span class="font-semibold">${units}</span></span>`;
+                    else if(ct==='topStreamingAlbums') unitsDisplay=`<span class="text-xs text-muted-item">Streams: <span class="font-semibold">${units}</span></span>`;
                     else if(ct==='topAlbumSales') unitsDisplay=`<span class="text-xs text-muted-item">Sales: <span class="font-semibold">${units}</span></span>`;
                     else unitsDisplay=`<span class="text-xs text-muted-item">Units: <span class="font-semibold">${units}</span></span>`;
                 }
@@ -642,6 +537,20 @@
                 let run = appState.chartRunData[ct]?.[runKey]||[];
                 return `<div class="chart-card-item ${pos===1?(isGoat?'rank-1 goat':'rank-1'):''}" data-chart="${ct}" data-date="${appState.currentDate}"><div class="flex items-start"><div class="rank-number">${pos}${diffSym?`<span class="diff-indicator ${diffClass}">${diffSym}</span>`:''}</div><div class="mx-3 md:mx-4"><div class="spotify-image" id="img-${ct}-${idx}"><div class="w-full h-full placeholder-art"><i class="fas ${chartsConfig[ct]?.icon||'fa-music'} text-gray-600"></i></div></div></div><div class="flex-grow"><div class="flex justify-between"><div class="flex-grow pr-2"><div class="flex flex-wrap gap-1 mb-1"><p class="font-bold text-base md:text-lg"><span class="artist-link cursor-pointer" data-artist="${artist}" data-item="${name}" data-type="${ct.includes('Albums')||ct.includes('topStreaming')||ct.includes('topAlbumSales')?'album':'song'}">${name}</span></p></div>${artistDisplay}<div class="flex flex-wrap gap-2 mb-2">${w1badge}${newPeak}</div><div class="flex flex-col gap-1">${unitsDisplay}${totalDisplay}</div></div>${!isYear&&!isGoat?`<div class="chart-stats-vertical">${lw!==undefined?`<span>LW<span class="stat-value">${lw==='0'||lw?.toLowerCase()==='re'?'-':lw}</span></span>`:''}${pk?`<span>PK<span class="stat-value">${pk}</span></span>`:''}${wks?`<span>WOC<span class="stat-value">${wks}</span></span>`:''}</div>`:isGoat||isYear?`<div class="chart-stats-vertical">${pk?`<span>PK<span class="stat-value">${pk}</span></span>`:''}${wks?`<span>WKS<span class="stat-value">${wks}</span></span>`:''}</div>`:''}</div>${run.length?`<div class="mt-3 text-xs"><button class="text-accent chart-run-link" data-chart="${ct}" data-key="${runKey}">View Chart Run <i class="fas fa-arrow-right text-xs ml-1"></i></button></div>`:''}</div></div></div>`;
             }).join('');
+        }
+        
+        function renderDropouts(){
+            let ct=appState.activeChart, cm=appState.colMaps[ct]||{};
+            if(!appState.currentDate) return '';
+            let dates = Object.keys(appState.chartData[ct]||{}).sort();
+            let idx = dates.indexOf(appState.currentDate);
+            if(idx<=0) return '';
+            let prev=dates[idx-1], cur=appState.chartData[ct][appState.currentDate]||[], pre=appState.chartData[ct][prev]||[];
+            let curSet = new Set();
+            cur.forEach(r=>{ let n=ct.includes('Songs')?r[cm.song]:ct.includes('Albums')?r[cm.album]:r[cm.artist]; let a=r[cm.artist]; if(n&&a) curSet.add(`${n}:${a}`.toLowerCase()); });
+            let drop = pre.filter(r=>{ let n=ct.includes('Songs')?r[cm.song]:ct.includes('Albums')?r[cm.album]:r[cm.artist]; let a=r[cm.artist]; return n&&a && !curSet.has(`${n}:${a}`.toLowerCase()); }).slice(0,20);
+            if(!drop.length) return '';
+            return `<div class="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-gray-800"><h4 class="text-base md:text-lg font-bold mb-3 md:mb-4 text-gray-400">Dropouts from Previous Week</h4><div class="bg-black rounded-lg border border-gray-800">${drop.map(r=>`<div class="chart-row py-2 md:py-3 px-2 md:px-4 border-b border-gray-800 last:border-b-0 dropout-item"><div class="flex items-center"><div class="flex-shrink-0 w-8 md:w-10 text-center"><span class="text-base md:text-lg font-bold text-gray-500">${parseInt(r[cm.position])||0}</span></div><div class="flex-grow ml-2 md:ml-4"><p class="font-medium text-sm md:text-base text-gray-400 break-text">${ct.includes('Songs')?r[cm.song]:ct.includes('Albums')?r[cm.album]:r[cm.artist]}</p><p class="text-xs text-gray-500">${r[cm.artist]||'Unknown'}</p></div></div></div>`).join('')}</div></div>`;
         }
         
         function setupChartListeners(){
@@ -695,7 +604,7 @@
                     return `<div class="artist-list-card mb-6"><div class="artist-list-header"><h3 class="font-bold text-gray-800">${name}</h3><p class="text-xs text-gray-500">${isArtist?`Peak #${cd.entries[0]?.peak||0} / ${cd.entries[0]?.weeks||0} Weeks`:`${cd.count} Entries / ${cd.numberOnes} #1's / ${cd.topTens} Top 10's`}</p></div>${!isArtist?`<div class="divide-y">${cd.entries.slice(0,20).map(e=>`<div class="artist-list-item"><div><span class="font-medium">${e.item}</span>${e.unitsSold?`<span class="text-xs text-gray-500 ml-2">${e.unitsSold}</span>`:''}${e.totalUnits?`<span class="units-badge text-xs">${e.totalUnits} total</span>`:''}</div><div class="flex gap-3"><span class="text-xs text-gray-500">Peak #${e.peak}</span><span class="text-xs text-gray-500">${e.weeks} wks</span></div></div>`).join('')}${cd.entries.length>20?`<div class="text-center py-2 text-xs text-gray-400">... and ${cd.entries.length-20} more</div>`:''}</div>`:''}</div>`;
                 }).join('');
                 appContainer.innerHTML = `<div class="max-w-4xl mx-auto"><button id="backBtn" class="back-button mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back</button>${img?`<img src="${img}" class="artist-header-image">`:`<div class="artist-header-image placeholder-art flex items-center justify-center"><i class="fas fa-user text-4xl text-gray-500"></i></div>`}<h1 class="artist-name-large">${artist}</h1><p class="text-gray-400 text-sm mb-6">Detailed Chart History</p><div>${sections}</div></div>`;
-                document.getElementById('backBtn')?.addEventListener('click',()=>navigateBack());
+                document.getElementById('backBtn')?.addEventListener('click',navigateBack);
                 setupBackToTop();
             });
         }
@@ -704,7 +613,7 @@
             appState.currentView='allArtists';
             let artists = appState.allArtistsList;
             appContainer.innerHTML = `<div class="max-w-6xl mx-auto"><button id="backBtn" class="back-button mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button><h2 class="text-2xl font-bold mb-4 section-title">All Artists Entries</h2><div class="search-container mb-4"><i class="fas fa-search search-icon"></i><input type="text" id="artistSearch" class="search-input text-sm" placeholder="Search artists..."></div><div id="artistsGrid" class="artists-icons-grid">${artists.map(a=>`<div class="artist-icon-card" data-artist="${a}"><div class="artist-icon-placeholder" id="icon-${a.replace(/[^a-z0-9]/gi,'_')}"><i class="fas fa-user"></i></div><div class="artist-icon-name">${a}</div></div>`).join('')}</div></div>`;
-            document.getElementById('backBtn')?.addEventListener('click',()=>navigateBack());
+            document.getElementById('backBtn')?.addEventListener('click',navigateBack);
             document.getElementById('artistSearch').addEventListener('input',function(){
                 let term=this.value.toLowerCase();
                 let filtered=artists.filter(a=>a.toLowerCase().includes(term));
@@ -729,11 +638,10 @@
         
         function navigateBack(){
             let prev = appState.navigationHistory.pop();
-            if(prev?.view==='chart') showChart(prev.chart, prev.date);
+            if(prev?.view==='chart') showChart(prev.chart);
             else if(prev?.view==='artist') renderArtistPage(prev.artist);
             else if(prev?.view==='allArtists') showAllArtists();
             else if(prev?.view==='chartBeat') renderChartBeatPage();
-            else if(prev?.view==='about') renderAboutPage();
             else renderHome();
         }
         
@@ -750,11 +658,13 @@
         async function init(){
             showMessage('loading','Loading charts data...');
             try{
+                // Carregar todos os charts
                 const allCharts = [...weeklyChartList, ...yearEndList, ...goatList, 'artistStats'];
                 for(let ct of allCharts) await fetchChartData(ct);
                 await fetchChartBeat();
                 let years = Object.keys(appState.chartData.yearEndSongs||{}).sort((a,b)=>b-a);
                 if(years.length) appState.currentYear = years[0];
+                // Definir data padrão para weekly charts
                 for(let ct of weeklyChartList) {
                     let dates = Object.keys(appState.chartData[ct]||{});
                     if(dates.length) {
@@ -769,7 +679,6 @@
         document.addEventListener('DOMContentLoaded',()=>{
             init();
             document.getElementById('mainTitle').addEventListener('click',()=>{ appState.navigationHistory=[]; renderHome(); });
-            document.getElementById('navAbout').addEventListener('click',()=>renderAboutPage());
             document.getElementById('navAllArtists').addEventListener('click',()=>showAllArtists());
             document.getElementById('navChartBeat').addEventListener('click',()=>showChartBeat('hot100'));
             closeModal.addEventListener('click',()=>modal.classList.remove('active'));
