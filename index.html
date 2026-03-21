@@ -137,6 +137,10 @@
         .artist-list-card .font-medium { color: #111827; }
         .rank-symbol { font-size: 0.8rem; font-weight: 600; display: inline-block; margin-left: 0.25rem; }
         @media (min-width: 768px) { .rank-symbol { font-size: 1rem; } }
+        .loading-skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 12px; min-height: 120px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .progress-bar { width: 100%; height: 4px; background: #333; border-radius: 2px; overflow: hidden; margin-top: 1rem; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -169,16 +173,6 @@
         let imageCache = {};
         try { const saved = localStorage.getItem('daegon_image_cache'); if(saved) imageCache = JSON.parse(saved); } catch(e) {}
         function saveImageCache() { try { localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache)); } catch(e) {} }
-
-        // Correções específicas para artistas com imagens erradas
-        const artistImageCorrections = {
-            'Anitta': 'Anitta cantora',
-            'anitta': 'Anitta cantora',
-            'Jão': 'Jão cantor',
-            'jão': 'Jão cantor',
-            'João': 'Jão cantor',
-            'joão': 'Jão cantor'
-        };
 
         const weeklyChartList = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'];
         const yearEndList = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
@@ -229,90 +223,50 @@
         }
         
         async function getSpotifyImage(query, type, extra = {}) {
-    if (!query) return null;
-
-    const { artist = '', track = '', album = '' } = extra;
-
-    const key = `${type}:${query}:${artist}:${track}:${album}`.toLowerCase();
-
-    // cache
-    if (imageCache[key]) return imageCache[key];
-
-    const token = await getSpotifyToken();
-    if (!token) return null;
-
-    let url = null;
-
-    try {
-        // 🔥 1. MAIS PRECISO → track + artist
-        if (track && artist) {
-            const res = await fetch(
-                `https://api.spotify.com/v1/search?q=${encodeURIComponent(`track:${track} artist:${artist}`)}&type=track&limit=1`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            const data = await res.json();
-            url = data.tracks?.items?.[0]?.album?.images?.[0]?.url;
+            if (!query) return null;
+            const { artist = '', track = '', album = '' } = extra;
+            const key = `${type}:${query}:${artist}:${track}:${album}`.toLowerCase();
+            if (imageCache[key]) return imageCache[key];
+            const token = await getSpotifyToken();
+            if (!token) return null;
+            let url = null;
+            try {
+                if (track && artist) {
+                    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(`track:${track} artist:${artist}`)}&type=track&limit=1`, { headers: { Authorization: `Bearer ${token}` } });
+                    const data = await res.json();
+                    url = data.tracks?.items?.[0]?.album?.images?.[0]?.url;
+                }
+                if (!url && album && artist) {
+                    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(`album:${album} artist:${artist}`)}&type=album&limit=1`, { headers: { Authorization: `Bearer ${token}` } });
+                    const data = await res.json();
+                    url = data.albums?.items?.[0]?.images?.[0]?.url;
+                }
+                if (!url) {
+                    const searchType = type === 'artist' ? 'artist' : 'album';
+                    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${searchType}&limit=1`, { headers: { Authorization: `Bearer ${token}` } });
+                    const data = await res.json();
+                    if (type === 'artist') url = data.artists?.items?.[0]?.images?.[0]?.url;
+                    else url = data.albums?.items?.[0]?.images?.[0]?.url;
+                }
+                if (url) {
+                    imageCache[key] = url;
+                    localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache));
+                }
+                return url;
+            } catch (e) { return null; }
         }
-
-        // 🔁 2. fallback → album + artist
-        if (!url && album && artist) {
-            const res = await fetch(
-                `https://api.spotify.com/v1/search?q=${encodeURIComponent(`album:${album} artist:${artist}`)}&type=album&limit=1`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-            const data = await res.json();
-            url = data.albums?.items?.[0]?.images?.[0]?.url;
-        }
-
-        // 🔁 3. fallback → busca original
-        if (!url) {
-            const searchType = type === 'artist' ? 'artist' : 'album';
-
-            const res = await fetch(
-                `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=${searchType}&limit=1`,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
-            const data = await res.json();
-
-            if (type === 'artist') {
-                url = data.artists?.items?.[0]?.images?.[0]?.url;
-            } else {
-                url = data.albums?.items?.[0]?.images?.[0]?.url;
-            }
-        }
-
-        // salvar cache
-        if (url) {
-            imageCache[key] = url;
-            localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache));
-        }
-
-        return url;
-
-    } catch (e) {
-        console.error("Erro imagem:", e);
-        return null;
-    }
-}
 
         // ==================== DATA PROCESSING ====================
         function parseCsvRow(t) { if(!t) return []; let r=[], c='', q=false; for(let i=0;i<t.length;i++){ const ch=t[i]; if(ch==='"') q=!q; else if(ch===','&&!q){ r.push(c.trim()); c=''; } else c+=ch; } r.push(c.trim()); return r; }
         
-        // Função para calcular diff comparando com a semana anterior para TODOS os charts semanais
         function calculateDiffForChart(ct, currentData, currentDate) {
-            // Aplicar diff apenas para charts semanais (excluir year-end e goat)
             const weeklyCharts = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'];
             if (!weeklyCharts.includes(ct)) return currentData;
-            
             const dates = Object.keys(appState.chartData[ct] || {}).sort();
             const currentIndex = dates.indexOf(currentDate);
             if (currentIndex <= 0) return currentData;
-            
             const previousDate = dates[currentIndex - 1];
             const previousData = appState.chartData[ct][previousDate];
-            
-            // Criar mapa de posições anteriores por nome+artista
             const previousPositions = new Map();
             previousData.forEach(row => {
                 const cm = appState.colMaps[ct];
@@ -325,8 +279,6 @@
                 const position = parseInt(row[cm.position]) || 0;
                 previousPositions.set(key, { position, row });
             });
-            
-            // Adicionar diff a cada item atual
             return currentData.map(row => {
                 const cm = appState.colMaps[ct];
                 let name = '';
@@ -336,12 +288,9 @@
                 const artist = row[cm.artist] || '';
                 const key = `${name.toLowerCase()}:${artist.toLowerCase()}`;
                 const currentPos = parseInt(row[cm.position]) || 0;
-                
                 const previous = previousPositions.get(key);
                 let diffValue = '';
-                
                 if (!previous) {
-                    // Não estava na semana anterior - verificar se é NEW ou RE
                     let hpearedBefore = false;
                     for (let i = 0; i < currentIndex; i++) {
                         const weekData = appState.chartData[ct][dates[i]];
@@ -353,34 +302,23 @@
                             const rArtist = r[cm.artist] || '';
                             return `${rName.toLowerCase()}:${rArtist.toLowerCase()}` === key;
                         });
-                        if (found) {
-                            hpearedBefore = true;
-                            break;
-                        }
+                        if (found) { hpearedBefore = true; break; }
                     }
                     diffValue = hpearedBefore ? 'RE' : 'NEW';
                 } else {
                     const prevPos = previous.position;
                     const diff = prevPos - currentPos;
-                    if (diff > 0) {
-                        diffValue = `▲${diff}`;
-                    } else if (diff < 0) {
-                        diffValue = `▼${Math.abs(diff)}`;
-                    } else {
-                        diffValue = '=';
-                    }
+                    if (diff > 0) diffValue = `▲${diff}`;
+                    else if (diff < 0) diffValue = `▼${Math.abs(diff)}`;
+                    else diffValue = '=';
                 }
-                
-                // Adicionar diff ao row
                 const newRow = [...row];
-                if (cm.diff !== -1) {
-                    newRow[cm.diff] = diffValue;
-                }
+                if (cm.diff !== -1) newRow[cm.diff] = diffValue;
                 return newRow;
             });
         }
 
-        async function fetchChartData(ct) {
+        async function fetchChartData(ct, isBackground = false) {
             if(chartsConfig[ct]?.loaded) return true;
             const cfg = chartsConfig[ct]; if(!cfg) return false;
             const url = `${cfg.url}&_=${Date.now()}`;
@@ -454,7 +392,6 @@
                     appState.chartData[ct] = {};
                     sorted.forEach(d=>{ appState.chartData[ct][d]=groups[d]; });
                     
-                    // Após carregar todos os dados, calcular diffs para TODOS os charts semanais
                     const weeklyCharts = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales'];
                     if (weeklyCharts.includes(ct)) {
                         const newGroups = {};
@@ -531,13 +468,22 @@
         function renderChartCard(ct, title) {
             const top = appState.top3Data[ct] || [];
             const isGoat = ct.includes('goat');
+            if (!top.length) {
+                return `<div class="chart-card cursor-pointer transition-all duration-300 hover:border-accent shadow-sm ${isGoat ? 'hover:border-gold goat-card-border' : ''}" data-chart="${ct}">
+                    <div class="flex items-center justify-between mb-2 md:mb-3">
+                        <h4 class="font-semibold text-sm md:text-base text-white">${title}</h4>
+                        <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">Loading...</span>
+                    </div>
+                    <div class="loading-skeleton h-24"></div>
+                </div>`;
+            }
             return `<div class="chart-card cursor-pointer transition-all duration-300 hover:border-accent shadow-sm ${isGoat ? 'hover:border-gold goat-card-border' : ''}" data-chart="${ct}">
                 <div class="flex items-center justify-between mb-2 md:mb-3">
                     <h4 class="font-semibold text-sm md:text-base text-white">${title}</h4>
                     <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">Top ${top.length}</span>
                 </div>
                 <div class="space-y-1 md:space-y-2">
-                    ${top.length ? top.map((item, i) => `<div class="flex items-center text-xs md:text-sm text-gray-300"><span class="font-bold w-5 md:w-6 ${i===0?'text-accent':'text-gray-400'} ${isGoat && i===0 ? 'goat-text' : ''}">${item.position}</span><span class="truncate break-text">${item.name || 'Unknown'}</span></div>`).join('') : `<div class="text-center py-3"><div class="loader mx-auto mb-2" style="width:20px;height:20px"></div><p class="text-xs text-gray-400">Loading...</p></div>`}
+                    ${top.map((item, i) => `<div class="flex items-center text-xs md:text-sm text-gray-300"><span class="font-bold w-5 md:w-6 ${i===0?'text-accent':'text-gray-400'} ${isGoat && i===0 ? 'goat-text' : ''}">${item.position}</span><span class="truncate break-text">${item.name || 'Unknown'}</span></div>`).join('')}
                 </div>
             </div>`;
         }
@@ -555,14 +501,24 @@
                 
                 ${(h100||a50||a100)?`<div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Chart Beat - Latest News</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">${h100?`<div class="blog-card cursor-pointer" onclick="showChartBeat('hot100')"><img src="${h100.imageUrl||'https://via.placeholder.com/400x200?text=No+Image'}" class="w-full h-40 md:h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'"><div class="p-3"><span class="text-xs text-accent font-semibold">${h100.publicationDate}</span><h4 class="font-bold text-sm md:text-lg mt-1 text-white line-clamp-2">${h100.title}</h4></div></div>`:''}${a50?`<div class="blog-card cursor-pointer" onclick="showChartBeat('artists')"><img src="${a50.imageUrl||'https://via.placeholder.com/400x200?text=No+Image'}" class="w-full h-40 md:h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'"><div class="p-3"><span class="text-xs text-accent font-semibold">${a50.publicationDate}</span><h4 class="font-bold text-sm md:text-lg mt-1 text-white line-clamp-2">${a50.title}</h4></div></div>`:''}${a100?`<div class="blog-card cursor-pointer" onclick="showChartBeat('top100Albums')"><img src="${a100.imageUrl||'https://via.placeholder.com/400x200?text=No+Image'}" class="w-full h-40 md:h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'"><div class="p-3"><span class="text-xs text-accent font-semibold">${a100.publicationDate}</span><h4 class="font-bold text-sm md:text-lg mt-1 text-white line-clamp-2">${a100.title}</h4></div></div>`:''}</div></div>`:''}
                 
-                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Weekly Charts</h3><div class="weekly-charts-grid">${weeklyChartList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
-                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Year-End Charts</h3><div class="weekly-charts-grid">${yearEndList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
-                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title goat-title text-white">Greatest of All Time</h3><div class="weekly-charts-grid">${goatList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
+                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Weekly Charts</h3><div id="weeklyChartsGrid" class="weekly-charts-grid">${weeklyChartList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
+                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Year-End Charts</h3><div id="yearEndChartsGrid" class="weekly-charts-grid">${yearEndList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
+                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title goat-title text-white">Greatest of All Time</h3><div id="goatChartsGrid" class="weekly-charts-grid">${goatList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
             </div>`;
             
             document.querySelectorAll('.chart-card, .circle-card-container').forEach(el=>el.addEventListener('click',()=>showChart(el.dataset.chart)));
             setTimeout(()=>loadCircleImages(),100);
             setupBackToTop();
+        }
+        
+        function updateHomeCharts() {
+            const weeklyGrid = document.getElementById('weeklyChartsGrid');
+            const yearEndGrid = document.getElementById('yearEndChartsGrid');
+            const goatGrid = document.getElementById('goatChartsGrid');
+            if (weeklyGrid) weeklyGrid.innerHTML = weeklyChartList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('');
+            if (yearEndGrid) yearEndGrid.innerHTML = yearEndList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('');
+            if (goatGrid) goatGrid.innerHTML = goatList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('');
+            document.querySelectorAll('.chart-card').forEach(el=>el.addEventListener('click',()=>showChart(el.dataset.chart)));
         }
         
         async function loadCircleImages() {
@@ -682,22 +638,10 @@
                 let diffClass='', diffSym='';
                 if(diff){
                     let l=diff.toString().toLowerCase();
-                    if(l.includes('▲')||l.includes('+')){ 
-                        diffClass='diff-up'; 
-                        diffSym=diff;
-                    } 
-                    else if(l.includes('▼')||l.includes('-')){ 
-                        diffClass='diff-down'; 
-                        diffSym=diff;
-                    } 
-                    else if(l.includes('new')){ 
-                        diffClass='diff-new'; 
-                        diffSym='NEW';
-                    } 
-                    else if(l.includes('re')){ 
-                        diffClass='diff-new'; 
-                        diffSym='RE';
-                    } 
+                    if(l.includes('▲')||l.includes('+')){ diffClass='diff-up'; diffSym=diff; } 
+                    else if(l.includes('▼')||l.includes('-')){ diffClass='diff-down'; diffSym=diff; } 
+                    else if(l.includes('new')){ diffClass='diff-new'; diffSym='NEW'; } 
+                    else if(l.includes('re')){ diffClass='diff-new'; diffSym='RE'; } 
                     else if(l==='=' || l==='0') diffSym='=';
                     else if(l && !isNaN(parseInt(l))) {
                         let num = parseInt(l);
@@ -798,6 +742,11 @@
         function showAllArtists(){
             appState.currentView='allArtists';
             let artists = appState.allArtistsList;
+            if (!artists.length) {
+                appContainer.innerHTML = `<div class="max-w-6xl mx-auto"><button id="backBtn" class="back-button mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button><div class="text-center py-8"><div class="loader mx-auto mb-4"></div><p class="text-gray-400">Loading artists data...</p></div></div>`;
+                document.getElementById('backBtn')?.addEventListener('click',navigateBack);
+                return;
+            }
             appContainer.innerHTML = `<div class="max-w-6xl mx-auto"><button id="backBtn" class="back-button mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button><h2 class="text-2xl font-bold mb-4 section-title">All Artists Entries</h2><div class="search-container mb-4"><i class="fas fa-search search-icon"></i><input type="text" id="artistSearch" class="search-input text-sm" placeholder="Search artists..."></div><div id="artistsGrid" class="artists-icons-grid">${artists.map(a=>`<div class="artist-icon-card" data-artist="${a}"><div class="artist-icon-placeholder" id="icon-${a.replace(/[^a-z0-9]/gi,'_')}"><i class="fas fa-user"></i></div><div class="artist-icon-name">${a}</div></div>`).join('')}</div></div>`;
             document.getElementById('backBtn')?.addEventListener('click',navigateBack);
             document.getElementById('artistSearch').addEventListener('input',function(){
@@ -842,13 +791,13 @@
         }
         
         async function init(){
-            showMessage('loading','Loading charts data...');
+            showMessage('loading','Loading charts...');
             try{
-                const allCharts = [...weeklyChartList, ...yearEndList, ...goatList, 'artistStats'];
-                for(let ct of allCharts) await fetchChartData(ct);
-                await fetchChartBeat();
-                let years = Object.keys(appState.chartData.yearEndSongs||{}).sort((a,b)=>b-a);
-                if(years.length) appState.currentYear = years[0];
+                // Carrega APENAS os 6 charts semanais primeiro (mais importantes)
+                const priorityCharts = [...weeklyChartList];
+                await Promise.all(priorityCharts.map(ct => fetchChartData(ct)));
+                
+                // Configura a data compartilhada
                 for(let ct of weeklyChartList) {
                     let dates = Object.keys(appState.chartData[ct]||{});
                     if(dates.length) {
@@ -856,7 +805,30 @@
                         break;
                     }
                 }
+                
+                // Mostra a página IMEDIATAMENTE
                 renderHome();
+                
+                // Carrega o resto em segundo plano (sem esperar)
+                const backgroundCharts = [...yearEndList, ...goatList, 'artistStats'];
+                backgroundCharts.forEach(ct => {
+                    fetchChartData(ct).then(() => {
+                        // Atualiza os cards quando os dados chegarem
+                        if (ct.includes('yearEnd') || ct.includes('goat')) {
+                            updateHomeCharts();
+                        }
+                        if (ct === 'artistStats') {
+                            // Atualiza a lista de artistas se necessário
+                            if (appState.currentView === 'allArtists') {
+                                showAllArtists();
+                            }
+                        }
+                    });
+                });
+                
+                // Carrega Chart Beat em segundo plano
+                setTimeout(() => fetchChartBeat(), 500);
+                
             } catch(e){ console.error(e); showMessage('error','Error loading data: '+e.message); }
         }
         
