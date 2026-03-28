@@ -144,6 +144,19 @@
         .nav-charts-wrapper { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 1.5rem; }
         .nav-charts-wrapper .chart-nav-btn { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
         @media (min-width: 768px) { .nav-charts-wrapper .chart-nav-btn { font-size: 0.875rem; padding: 0.5rem 1rem; } }
+        
+        /* Stats Page Styles */
+        .stats-selector { background-color: #1a1a1a; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
+        .stats-selector select { background-color: #2a2a2a; color: white; border: 1px solid #3a3a3a; border-radius: 8px; padding: 0.75rem 1rem; width: 100%; max-width: 400px; font-size: 0.9rem; cursor: pointer; }
+        .stats-selector select:focus { outline: none; border-color: var(--accent); }
+        .stats-table { width: 100%; border-collapse: collapse; }
+        .stats-table th { text-align: left; padding: 1rem; background-color: #1a1a1a; color: var(--accent); font-weight: 600; border-bottom: 2px solid #333; }
+        .stats-table td { padding: 0.75rem 1rem; border-bottom: 1px solid #2a2a2a; color: #e5e5e5; }
+        .stats-table tr:hover { background-color: #1a1a1a; }
+        .stats-table .rank-col { width: 80px; font-weight: 700; color: var(--accent); }
+        .stats-table .number-col { text-align: right; font-family: monospace; font-weight: 600; color: #10b981; }
+        .stats-item-image { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #2a2a2a; }
+        @media (min-width: 768px) { .stats-item-image { width: 60px; height: 60px; } }
     </style>
 </head>
 <body class="flex flex-col min-h-screen">
@@ -153,9 +166,12 @@
     <header class="bg-black border-b border-gray-800 sticky top-0 z-20 shadow-sm">
         <div class="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
             <h1 class="text-xl md:text-3xl font-extrabold"><span class="gold-title" id="mainTitle">daegon charts</span></h1>
-            <nav class="flex space-x-2 md:space-x-4">
+            <nav class="flex space-x-2 md:space-x-4 items-center">
                 <button id="navAllArtists" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">All Artists Entries</button>
+                <span class="text-gray-600">|</span>
                 <button id="navChartBeat" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">Chart Beat</button>
+                <span class="text-gray-600">|</span>
+                <button id="navStats" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">Stats</button>
             </nav>
         </div>
     </header>
@@ -196,7 +212,8 @@
             goatSongs: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1157278896', title: 'Songs', icon: 'fa-trophy', loaded: false },
             goatArtists: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=222299678', title: 'Artists', icon: 'fa-trophy', loaded: false },
             goatAlbums: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1548244755', title: 'Albums', icon: 'fa-trophy', loaded: false },
-            artistStats: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1519606558', title: 'Artist Statistics', icon: 'fa-chart-bar', loaded: false }
+            artistStats: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=1519606558', title: 'Artist Statistics', icon: 'fa-chart-bar', loaded: false },
+            statsData: { url: 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=193788146', title: 'Stats', icon: 'fa-chart-line', loaded: false }
         };
 
         const chartBeatConfig = {
@@ -208,7 +225,8 @@
         let appState = {
             activeChart: 'songs', chartData: {}, currentDate: null, currentView: 'home', currentArtist: null, currentYear: new Date().getFullYear().toString(),
             colMaps: {}, top3Data: {}, chartRunData: {}, navigationHistory: [], chartBeatData: { hot100: [], artists: [], top100Albums: [] },
-            currentBlog: 'hot100', sharedDate: null, artistDetailsData: {}, activeTag: null, allArtistsList: [], lastChart: null, lastChartDate: null, lastChartYear: null
+            currentBlog: 'hot100', sharedDate: null, artistDetailsData: {}, activeTag: null, allArtistsList: [], lastChart: null, lastChartDate: null, lastChartYear: null,
+            statsData: { raw: [], categories: [], currentCategory: null, items: [] }
         };
 
         const appContainer = document.getElementById('app'), modal = document.getElementById('itemDetailsModal'), modalContent = document.getElementById('modalContent'), closeModal = document.getElementById('closeModal');
@@ -230,7 +248,6 @@
         async function getSpotifyImage(query, type, extra = {}) {
             if (!query) return null;
             
-            // Correção refinada para Anitta e Jão
             let searchQuery = query;
             if (query.toLowerCase() === 'anitta') {
                 searchQuery = 'Anitta cantora';
@@ -347,6 +364,43 @@
                 const header = rows[0].map(h=>h.toLowerCase().trim());
                 const data = rows.slice(1);
                 const find = (ks) => { for(let k of ks){ let i=header.indexOf(k); if(i!==-1) return i; } return -1; };
+                
+                // Processamento especial para statsData
+                if (ct === 'statsData') {
+                    const rankIdx = find(['rank', 'pos', 'position']);
+                    const statsIdx = find(['stats', 'category']);
+                    const itemIdx = find(['artist/song', 'item', 'title', 'name']);
+                    const numberIdx = find(['number', 'value', 'total', 'count']);
+                    
+                    const categoriesMap = new Map();
+                    data.forEach(row => {
+                        const category = row[statsIdx]?.trim();
+                        if (!category) return;
+                        if (!categoriesMap.has(category)) categoriesMap.set(category, []);
+                        categoriesMap.get(category).push({
+                            rank: parseInt(row[rankIdx]) || 0,
+                            item: row[itemIdx]?.trim() || 'Unknown',
+                            number: row[numberIdx]?.trim() || '0'
+                        });
+                    });
+                    
+                    // Ordenar cada categoria por rank
+                    for (let [cat, items] of categoriesMap) {
+                        items.sort((a,b) => a.rank - b.rank);
+                    }
+                    
+                    appState.statsData = {
+                        raw: data,
+                        categories: Array.from(categoriesMap.keys()),
+                        itemsMap: categoriesMap,
+                        currentCategory: Array.from(categoriesMap.keys())[0] || null,
+                        items: categoriesMap.get(Array.from(categoriesMap.keys())[0]) || []
+                    };
+                    
+                    chartsConfig[ct].loaded = true;
+                    return true;
+                }
+                
                 appState.colMaps[ct] = {
                     date: find(['date','chart date']), position: find(['position','rank','pos']), diff: find(['dif','diff','▲▼']),
                     song: find(['song','title','track']), album: find(['album']), artist: find(['artist','artists']),
@@ -355,15 +409,12 @@
                     chart: find(['chart']), item: find(['item']), unitsSold: find(['units sold','sales','total sales'])
                 };
                 
-                // CORREÇÃO ESPECÍFICA PARA RADIO SONGS: forçar a busca pela coluna "audience"
+                // CORREÇÃO ESPECÍFICA PARA RADIO SONGS
                 if (ct === 'radioSongs') {
-                    // Encontra o índice da coluna "audience" especificamente
                     const audienceIndex = header.indexOf('audience');
                     if (audienceIndex !== -1) {
                         appState.colMaps[ct].units = audienceIndex;
                         console.log(`✅ Radio Songs: Audience column found at index ${audienceIndex}`);
-                    } else {
-                        console.warn(`⚠️ Radio Songs: Audience column not found, using default units mapping`);
                     }
                 }
                 
@@ -597,6 +648,96 @@
             document.querySelectorAll('.tag').forEach(t=>t.addEventListener('click',(e)=>{ e.stopPropagation(); modal.classList.remove('active'); appState.activeTag=t.dataset.tag; renderChartBeatPage(); }));
         }
         
+        // ==================== STATS PAGE ====================
+        function renderStatsPage() {
+            appState.currentView = 'stats';
+            const stats = appState.statsData;
+            const categories = stats.categories || [];
+            const currentCategory = stats.currentCategory;
+            const items = stats.itemsMap?.get(currentCategory) || [];
+            
+            appContainer.innerHTML = `<div class="max-w-5xl mx-auto">
+                <button id="backBtn" class="back-button mb-4 md:mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors text-sm md:text-base"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button>
+                <div class="text-center mb-6 md:mb-8">
+                    <h2 class="text-2xl md:text-3xl font-bold mb-2 text-white">Statistics</h2>
+                    <p class="text-gray-400 text-sm md:text-base">Historical charts and music statistics</p>
+                </div>
+                
+                <div class="stats-selector">
+                    <label class="block text-gray-300 text-sm font-medium mb-2">Select Statistic:</label>
+                    <select id="statsCategorySelect" class="w-full max-w-md bg-gray-800 text-white border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-accent">
+                        ${categories.map(cat => `<option value="${cat.replace(/"/g, '&quot;')}" ${currentCategory === cat ? 'selected' : ''}>${cat}</option>`).join('')}
+                    </select>
+                </div>
+                
+                <div class="bg-black/40 rounded-xl border border-gray-800 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="stats-table">
+                            <thead>
+                                <tr>
+                                    <th class="rank-col">#</th>
+                                    <th>Item</th>
+                                    <th class="number-col">Number</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${items.length ? items.map(item => `
+                                    <tr>
+                                        <td class="rank-col font-bold">${item.rank}</td>
+                                        <td class="font-medium">${escapeHtml(item.item)}</td>
+                                        <td class="number-col font-mono">${formatNumber(item.number)}</td>
+                                    </tr>
+                                `).join('') : `
+                                    <tr><td colspan="3" class="text-center py-8 text-gray-400">No data available for this category</td></tr>
+                                `}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>`;
+            
+            document.getElementById('backBtn')?.addEventListener('click', () => navigateBack());
+            const selectEl = document.getElementById('statsCategorySelect');
+            if (selectEl) {
+                selectEl.addEventListener('change', (e) => {
+                    const newCategory = e.target.value;
+                    appState.statsData.currentCategory = newCategory;
+                    renderStatsPage();
+                });
+            }
+            setupBackToTop();
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        function formatNumber(num) {
+            if (!num) return '0';
+            const n = parseInt(num.toString().replace(/,/g, ''));
+            if (isNaN(n)) return num;
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return n.toString();
+        }
+        
+        function showStats() {
+            if (!chartsConfig.statsData.loaded) {
+                appContainer.innerHTML = `<div class="flex flex-col items-center justify-center p-8"><div class="loader mb-4"></div><p class="text-gray-400">Loading statistics data...</p></div>`;
+                fetchChartData('statsData').then(() => {
+                    renderStatsPage();
+                });
+                return;
+            }
+            renderStatsPage();
+        }
+        
         function showChart(ct, dateToSet=null){
             appState.lastChart = appState.activeChart;
             appState.lastChartDate = appState.currentDate;
@@ -615,7 +756,7 @@
                 else appState.currentDate = recent;
                 appState.sharedDate = appState.currentDate;
             }
-            const nav = isYear?Object.entries(chartsConfig).filter(([k])=>k.includes('yearEnd')):isGoat?Object.entries(chartsConfig).filter(([k])=>k.includes('goat')):Object.entries(chartsConfig).filter(([k])=>!k.includes('yearEnd')&&!k.includes('goat')&&k!=='artistStats');
+            const nav = isYear?Object.entries(chartsConfig).filter(([k])=>k.includes('yearEnd')):isGoat?Object.entries(chartsConfig).filter(([k])=>k.includes('goat')):Object.entries(chartsConfig).filter(([k])=>!k.includes('yearEnd')&&!k.includes('goat')&&k!=='artistStats'&&k!=='statsData');
             appContainer.innerHTML = `<div class="max-w-4xl mx-auto"><button id="backBtn" class="back-button mb-4 md:mb-6 flex items-center text-accent hover:text-accent-dark font-semibold transition-colors text-sm md:text-base"><i class="fas fa-arrow-left mr-2"></i> Back to ${appState.lastChart ? chartsConfig[appState.lastChart]?.title || 'Chart' : 'Home'}</button>
             <div class="mb-4 md:mb-6"><h2 class="text-xl md:text-3xl font-bold text-center mb-2 text-white">${isYear?'Year-End Charts':isGoat?'Greatest of All Time':'Weekly Charts'}</h2>
             <div class="nav-charts-wrapper">${nav.map(([k,c])=>`<button data-chart="${k}" class="chart-nav-btn btn-hover ${appState.activeChart===k?(isGoat?'goat-active':'active'):''} text-xs md:text-sm font-semibold py-2 px-3 rounded-md transition-all">${c.title}</button>`).join('')}</div></div>
@@ -814,6 +955,7 @@
             else if(prev?.view==='artist') renderArtistPage(prev.artist);
             else if(prev?.view==='allArtists') showAllArtists();
             else if(prev?.view==='chartBeat') renderChartBeatPage();
+            else if(prev?.view==='stats') showStats();
             else renderHome();
         }
         
@@ -830,7 +972,7 @@
         async function init(){
             showMessage('loading','Loading charts...');
             try{
-                // Carrega APENAS os 8 charts semanais primeiro (mais importantes)
+                // Carrega os 8 charts semanais primeiro
                 const priorityCharts = [...weeklyChartList];
                 await Promise.all(priorityCharts.map(ct => fetchChartData(ct)));
                 
@@ -846,17 +988,15 @@
                 // Mostra a página IMEDIATAMENTE
                 renderHome();
                 
-                // Carrega o resto em segundo plano (sem esperar)
-                const backgroundCharts = [...yearEndList, ...goatList, 'artistStats'];
+                // Carrega o resto em segundo plano
+                const backgroundCharts = [...yearEndList, ...goatList, 'artistStats', 'statsData'];
                 backgroundCharts.forEach(ct => {
                     fetchChartData(ct).then(() => {
                         if (ct.includes('yearEnd') || ct.includes('goat')) {
                             updateHomeCharts();
                         }
-                        if (ct === 'artistStats') {
-                            if (appState.currentView === 'allArtists') {
-                                showAllArtists();
-                            }
+                        if (ct === 'artistStats' && appState.currentView === 'allArtists') {
+                            showAllArtists();
                         }
                     });
                 });
@@ -872,6 +1012,7 @@
             document.getElementById('mainTitle').addEventListener('click',()=>{ appState.navigationHistory=[]; renderHome(); });
             document.getElementById('navAllArtists').addEventListener('click',()=>showAllArtists());
             document.getElementById('navChartBeat').addEventListener('click',()=>showChartBeat('hot100'));
+            document.getElementById('navStats').addEventListener('click',()=>showStats());
             closeModal.addEventListener('click',()=>modal.classList.remove('active'));
             modal.addEventListener('click',e=>{ if(e.target===modal) modal.classList.remove('active'); });
         });
