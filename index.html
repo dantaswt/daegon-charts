@@ -86,14 +86,59 @@
         .chart-container { background-color: #000; padding: 1rem; border-radius: 1rem; }
         @media (min-width: 768px) { .chart-container { padding: 1.5rem; } }
         .diff-indicator { display: inline-block; margin-left: 0.25rem; font-size: 0.7rem; font-weight: 600; }
-        .chart-run-grid { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1rem; }
-        .chart-run-card { background-color: white; border-radius: 8px; padding: 0.75rem 1rem; min-width: 120px; flex: 1 1 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-left: 4px solid transparent; transition: transform 0.2s ease; }
-        .chart-run-card.run-up { border-left-color: var(--run-up); background-color: rgba(16,185,129,0.05); }
-        .chart-run-card.run-down { border-left-color: var(--run-down); background-color: rgba(239,68,68,0.05); }
-        .chart-run-card.run-new { border-left-color: var(--run-new); background-color: rgba(251,191,36,0.05); }
-        .chart-run-card.run-peak { border-left-color: var(--run-peak); background-color: rgba(139,92,246,0.05); }
-        .chart-run-card.run-steady { border-left-color: var(--run-steady); background-color: rgba(156,163,175,0.05); }
-        .chart-run-card.run-number-one { border-left-color: var(--accent); background-color: rgba(255,215,0,0.1); }
+        
+        .chart-run-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .chart-run-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .chart-run-list-item:hover {
+            background-color: #f0f0f0;
+        }
+        .chart-run-list-item.run-up { border-left-color: var(--run-up); background-color: rgba(16,185,129,0.05); }
+        .chart-run-list-item.run-down { border-left-color: var(--run-down); background-color: rgba(239,68,68,0.05); }
+        .chart-run-list-item.run-new { border-left-color: var(--run-new); background-color: rgba(251,191,36,0.05); }
+        .chart-run-list-item.run-peak { border-left-color: var(--run-peak); background-color: rgba(139,92,246,0.05); }
+        .chart-run-list-item.run-steady { border-left-color: var(--run-steady); background-color: rgba(156,163,175,0.05); }
+        .chart-run-list-item.run-number-one { border-left-color: var(--accent); background-color: rgba(255,215,0,0.1); }
+        .chart-run-date-btn {
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .chart-run-date-btn:hover { text-decoration: underline; }
+        .chart-run-position { font-weight: 700; font-size: 1rem; min-width: 50px; }
+        .chart-run-peak-badge, .chart-run-new-badge {
+            font-size: 0.65rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 12px;
+            margin-left: 0.5rem;
+        }
+        .chart-run-peak-badge { background-color: #8B5CF6; color: white; }
+        .chart-run-new-badge { background-color: #FBBF24; color: black; }
+        .chart-run-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            color: #6B7280;
+        }
+        .chart-run-stats span { font-weight: 600; color: #111827; }
+        
         .artist-header-image { width: 100%; height: 200px; object-fit: cover; border-radius: 16px; margin-bottom: 1.5rem; }
         @media (min-width: 768px) { .artist-header-image { height: 280px; } }
         .artist-name-large { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; color: white; }
@@ -145,7 +190,6 @@
         .nav-charts-wrapper .chart-nav-btn { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
         @media (min-width: 768px) { .nav-charts-wrapper .chart-nav-btn { font-size: 0.875rem; padding: 0.5rem 1rem; } }
         
-        /* Stats Page Styles */
         .stats-selector { background-color: #1a1a1a; border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
         .stats-selector select { background-color: #2a2a2a; color: white; border: 1px solid #3a3a3a; border-radius: 8px; padding: 0.75rem 1rem; width: 100%; max-width: 400px; font-size: 0.9rem; cursor: pointer; }
         .stats-selector select:focus { outline: none; border-color: var(--accent); }
@@ -193,6 +237,30 @@
         try { const saved = localStorage.getItem('daegon_image_cache'); if(saved) imageCache = JSON.parse(saved); } catch(e) {}
         function saveImageCache() { try { localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache)); } catch(e) {} }
 
+        // MAPA DE ANOS CORRETOS PARA TAYLOR'S VERSION
+        const TAYLORS_VERSION_YEARS = {
+            'fearless (taylor\'s version)': '2021',
+            'red (taylor\'s version)': '2021',
+            'speak now (taylor\'s version)': '2023',
+            '1989 (taylor\'s version)': '2023'
+        };
+
+        // FUNÇÃO GLOBAL PARA CORREÇÃO DE NOMES DE ARTISTAS - USADA EM TODO O SITE
+        function getArtistSearchName(artistName) {
+            if (!artistName) return artistName;
+            const lowerName = artistName.toLowerCase();
+            if (lowerName === 'anitta') {
+                return 'Anitta cantora';
+            }
+            if (lowerName === 'jão' || lowerName === 'jao') {
+                return 'Jão cantor';
+            }
+            if (lowerName === 'taylor swift') {
+                return 'Taylor Swift';
+            }
+            return artistName;
+        }
+
         const weeklyChartList = ['songs', 'artists', 'albums', 'radioSongs', 'topStreamingAlbums', 'topAlbumSales', 'streamingSongs', 'digitalSongsSales'];
         const yearEndList = ['yearEndSongs', 'yearEndArtists', 'yearEndAlbums'];
         const goatList = ['goatSongs', 'goatArtists', 'goatAlbums'];
@@ -231,7 +299,105 @@
 
         const appContainer = document.getElementById('app'), modal = document.getElementById('itemDetailsModal'), modalContent = document.getElementById('modalContent'), closeModal = document.getElementById('closeModal');
 
-        // ==================== SPOTIFY ====================
+        // ==================== FUNÇÕES AUXILIARES ====================
+        function normalizeText(str) {
+            if (!str) return '';
+            return str.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^\w\s]/g, '')
+                .trim();
+        }
+        
+        function extractYearFromAlbumName(albumName) {
+            if (!albumName) return null;
+            const match = albumName.match(/[\(\[](\d{4})[\)\]]/);
+            if (match) return match[1];
+            return null;
+        }
+        
+        function isTaylorsVersion(albumName) {
+            if (!albumName) return false;
+            const lowerName = albumName.toLowerCase();
+            return lowerName.includes("taylor's version") || 
+                   lowerName.includes("taylor’s version") ||
+                   lowerName === 'fearless (taylor\'s version)' ||
+                   lowerName === 'red (taylor\'s version)' ||
+                   lowerName === 'speak now (taylor\'s version)' ||
+                   lowerName === '1989 (taylor\'s version)';
+        }
+        
+        function getTaylorsVersionYear(albumName) {
+            const lowerName = albumName.toLowerCase();
+            for (const [key, year] of Object.entries(TAYLORS_VERSION_YEARS)) {
+                if (lowerName.includes(key)) {
+                    return year;
+                }
+            }
+            return null;
+        }
+        
+        function scoreAlbum(item, targetAlbum, targetArtist, targetYear) {
+            let score = 0;
+            const itemName = item.name;
+            const itemArtist = item.artists[0]?.name || '';
+            const itemYear = item.release_date ? item.release_date.split('-')[0] : null;
+            
+            const normalizedItemName = normalizeText(itemName);
+            const normalizedTargetAlbum = normalizeText(targetAlbum);
+            const normalizedItemArtist = normalizeText(itemArtist);
+            const normalizedTargetArtist = normalizeText(targetArtist);
+            
+            if (normalizedItemArtist === normalizedTargetArtist) score += 50;
+            else if (normalizedItemArtist.includes(normalizedTargetArtist) || normalizedTargetArtist.includes(normalizedItemArtist)) score += 25;
+            
+            const cleanItemName = normalizedItemName.replace(/\s*\([^)]*\)/g, '').trim();
+            const cleanTargetAlbum = normalizedTargetAlbum.replace(/\s*\([^)]*\)/g, '').trim();
+            
+            if (normalizedItemName === normalizedTargetAlbum) {
+                score += 100;
+            } else if (cleanItemName === cleanTargetAlbum) {
+                score += 80;
+            } else if (cleanItemName.includes(cleanTargetAlbum) || cleanTargetAlbum.includes(cleanItemName)) {
+                score += 50;
+            }
+            
+            if (isTaylorsVersion(targetAlbum)) {
+                if (itemName.toLowerCase().includes("taylor's version") || itemName.toLowerCase().includes("taylor’s version")) {
+                    score += 100;
+                }
+                const correctYear = getTaylorsVersionYear(targetAlbum);
+                if (correctYear && itemYear === correctYear) {
+                    score += 80;
+                }
+                if (!itemName.toLowerCase().includes("taylor's version") && !itemName.toLowerCase().includes("taylor’s version")) {
+                    score -= 50;
+                }
+            }
+            
+            const albumYearFromName = extractYearFromAlbumName(itemName);
+            
+            if (targetYear && itemYear && targetYear === itemYear) {
+                score += 40;
+            } else if (targetYear && albumYearFromName && targetYear === albumYearFromName) {
+                score += 35;
+            } else if (itemYear) {
+                const currentYear = new Date().getFullYear();
+                const yearDiff = currentYear - parseInt(itemYear);
+                if (yearDiff <= 5) score += 15;
+                else if (yearDiff <= 10) score += 5;
+            }
+            
+            if (item.album_type === 'album') score += 20;
+            else if (item.album_type === 'single') score -= 20;
+            else if (item.album_type === 'compilation') score -= 10;
+            
+            if (itemName.toLowerCase().includes('deluxe')) score += 5;
+            if (itemName.toLowerCase().includes('live')) score -= 30;
+            if (itemName.toLowerCase().includes('remix')) score -= 25;
+            
+            return score;
+        }
+
         async function getSpotifyToken() {
             if (SPOTIFY_ACCESS_TOKEN) return SPOTIFY_ACCESS_TOKEN;
             try {
@@ -248,44 +414,140 @@
         async function getSpotifyImage(query, type, extra = {}) {
             if (!query) return null;
             
-            let searchQuery = query;
-            if (query.toLowerCase() === 'anitta') {
-                searchQuery = 'Anitta cantora';
-            } else if (query.toLowerCase() === 'jão' || query.toLowerCase() === 'jao') {
-                searchQuery = 'Jão cantor';
-            }
-            
-            const { artist = '', track = '', album = '' } = extra;
-            const key = `${type}:${searchQuery}:${artist}:${track}:${album}`.toLowerCase();
+            const { artist = '', album = '', year = '' } = extra;
+            const key = `${type}:${query}:${artist}:${album}:${year}`.toLowerCase();
             if (imageCache[key]) return imageCache[key];
             
             const token = await getSpotifyToken();
             if (!token) return null;
             let url = null;
+            
             try {
-                if (track && artist) {
-                    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(`track:${track} artist:${artist}`)}&type=track&limit=1`, { headers: { Authorization: `Bearer ${token}` } });
+                if (type === 'album' && album && artist) {
+                    let targetYear = year;
+                    if (!targetYear) {
+                        targetYear = extractYearFromAlbumName(album);
+                    }
+                    
+                    const isTaylor = isTaylorsVersion(album);
+                    if (isTaylor) {
+                        const correctYear = getTaylorsVersionYear(album);
+                        if (correctYear) {
+                            targetYear = correctYear;
+                            console.log(`🎤 TAYLOR'S VERSION detectado: "${album}" - ano correto: ${targetYear}`);
+                        }
+                    }
+                    
+                    console.log(`🔍 Buscando álbum: "${album}" - ${artist}${targetYear ? ` (ano: ${targetYear})` : ''}`);
+                    
+                    let exactSearchTerm = `album:"${album}" artist:"${artist}"`;
+                    console.log(`   [1/3] Busca exata: ${exactSearchTerm}`);
+                    
+                    let res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(exactSearchTerm)}&type=album&limit=20`, { 
+                        headers: { Authorization: `Bearer ${token}` } 
+                    });
+                    let data = await res.json();
+                    
+                    let bestMatch = null;
+                    let bestScore = -1;
+                    
+                    if (data.albums?.items?.length) {
+                        for (const item of data.albums.items) {
+                            const score = scoreAlbum(item, album, artist, targetYear);
+                            console.log(`      - "${item.name}" (${item.album_type}, ${item.release_date?.split('-')[0] || '?'}) - score: ${score}`);
+                            if (score > bestScore) {
+                                bestScore = score;
+                                bestMatch = item;
+                            }
+                        }
+                    }
+                    
+                    if (!bestMatch || bestScore < 60) {
+                        const broadSearchTerm = `album:${album} artist:${artist}`;
+                        console.log(`   [2/3] Busca ampla: ${broadSearchTerm}`);
+                        
+                        res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(broadSearchTerm)}&type=album&limit=30`, { 
+                            headers: { Authorization: `Bearer ${token}` } 
+                        });
+                        data = await res.json();
+                        
+                        if (data.albums?.items?.length) {
+                            for (const item of data.albums.items) {
+                                const score = scoreAlbum(item, album, artist, targetYear);
+                                console.log(`      - "${item.name}" (${item.album_type}, ${item.release_date?.split('-')[0] || '?'}) - score: ${score}`);
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestMatch = item;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (!bestMatch || bestScore < 40) {
+                        const deluxeAlbum = `${album} Deluxe`;
+                        const deluxeSearchTerm = `album:"${deluxeAlbum}" artist:"${artist}"`;
+                        console.log(`   [3/3] Busca com Deluxe: ${deluxeSearchTerm}`);
+                        
+                        res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(deluxeSearchTerm)}&type=album&limit=20`, { 
+                            headers: { Authorization: `Bearer ${token}` } 
+                        });
+                        data = await res.json();
+                        
+                        if (data.albums?.items?.length) {
+                            for (const item of data.albums.items) {
+                                const score = scoreAlbum(item, deluxeAlbum, artist, targetYear);
+                                console.log(`      - "${item.name}" (${item.album_type}, ${item.release_date?.split('-')[0] || '?'}) - score: ${score}`);
+                                if (score > bestScore) {
+                                    bestScore = score;
+                                    bestMatch = item;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (bestMatch && bestMatch.images?.[0]?.url && bestScore > 20) {
+                        url = bestMatch.images[0].url;
+                        console.log(`✅ Álbum selecionado: "${bestMatch.name}" (score: ${bestScore})`);
+                    } else {
+                        console.log(`⚠️ Nenhum álbum bom encontrado para: "${album}" - ${artist}`);
+                        
+                        // FALLBACK: Imagem do artista com nome corrigido
+                        const artistSearchName = getArtistSearchName(artist);
+                        const artistRes = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(artistSearchName)}&type=artist&limit=1`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+                        const artistData = await artistRes.json();
+                        if (artistData.artists?.items?.[0]?.images?.[0]?.url) {
+                            url = artistData.artists.items[0].images[0].url;
+                            console.log(`🎤 Fallback: imagem do artista "${artistSearchName}"`);
+                        }
+                    }
+                } else if (type === 'artist') {
+                    // CORREÇÃO: Usa o nome corrigido para busca de artista
+                    const artistSearchName = getArtistSearchName(query);
+                    console.log(`🔍 Buscando artista: "${query}" -> termo de busca: "${artistSearchName}"`);
+                    
+                    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(artistSearchName)}&type=artist&limit=1`, { 
+                        headers: { Authorization: `Bearer ${token}` } 
+                    });
                     const data = await res.json();
-                    url = data.tracks?.items?.[0]?.album?.images?.[0]?.url;
+                    url = data.artists?.items?.[0]?.images?.[0]?.url;
+                    if (url) {
+                        console.log(`✅ Artista encontrado: ${query} -> imagem obtida`);
+                    } else {
+                        console.log(`⚠️ Artista não encontrado: ${query}`);
+                    }
                 }
-                if (!url && album && artist) {
-                    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(`album:${album} artist:${artist}`)}&type=album&limit=1`, { headers: { Authorization: `Bearer ${token}` } });
-                    const data = await res.json();
-                    url = data.albums?.items?.[0]?.images?.[0]?.url;
-                }
-                if (!url) {
-                    const searchType = type === 'artist' ? 'artist' : 'album';
-                    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(searchQuery)}&type=${searchType}&limit=1`, { headers: { Authorization: `Bearer ${token}` } });
-                    const data = await res.json();
-                    if (type === 'artist') url = data.artists?.items?.[0]?.images?.[0]?.url;
-                    else url = data.albums?.items?.[0]?.images?.[0]?.url;
-                }
+                
                 if (url) {
                     imageCache[key] = url;
-                    localStorage.setItem('daegon_image_cache', JSON.stringify(imageCache));
+                    saveImageCache();
                 }
                 return url;
-            } catch (e) { return null; }
+            } catch (e) { 
+                console.error(`❌ Erro na busca:`, e); 
+                return null; 
+            }
         }
 
         // ==================== DATA PROCESSING ====================
@@ -365,7 +627,6 @@
                 const data = rows.slice(1);
                 const find = (ks) => { for(let k of ks){ let i=header.indexOf(k); if(i!==-1) return i; } return -1; };
                 
-                // Processamento especial para statsData
                 if (ct === 'statsData') {
                     const rankIdx = find(['rank', 'pos', 'position']);
                     const statsIdx = find(['stats', 'category']);
@@ -384,7 +645,6 @@
                         });
                     });
                     
-                    // Ordenar cada categoria por rank
                     for (let [cat, items] of categoriesMap) {
                         items.sort((a,b) => a.rank - b.rank);
                     }
@@ -409,7 +669,6 @@
                     chart: find(['chart']), item: find(['item']), unitsSold: find(['units sold','sales','total sales'])
                 };
                 
-                // CORREÇÃO ESPECÍFICA PARA RADIO SONGS
                 if (ct === 'radioSongs') {
                     const audienceIndex = header.indexOf('audience');
                     if (audienceIndex !== -1) {
@@ -529,7 +788,8 @@
                     setTimeout(async () => {
                         for(let i=0;i<processed.length;i++) {
                             if(processed[i].artist) {
-                                const url = await getSpotifyImage(processed[i].artist, 'artist');
+                                const artistSearchName = getArtistSearchName(processed[i].artist);
+                                const url = await getSpotifyImage(artistSearchName, 'artist');
                                 if(url) processed[i].imageUrl = url;
                             }
                         }
@@ -610,11 +870,31 @@
             for(let ct of weeklyChartList) {
                 let top = appState.top3Data[ct]?.[0];
                 if(!top) continue;
-                let q='', t='';
-                if(ct==='songs'||ct==='radioSongs'||ct==='streamingSongs'||ct==='digitalSongsSales'){ q=top.artist; t='artist'; }
-                else if(ct==='albums'||ct==='topStreamingAlbums'||ct==='topAlbumSales'){ let a=top.name?.includes('(')?top.name.substring(0,top.name.indexOf('(')).trim():top.name; q=`${top.artist} ${a}`; t='album'; }
-                else{ q=top.name; t='artist'; }
-                if(q && q!=='Unknown'){ let url=await getSpotifyImage(q,t); let el=document.getElementById(`circle-${ct}`); if(el&&url){ el.innerHTML=`<img src="${url}" class="w-full h-full object-cover">`; el.classList.remove('placeholder-art'); } }
+                let q='', t='', extra = {};
+                if(ct==='songs'||ct==='radioSongs'||ct==='streamingSongs'||ct==='digitalSongsSales'){ 
+                    q=top.artist; 
+                    t='artist'; 
+                }
+                else if(ct==='albums'||ct==='topStreamingAlbums'||ct==='topAlbumSales'){ 
+                    let a=top.name; 
+                    q=`${top.artist} ${a}`; 
+                    t='album';
+                    extra = { album: top.name, artist: top.artist };
+                }
+                else{ 
+                    q=top.name; 
+                    t='artist'; 
+                }
+                if(q && q!=='Unknown'){ 
+                    // Para busca de artista, usa o nome corrigido
+                    let searchQuery = t === 'artist' ? getArtistSearchName(q) : q;
+                    let url=await getSpotifyImage(searchQuery, t, extra); 
+                    let el=document.getElementById(`circle-${ct}`); 
+                    if(el&&url){ 
+                        el.innerHTML=`<img src="${url}" class="w-full h-full object-cover">`; 
+                        el.classList.remove('placeholder-art'); 
+                    } 
+                }
             }
         }
         
@@ -648,7 +928,6 @@
             document.querySelectorAll('.tag').forEach(t=>t.addEventListener('click',(e)=>{ e.stopPropagation(); modal.classList.remove('active'); appState.activeTag=t.dataset.tag; renderChartBeatPage(); }));
         }
         
-        // ==================== STATS PAGE ====================
         function renderStatsPage() {
             appState.currentView = 'stats';
             const stats = appState.statsData;
@@ -866,7 +1145,57 @@
             let [name,artist] = key.split(':');
             if(!run.length) modalContent.innerHTML='<p class="text-center text-gray-400">No chart run data.</p>';
             else{
-                modalContent.innerHTML = `<h3 class="text-xl md:text-2xl font-bold mb-4 text-black">${name} by ${artist} - Chart Run</h3><div class="chart-run-grid">${run.map((r,i,a)=>{ let cls='run-steady'; if(i>0){ if(r.position<a[i-1].position) cls='run-up'; else if(r.position>a[i-1].position) cls='run-down'; } if(r.position===r.peak&&i>0&&r.position<a[i-1].peak) cls='run-peak'; if(r.position===1) cls='run-number-one'; if(i===0) cls='run-new'; return `<div class="chart-run-card ${cls}"><div class="chart-run-date"><button class="date-link" onclick="goToWeek('${ct}','${r.date}')">${r.date}</button></div><div class="flex justify-between"><span class="chart-run-position">#${r.position}</span>${cls==='run-up'?'▲':cls==='run-down'?'▼':''}${r.position===r.peak&&i>0?'<span class="chart-run-peak-badge">NEW PEAK</span>':''}${i===0?'<span class="chart-run-new-badge">DEBUT</span>':''}</div></div>`; }).join('')}</div>`;
+                const bestPeak = Math.min(...run.map(r => r.peak));
+                const totalWeeks = run.length;
+                
+                modalContent.innerHTML = `
+                    <h3 class="text-xl md:text-2xl font-bold mb-2 text-black">${decodeURIComponent(name)}</h3>
+                    <p class="text-gray-600 mb-4">by <span class="font-semibold">${artist}</span></p>
+                    <div class="bg-gray-100 p-3 rounded-lg mb-4 flex justify-between text-sm">
+                        <span>🏆 Best Peak: <strong>#${bestPeak}</strong></span>
+                        <span>📅 Total Weeks: <strong>${totalWeeks}</strong></span>
+                    </div>
+                    <div class="chart-run-list">
+                        ${run.map((r,i,a)=>{
+                            let cls = 'run-steady';
+                            let changeIcon = '';
+                            if(i>0){
+                                if(r.position < a[i-1].position){
+                                    cls = 'run-up';
+                                    changeIcon = '<span class="text-green-600 ml-1">▲</span>';
+                                } else if(r.position > a[i-1].position){
+                                    cls = 'run-down';
+                                    changeIcon = '<span class="text-red-600 ml-1">▼</span>';
+                                }
+                            }
+                            if(r.position === r.peak && i>0 && r.position < a[i-1].peak) cls = 'run-peak';
+                            if(r.position === 1) cls = 'run-number-one';
+                            if(i===0) cls = 'run-new';
+                            
+                            let isPeak = (r.position === r.peak && (i===0 || r.position < a[i-1].peak));
+                            
+                            return `
+                                <div class="chart-run-list-item ${cls}">
+                                    <div class="flex items-center gap-3 flex-wrap">
+                                        <button class="chart-run-date-btn" onclick="goToWeek('${ct}','${r.date}')">
+                                            <i class="far fa-calendar-alt mr-1"></i>${r.date}
+                                        </button>
+                                        <span class="chart-run-position font-mono">#${r.position}${changeIcon}</span>
+                                        <div class="chart-run-stats">
+                                            <span>📈 Peak: <span class="font-semibold">#${r.peak}</span></span>
+                                            <span>⏱️ Weeks: <span class="font-semibold">${r.weeks}</span></span>
+                                        </div>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        ${isPeak ? '<span class="chart-run-peak-badge">NEW PEAK</span>' : ''}
+                                        ${i===0 ? '<span class="chart-run-new-badge">DEBUT</span>' : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    <div class="text-center text-xs text-gray-400 mt-4">Click on any date to view that week's chart</div>
+                `;
             }
             modal.classList.add('active');
         }
@@ -879,14 +1208,29 @@
             else if(ct.includes('goat')) items=appState.chartData[ct]||[];
             else items=appState.chartData[ct]?.[appState.currentDate]||[];
             for(let i=0;i<items.length;i++){
-                let row=items[i], artist=row[cm.artist]||'Unknown', q='', t='';
-                if(ct.includes('Songs')||ct==='songs'||ct==='radioSongs'||ct==='streamingSongs'||ct==='digitalSongsSales'){ q=artist; t='artist'; }
-                else if(ct.includes('Albums')||ct==='albums'||ct==='topStreamingAlbums'||ct==='topAlbumSales'){ let alb=row[cm.album]||''; q=`${artist} ${alb}`; t='album'; }
-                else{ q=artist; t='artist'; }
+                let row=items[i], artist=row[cm.artist]||'Unknown', q='', t='', extra = {};
+                if(ct.includes('Songs')||ct==='songs'||ct==='radioSongs'||ct==='streamingSongs'||ct==='digitalSongsSales'){ 
+                    q=artist; 
+                    t='artist'; 
+                }
+                else if(ct.includes('Albums')||ct==='albums'||ct==='topStreamingAlbums'||ct==='topAlbumSales'){ 
+                    let alb=row[cm.album]||'';
+                    q = `${artist} ${alb}`;
+                    t = 'album';
+                    extra = { album: alb, artist: artist };
+                }
+                else{ 
+                    q=artist; 
+                    t='artist'; 
+                }
                 if(q && q!=='Unknown'){
-                    let url = await getSpotifyImage(q,t);
+                    let searchQuery = t === 'artist' ? getArtistSearchName(q) : q;
+                    let url = await getSpotifyImage(searchQuery, t, extra);
                     let el = document.getElementById(`img-${ct}-${i}`);
-                    if(el && url){ el.innerHTML=`<img src="${url}" class="w-full h-full object-cover">`; el.classList.remove('placeholder-art'); }
+                    if(el && url){ 
+                        el.innerHTML=`<img src="${url}" class="w-full h-full object-cover">`; 
+                        el.classList.remove('placeholder-art'); 
+                    }
                 }
             }
         }
@@ -901,7 +1245,9 @@
                 });
                 return; 
             }
-            getSpotifyImage(artist,'artist').then(img=>{
+            // Usa o nome corrigido para busca do artista
+            const artistSearchName = getArtistSearchName(artist);
+            getSpotifyImage(artistSearchName, 'artist').then(img=>{
                 let sections = ['Top 50 Artists','Hot 100 Songs','Radio Songs','Top 100 Albums','Top Streaming Albums','Top Album Sales','Streaming Songs','Digital Songs Sales'].map(name=>{
                     let cd = data[name];
                     if(!cd||cd.count===0) return '';
@@ -943,9 +1289,13 @@
         
         async function loadArtistIcons(artists){
             for(let a of artists){
-                let url = await getSpotifyImage(a,'artist');
+                const artistSearchName = getArtistSearchName(a);
+                let url = await getSpotifyImage(artistSearchName, 'artist');
                 let el = document.getElementById(`icon-${a.replace(/[^a-z0-9]/gi,'_')}`);
-                if(el && url){ el.innerHTML=`<img src="${url}" class="artist-icon-image">`; el.classList.remove('artist-icon-placeholder'); }
+                if(el && url){ 
+                    el.innerHTML=`<img src="${url}" class="artist-icon-image">`; 
+                    el.classList.remove('artist-icon-placeholder'); 
+                }
             }
         }
         
@@ -972,11 +1322,9 @@
         async function init(){
             showMessage('loading','Loading charts...');
             try{
-                // Carrega os 8 charts semanais primeiro
                 const priorityCharts = [...weeklyChartList];
                 await Promise.all(priorityCharts.map(ct => fetchChartData(ct)));
                 
-                // Configura a data compartilhada
                 for(let ct of weeklyChartList) {
                     let dates = Object.keys(appState.chartData[ct]||{});
                     if(dates.length) {
@@ -985,10 +1333,8 @@
                     }
                 }
                 
-                // Mostra a página IMEDIATAMENTE
                 renderHome();
                 
-                // Carrega o resto em segundo plano
                 const backgroundCharts = [...yearEndList, ...goatList, 'artistStats', 'statsData'];
                 backgroundCharts.forEach(ct => {
                     fetchChartData(ct).then(() => {
@@ -1001,7 +1347,6 @@
                     });
                 });
                 
-                // Carrega Chart Beat em segundo plano
                 setTimeout(() => fetchChartBeat(), 500);
                 
             } catch(e){ console.error(e); showMessage('error','Error loading data: '+e.message); }
