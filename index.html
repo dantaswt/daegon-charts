@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="portal.css?v=20260927-globalheader-1">\n</head>
+  <link rel="stylesheet" href="portal.css?v=20260927-globalfooter-1">\n</head>
 <body>
 <div class="shell">
   <header class="site-header">
@@ -1952,14 +1952,16 @@
             <button id="nextBtnBottom" class="gold-btn bottom-nav-btn">Next <i class="fas fa-chevron-right"></i></button>
           </div>
         </div>
-        <section class="site-about-note" aria-labelledby="about-chart-heading">
-          <h2 id="about-chart-heading">About Daegon Charts</h2>
-          <p>Daegon Charts is an independent music-ranking project and historical archive. The weekly pages organize songs, albums and artists into original rankings and preserve chart movement, peak, weeks charted, weeks at number one and historical chart runs.</p>
-          <p>The project combines structured music-performance data with a consistent chart methodology designed for continuity across weeks and years. It is not affiliated with Billboard, Spotify, Last.fm or any record label. Learn more about how the rankings are built in the <a href="/methodology">methodology</a>.</p>
-        </section>
+
       </main>
     </div>
   </div>
+
+  <section class="site-about-note global-site-about" aria-labelledby="global-about-chart-heading">
+    <h2 id="global-about-chart-heading">About Daegon Charts</h2>
+    <p>Daegon Charts is an independent music-ranking project and historical archive. The weekly pages organize songs, albums and artists into original rankings and preserve chart movement, peak, weeks charted, weeks at number one and historical chart runs.</p>
+    <p>The project combines structured music-performance data with a consistent chart methodology designed for continuity across weeks and years. It is not affiliated with Billboard, Spotify, Last.fm or any record label. Learn more about how the rankings are built in the <a href="/methodology">methodology</a>.</p>
+  </section>
 
   <footer class="site-footer">
     <nav class="footer-links" aria-label="Site information">
@@ -2851,5 +2853,5 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="portal.js?v=20260927-globalheader-1"></script>\n</body>
+<script src="portal.js?v=20260927-globalfooter-1"></script>\n</body>
 </html>
