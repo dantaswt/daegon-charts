@@ -2136,3 +2136,57 @@ html body .site-header .brand{
     justify-self:auto!important;
   }
 }
+
+/* === MOBILE HEADER TRUE CENTER v5 === */
+@media(max-width:767px){
+  html body .site-header .header-inner{
+    position:relative!important;
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr) 44px!important;
+    width:100%!important;
+    max-width:none!important;
+    height:62px!important;
+    min-height:62px!important;
+    margin:0!important;
+    padding:9px 14px!important;
+    gap:8px!important;
+    align-items:center!important;
+  }
+
+  html body .site-header .portal-menu-toggle{
+    position:static!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    justify-self:start!important;
+  }
+
+  html body .site-header .brand{
+    position:static!important;
+    grid-column:2!important;
+    grid-row:1!important;
+    justify-self:center!important;
+    align-self:center!important;
+    transform:none!important;
+    left:auto!important;
+    right:auto!important;
+    top:auto!important;
+    bottom:auto!important;
+    width:max-content!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+  }
+
+  html body .site-header .theme-btn{
+    position:static!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:end!important;
+  }
+}
