@@ -5,6 +5,9 @@ on:
     branches: [main, dynamic-app]
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,3 +36,16 @@ jobs:
           path: dist/client
           if-no-files-found: error
           retention-days: 7
+      - name: Publish compiled SPA branch
+        if: github.ref == 'refs/heads/dynamic-app' && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd dist/client
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Build SPA from ${GITHUB_SHA}"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push --force origin HEAD:spa-pages
