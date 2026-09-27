@@ -164,6 +164,15 @@ function setMode(portal){
   document.body.classList.toggle('portal-mode',!!portal);
   document.body.classList.toggle('weekly-mode',!portal);
   document.body.classList.add('global-bars-weekly');
+
+  // Keep Weekly branding untouched, but mirror the daegoncharts header on portal routes.
+  const brand=document.querySelector('.brand');
+  if(brand){
+    brand.innerHTML=portal
+      ? '<span class="brand-word">daegon charts</span>'
+      : '<span class="brand-mark" aria-hidden="true">D</span><span class="brand-word">aegon charts</span>';
+  }
+
   const footer=document.querySelector('.site-footer');
   if(portal){
     weeklyEl.style.display='none';
