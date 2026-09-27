@@ -1020,7 +1020,16 @@
             renderStatsPage();
         }
         
-        function showChart(ct, dateToSet=null){
+        async function showChart(ct, dateToSet=null){
+            if (!chartsConfig[ct]?.loaded) {
+                appContainer.innerHTML = `<div class="flex flex-col items-center justify-center p-8 min-h-[40vh]"><div class="loader mb-4"></div><p class="text-gray-400">Loading ${chartsConfig[ct]?.title || 'chart'}...</p></div>`;
+                const ok = await fetchChartData(ct);
+                if (!ok) {
+                    appContainer.innerHTML = `<div class="max-w-xl mx-auto text-center py-10"><p class="text-red-400 mb-4">Could not load ${chartsConfig[ct]?.title || 'this chart'}.</p><button id="retryChartBtn" class="px-4 py-2 rounded bg-accent text-black font-semibold">Try again</button></div>`;
+                    document.getElementById('retryChartBtn')?.addEventListener('click', () => showChart(ct, dateToSet));
+                    return;
+                }
+            }
             appState.lastChart = appState.activeChart;
             appState.lastChartDate = appState.currentDate;
             appState.lastChartYear = appState.currentYear;
@@ -1266,7 +1275,14 @@
             });
         }
         
-        function showAllArtists(){
+        async function showAllArtists(){
+            if (!chartsConfig.artistStats.loaded) {
+                appState.currentView='allArtists';
+                appContainer.innerHTML = `<div class="max-w-6xl mx-auto"><button id="backBtn" class="back-button mb-4 text-accent"><i class="fas fa-arrow-left mr-2"></i> Back to Home</button><div class="text-center py-8"><div class="loader mx-auto mb-4"></div><p class="text-gray-400">Loading artists data...</p></div></div>`;
+                document.getElementById('backBtn')?.addEventListener('click',navigateBack);
+                const ok = await fetchChartData('artistStats');
+                if (!ok) return;
+            }
             appState.currentView='allArtists';
             let artists = appState.allArtistsList;
             if (!artists.length) {
@@ -1323,52 +1339,22 @@
         }
         
         async function init(){
-            // Render the interface immediately. Individual charts fill in as their data arrives.
             renderHome();
 
-            const coreCharts = ['songs', 'artists', 'albums'];
-            const secondaryWeeklyCharts = weeklyChartList.filter(ct => !coreCharts.includes(ct));
-
-            const refreshAfterLoad = (ct, ok) => {
+            const refreshHome = (ct, ok) => {
                 if (!ok) return;
-
                 if (!appState.sharedDate && weeklyChartList.includes(ct)) {
                     const dates = Object.keys(appState.chartData[ct] || {});
                     if (dates.length) appState.sharedDate = dates[dates.length - 1];
                 }
-
-                if (appState.currentView === 'home') {
-                    updateHomeCharts();
-                    setTimeout(() => loadCircleImages(), 50);
-                }
+                if (appState.currentView === 'home') updateHomeCharts();
             };
 
-            // Prioritize the three principal charts, but never block the page on them.
-            coreCharts.forEach(ct => {
-                fetchChartData(ct).then(ok => refreshAfterLoad(ct, ok));
-            });
+            fetchChartData('songs').then(ok => refreshHome('songs', ok));
+            setTimeout(() => fetchChartData('artists').then(ok => refreshHome('artists', ok)), 500);
+            setTimeout(() => fetchChartData('albums').then(ok => refreshHome('albums', ok)), 1000);
 
-            // Load the remaining weekly charts independently in the background.
-            secondaryWeeklyCharts.forEach(ct => {
-                fetchChartData(ct).then(ok => refreshAfterLoad(ct, ok));
-            });
-
-            // Year-end, GOAT, artist stats and stats are lower-priority background requests.
-            const backgroundCharts = [...yearEndList, ...goatList, 'artistStats', 'statsData'];
-            backgroundCharts.forEach(ct => {
-                fetchChartData(ct).then(ok => {
-                    if (!ok) return;
-                    if ((ct.includes('yearEnd') || ct.includes('goat')) && appState.currentView === 'home') {
-                        updateHomeCharts();
-                    }
-                    if (ct === 'artistStats' && appState.currentView === 'allArtists') {
-                        showAllArtists();
-                    }
-                });
-            });
-
-            // Chart Beat is deliberately delayed so it cannot hold up the main charts.
-            setTimeout(() => fetchChartBeat(), 800);
+            setTimeout(() => fetchChartBeat(), 2500);
         }
 
         document.addEventListener('DOMContentLoaded',()=>{
