@@ -1590,3 +1590,164 @@
     z-index:20!important;
   }
 }
+
+
+/* === GLOBAL HEADER: identical on EVERY route, including Weekly Charts === */
+body.global-bars-weekly .site-header{
+  position:fixed!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  z-index:100!important;
+}
+
+body.global-bars-weekly .weekly-label{
+  display:none!important;
+}
+
+@media (min-width:768px){
+  body.global-bars-weekly .header-inner{
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:16px!important;
+  }
+  body.global-bars-weekly .brand{
+    grid-column:1!important;
+    position:static!important;
+    transform:none!important;
+  }
+  body.global-bars-weekly .portal-topnav{
+    display:flex!important;
+    grid-column:2!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    min-width:0!important;
+  }
+  body.global-bars-weekly .theme-btn{
+    grid-column:3!important;
+    justify-self:end!important;
+  }
+}
+
+@media (max-width:767px){
+  body.global-bars-weekly .header-inner{
+    position:relative!important;
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    width:100%!important;
+    min-height:62px!important;
+    margin:0 auto!important;
+    padding:9px 14px!important;
+    gap:8px!important;
+  }
+
+  body.global-bars-weekly .portal-menu-toggle{
+    display:flex!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    position:static!important;
+    left:auto!important;
+    top:auto!important;
+    width:44px!important;
+    height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    justify-self:start!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:transparent!important;
+    border:0!important;
+    color:#f5f5f5!important;
+    z-index:20!important;
+  }
+
+  body.global-bars-weekly .portal-hamb{
+    width:22px!important;
+    height:16px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+  }
+  body.global-bars-weekly .portal-hamb span{
+    display:block!important;
+    width:22px!important;
+    height:2px!important;
+    background:#f5f5f5!important;
+  }
+
+  body.global-bars-weekly .brand{
+    position:absolute!important;
+    left:50%!important;
+    right:auto!important;
+    top:50%!important;
+    transform:translate(-50%,-50%)!important;
+    width:max-content!important;
+    max-width:calc(100% - 132px)!important;
+    min-width:0!important;
+    margin:0!important;
+    padding:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    overflow:visible!important;
+    white-space:nowrap!important;
+    text-align:center!important;
+    z-index:10!important;
+  }
+
+  body.global-bars-weekly .brand-mark{
+    display:inline-flex!important;
+    width:23px!important;
+    height:23px!important;
+    flex:0 0 23px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:var(--accent)!important;
+    color:#090909!important;
+    font-size:13px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    letter-spacing:-.05em!important;
+    transform:skewX(-7deg)!important;
+    box-shadow:2px 2px 0 #ffd54a!important;
+  }
+
+  body.global-bars-weekly .brand-word{
+    display:block!important;
+    min-width:0!important;
+    max-width:none!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    white-space:nowrap!important;
+    font-size:18px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:.02em!important;
+    text-transform:lowercase!important;
+  }
+
+  body.global-bars-weekly .portal-search-btn,
+  body.global-bars-weekly .portal-topnav{
+    display:none!important;
+  }
+
+  body.global-bars-weekly .theme-btn{
+    display:flex!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    position:static!important;
+    width:44px!important;
+    height:44px!important;
+    flex:0 0 44px!important;
+    margin:0!important;
+    padding:0!important;
+    justify-self:end!important;
+    align-items:center!important;
+    justify-content:center!important;
+    z-index:20!important;
+  }
+}
