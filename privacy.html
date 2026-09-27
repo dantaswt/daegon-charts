@@ -16,11 +16,21 @@
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,sans-serif}a{color:var(--accent)}
 header{background:#0f0f0f;border-bottom:1px solid #2a2a2a}.head{max-width:980px;margin:auto;padding:16px;display:flex;justify-content:space-between;gap:16px;align-items:center}.brand{color:#f5f5f5;font-weight:800;text-decoration:none}.back{color:#cbd5e1;text-decoration:none;font-size:13px}
 main{max-width:900px;margin:0 auto;padding:42px 18px 64px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}h1{font-size:42px;line-height:1.05;margin:8px 0 18px}h2{font-size:20px;margin:30px 0 10px}p,li{font-size:15px;line-height:1.75}p{margin:10px 0}ul{padding-left:22px}.card{background:var(--card);border:1px solid var(--border);padding:22px;margin:20px 0}.muted{color:var(--muted)}footer{border-top:1px solid var(--border);padding:24px 16px;text-align:center;color:var(--muted);font-size:12px}.links{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-bottom:10px}.links a{text-decoration:none;font-weight:700}
-@media(max-width:640px){main{padding-top:30px}h1{font-size:32px}.head{padding:13px 14px}.card{padding:16px}}
+.brand{display:flex;align-items:center;gap:9px!important;color:#f5f5f5!important}
+.brand-mark{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#090909;font-size:15px;font-weight:900;letter-spacing:-.05em;transform:skewX(-7deg);box-shadow:3px 3px 0 #ffd54a}
+.brand-word{font-size:20px;font-weight:900;letter-spacing:-.035em;text-transform:lowercase}
+h1{position:relative;padding-bottom:12px}
+h1::after{content:"";position:absolute;left:0;bottom:0;width:64px;height:3px;background:linear-gradient(90deg,var(--accent),#ffd54a)}
+.card{position:relative;border-left:3px solid var(--accent)!important;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.card::before{content:"";position:absolute;left:-3px;top:-1px;bottom:-1px;width:3px;background:linear-gradient(180deg,var(--accent),#ffd54a)}
+h2{position:relative}
+h2::before{content:"";display:inline-block;width:7px;height:7px;background:var(--accent);margin-right:8px;vertical-align:2px;box-shadow:2px 2px 0 #ffd54a}
+.links a{color:var(--accent)}
+@media(max-width:640px){main{padding-top:30px}h1{font-size:32px}.head{padding:13px 14px}.card{padding:16px}.brand{gap:7px!important}.brand-mark{width:23px;height:23px;font-size:13px;box-shadow:2px 2px 0 #ffd54a}.brand-word{font-size:17px}}
 </style>
 </head>
 <body>
-<header><div class="head"><a class="brand" href="index.html">daegon charts</a><a class="back" href="index.html">← Weekly Charts</a></div></header>
+<header><div class="head"><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">D</span><span class="brand-word">daegon charts</span></a><a class="back" href="index.html">← Weekly Charts</a></div></header>
 <main><div class="eyebrow">Site policy</div><h1>Privacy Policy</h1><p class="muted">Last updated: September 27, 2026.</p>
 <p>Daegon Charts is an independent music-chart website. This policy explains what information may be processed when you use the site and how third-party services may be involved.</p>
 <h2>Information stored by the site</h2><p>The site may use browser storage for functional preferences such as theme choice and cached artwork references. This information is stored in your browser to improve repeat visits and is not intended to identify you personally.</p>
