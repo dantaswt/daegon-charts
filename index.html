@@ -3,7 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>daegon charts — weekly music charts</title>
+  <title>Daegon Charts — Weekly Music Charts & Historical Archive</title>
+  <meta name="description" content="Daegon Charts is an independent weekly music chart and historical archive covering songs, albums and artists with original rankings, chart runs and movement data.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Daegon Charts">
+  <meta property="og:title" content="Daegon Charts — Weekly Music Charts & Historical Archive">
+  <meta property="og:description" content="Independent weekly rankings, chart runs and historical music chart data for songs, albums and artists.">
+  <meta property="og:type" content="website">
   <link rel="icon" type="image/png" href="https://i.imgur.com/jaBZ19n.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1674,6 +1680,34 @@
         transform:translateX(-50%);
       }
     }
+
+    .site-about-note{
+      max-width:896px;
+      margin:30px auto 0;
+      padding:18px 20px;
+      border-top:1px solid var(--border);
+      color:var(--muted-foreground);
+      font-size:12px;
+      line-height:1.65;
+    }
+    .site-about-note h2{
+      margin:0 0 8px;
+      color:var(--foreground);
+      font-size:14px;
+      line-height:1.3;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+    .site-about-note p{margin:6px 0}
+    .site-about-note a,.site-footer a{color:var(--accent);text-decoration:none}
+    .site-about-note a:hover,.site-footer a:hover{text-decoration:underline}
+    .site-footer{display:flex;flex-direction:column;align-items:center;gap:10px}
+    .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .footer-copy{font-size:11px;color:#9ca3af}
+    @media(max-width:767px){
+      .site-about-note{margin-top:22px;padding:14px 8px;font-size:11px}
+      .footer-links{gap:10px;font-size:10px}
+    }
 </style>
 </head>
 <body>
@@ -1750,11 +1784,25 @@
             <button id="nextBtnBottom" class="gold-btn bottom-nav-btn">Next <i class="fas fa-chevron-right"></i></button>
           </div>
         </div>
+        <section class="site-about-note" aria-labelledby="about-chart-heading">
+          <h2 id="about-chart-heading">About Daegon Charts</h2>
+          <p>Daegon Charts is an independent music-ranking project and historical archive. The weekly pages organize songs, albums and artists into original rankings and preserve chart movement, peak, weeks charted, weeks at number one and historical chart runs.</p>
+          <p>The project combines structured music-performance data with a consistent chart methodology designed for continuity across weeks and years. It is not affiliated with Billboard, Spotify, Last.fm or any record label. Learn more about how the rankings are built in the <a href="methodology.html">methodology</a>.</p>
+        </section>
       </main>
     </div>
   </div>
 
-  <footer class="site-footer">Chart generated based on daegon charts archive.</footer>
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Site information">
+      <a href="about.html">About</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+      <a href="terms.html">Terms</a>
+    </nav>
+    <div class="footer-copy">Daegon Charts — independent weekly music charts and historical archive.</div>
+  </footer>
   <button id="backTop" class="back-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
 </div>
 
