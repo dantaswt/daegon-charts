@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-</head>
+  <link rel="stylesheet" href="/portal.css">\n</head>
 <body>
 <div class="shell">
   <header class="site-header">
@@ -1992,7 +1992,7 @@ const charts={
   streamingSongs:{id:'streamingSongs',title:'Streaming Songs',kind:'song',url:SHEET+'626144821'},
   digitalSongsSales:{id:'digitalSongsSales',title:'Digital Songs Sales',kind:'song',url:SHEET+'302176914'}
 };
-const SITE_ORIGIN='https://daegoncharts.pages.dev';
+const SITE_ORIGIN='https://daegoncharts.com.br';
 const chartSlugs={
   songs:'daegon-100',
   albums:'daegon-albums-100',
@@ -2848,5 +2848,5 @@ const initialRoute=parseRoute();
 renderNav();
 loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 </script>
-</body>
+<script src="/portal.js"></script>\n</body>
 </html>
