@@ -119,9 +119,9 @@ function ensureShell(){
     navEl.id='portalTopNav';
     navEl.className='portal-topnav';
     navEl.innerHTML=[
-      ['Home','/'],['Weekly','/chart/daegon-100'],['Songs','/songs'],['Albums','/albums'],['Artists','/artists'],
-      ["#1's",'/number-ones'],['Stats','/stats'],['Year-End','/year-end'],['Decade-End','/decade-end'],
-      ['GOAT','/goat'],['Chart Beat','/chart-beat'],['Awards','/awards'],['Battle','/chart-battle'],['Search','/search']
+      ['DAEGON 100','/chart/daegon-100'],['CHART BEAT','/chart-beat'],['YEAR-END CHARTS','/year-end'],
+      ['DECADE-END','/decade-end'],['GREATEST OF ALL TIME','/goat'],['STATS','/stats'],
+      ['AWARDS','/awards'],["#1'S",'/number-ones'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     const theme=document.getElementById('themeToggle');
     head.insertBefore(navEl,theme);
@@ -142,12 +142,19 @@ function ensureShell(){
     mobileMenu.id='portalMobileMenu';
     mobileMenu.className='portal-mobile-drawer';
     mobileMenu.innerHTML=[
-      ['Home','/'],['Weekly','/chart/daegon-100'],['Songs','/songs'],['Albums','/albums'],['Artists','/artists'],
-      ["#1's",'/number-ones'],['Stats','/stats'],['Year-End','/year-end'],['Decade-End','/decade-end'],
-      ['GOAT','/goat'],['Chart Beat','/chart-beat'],['Awards','/awards'],['Battle','/chart-battle'],['Search','/search']
+      ['DAEGON 100','/chart/daegon-100'],['CHART BEAT','/chart-beat'],['YEAR-END CHARTS','/year-end'],
+      ['DECADE-END','/decade-end'],['GREATEST OF ALL TIME','/goat'],['STATS','/stats'],
+      ['AWARDS','/awards'],["#1'S",'/number-ones'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     mobileBtn.onclick=()=>mobileMenu.classList.toggle('open');
     head.insertBefore(mobileBtn,theme);
+    const searchBtn=document.createElement('button');
+    searchBtn.id='portalSearchBtn';
+    searchBtn.className='portal-search-btn';
+    searchBtn.setAttribute('aria-label','Search');
+    searchBtn.innerHTML='<i class="fas fa-search"></i>';
+    searchBtn.onclick=()=>go('/search');
+    head.insertBefore(searchBtn,theme);
     document.querySelector('.site-header').appendChild(mobileMenu);
   }
 }
@@ -156,14 +163,17 @@ function setMode(portal){
   ensureShell();
   document.body.classList.toggle('portal-mode',!!portal);
   document.body.classList.toggle('weekly-mode',!portal);
+  const footer=document.querySelector('.site-footer');
   if(portal){
     weeklyEl.style.display='none';
     portalEl.classList.add('active');
     portalEl.removeAttribute('hidden');
+    if(footer)footer.innerHTML='<div class="ref-footer-links"><a href="'+appHref('/artists')+'" data-portal-link="/artists">Artists</a><span>|</span><a href="'+appHref('/albums')+'" data-portal-link="/albums">Albums</a><span>|</span><a href="'+appHref('/songs')+'" data-portal-link="/songs">Songs</a></div><div class="ref-footer-copy"><p>Chart generated based on daegon charts archive.</p><p>Powered by TanStack Start.</p></div>';
   }else{
     weeklyEl.style.display='';
     portalEl.classList.remove('active');
     portalEl.setAttribute('hidden','');
+    if(footer)footer.innerHTML='<nav class="footer-links" aria-label="Site information"><a href="/about">About</a><a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/contact">Contact</a><a href="/terms">Terms</a></nav><div class="footer-copy">Daegon Charts — independent weekly music charts and historical archive.</div>';
   }
 }
 function loading(title='Loading'){
