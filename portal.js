@@ -168,9 +168,7 @@ function setMode(portal){
   // Keep Weekly branding untouched, but mirror the daegoncharts header on portal routes.
   const brand=document.querySelector('.brand');
   if(brand){
-    brand.innerHTML=portal
-      ? '<span class="brand-word">daegon charts</span>'
-      : '<span class="brand-mark" aria-hidden="true">D</span><span class="brand-word">aegon charts</span>';
+    brand.innerHTML='<span class="brand-mark" aria-hidden="true">D</span><span class="brand-word">aegon charts</span>';
   }
 
   const footer=document.querySelector('.site-footer');
