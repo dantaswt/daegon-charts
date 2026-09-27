@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn } from "./client-server-fn";
 import { getWeeklyChart, getAllArtistStats, cached, type ChartEntry, type WeeklyChartData } from "./charts.functions";
 import { chartsConfig } from "./charts-config";
 
