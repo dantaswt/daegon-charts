@@ -460,6 +460,15 @@ function onDocumentClick(e){
 
 window.DaegonPortal={handles:isHandled,route:renderRoute,go,activateWeeklyIfNeeded};
 ensureShell();
+try{
+  const savedRoute=sessionStorage.getItem('dc_route');
+  if(savedRoute){
+    sessionStorage.removeItem('dc_route');
+    const prefix=basePrefix();
+    const normalized=prefix&&savedRoute.startsWith(prefix)?savedRoute.slice(prefix.length):savedRoute;
+    history.replaceState({},'',appHref(normalized||'/'));
+  }
+}catch{}
 document.addEventListener('click',onDocumentClick);
 window.addEventListener('popstate',()=>{if(!activateWeeklyIfNeeded())renderRoute()});
 if(!activateWeeklyIfNeeded())renderRoute();
