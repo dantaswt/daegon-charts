@@ -1279,6 +1279,104 @@
         white-space:nowrap !important;
       }
     }
+
+    .dropouts{
+      max-width:896px;
+      margin:32px auto 0;
+      border:1px solid var(--border);
+      background:var(--muted);
+      padding:16px;
+    }
+    .dropouts-title{
+      font-size:12px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.2em;
+      color:var(--muted-foreground);
+      margin-bottom:12px;
+    }
+    .dropouts-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .dropout{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      width:100%;
+      border:1px solid var(--border-dark);
+      background:var(--muted);
+      padding:12px;
+      color:var(--muted-foreground);
+      font-size:12px;
+      transition:border-color .15s;
+    }
+    .dropout:hover{
+      border-color:var(--accent);
+    }
+    .dropout-cover{
+      width:56px;
+      height:56px;
+      flex:0 0 56px;
+      overflow:hidden;
+      background:var(--muted);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--muted-foreground);
+      font-size:20px;
+    }
+    .dropout-cover img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .dropout-info{
+      min-width:0;
+      flex:1;
+    }
+    .dropout-name{
+      font-size:12px;
+      font-weight:600;
+      color:var(--foreground);
+      overflow-wrap:anywhere;
+    }
+    .dropout-artist{
+      margin-top:1px;
+      font-size:11px;
+      color:var(--muted-foreground);
+      overflow-wrap:anywhere;
+    }
+    .dropout-meta{
+      margin-top:4px;
+      display:flex;
+      flex-wrap:wrap;
+      column-gap:8px;
+      row-gap:2px;
+      font-size:10px;
+      color:var(--muted-foreground);
+    }
+    .dropout-meta strong{
+      color:inherit;
+      font-weight:600;
+    }
+    @media(max-width:767px){
+      .dropouts{
+        margin-top:24px;
+        padding:12px;
+      }
+      .dropout{
+        padding:10px;
+        gap:10px;
+      }
+      .dropout-cover{
+        width:56px;
+        height:56px;
+        flex-basis:56px;
+      }
+    }
 </style>
 </head>
 <body>
@@ -2001,11 +2099,61 @@ function renderRows(data,date){
   content.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const e=all.find(x=>itemKey(x)===b.dataset.entry);if(e)playEntry(e,b)});
   hydrateImages(cfg,rows);
 }
+async function hydrateDropoutImages(cfg,outs){
+  const nodes=[...dropoutsEl.querySelectorAll('[data-dropout-image-key]')];
+  await Promise.all(nodes.map(async node=>{
+    const key=node.dataset.dropoutImageKey;
+    const e=outs.find(x=>itemKey(x)===key);
+    if(!e)return;
+    const url=await resolveImage(e,cfg);
+    if(url&&node.isConnected){
+      node.innerHTML='<img src="'+esc(url)+'" alt="'+esc(e.artist||e.name)+'" loading="lazy" decoding="async">';
+    }
+  }));
+}
 function renderDropouts(data,date){
-  const idx=data.dates.indexOf(date);if(idx<=0){dropoutsEl.innerHTML='';return}
-  const prev=data.entriesByDate[data.dates[idx-1]]||[],curr=data.entriesByDate[date]||[],keys=new Set(curr.map(itemKey)),outs=prev.filter(e=>!keys.has(itemKey(e)));
+  const idx=data.dates.indexOf(date);
+  if(idx<=0){dropoutsEl.innerHTML='';return}
+
+  const prev=data.entriesByDate[data.dates[idx-1]]||[];
+  const curr=data.entriesByDate[date]||[];
+
+  // Same logic as daegoncharts: an item is a dropout only when the exact
+  // name + artist pair existed in the immediately previous week and is absent now.
+  const outs=prev.filter(prevEntry=>
+    !curr.some(currEntry=>
+      String(currEntry.name||'')===String(prevEntry.name||'') &&
+      String(currEntry.artist||'')===String(prevEntry.artist||'')
+    )
+  );
+
   if(!outs.length){dropoutsEl.innerHTML='';return}
-  dropoutsEl.innerHTML='<div class="dropouts"><div class="dropouts-title">DROP-OUTS</div>'+outs.map(e=>'<div class="dropout"><div class="dropout-rank">#'+e.position+'</div><div class="dropout-info"><div class="dropout-name">'+esc(e.name)+'</div><div class="dropout-meta">'+(charts[state.active].kind!=='artist'?esc(e.artist)+' · ':'')+'Peak #'+esc(e.peak||'-')+' · Weeks '+esc(e.weeks||'-')+'</div></div></div>').join('')+'</div>';
+
+  const cfg=charts[state.active];
+  dropoutsEl.innerHTML=
+    '<div class="dropouts">'+
+      '<div class="dropouts-title">DROP-OUTS</div>'+
+      '<div class="dropouts-list">'+
+        outs.map(e=>
+          '<div class="dropout">'+
+            '<div class="dropout-cover" data-dropout-image-key="'+esc(itemKey(e))+'">'+
+              '<i class="fas '+(cfg.kind==='album'?'fa-compact-disc':cfg.kind==='song'?'fa-music':'fa-user')+'"></i>'+
+            '</div>'+
+            '<div class="dropout-info">'+
+              '<div class="dropout-name">'+esc(e.name)+'</div>'+
+              (cfg.kind!=='artist'?'<div class="dropout-artist">'+esc(e.artist)+'</div>':'')+
+              '<div class="dropout-meta">'+
+                '<span>LW: <strong>#'+esc(e.position)+'</strong></span>'+
+                (e.peak?'<span>Peak: <strong>#'+esc(e.peak)+'</strong></span>':'')+
+                (e.weeks?'<span>Weeks: <strong>'+esc(e.weeks)+'</strong></span>':'')+
+              '</div>'+
+            '</div>'+
+          '</div>'
+        ).join('')+
+      '</div>'+
+    '</div>';
+
+  hydrateDropoutImages(cfg,outs);
 }
 function renderWeekPicker(data){
   weekPickerLabel.textContent=fmtShort(state.date);
