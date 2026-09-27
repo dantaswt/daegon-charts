@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn } from "./client-server-fn";
 import Papa from "papaparse";
 import { chartsConfig, chartBeatConfig, slugify, slugifyArtist, songSlug, parseSongSlug, weeklyChartIds } from "./charts-config";
 import { getSupabase } from "./supabase";
