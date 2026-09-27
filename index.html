@@ -435,7 +435,7 @@ const charts={
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
-  const imageCacheVersion='server-artwork-resolver-v1';
+  const imageCacheVersion='real-artwork-only-v4';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
     for(let i=localStorage.length-1;i>=0;i--){
       const k=localStorage.key(i);
@@ -911,11 +911,15 @@ async function resolveImage(e,cfg){
   }catch{}
 
   const isReal=usableImage(url)&&/^https?:\/\//i.test(url);
-  if(!isReal)url=generatedFallbackImage(e,cfg);
+  if(!isReal)url='';
 
-  state.images.set(key,url);
-  if(isReal){try{localStorage.setItem(persistedKey,url)}catch{}}
-  else{try{localStorage.removeItem(persistedKey)}catch{}}
+  if(isReal){
+    state.images.set(key,url);
+    try{localStorage.setItem(persistedKey,url)}catch{}
+  }else{
+    state.images.delete(key);
+    try{localStorage.removeItem(persistedKey)}catch{}
+  }
   return url;
 }
 async function resolvePreview(e){
@@ -950,8 +954,7 @@ async function hydrateImages(cfg,rows){
 
       for(const node of byKey.get(key)||[]){
         if(node.isConnected){
-          const fallback=generatedFallbackImage(e,cfg);
-          node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+esc(fallback)+'\'">';
+          node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
         }
       }
     }
