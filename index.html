@@ -235,6 +235,42 @@
       .filters{margin-bottom:10px}
       .filter{min-height:38px;padding:7px 9px;font-size:10px}
     }
+
+    .week-picker{position:relative;min-width:175px}
+    .week-picker-button{
+      width:100%;min-width:175px;min-height:44px;
+      background:var(--muted);color:var(--foreground);
+      border:1px solid var(--border);
+      font-size:14px;font-weight:800;
+      padding:9px 14px;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      cursor:pointer;
+    }
+    .week-picker-button:hover{border-color:var(--accent)}
+    .week-picker-button i{font-size:11px;transition:transform .15s}
+    .week-picker.open .week-picker-button i{transform:rotate(180deg)}
+    .week-picker-menu{
+      position:absolute;top:100%;left:0;right:0;z-index:80;
+      background:var(--card);border:1px solid var(--border);
+      max-height:300px;overflow-y:auto;
+      display:none;
+      box-shadow:0 8px 24px rgba(0,0,0,.18);
+    }
+    .week-picker.open .week-picker-menu{display:block}
+    .week-picker-option{
+      width:100%;min-height:44px;border:0;border-bottom:1px solid var(--border);
+      background:var(--card);color:var(--foreground);
+      padding:9px 14px;text-align:center;
+      font-size:14px;font-weight:800;cursor:pointer;
+    }
+    .week-picker-option:hover{background:var(--muted)}
+    .week-picker-option.selected{background:var(--accent);color:#000}
+    @media(max-width:767px){
+      .week-picker{min-width:145px}
+      .week-picker-button{min-width:145px;min-height:40px;padding:7px 9px;font-size:12px}
+      .week-picker-option{min-height:40px;padding:7px 9px;font-size:12px}
+      .week-picker-menu{max-height:260px}
+    }
 </style>
 </head>
 <body>
@@ -269,7 +305,13 @@
           <div class="week-label">Chart Week</div>
           <div class="week-controls">
             <button id="prevBtn" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
-            <select id="weekSelect" class="date-select"></select>
+            <div id="weekPicker" class="week-picker">
+              <button id="weekPickerButton" class="week-picker-button" type="button">
+                <span id="weekPickerLabel">Select week</span>
+                <i id="weekPickerChevron" class="fas fa-chevron-down"></i>
+              </button>
+              <div id="weekPickerMenu" class="week-picker-menu"></div>
+            </div>
             <button id="nextBtn" class="gold-btn">Next <i class="fas fa-chevron-right"></i></button>
           </div>
         </div>
@@ -319,7 +361,8 @@ const charts={
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 const desktopChartNav=document.getElementById('desktopChartNav'), mobileActiveChart=document.getElementById('mobileActiveChart'), mobileMoreCharts=document.getElementById('mobileMoreCharts'), mobileChartMenu=document.getElementById('mobileChartMenu'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
-const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel'), weekSelect=document.getElementById('weekSelect');
+const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel');
+const weekPicker=document.getElementById('weekPicker'), weekPickerButton=document.getElementById('weekPickerButton'), weekPickerLabel=document.getElementById('weekPickerLabel'), weekPickerMenu=document.getElementById('weekPickerMenu');
 
 function parseCsvRow(line){
   const out=[];let cur='',quoted=false;
@@ -662,21 +705,41 @@ function renderDropouts(data,date){
   if(!outs.length){dropoutsEl.innerHTML='';return}
   dropoutsEl.innerHTML='<div class="dropouts"><div class="dropouts-title">DROP-OUTS</div>'+outs.map(e=>'<div class="dropout"><div class="dropout-rank">#'+e.position+'</div><div class="dropout-info"><div class="dropout-name">'+esc(e.name)+'</div><div class="dropout-meta">'+(charts[state.active].kind!=='artist'?esc(e.artist)+' · ':'')+'Peak #'+esc(e.peak||'-')+' · Weeks '+esc(e.weeks||'-')+'</div></div></div>').join('')+'</div>';
 }
+function renderWeekPicker(data){
+  weekPickerLabel.textContent=fmtShort(state.date);
+  weekPickerMenu.innerHTML=data.dates.map(d=>'<button class="week-picker-option '+(d===state.date?'selected':'')+'" data-date="'+d+'">'+fmtShort(d)+'</button>').join('');
+  weekPickerMenu.querySelectorAll('.week-picker-option').forEach(btn=>{
+    btn.onclick=()=>{
+      weekPicker.classList.remove('open');
+      if(btn.dataset.date!==state.date)setDate(btn.dataset.date,data);
+    };
+  });
+  requestAnimationFrame(()=>{
+    const selected=weekPickerMenu.querySelector('.selected');
+    if(selected) selected.scrollIntoView({block:'center'});
+  });
+}
 function syncWeekButtons(data){
   const idx=data.dates.indexOf(state.date),prev=idx>0?data.dates[idx-1]:null,next=idx>=0&&idx<data.dates.length-1?data.dates[idx+1]:null;
   for(const id of ['prevBtn','prevBtnBottom']){const b=document.getElementById(id);b.disabled=!prev;b.onclick=()=>prev&&setDate(prev,data)}
   for(const id of ['nextBtn','nextBtnBottom']){const b=document.getElementById(id);b.disabled=!next;b.onclick=()=>next&&setDate(next,data)}
 }
 function setDate(date,data){
-  state.date=date;weekSelect.value=date;dateLabel.textContent='Chart week of '+fmtDate(date);renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);window.scrollTo({top:0,behavior:'smooth'});
+  state.date=date;
+  dateLabel.textContent='Chart week of '+fmtDate(date);
+  renderWeekPicker(data);
+  renderNav();
+  syncWeekButtons(data);
+  renderRows(data,date);
+  renderDropouts(data,date);
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 async function loadChart(id,requestedDate=null){
   state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';dropoutsEl.innerHTML='';
   try{
     const data=await loadWeekly(id);if(!data.dates.length)throw new Error('No dates');
     let date=requestedDate&&data.entriesByDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];state.date=date;
-    weekSelect.innerHTML=data.dates.slice().reverse().map(d=>'<option value="'+d+'">'+fmtShort(d)+'</option>').join('');
-    weekSelect.value=date;weekSelect.onchange=()=>setDate(weekSelect.value,data);
+    renderWeekPicker(data);
     dateLabel.textContent='Chart week of '+fmtDate(date);renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);
   }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" id="retryChart">Try again</button></div>';document.getElementById('retryChart').onclick=()=>{state.cache.delete(state.active);loadChart(state.active,state.date)}}
 }
