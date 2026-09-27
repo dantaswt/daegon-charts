@@ -877,6 +877,37 @@ mobileMoreCharts.onclick=()=>{
   mobileMoreCharts.textContent=open?'− Less':'+ More Charts';
 };
 
+let lastWeekPickerTouch=0;
+weekPickerButton.addEventListener('click',function(e){
+  if(Date.now()-lastWeekPickerTouch<700)return;
+  e.preventDefault();
+  e.stopPropagation();
+  const open=weekPicker.classList.toggle('open');
+  if(open){
+    requestAnimationFrame(()=>{
+      const selected=weekPickerMenu.querySelector('.selected');
+      if(selected) selected.scrollIntoView({block:'center'});
+    });
+  }
+});
+
+weekPickerButton.addEventListener('touchend',function(e){
+  lastWeekPickerTouch=Date.now();
+  e.preventDefault();
+  e.stopPropagation();
+  const open=weekPicker.classList.toggle('open');
+  if(open){
+    requestAnimationFrame(()=>{
+      const selected=weekPickerMenu.querySelector('.selected');
+      if(selected) selected.scrollIntoView({block:'center'});
+    });
+  }
+},{passive:false});
+
+document.addEventListener('click',function(e){
+  if(!weekPicker.contains(e.target)) weekPicker.classList.remove('open');
+});
+
 renderNav();loadChart('songs');
 </script>
 </body>
