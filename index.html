@@ -1377,6 +1377,109 @@
         flex-basis:56px;
       }
     }
+
+    /* Artwork play: desktop hover-only overlay */
+    .artwork-cover{
+      position:relative;
+    }
+    .artwork-slot{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .artwork-slot img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .cover-play{
+      display:none;
+    }
+    @media(min-width:901px){
+      .cover-play{
+        position:absolute;
+        inset:0;
+        z-index:3;
+        width:100%;
+        height:100%;
+        border:0;
+        background:rgba(0,0,0,.42);
+        color:#fff;
+        align-items:center;
+        justify-content:center;
+        font-size:24px;
+        cursor:pointer;
+        opacity:0;
+        transition:opacity .15s ease;
+      }
+      .artwork-cover:hover .cover-play,
+      .cover-play:focus-visible{
+        display:flex;
+        opacity:1;
+      }
+      .cover-play:hover{
+        background:rgba(0,0,0,.48);
+      }
+      .cover-play i{
+        filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));
+      }
+    }
+
+    /* Copy text lives inside Details, above Chart run */
+    .details-copy{
+      width:100%;
+      display:block;
+      margin:0 0 12px;
+      padding:12px;
+      border:1px solid var(--border);
+      background:var(--card);
+      color:var(--foreground);
+      text-align:left;
+      cursor:pointer;
+      transition:border-color .15s,background .15s;
+    }
+    .details-copy:hover{
+      border-color:var(--accent);
+      background:var(--muted);
+    }
+    .details-copy-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:7px;
+      font-size:11px;
+      line-height:14px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted-foreground);
+    }
+    .details-copy-text{
+      font-size:12px;
+      line-height:1.45;
+      color:var(--foreground);
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
+    }
+    @media(max-width:767px){
+      .details-copy{
+        padding:10px;
+        margin-bottom:10px;
+      }
+      .details-copy-top{
+        font-size:10px;
+        margin-bottom:6px;
+      }
+      .details-copy-text{
+        font-size:11px;
+        line-height:1.4;
+      }
+    }
 </style>
 </head>
 <body>
@@ -2003,7 +2106,9 @@ async function hydrateImages(cfg,rows){
 
       for(const node of byKey.get(key)||[]){
         if(node.isConnected){
-          node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
+          const slot=node.querySelector('.artwork-slot');
+          if(slot) slot.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
+          else node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
         }
       }
     }
@@ -2021,8 +2126,15 @@ async function playEntry(e,btn){
 
 function coverHtml(e,one,mobile=false){
   const cls=mobile?(one?'m-cover one':'m-cover'):(one?'cover one':'cover');
-  const icon=charts[state.active].kind==='artist'?'fa-user':charts[state.active].kind==='album'?'fa-compact-disc':'fa-music';
-  return '<div class="'+cls+'" data-image-key="'+esc(itemKey(e))+'"><i class="fas '+icon+'" style="opacity:.3;font-size:24px"></i></div>';
+  const kind=charts[state.active].kind;
+  const icon=kind==='artist'?'fa-user':kind==='album'?'fa-compact-disc':'fa-music';
+  const play=(!mobile&&kind==='song')
+    ? '<button class="cover-play play" data-entry="'+esc(itemKey(e))+'" aria-label="Play preview"><i class="fas fa-play"></i></button>'
+    : '';
+  return '<div class="'+cls+' artwork-cover" data-image-key="'+esc(itemKey(e))+'">'+
+    '<div class="artwork-slot"><i class="fas '+icon+'" style="opacity:.3;font-size:24px"></i></div>'+
+    play+
+  '</div>';
 }
 function metricsHtml(e){
   const lw=e.lastWeek!==undefined&&String(e.lastWeek).trim()!==''?(String(e.lastWeek)==='0'?'-':String(e.lastWeek)):'-';
@@ -2037,29 +2149,34 @@ function metricsHtml(e){
   '</div>';
 }
 function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';return '<div class="m-metrics"><span>LW '+esc(lw)+'</span><span>·</span><span>PEAK '+esc(e.peak||'-')+'</span><span>·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div>'}
-function detailHtml(e,cfg,data,date){
+function detailHtml(e,cfg,data,date,copy){
   const run=runEntries(e,data,date);
-  if(!run.length){
-    return '<div class="details details-panel"><div class="details-empty">Details shown. Press + again to close.</div></div>';
-  }
+  const copyBlock=
+    '<button class="details-copy copy-detail" type="button" data-copy="'+esc(copy)+'">'+
+      '<div class="details-copy-top"><span>Copy chart text</span><i class="fas fa-copy"></i></div>'+
+      '<div class="details-copy-text">'+esc(copy)+'</div>'+
+    '</button>';
   return '<div class="details details-panel">'+
-    '<div class="details-title">Chart run</div>'+
-    '<div class="details-run-list">'+
-      run.map(x=>{
-        const extras=[];
-        if(x.peak)extras.push('Peak: '+esc(x.peak));
-        if(x.weeks)extras.push('Weeks: '+esc(x.weeks));
-        if(x.points)extras.push('Points: '+esc(formatValue(x.points,cfg.id)));
-        if(x.totalUnits)extras.push('Total Units: '+esc(formatValue(x.totalUnits,cfg.id)));
-        return '<button class="run-jump details-run-card" data-date="'+esc(x.date)+'">'+
-          '<div class="details-run-head">'+
-            '<span>'+esc(fmtShort(x.date))+'</span>'+
-            '<span class="details-run-pos">'+esc(x.position)+'</span>'+
-          '</div>'+
-          '<div class="details-run-meta">'+extras.map(v=>'<span>'+v+'</span>').join('')+'</div>'+
-        '</button>';
-      }).join('')+
-    '</div>'+
+    copyBlock+
+    (run.length
+      ? '<div class="details-title">Chart run</div>'+
+        '<div class="details-run-list">'+
+          run.map(x=>{
+            const extras=[];
+            if(x.peak)extras.push('Peak: '+esc(x.peak));
+            if(x.weeks)extras.push('Weeks: '+esc(x.weeks));
+            if(x.points)extras.push('Points: '+esc(formatValue(x.points,cfg.id)));
+            if(x.totalUnits)extras.push('Total Units: '+esc(formatValue(x.totalUnits,cfg.id)));
+            return '<button class="run-jump details-run-card" data-date="'+esc(x.date)+'">'+
+              '<div class="details-run-head">'+
+                '<span>'+esc(fmtShort(x.date))+'</span>'+
+                '<span class="details-run-pos">'+esc(x.position)+'</span>'+
+              '</div>'+
+              '<div class="details-run-meta">'+extras.map(v=>'<span>'+v+'</span>').join('')+'</div>'+
+            '</button>';
+          }).join('')+
+        '</div>'
+      : '<div class="details-empty">No chart run available.</div>')+
   '</div>';
 }
 function visibleChartTitle(name){
@@ -2078,8 +2195,7 @@ function renderRows(data,date){
         '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+esc(cfg.kind==='song'?visibleChartTitle(e.name):e.name)+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+esc(e.artist)+'</div>':'')+'</div>'+
         '<div class="right">'+(award.hasStar?'<span class="award" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><i class="fas fa-star" style="font-size:11px"></i></span>':'')+
           metricsHtml(e)+
-          '<div class="actions">'+(cfg.kind==='song'?'<button class="action play" data-entry="'+esc(itemKey(e))+'" aria-label="Play preview"><i class="fas fa-play"></i></button>':'')+
-          '<button class="action copy" aria-label="Copy info" data-copy="'+esc(copy)+'"><i class="fas fa-copy"></i></button>'+
+          '<div class="actions">'+
           '<button class="action details-btn" aria-label="Toggle details" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
         '</div>'+
       '</div>'+
@@ -2087,13 +2203,23 @@ function renderRows(data,date){
         '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div>'+(one&&w1>=2?'<div class="weeks1" style="font-size:7px;padding:2px 4px">'+w1+'W AT #1</div>':'')+'</div>'+
         coverHtml(e,one,true)+
         '<div class="m-entry"><div class="m-title">'+esc(e.name)+(!one&&w1>=2?'<span class="badge-inline" style="font-size:7px">'+w1+'W AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
-        '<div class="m-actions"><div class="m-actions-top">'+(award.hasStar?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':'')+(cfg.kind==='song'?'<button class="action play" data-entry="'+esc(itemKey(e))+'"><i class="fas fa-play"></i></button>':'')+'<button class="action copy" data-copy="'+esc(copy)+'"><i class="fas fa-copy"></i></button></div><button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+        '<div class="m-actions"><div class="m-actions-top">'+(award.hasStar?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':'')+'</div><button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
-      (open?detailHtml(e,cfg,data,date):'')+
+      (open?detailHtml(e,cfg,data,date,copy):'')+
     '</article>';
   }).join('');
 
-  content.querySelectorAll('.copy').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copy||'');b.innerHTML='<i class="fas fa-check"></i>';setTimeout(()=>b.innerHTML='<i class="fas fa-copy"></i>',1200)}catch{}});
+  content.querySelectorAll('.copy-detail').forEach(b=>b.onclick=async()=>{
+    const text=b.dataset.copy||'';
+    try{
+      if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+      else{
+        const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+      }
+      const top=b.querySelector('.details-copy-top span');
+      if(top){const old=top.textContent;top.textContent='Copied!';setTimeout(()=>top.textContent=old,1200)}
+    }catch{}
+  });
   content.querySelectorAll('.details-btn').forEach(b=>b.onclick=()=>{const k=b.dataset.key;if(state.details.has(k))state.details.delete(k);else state.details.add(k);renderRows(data,date)});
   content.querySelectorAll('.run-jump').forEach(b=>b.onclick=()=>setDate(b.dataset.date,data));
   content.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const e=all.find(x=>itemKey(x)===b.dataset.entry);if(e)playEntry(e,b)});
