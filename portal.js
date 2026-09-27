@@ -162,7 +162,7 @@ function ensureShell(){
 function setMode(portal){
   ensureShell();
   document.body.classList.toggle('portal-mode',!!portal);
-  document.body.classList.toggle('weekly-mode',!portal);
+  document.body.classList.add('global-site-shell');
   document.body.classList.add('global-bars-weekly');
 
   // Keep Weekly branding untouched, but mirror the daegoncharts header on portal routes.
