@@ -1940,3 +1940,132 @@ body.global-site-shell .portal-search-btn{display:none!important}
     justify-self:end!important;
   }
 }
+
+
+/* === FROZEN GLOBAL MOBILE HEADER GEOMETRY ===
+   Same coordinates and dimensions on every route/state. */
+@media (max-width:767px){
+  html body .site-header{
+    position:fixed!important;
+    top:0!important;
+    left:0!important;
+    right:0!important;
+    width:100vw!important;
+    z-index:1000!important;
+  }
+
+  html body .site-header .header-inner{
+    position:relative!important;
+    width:100%!important;
+    max-width:none!important;
+    height:62px!important;
+    min-height:62px!important;
+    margin:0!important;
+    padding:9px 14px!important;
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+
+  html body .site-header .weekly-label,
+  html body .site-header .portal-topnav,
+  html body .site-header .portal-search-btn{
+    display:none!important;
+  }
+
+  html body .site-header .portal-menu-toggle{
+    display:flex!important;
+    position:relative!important;
+    inset:auto!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    width:44px!important;
+    height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    justify-self:start!important;
+    align-items:center!important;
+    justify-content:center!important;
+    z-index:30!important;
+    background:transparent!important;
+    border:0!important;
+    color:#f5f5f5!important;
+  }
+
+  html body .site-header .brand{
+    position:absolute!important;
+    left:50%!important;
+    right:auto!important;
+    top:50%!important;
+    bottom:auto!important;
+    transform:translate(-50%,-50%)!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-align:center!important;
+    z-index:20!important;
+  }
+
+  html body .site-header .brand-mark{
+    display:inline-flex!important;
+    width:23px!important;
+    height:23px!important;
+    min-width:23px!important;
+    max-width:23px!important;
+    flex:0 0 23px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  html body .site-header .brand-word{
+    display:inline-block!important;
+    width:auto!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    font-size:18px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:.02em!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+
+  html body .site-header .theme-btn{
+    display:flex!important;
+    position:relative!important;
+    inset:auto!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    margin:0!important;
+    padding:0!important;
+    justify-self:end!important;
+    align-items:center!important;
+    justify-content:center!important;
+    z-index:30!important;
+  }
+
+  html body .site-header .portal-mobile-drawer{
+    top:62px!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+  }
+}
