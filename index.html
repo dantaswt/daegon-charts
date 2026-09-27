@@ -1526,6 +1526,154 @@
         font-size:11px !important;
       }
     }
+
+    /* === Color Movements: ported from daegoncharts === */
+    .color-new{
+      background:#bae6fd !important; /* sky-200 */
+      color:#1a1a1a !important;
+    }
+    .color-re{
+      background:#bfdbfe !important; /* blue-200 */
+      color:#1a1a1a !important;
+    }
+    .color-up1{
+      background:#d1fae5 !important; /* emerald-100 */
+      color:#1a1a1a !important;
+    }
+    .color-up10{
+      background:#6ee7b7 !important; /* emerald-300 */
+      color:#1a1a1a !important;
+    }
+    .color-down1{
+      background:#fee2e2 !important; /* red-100 */
+      color:#1a1a1a !important;
+    }
+    .color-down10{
+      background:#fca5a5 !important; /* red-300 */
+      color:#1a1a1a !important;
+    }
+
+    .color-control{
+      position:relative;
+      display:inline-flex;
+    }
+    .color-legend{
+      position:absolute;
+      left:50%;
+      top:100%;
+      z-index:90;
+      width:208px;
+      margin-top:8px;
+      padding:12px;
+      transform:translateX(-50%);
+      display:none;
+      background:var(--card);
+      color:var(--foreground);
+      border:1px solid var(--border);
+      box-shadow:0 8px 24px rgba(0,0,0,.16);
+    }
+    .color-control:hover .color-legend,
+    .color-control:focus-within .color-legend{
+      display:block;
+    }
+    .color-legend-title{
+      margin-bottom:8px;
+      font-size:10px;
+      line-height:14px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--muted-foreground);
+    }
+    .color-legend-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:6px;
+      font-size:12px;
+      line-height:16px;
+      color:var(--foreground);
+      white-space:nowrap;
+    }
+    .color-swatch{
+      width:16px;
+      height:16px;
+      flex:0 0 16px;
+      display:inline-block;
+    }
+    .legend-new{background:#7dd3fc}          /* sky-300, as original legend */
+    .legend-re{background:#93c5fd}           /* blue-300 */
+    .legend-up-small{
+      background:#d1fae5;
+      border:1px solid #6ee7b7;
+    }
+    .legend-up-big{background:#6ee7b7}
+    .legend-down-small{
+      background:#fee2e2;
+      border:1px solid #fca5a5;
+    }
+    .legend-down-big{background:#fca5a5}
+
+    /* Original daegoncharts dark-mode treatment for colored rows */
+    .dark .diff-colors-active,
+    .dark .diff-colors-active *{
+      color:#1a1a1a !important;
+    }
+    .dark .diff-colors-active .artist,
+    .dark .diff-colors-active .m-artist,
+    .dark .diff-colors-active .metrics,
+    .dark .diff-colors-active .metrics *,
+    .dark .diff-colors-active .m-metrics,
+    .dark .diff-colors-active .m-metrics *{
+      color:#555 !important;
+    }
+    .dark .diff-colors-active .award,
+    .dark .diff-colors-active .award i{
+      border-color:#1a1a1a !important;
+      color:#1a1a1a !important;
+    }
+    .dark .diff-colors-active .details-btn,
+    .dark .diff-colors-active .action{
+      color:#f5f5f5 !important;
+      background:var(--muted) !important;
+    }
+    .dark .diff-colors-active .details-btn *,
+    .dark .diff-colors-active .action *{
+      color:inherit !important;
+    }
+
+    /* Open details must retain the normal theme even when its parent row is colorized */
+    .dark .diff-colors-active .details-panel,
+    .dark .diff-colors-active .details-panel *{
+      color:var(--foreground) !important;
+    }
+    .dark .diff-colors-active .details-panel{
+      background:var(--card) !important;
+      border-color:var(--border) !important;
+    }
+    .dark .diff-colors-active .details-panel .details-copy,
+    .dark .diff-colors-active .details-panel .details-run-card{
+      background:var(--muted) !important;
+      border-color:var(--border) !important;
+    }
+    .dark .diff-colors-active .details-panel .details-copy-top,
+    .dark .diff-colors-active .details-panel .details-run-meta{
+      color:var(--muted-foreground) !important;
+    }
+    .dark .diff-colors-active .details-panel .details-run-pos{
+      color:var(--accent) !important;
+    }
+
+    @media(max-width:767px){
+      .color-legend{
+        position:fixed;
+        left:50%;
+        top:auto;
+        bottom:16px;
+        width:min(208px,calc(100vw - 24px));
+        transform:translateX(-50%);
+      }
+    }
 </style>
 </head>
 <body>
@@ -1579,7 +1727,18 @@
           <button class="filter" data-filter="rising"><i class="fas fa-arrow-up"></i></button>
           <button class="filter" data-filter="falling"><i class="fas fa-arrow-down"></i></button>
           <button class="filter" data-filter="static"><i class="fas fa-arrow-right"></i></button>
-          <button id="colorToggle" class="filter" title="Color movements"><i class="fas fa-palette"></i></button>
+          <div class="color-control">
+            <button id="colorToggle" class="filter" title="Color movements" aria-label="Color movements"><i class="fas fa-palette"></i></button>
+            <div class="color-legend" role="tooltip">
+              <div class="color-legend-title">Color Legend</div>
+              <div class="color-legend-row"><span class="color-swatch legend-new"></span><span>New entry</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-re"></span><span>Re-entry</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-up-small"></span><span>Up (small)</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-up-big"></span><span>Up (+10 or more)</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-down-small"></span><span>Down (small)</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-down-big"></span><span>Down (-10 or more)</span></div>
+            </div>
+          </div>
         </div>
 
         <div id="content" class="chart-list"><div class="loader-wrap"><div class="loader"></div></div></div>
@@ -2231,7 +2390,8 @@ function renderRows(data,date){
   if(!rows.length){content.innerHTML='<div class="error">No entries match these filters.</div>';return}
   content.innerHTML=rows.map(e=>{
     const one=e.position===1,w1=e.weeksAt1||0,key=date+'|'+e.position+'|'+e.name+'|'+e.artist,open=state.details.has(key),award=awardsFor(e,all,state.active),copy=copyText(e,cfg,date,data);
-    return '<article class="chart-card '+colorClass(e.diff)+'" data-key="'+esc(key)+'">'+
+    const movementClass=colorClass(e.diff);
+    return '<article class="chart-card '+movementClass+(state.diffColors&&movementClass?' diff-colors-active':'')+'" data-key="'+esc(key)+'">'+
       '<div class="desktop-row">'+
         '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div>'+(one&&w1>=2?'<div class="weeks1">'+w1+' '+(w1===1?'WEEK':'WEEKS')+'</div>':'')+'</div>'+
         coverHtml(e,one,false)+
