@@ -294,7 +294,8 @@ function latestEntry(data){const d=data.dates[data.dates.length-1]||'';return {d
 
 async function renderHome(){
   loading('Home');
-  const ids=['songs','albums','artists','radioSongs','topStreamingAlbums','topAlbumSales','streamingSongs','digitalSongsSales'];
+  // Match the real daegoncharts home loader: only the three primary charts are blocking.
+  const ids=['songs','albums','artists'];
   const all=await Promise.all(ids.map(async id=>{try{return await loadWeekly(id)}catch{return {chartId:id,dates:[],entriesByDate:{}}}}));
   const byId=Object.fromEntries(ids.map((id,i)=>[id,all[i]]));
   const mainIds=['songs','albums','artists'];
