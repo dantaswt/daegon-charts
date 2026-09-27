@@ -2847,7 +2847,7 @@ window.addEventListener('popstate',()=>{
 });
 const initialRoute=parseRoute();
 renderNav();
-if(/\\/chart\\//.test(location.pathname)){
+if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
