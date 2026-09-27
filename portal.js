@@ -91,6 +91,8 @@ function ensureShell(){
 
 function setMode(portal){
   ensureShell();
+  document.body.classList.toggle('portal-mode',!!portal);
+  document.body.classList.toggle('weekly-mode',!portal);
   if(portal){
     weeklyEl.style.display='none';
     portalEl.classList.add('active');
