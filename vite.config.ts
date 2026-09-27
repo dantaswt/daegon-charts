@@ -7,9 +7,9 @@ export default defineConfig({
     },
     server: { entry: "server" },
   },
-  nitro: {
-    preset: "node-server",
-  },
+  // SPA shell prerendering expects TanStack Start's standard dist/server output.
+  // Nitro is unnecessary because production is static GitHub Pages.
+  nitro: false,
   vite: {
     server: {
       allowedHosts: true,
