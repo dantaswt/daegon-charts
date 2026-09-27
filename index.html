@@ -652,6 +652,147 @@
         font-size:19px;
       }
     }
+
+    /* Desktop reference sizing — keep the page at the same visual scale as the original app */
+    @media(min-width:901px){
+      .page{
+        max-width:1460px;
+        width:100%;
+        margin:0 auto;
+        padding:104px 0 48px;
+      }
+      .layout{
+        grid-template-columns:330px minmax(0,1fr);
+        gap:48px;
+      }
+      .sidebar{
+        top:104px;
+      }
+      .chart-nav button{
+        min-height:52px;
+        font-size:15px;
+      }
+
+      .title-row{
+        min-height:66px;
+        margin-bottom:4px;
+      }
+      h1{
+        font-size:42px;
+      }
+      .date-label{
+        font-size:15px;
+        margin-top:6px;
+      }
+
+      .week-nav{
+        margin:4px 0 14px;
+        gap:8px;
+      }
+      .week-controls{
+        gap:12px;
+      }
+      .gold-btn{
+        min-height:52px;
+        padding:0 18px;
+        font-size:15px;
+      }
+      .week-picker{
+        flex-basis:188px;
+        max-width:188px;
+      }
+      .week-picker-button{
+        min-height:52px;
+        font-size:14px;
+      }
+      .filters{
+        margin-bottom:18px;
+      }
+      .filter{
+        min-height:52px;
+        padding:0 13px;
+      }
+
+      .chart-card{
+        min-height:154px;
+        padding:0 18px;
+      }
+      .desktop-row{
+        grid-template-columns:72px 116px 48px minmax(0,1fr) auto;
+        min-height:152px;
+        gap:12px;
+      }
+      .rank-wrap{
+        width:72px;
+      }
+      .rank-num{
+        width:72px;
+        min-width:72px;
+        font-size:32px;
+      }
+      .cover{
+        width:116px;
+        height:116px;
+      }
+      .diff-wrap{
+        width:48px;
+      }
+      .entry-title{
+        font-size:18px;
+      }
+      .artist{
+        font-size:16px;
+        margin-top:4px;
+      }
+      .right{
+        min-width:250px;
+        gap:16px;
+      }
+      .metrics{
+        min-width:110px;
+        font-size:11px;
+      }
+      .action{
+        width:38px;
+        height:38px;
+      }
+
+      .chart-card:has(.rank-num.one){
+        min-height:246px;
+        padding:0 18px;
+      }
+      .chart-card:has(.rank-num.one) .desktop-row{
+        min-height:244px;
+        grid-template-columns:72px 210px 48px minmax(0,1fr) auto;
+      }
+      .rank-num.one{
+        width:72px;
+        min-width:72px;
+        height:76px;
+        font-size:39px;
+      }
+      .chart-card:has(.rank-num.one) .cover.one{
+        width:210px;
+        height:210px;
+        margin-left:0;
+      }
+      .chart-card:has(.rank-num.one) .entry-title.one{
+        font-size:22px;
+      }
+      .chart-card:has(.rank-num.one) .artist.one{
+        font-size:17px;
+      }
+    }
+
+    @media(min-width:901px) and (max-width:1500px){
+      .page{
+        max-width:calc(100% - 40px);
+      }
+      .layout{
+        grid-template-columns:300px minmax(0,1fr);
+        gap:36px;
+      }
+    }
 </style>
 </head>
 <body>
