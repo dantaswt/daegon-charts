@@ -2069,3 +2069,40 @@ body.global-site-shell .portal-search-btn{display:none!important}
     width:100%!important;
   }
 }
+
+/* === TRUE ONE GLOBAL HEADER v3 === */
+html body .site-header,
+body.global-site-shell .site-header,
+body.global-bars-weekly .site-header{
+  position:-webkit-sticky!important;
+  position:sticky!important;
+  top:0!important;
+  left:auto!important;
+  right:auto!important;
+  width:100%!important;
+  z-index:1000!important;
+  transform:none!important;
+  pointer-events:auto!important;
+}
+
+@media(max-width:767px){
+  body.global-site-shell .page,
+  body.global-bars-weekly .page{
+    padding-top:12px!important;
+  }
+  html body .site-header .portal-menu-toggle{
+    pointer-events:auto!important;
+    touch-action:manipulation!important;
+  }
+  html body .site-header .portal-mobile-drawer{
+    position:absolute!important;
+    top:100%!important;
+  }
+}
+
+@media(min-width:768px){
+  body.global-site-shell .page,
+  body.global-bars-weekly .page{
+    padding-top:34px!important;
+  }
+}
