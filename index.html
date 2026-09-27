@@ -343,8 +343,6 @@
       .week-picker-button i{font-size:9px}
     }
 
-    .desktop-view-actions{display:none}
-
     @media(min-width:901px){
       .page{
         max-width:1580px;
@@ -385,40 +383,6 @@
       .date-label{
         margin-top:8px;
         font-size:16px;
-      }
-      .desktop-view-actions{
-        display:flex;
-        align-items:center;
-        gap:12px;
-        margin-top:10px;
-      }
-      .view-toggle{display:flex}
-      .view-btn,.download-chart-btn{
-        min-height:54px;
-        border:1px solid var(--border);
-        font-weight:800;
-        font-size:13px;
-        letter-spacing:.02em;
-      }
-      .view-btn{
-        min-width:82px;
-        padding:0 14px;
-        background:#eee;
-        color:#111;
-      }
-      .view-btn.active{
-        background:var(--accent);
-        border-color:var(--accent);
-      }
-      .download-chart-btn{
-        background:var(--accent);
-        color:#000;
-        border-color:var(--accent);
-        padding:0 18px;
-        display:flex;
-        align-items:center;
-        gap:9px;
-        white-space:nowrap;
       }
       .week-nav{
         margin:8px 0 18px;
@@ -571,8 +535,6 @@
       .page{padding-left:20px;padding-right:20px}
       .layout{grid-template-columns:270px minmax(0,1fr);gap:28px}
       .chart-nav button{font-size:14px}
-      .desktop-view-actions{gap:8px}
-      .download-chart-btn{padding:0 12px}
       .chart-card{padding-left:12px;padding-right:12px}
       .desktop-row{grid-template-columns:62px 104px 36px minmax(0,1fr) auto;gap:10px}
       .rank-wrap,.rank-num{width:62px;min-width:62px}
@@ -608,13 +570,7 @@
             <h1 id="chartTitle"></h1>
             <div id="dateLabel" class="date-label"></div>
           </div>
-          <div class="desktop-view-actions">
-            <div class="view-toggle">
-              <button id="top10Btn" class="view-btn active" type="button">TOP 10</button>
-              <button id="fullChartBtn" class="view-btn" type="button">FULL CHART</button>
-            </div>
-            <button id="downloadChartBtn" class="download-chart-btn" type="button"><i class="fas fa-download"></i> Download Image</button>
-          </div>
+
         </div>
 
         <div class="week-nav">
@@ -678,7 +634,7 @@ const charts={
   digitalSongsSales:{id:'digitalSongsSales',title:'Digital Songs Sales',kind:'song',url:SHEET+'302176914'}
 };
 const weeklyIds=Object.keys(charts);
-const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null,desktopLimit:10};
+const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
   const imageCacheVersion='artist-priority-v6';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
@@ -1243,9 +1199,7 @@ function detailHtml(e,cfg,data,date){
   '</div>';
 }
 function renderRows(data,date){
-  const cfg=charts[state.active],all=data.entriesByDate[date]||[];
-  let rows=all.filter(e=>state.filters.has('all')||state.filters.has(diffType(e.diff)));
-  if(window.matchMedia('(min-width:901px)').matches && state.desktopLimit===10) rows=rows.slice(0,10);
+  const cfg=charts[state.active],all=data.entriesByDate[date]||[],rows=all.filter(e=>state.filters.has('all')||state.filters.has(diffType(e.diff)));
   if(!rows.length){content.innerHTML='<div class="error">No entries match these filters.</div>';return}
   content.innerHTML=rows.map(e=>{
     const one=e.position===1,w1=e.weeksAt1||0,key=date+'|'+e.position+'|'+e.name+'|'+e.artist,open=state.details.has(key),award=awardsFor(e,all,state.active),copy=copyText(e,cfg,date,data);
@@ -1331,27 +1285,6 @@ document.getElementById('filters').querySelectorAll('[data-filter]').forEach(b=>
 document.getElementById('colorToggle').onclick=()=>{state.diffColors=!state.diffColors;document.getElementById('colorToggle').classList.toggle('active',state.diffColors);const data=state.cache.get(state.active);if(data)renderRows(data,state.date)};
 document.getElementById('themeToggle').onclick=()=>{const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light')}catch{}document.querySelector('#themeToggle i').className='fas '+(dark?'fa-sun':'fa-moon')};
 document.querySelector('#themeToggle i').className='fas '+(document.documentElement.classList.contains('dark')?'fa-sun':'fa-moon');
-const top10Btn=document.getElementById('top10Btn');
-const fullChartBtn=document.getElementById('fullChartBtn');
-const downloadChartBtn=document.getElementById('downloadChartBtn');
-
-function syncDesktopViewButtons(){
-  top10Btn?.classList.toggle('active',state.desktopLimit===10);
-  fullChartBtn?.classList.toggle('active',state.desktopLimit!==10);
-}
-top10Btn.onclick=()=>{
-  state.desktopLimit=10;syncDesktopViewButtons();
-  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
-};
-fullChartBtn.onclick=()=>{
-  state.desktopLimit=Infinity;syncDesktopViewButtons();
-  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
-};
-downloadChartBtn.onclick=()=>{
-  window.print();
-};
-syncDesktopViewButtons();
-
 const backTop=document.getElementById('backTop');window.addEventListener('scroll',()=>backTop.style.display=window.scrollY>300?'flex':'none');backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
 mobileMoreCharts.onclick=()=>{
