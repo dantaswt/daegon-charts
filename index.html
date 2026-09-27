@@ -435,7 +435,7 @@ const charts={
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
-  const imageCacheVersion='artwork-release-exact-v2';
+  const imageCacheVersion='single-or-official-album-v3';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
     for(let i=localStorage.length-1;i>=0;i--){
       const k=localStorage.key(i);
@@ -957,6 +957,20 @@ async function resolveImage(e,cfg){
     const hardcoded=HARDCODED_TRACK_IMAGES[compactKey(name)];
     if(hardcoded)url=hardcoded;
 
+    const badCompilationArtist=a=>{
+      const x=comparable(a);
+      return !x||x==='various artists'||x==='various'||x==='va'||x.includes('various artists');
+    };
+    const badCompilationTitle=t=>{
+      const x=comparable(t);
+      return /^now( thats what i call music)?\b/.test(x)
+        ||x.includes('greatest hits')
+        ||x.includes('best of')
+        ||x.includes('various artists')
+        ||x.includes('soundtrack')
+        ||x.includes('compilation');
+    };
+
     // 1. Wikipedia: prefer the actual single/song artwork page.
     if(!url&&artist){
       for(const title of [name+' ('+artist+' single)',name+' ('+artist+' song)',name+' (song)',name+' (single)']){
@@ -965,37 +979,69 @@ async function resolveImage(e,cfg){
       }
     }
 
-    // 2. iTunes: exact track + exact artist; prefer true single releases.
+    // 2. iTunes: exact track + exact artist; prefer true single release.
+    // If there is no single cover, use the parent album by the SAME artist.
     if(!url&&artist){
       const queries=[name+' '+artist,'\"'+name+'\" '+artist];
       let exact=[];
       for(const q of queries){
         const d=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&entity=song&limit=100',7000);
-        exact=(d?.results||[]).filter(r=>r.artworkUrl100&&exactTitle(r.trackName,name)&&exactArtist(r.artistName,artist));
+        exact=(d?.results||[]).filter(r=>
+          r.artworkUrl100&&
+          exactTitle(r.trackName,name)&&
+          exactArtist(r.artistName,artist)
+        );
         if(exact.length)break;
       }
-      const hit=exact.find(r=>r.trackCount===1)
-        ||exact.find(r=>exactTitle(r.collectionName,name))
-        ||exact[0];
+
+      const singleHit=exact.find(r=>
+        r.trackCount===1 &&
+        !badCompilationArtist(r.collectionArtistName||r.artistName) &&
+        !badCompilationTitle(r.collectionName)
+      );
+
+      const albumHit=exact.find(r=>
+        r.trackCount>1 &&
+        !badCompilationArtist(r.collectionArtistName||r.artistName) &&
+        exactArtist(r.collectionArtistName||r.artistName,artist) &&
+        !badCompilationTitle(r.collectionName)
+      );
+
+      const hit=singleHit||albumHit;
       if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
     }
 
-    // 3. Deezer: exact track + exact artist; prefer single release.
+    // 3. Deezer: exact track + exact artist; single first, then official album by same artist.
     if(!url&&artist){
       const d=await jsonFetch('https://api.deezer.com/search/track?q='+encodeURIComponent('track:\"'+name+'\" artist:\"'+artist+'\"')+'&limit=100',7000);
-      const exact=(d?.data||[]).filter(r=>exactTitle(r?.title,name)&&exactArtist(r?.artist?.name,artist)&&(r?.album?.cover_xl||r?.album?.cover_big||r?.album?.cover_medium));
-      const hit=exact.find(r=>r?.album?.album_type==='single')
-        ||exact.find(r=>exactTitle(r?.album?.title,name))
-        ||exact[0];
+      const exact=(d?.data||[]).filter(r=>
+        exactTitle(r?.title,name)&&
+        exactArtist(r?.artist?.name,artist)&&
+        (r?.album?.cover_xl||r?.album?.cover_big||r?.album?.cover_medium)
+      );
+
+      const singleHit=exact.find(r=>
+        r?.album?.album_type==='single' &&
+        !badCompilationTitle(r?.album?.title)
+      );
+
+      const albumHit=exact.find(r=>
+        (r?.album?.album_type==='album'||!r?.album?.album_type) &&
+        !badCompilationTitle(r?.album?.title)
+      );
+
+      const hit=singleHit||albumHit;
       if(hit)url=hit.album.cover_xl||hit.album.cover_big||hit.album.cover_medium;
     }
 
-    // 4. Spotify secure endpoint: exact track + artist, with single release preferred server-side.
+    // 4. Spotify secure endpoint: exact track + artist.
+    // Server prefers single, then an album release by the same artist and rejects compilations.
     if(!url&&artist){
       url=await spotifyArtwork(name,artist,'song');
     }
 
-    // 5. MusicBrainz: identify exact recording + artist, then prefer single release cover.
+    // 5. MusicBrainz: exact recording + artist.
+    // Prefer single release; otherwise choose a non-compilation album release.
     if(!url&&artist){
       const mb=await jsonFetch('https://musicbrainz.org/ws/2/recording/?query='+encodeURIComponent('recording:\"'+name+'\" AND artist:\"'+artist+'\"')+'&fmt=json&limit=25&inc=releases+artist-credits',8000);
       const rec=(mb?.recordings||[]).find(r=>{
@@ -1004,18 +1050,30 @@ async function resolveImage(e,cfg){
       });
       if(rec){
         const releases=rec.releases||[];
-        const preferred=releases.find(r=>String(r?.['release-group']?.['primary-type']||'').toLowerCase()==='single')
-          ||releases.find(r=>exactTitle(r?.title,name))
-          ||releases[0];
+        const valid=releases.filter(r=>
+          !badCompilationTitle(r?.title) &&
+          String(r?.status||'').toLowerCase()!=='bootleg'
+        );
+        const preferred=
+          valid.find(r=>String(r?.['release-group']?.['primary-type']||'').toLowerCase()==='single') ||
+          valid.find(r=>String(r?.['release-group']?.['primary-type']||'').toLowerCase()==='album') ||
+          valid.find(r=>exactTitle(r?.title,name)) ||
+          valid[0];
         if(preferred?.id)url='https://coverartarchive.org/release/'+preferred.id+'/front-500';
       }
     }
 
-    // 6. Last.fm is useful, but only after dedicated single/release sources.
+    // 6. Last.fm only as a final metadata fallback.
     if(!url&&artist){
       const d=await jsonFetch('https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=8fc896e5a34e6491b19710f4f1212a34&artist='+encodeURIComponent(artist)+'&track='+encodeURIComponent(name)+'&format=json',7000);
       const lfArtist=d?.track?.artist?.name||d?.track?.artist;
-      if(d?.track?.name&&lfArtist&&exactTitle(d.track.name,name)&&exactArtist(lfArtist,artist)){
+      const albumTitle=d?.track?.album?.title||'';
+      if(
+        d?.track?.name&&lfArtist&&
+        exactTitle(d.track.name,name)&&
+        exactArtist(lfArtist,artist)&&
+        !badCompilationTitle(albumTitle)
+      ){
         url=pickLastfmImage(d?.track?.album?.image);
       }
     }
