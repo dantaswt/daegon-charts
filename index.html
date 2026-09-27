@@ -755,11 +755,39 @@ async function resolvePreview(e){
   state.previews.set(key,p);return p;
 }
 async function hydrateImages(cfg,rows){
-  const nodes=[...content.querySelectorAll('[data-image-key]')].slice(0,30);
+  const nodes=[...content.querySelectorAll('[data-image-key]')];
+  const byKey=new Map();
+
   for(const node of nodes){
-    const key=node.dataset.imageKey;const e=rows.find(x=>itemKey(x)===key);if(!e)continue;
-    const url=await resolveImage(e,cfg);if(url&&node.isConnected)node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async">';
+    const key=node.dataset.imageKey;
+    if(!key)continue;
+    if(!byKey.has(key))byKey.set(key,[]);
+    byKey.get(key).push(node);
   }
+
+  const entries=[...byKey.keys()]
+    .map(key=>rows.find(x=>itemKey(x)===key))
+    .filter(Boolean);
+
+  const concurrency=6;
+  let cursor=0;
+
+  async function worker(){
+    while(cursor<entries.length){
+      const e=entries[cursor++];
+      const key=itemKey(e);
+      const url=await resolveImage(e,cfg);
+      if(!url)continue;
+
+      for(const node of byKey.get(key)||[]){
+        if(node.isConnected){
+          node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async">';
+        }
+      }
+    }
+  }
+
+  await Promise.all(Array.from({length:Math.min(concurrency,entries.length)},()=>worker()));
 }
 async function playEntry(e,btn){
   if(state.audio){state.audio.pause();state.audio=null;if(state.playingBtn)state.playingBtn.innerHTML='<i class="fas fa-play"></i>'}
