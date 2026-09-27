@@ -179,22 +179,42 @@ function setMeta(title,desc,path){
   const od=document.querySelector('meta[property="og:description"]');if(od)od.content=desc;
 }
 function sideHtml(){
-  return '<aside class="portal-side">'+
-    '<div class="portal-sidebox"><h3>Explore</h3><div class="portal-side-links">'+
-      [['Weekly Charts','/chart/daegon-100'],['Songs','/songs'],['Albums','/albums'],['Artists','/artists'],["Number One's",'/number-ones'],['Stats','/stats']]
-      .map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('')+
+  return '<aside class="ref-home-side">'+
+    '<div class="ref-side-section"><div class="ref-side-title">Search Artists</div><div class="ref-side-search"><input id="refSideSearch" placeholder="Search Artists"><i class="fas fa-chevron-down"></i></div><div id="refSideResults" class="ref-side-results"></div></div>'+
+    '<div class="ref-side-section"><div class="ref-side-title">Weekly Charts</div><div class="ref-side-links">'+
+      ['songs','albums','artists','radioSongs','topStreamingAlbums','topAlbumSales','streamingSongs','digitalSongsSales'].map(id=>'<a href="'+appHref(chartPath(id))+'">'+esc(charts[id].title)+'</a>').join('')+
     '</div></div>'+
-    '<div class="portal-sidebox"><h3>Rankings</h3><div class="portal-side-links">'+
-      [['Year-End','/year-end'],['Decade-End','/decade-end'],['Greatest of All Time','/goat'],['Awards','/awards']]
-      .map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('')+
+    '<div class="ref-side-section"><button class="ref-side-toggle" data-side-toggle="goat"><span>Greatest of All Time</span><i class="fas fa-chevron-down"></i></button><div class="ref-side-links ref-side-collapsible" data-side-panel="goat">'+
+      '<a href="'+appHref('/goat/songs')+'" data-portal-link="/goat/songs">Songs</a><a href="'+appHref('/goat/artists')+'" data-portal-link="/goat/artists">Artists</a><a href="'+appHref('/goat/albums')+'" data-portal-link="/goat/albums">Albums</a>'+
     '</div></div>'+
-    '<div class="portal-sidebox"><h3>Features</h3><div class="portal-side-links">'+
-      [['Chart Beat','/chart-beat'],['Chart Battle','/chart-battle'],['Search','/search']]
-      .map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('')+
+    '<div class="ref-side-section"><button class="ref-side-toggle" data-side-toggle="yec"><span>Year-End Charts</span><i class="fas fa-chevron-down"></i></button><div class="ref-side-links ref-side-collapsible" data-side-panel="yec">'+
+      '<a href="'+appHref('/year-end/songs')+'" data-portal-link="/year-end/songs">Daegon 100</a><a href="'+appHref('/year-end/artists')+'" data-portal-link="/year-end/artists">Daegon Artists 50</a><a href="'+appHref('/year-end/albums')+'" data-portal-link="/year-end/albums">Daegon Albums 100</a>'+
     '</div></div>'+
+    '<a href="'+appHref('/stats')+'" data-portal-link="/stats" class="ref-side-section ref-side-stat"><div class="ref-side-title">Stats</div></a>'+
   '</aside>';
 }
-function shellHtml(main){return '<div class="portal-shell"><div class="portal-main">'+main+'</div>'+sideHtml()+'</div>'}
+function shellHtml(main,withSidebar=false){
+  return withSidebar
+    ? '<div class="portal-shell ref-home-shell">'+sideHtml()+'<div class="portal-main">'+main+'</div></div>'
+    : '<div class="portal-main ref-standalone">'+main+'</div>';
+}
+function bindHomeSidebar(){
+  const search=document.getElementById('refSideSearch'),results=document.getElementById('refSideResults');
+  if(search&&results){
+    const draw=async()=>{
+      const q=search.value.trim().toLowerCase();
+      if(!q){results.innerHTML='';return}
+      const data=await loadWeekly('artists'),items=aggregateCatalog(data,'artist').filter(x=>x.name.toLowerCase().includes(q)).slice(0,8);
+      results.innerHTML=items.map(x=>'<a href="'+appHref(entityPath(x,'artist'))+'" data-portal-link="'+entityPath(x,'artist')+'">'+esc(x.name)+'</a>').join('');
+      bindLinks();
+    };
+    search.oninput=draw;
+  }
+  portalEl.querySelectorAll('[data-side-toggle]').forEach(btn=>btn.onclick=()=>{
+    const key=btn.dataset.sideToggle,p=portalEl.querySelector('[data-side-panel="'+key+'"]'),i=btn.querySelector('i');
+    p.classList.toggle('open');i.className='fas fa-chevron-'+(p.classList.contains('open')?'up':'down');
+  });
+}
 
 async function hydratePortalImages(){
   const nodes=[...portalEl.querySelectorAll('[data-portal-image]')];
@@ -292,7 +312,7 @@ async function renderHome(){
     '<section class="portal-section"><div class="portal-section-head"><h2>Chart Beat</h2><a class="portal-more" href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat">View all</a></div>'+
       '<div class="portal-panel"><div class="portal-card-title">'+esc(top10[0]?.name||'')+' leads the Daegon 100 for the week of '+fmtDate(songLatest.date)+'.</div><div class="portal-card-sub">Explore the week’s No. 1, Top 10, debuts, re-entries and biggest movers.</div></div>'+
     '</section>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Daegon Charts','Weekly music charts and historical archive.','/');hydratePortalImages();
+  setMode(true);portalEl.innerHTML=shellHtml(main,true);setMeta('Daegon Charts','Weekly music charts and historical archive.','/');hydratePortalImages();bindHomeSidebar();
 }
 
 async function renderCatalog(kind){
