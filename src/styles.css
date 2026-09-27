@@ -402,13 +402,9 @@ span.award-icon {
   border-color: var(--border) !important;
 }
 
-
-
-
-
-/* Daegon visual layer carried from the public site.
-   Functional behavior remains the original dynamic TanStack app. */
-.dc-brand{
+/* Weekly-only visual identity.
+   All non-weekly routes intentionally keep the original daegoncharts styles above. */
+.dc-weekly-brand{
   display:inline-flex;
   align-items:center;
   gap:8px;
@@ -416,7 +412,7 @@ span.award-icon {
   text-decoration:none;
   min-width:0;
 }
-.dc-brand-mark{
+.dc-weekly-brand-mark{
   width:26px;
   height:26px;
   display:inline-flex;
@@ -431,7 +427,7 @@ span.award-icon {
   box-shadow:3px 3px 0 #ffd54a;
   flex:0 0 auto;
 }
-.dc-brand-word{
+.dc-weekly-brand-word{
   font-size:20px;
   font-weight:800;
   line-height:1;
@@ -439,21 +435,19 @@ span.award-icon {
   text-transform:lowercase;
   white-space:nowrap;
 }
-.dc-brand-mobile .dc-brand-mark{
+.dc-weekly-brand-mobile .dc-weekly-brand-mark{
   width:23px;
   height:23px;
   font-size:13px;
   box-shadow:2px 2px 0 #ffd54a;
 }
-.dc-brand-mobile .dc-brand-word{
-  font-size:17px;
-}
+.dc-weekly-brand-mobile .dc-weekly-brand-word{font-size:17px}
 
-.chart-card{
+.dc-weekly-current .chart-card{
   position:relative;
   border-left:3px solid rgba(255,109,0,.34);
 }
-.chart-card::before{
+.dc-weekly-current .chart-card::before{
   content:"";
   position:absolute;
   left:-3px;
@@ -464,22 +458,20 @@ span.award-icon {
   opacity:.42;
   pointer-events:none;
 }
-.chart-card:hover::before{opacity:1}
-.chart-card:hover{
-  transform:translateX(2px) !important;
-  box-shadow:0 1px 0 rgba(255,109,0,.22),0 6px 18px rgba(0,0,0,.10) !important;
+.dc-weekly-current .chart-card:hover::before{opacity:1}
+.dc-weekly-current .chart-card:hover{
+  transform:translateX(2px);
+  box-shadow:0 1px 0 rgba(255,109,0,.22),0 6px 18px rgba(0,0,0,.10);
 }
-.chart-card.rank-1{
-  border-left-color:var(--accent);
-}
-.chart-card.rank-1 .rank-num{
+.dc-weekly-current .chart-card.rank-1{border-left-color:var(--accent)}
+.dc-weekly-current .chart-card.rank-1 .rank-num{
   position:relative;
   background:linear-gradient(135deg,var(--accent) 0%,#ff8f00 72%,#ffd54a 100%);
   color:#090909;
   box-shadow:5px 5px 0 rgba(255,213,74,.42);
   border:1px solid rgba(0,0,0,.12);
 }
-.chart-card.rank-1 .rank-num::after{
+.dc-weekly-current .chart-card.rank-1 .rank-num::after{
   content:"#1";
   position:absolute;
   right:4px;
@@ -490,33 +482,56 @@ span.award-icon {
   letter-spacing:.08em;
   opacity:.55;
 }
-.weeks1,
-.badge-inline{
-  background:#111 !important;
-  color:#ffd54a !important;
-  border:1px solid rgba(255,213,74,.7) !important;
-  letter-spacing:.06em !important;
+.dc-weekly-current .weeks1,
+.dc-weekly-current .badge-inline{
+  background:#111!important;
+  color:#ffd54a!important;
+  border:1px solid rgba(255,213,74,.7)!important;
+  letter-spacing:.06em!important;
 }
-.dark .weeks1,
-.dark .badge-inline{
-  background:#090909 !important;
-  color:#ffd54a !important;
+.dark .dc-weekly-current .weeks1,
+.dark .dc-weekly-current .badge-inline{
+  background:#090909!important;
+  color:#ffd54a!important;
 }
-.chart-card.diff-colors-active::before{
+.dc-weekly-current aside a,
+.dc-weekly-current aside button{
+  border-radius:0!important;
+}
+.dc-weekly-current .btn-gold{
+  border-radius:0;
+  background:var(--accent);
+  color:#000;
+}
+.dc-weekly-current main > div:first-child h1{
+  position:relative;
+  padding-bottom:8px;
+}
+.dc-weekly-current main > div:first-child h1::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:42px;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent),#ffd54a);
+}
+.dc-weekly-current .chart-card.diff-colors-active::before{
   background:rgba(0,0,0,.22);
 }
+
 @media(max-width:767px){
-  .dc-brand-mobile{
-    gap:7px;
-  }
-  .chart-card{
+  .dc-weekly-current .chart-card{
     border-left-width:2px;
   }
-  .chart-card::before{
+  .dc-weekly-current .chart-card::before{
     left:-2px;
     width:2px;
   }
-  .chart-card:hover{
-    transform:none !important;
+  .dc-weekly-current .chart-card:hover{transform:none}
+  .dc-weekly-current main > div:first-child h1::after{
+    left:50%;
+    transform:translateX(-50%);
   }
 }
+
