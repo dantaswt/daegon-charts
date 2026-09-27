@@ -769,6 +769,23 @@ function pickLastfmImage(images){
   }
   return '';
 }
+function generatedFallbackImage(e,cfg){
+  const title=String(e.name||'Unknown').trim();
+  const artist=String(e.artist||'').trim();
+  const initials=(title.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('')||'♪').toUpperCase();
+  const label=cfg.kind==='artist'?'ARTIST':cfg.kind==='album'?'ALBUM':'SONG';
+  const safe=(v)=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">'+
+    '<rect width="600" height="600" fill="#111"/>'+
+    '<rect x="24" y="24" width="552" height="552" fill="none" stroke="#FF6D00" stroke-width="6"/>'+
+    '<text x="50%" y="42%" text-anchor="middle" dominant-baseline="middle" fill="#FF6D00" font-family="Arial,Helvetica,sans-serif" font-size="150" font-weight="900">'+safe(initials)+'</text>'+
+    '<text x="50%" y="61%" text-anchor="middle" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="800">'+safe(title.slice(0,28))+'</text>'+
+    (artist?'<text x="50%" y="68%" text-anchor="middle" fill="#aaa" font-family="Arial,Helvetica,sans-serif" font-size="24">'+safe(artist.slice(0,34))+'</text>':'')+
+    '<text x="50%" y="88%" text-anchor="middle" fill="#FF6D00" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="700" letter-spacing="3">'+label+'</text>'+
+    '</svg>';
+  return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+}
+
 async function resolveImage(e,cfg){
   const key=cfg.kind+'|'+e.name+'|'+e.artist;
   if(state.images.has(key))return state.images.get(key);
@@ -816,17 +833,26 @@ async function resolveImage(e,cfg){
     if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
   }
 
-  // 3) Wikipedia thumbnail for artists and stubborn album titles.
+  // 3) Wikipedia exact summary.
   if(!url){
     const titles=cfg.kind==='artist'
       ? [name]
       : cfg.kind==='album'
         ? [name+' ('+artist+' album)',name+' (album)',name]
-        : [];
+        : [name+' ('+artist+' song)',name+' (song)',name];
     for(const title of titles){
       const d=await jsonFetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title),5000);
       if(usableImage(d?.thumbnail?.source)){url=d.thumbnail.source;break}
     }
+  }
+
+  // 3b) Wikipedia search fallback when exact page title is unknown.
+  if(!url){
+    const q=cfg.kind==='artist'?name:(name+' '+artist);
+    const d=await jsonFetch('https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=600&format=json&origin=*',7000);
+    const pages=Object.values(d?.query?.pages||{});
+    const p=pages.find(x=>usableImage(x?.thumbnail?.source));
+    if(p?.thumbnail?.source)url=p.thumbnail.source;
   }
 
   // 4) Cover Art Archive via MusicBrainz for albums.
@@ -845,9 +871,18 @@ async function resolveImage(e,cfg){
     if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
   }
 
-  if(!usableImage(url))url='';
+  // 6) For artists, use a representative release cover if no portrait exists.
+  if(!url&&cfg.kind==='artist'){
+    const d=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(name)+'&entity=song&attribute=artistTerm&limit=20',7000);
+    const hit=(d?.results||[]).find(x=>exactish(x.artistName,name)&&x.artworkUrl100)||(d?.results||[]).find(x=>x.artworkUrl100);
+    if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
+  }
+
+  // 7) Absolute guarantee: never leave an item without artwork.
+  if(!usableImage(url))url=generatedFallbackImage(e,cfg);
+
   state.images.set(key,url);
-  if(url){try{localStorage.setItem(persistedKey,url)}catch{}}
+  try{localStorage.setItem(persistedKey,url)}catch{}
   return url;
 }
 async function resolvePreview(e){
@@ -882,7 +917,8 @@ async function hydrateImages(cfg,rows){
 
       for(const node of byKey.get(key)||[]){
         if(node.isConnected){
-          node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async">';
+          const fallback=generatedFallbackImage(e,cfg);
+          node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\''+esc(fallback)+'\'">';
         }
       }
     }
