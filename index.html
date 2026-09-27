@@ -26,7 +26,7 @@ const charts={
 };
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
-const chartNav=document.getElementById('chartNav'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
+const desktopChartNav=document.getElementById('desktopChartNav'), mobileActiveChart=document.getElementById('mobileActiveChart'), mobileMoreCharts=document.getElementById('mobileMoreCharts'), mobileChartMenu=document.getElementById('mobileChartMenu'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
 const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel'), weekSelect=document.getElementById('weekSelect');
 
 function parseCsvRow(line){
@@ -175,8 +175,18 @@ async function loadWeekly(chartId){
 
 function visibleCharts(date){return date&&date<'2017-01-01'?['songs','artists','albums']:weeklyIds}
 function renderNav(){
-  chartNav.innerHTML=visibleCharts(state.date).map(id=>'<button data-id="'+id+'" class="'+(id===state.active?'active':'')+'">'+charts[id].title+'</button>').join('');
-  chartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date));
+  const ids=visibleCharts(state.date);
+
+  desktopChartNav.innerHTML=ids.map(id=>'<button data-id="'+id+'" class="'+(id===state.active?'active':'')+'">'+charts[id].title+'</button>').join('');
+  desktopChartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date));
+
+  mobileActiveChart.textContent=charts[state.active].title;
+  mobileChartMenu.innerHTML=ids.filter(id=>id!==state.active).map(id=>'<button data-id="'+id+'">'+charts[id].title+'</button>').join('');
+  mobileChartMenu.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    mobileChartMenu.classList.remove('open');
+    mobileMoreCharts.textContent='+ More Charts';
+    loadChart(b.dataset.id,state.date);
+  });
 }
 function diffType(diff){const d=String(diff||'');if(d==='NEW')return'debut';if(d==='RE')return're';if(d.startsWith('▲'))return'rising';if(d.startsWith('▼'))return'falling';return'static'}
 function diffHtml(diff){
@@ -388,6 +398,11 @@ document.getElementById('colorToggle').onclick=()=>{state.diffColors=!state.diff
 document.getElementById('themeToggle').onclick=()=>{const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light')}catch{}document.querySelector('#themeToggle i').className='fas '+(dark?'fa-sun':'fa-moon')};
 document.querySelector('#themeToggle i').className='fas '+(document.documentElement.classList.contains('dark')?'fa-sun':'fa-moon');
 const backTop=document.getElementById('backTop');window.addEventListener('scroll',()=>backTop.style.display=window.scrollY>300?'flex':'none');backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
+mobileMoreCharts.onclick=()=>{
+  const open=mobileChartMenu.classList.toggle('open');
+  mobileMoreCharts.textContent=open?'− Less':'+ More Charts';
+};
 
 renderNav();loadChart('songs');
 </script>
