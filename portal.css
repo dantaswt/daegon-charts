@@ -1140,3 +1140,82 @@
   .ref-battle-float small{color:var(--card-foreground)}
   .ref-battle-float strong{font-size:18px;text-transform:uppercase}
 }
+
+
+/* Mobile portal header: fixed 3-column layout (menu | brand | theme). */
+@media(max-width:767px){
+  .portal-mode .header-inner{
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:9px 14px!important;
+    min-height:62px!important;
+  }
+  .portal-mode .portal-menu-toggle{
+    grid-column:1!important;
+    grid-row:1!important;
+    position:static!important;
+    display:flex!important;
+    width:44px!important;
+    height:44px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    margin:0!important;
+    padding:0!important;
+    order:initial!important;
+    z-index:2;
+  }
+  .portal-mode .brand{
+    grid-column:2!important;
+    grid-row:1!important;
+    position:static!important;
+    left:auto!important;
+    right:auto!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    overflow:hidden!important;
+    white-space:nowrap!important;
+    text-overflow:ellipsis!important;
+    z-index:1;
+  }
+  .portal-mode .brand-word{
+    display:block!important;
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    font-size:18px!important;
+    line-height:1!important;
+  }
+  .portal-mode .theme-btn{
+    grid-column:3!important;
+    grid-row:1!important;
+    position:static!important;
+    width:44px!important;
+    height:44px!important;
+    margin:0!important;
+    justify-self:end!important;
+  }
+  .portal-hamb{
+    width:22px;
+    height:16px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .portal-hamb span{
+    display:block;
+    height:2px;
+    width:100%;
+    background:#f5f5f5;
+  }
+}
