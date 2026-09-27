@@ -433,6 +433,17 @@ const charts={
 };
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
+try{
+  const imageCacheVersion='exact-v1';
+  if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
+    for(let i=localStorage.length-1;i>=0;i--){
+      const k=localStorage.key(i);
+      if(k&&k.startsWith('img:'))localStorage.removeItem(k);
+    }
+    localStorage.setItem('imageCacheVersion',imageCacheVersion);
+  }
+}catch{}
+
 const desktopChartNav=document.getElementById('desktopChartNav'), mobileActiveChart=document.getElementById('mobileActiveChart'), mobileMoreCharts=document.getElementById('mobileMoreCharts'), mobileChartMenu=document.getElementById('mobileChartMenu'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
 const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel');
 const weekPicker=document.getElementById('weekPicker'), weekPickerButton=document.getElementById('weekPickerButton'), weekPickerLabel=document.getElementById('weekPickerLabel'), weekPickerMenu=document.getElementById('weekPickerMenu');
@@ -737,15 +748,20 @@ function comparable(value){
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g,'')
     .replace(/&/g,'and')
-    .replace(/\b(feat|ft|featuring)\.?\b.*$/i,'')
-    .replace(/\b(deluxe|edition|remaster(?:ed)?|version|expanded|anniversary)\b/gi,'')
-    .replace(/[^a-z0-9 ]/g,' ')
+    .replace(/[’‘]/g,"'")
+    .replace(/[^a-z0-9' ]/g,' ')
     .replace(/\s+/g,' ')
     .trim();
 }
 function exactish(a,b){
   const x=comparable(a),y=comparable(b);
-  return !!x&&!!y&&(x===y||x.includes(y)||y.includes(x));
+  return !!x&&!!y&&x===y;
+}
+function exactArtist(a,b){
+  return exactish(a,b);
+}
+function exactTitle(a,b){
+  return exactish(a,b);
 }
 function usableImage(url){
   if(!url)return false;
@@ -793,92 +809,94 @@ async function resolveImage(e,cfg){
   const persistedKey='img:'+key;
   try{
     const persisted=localStorage.getItem(persistedKey);
-    if(persisted){state.images.set(key,persisted);return persisted}
+    if(persisted&&persisted.startsWith('data:image/svg+xml')){
+      state.images.set(key,persisted);
+      return persisted;
+    }
   }catch{}
 
   let url='';
-  const artist=String(e.artist||e.name||'').trim();
   const name=String(e.name||'').trim();
+  const artist=String(e.artist||e.name||'').trim();
 
-  // 1) Last.fm: best first source for old catalog and artists.
+  // ARTIST: only exact artist-name matches are accepted.
   if(cfg.kind==='artist'){
     const d=await jsonFetch('https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=8fc896e5a34e6491b19710f4f1212a34&artist='+encodeURIComponent(name)+'&format=json');
-    url=pickLastfmImage(d?.artist?.image);
-  }else if(cfg.kind==='album'){
-    const d=await jsonFetch('https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=8fc896e5a34e6491b19710f4f1212a34&artist='+encodeURIComponent(artist)+'&album='+encodeURIComponent(name)+'&format=json');
-    if(d?.album?.name&&exactish(d.album.name,name))url=pickLastfmImage(d.album.image);
-  }else{
-    const d=await jsonFetch('https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=8fc896e5a34e6491b19710f4f1212a34&artist='+encodeURIComponent(artist)+'&track='+encodeURIComponent(name)+'&format=json');
-    url=pickLastfmImage(d?.track?.album?.image);
-  }
-
-  // 2) iTunes exact/fuzzy candidate search.
-  if(!url){
-    const entity=cfg.kind==='album'?'album':cfg.kind==='artist'?'musicArtist':'song';
-    const term=cfg.kind==='artist'?name:(name+' '+artist);
-    const d=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(term)+'&entity='+entity+'&limit=20',7000);
-    const results=d?.results||[];
-    let hit=null;
-    if(cfg.kind==='artist'){
-      hit=results.find(x=>exactish(x.artistName,name)&&x.artworkUrl100)||results.find(x=>x.artworkUrl100);
-    }else if(cfg.kind==='album'){
-      hit=results.find(x=>exactish(x.collectionName,name)&&exactish(x.artistName,artist))
-        ||results.find(x=>exactish(x.collectionName,name))
-        ||results.find(x=>exactish(x.artistName,artist));
-    }else{
-      hit=results.find(x=>exactish(x.trackName,name)&&exactish(x.artistName,artist))
-        ||results.find(x=>exactish(x.trackName,name))
-        ||results.find(x=>exactish(x.artistName,artist));
+    if(d?.artist?.name&&exactArtist(d.artist.name,name)){
+      url=pickLastfmImage(d.artist.image);
     }
-    if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
-  }
 
-  // 3) Wikipedia exact summary.
-  if(!url){
-    const titles=cfg.kind==='artist'
-      ? [name]
-      : cfg.kind==='album'
-        ? [name+' ('+artist+' album)',name+' (album)',name]
-        : [name+' ('+artist+' song)',name+' (song)',name];
-    for(const title of titles){
-      const d=await jsonFetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title),5000);
-      if(usableImage(d?.thumbnail?.source)){url=d.thumbnail.source;break}
+    if(!url){
+      const it=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(name)+'&entity=musicArtist&limit=20',7000);
+      const hit=(it?.results||[]).find(x=>exactArtist(x.artistName,name)&&x.artworkUrl100);
+      if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
+    }
+
+    if(!url){
+      const w=await jsonFetch('https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent('"'+name+'"')+'&gsrlimit=10&prop=pageimages|info&inprop=url&piprop=thumbnail&pithumbsize=600&format=json&origin=*',7000);
+      const pages=Object.values(w?.query?.pages||{});
+      const hit=pages.find(x=>exactArtist(x?.title,name)&&usableImage(x?.thumbnail?.source));
+      if(hit?.thumbnail?.source)url=hit.thumbnail.source;
     }
   }
 
-  // 3b) Wikipedia search fallback when exact page title is unknown.
-  if(!url){
-    const q=cfg.kind==='artist'?name:(name+' '+artist);
-    const d=await jsonFetch('https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch='+encodeURIComponent(q)+'&gsrlimit=5&prop=pageimages&piprop=thumbnail&pithumbsize=600&format=json&origin=*',7000);
-    const pages=Object.values(d?.query?.pages||{});
-    const p=pages.find(x=>usableImage(x?.thumbnail?.source));
-    if(p?.thumbnail?.source)url=p.thumbnail.source;
+  // ALBUM: title AND artist must both match exactly.
+  if(cfg.kind==='album'){
+    const lf=await jsonFetch('https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=8fc896e5a34e6491b19710f4f1212a34&artist='+encodeURIComponent(artist)+'&album='+encodeURIComponent(name)+'&format=json');
+    if(lf?.album?.name&&lf?.album?.artist&&exactTitle(lf.album.name,name)&&exactArtist(lf.album.artist,artist)){
+      url=pickLastfmImage(lf.album.image);
+    }
+
+    if(!url){
+      const it=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(name+' '+artist)+'&entity=album&limit=50',7000);
+      const hit=(it?.results||[]).find(x=>
+        exactTitle(x.collectionName,name)&&
+        exactArtist(x.artistName,artist)&&
+        x.artworkUrl100
+      );
+      if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
+    }
+
+    if(!url){
+      const mb=await jsonFetch('https://musicbrainz.org/ws/2/release-group/?query='+encodeURIComponent('releasegroup:"'+name+'" AND artist:"'+artist+'"')+'&fmt=json&limit=10',7000);
+      const group=(mb?.['release-groups']||[]).find(g=>{
+        const credited=(g?.['artist-credit']||[]).map(x=>x?.name||x?.artist?.name||'').filter(Boolean);
+        return exactTitle(g?.title,name)&&credited.some(a=>exactArtist(a,artist));
+      });
+      if(group?.id)url='https://coverartarchive.org/release-group/'+group.id+'/front-500';
+    }
   }
 
-  // 4) Cover Art Archive via MusicBrainz for albums.
-  if(!url&&cfg.kind==='album'){
-    const q='releasegroup:'+name+' AND artist:'+artist;
-    const mb=await jsonFetch('https://musicbrainz.org/ws/2/release-group/?query='+encodeURIComponent(q)+'&fmt=json&limit=5',7000);
-    const groups=mb?.['release-groups']||[];
-    const g=groups.find(x=>exactish(x.title,name))||groups[0];
-    if(g?.id)url='https://coverartarchive.org/release-group/'+g.id+'/front-500';
+  // SONG: track title AND artist must both match exactly.
+  if(cfg.kind==='song'){
+    const lf=await jsonFetch('https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=8fc896e5a34e6491b19710f4f1212a34&artist='+encodeURIComponent(artist)+'&track='+encodeURIComponent(name)+'&format=json');
+    const lfArtist=lf?.track?.artist?.name||lf?.track?.artist;
+    if(lf?.track?.name&&lfArtist&&exactTitle(lf.track.name,name)&&exactArtist(lfArtist,artist)){
+      url=pickLastfmImage(lf?.track?.album?.image);
+    }
+
+    if(!url){
+      const it=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(name+' '+artist)+'&entity=song&limit=50',7000);
+      const hit=(it?.results||[]).find(x=>
+        exactTitle(x.trackName,name)&&
+        exactArtist(x.artistName,artist)&&
+        x.artworkUrl100
+      );
+      if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
+    }
+
+    if(!url){
+      const mb=await jsonFetch('https://musicbrainz.org/ws/2/recording/?query='+encodeURIComponent('recording:"'+name+'" AND artist:"'+artist+'"')+'&fmt=json&limit=10',7000);
+      const rec=(mb?.recordings||[]).find(r=>{
+        const credited=(r?.['artist-credit']||[]).map(x=>x?.name||x?.artist?.name||'').filter(Boolean);
+        return exactTitle(r?.title,name)&&credited.some(a=>exactArtist(a,artist));
+      });
+      const rel=rec?.releases?.[0];
+      if(rel?.id)url='https://coverartarchive.org/release/'+rel.id+'/front-500';
+    }
   }
 
-  // 5) Album fallback for songs: search the track's album title if present.
-  if(!url&&cfg.kind==='song'&&e.album){
-    const d=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(String(e.album)+' '+artist)+'&entity=album&limit=10',7000);
-    const hit=(d?.results||[]).find(x=>exactish(x.collectionName,e.album)&&exactish(x.artistName,artist))||(d?.results||[])[0];
-    if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
-  }
-
-  // 6) For artists, use a representative release cover if no portrait exists.
-  if(!url&&cfg.kind==='artist'){
-    const d=await jsonFetch('https://itunes.apple.com/search?term='+encodeURIComponent(name)+'&entity=song&attribute=artistTerm&limit=20',7000);
-    const hit=(d?.results||[]).find(x=>exactish(x.artistName,name)&&x.artworkUrl100)||(d?.results||[]).find(x=>x.artworkUrl100);
-    if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
-  }
-
-  // 7) Absolute guarantee: never leave an item without artwork.
+  // Never accept a loose/uncertain real image.
   if(!usableImage(url))url=generatedFallbackImage(e,cfg);
 
   state.images.set(key,url);
