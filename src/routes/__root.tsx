@@ -230,8 +230,9 @@ function SiteHeader() {
     <header ref={headerRef} className="fixed top-0 left-0 right-0 z-[100] isolate pointer-events-auto bg-gradient-to-b from-[#0f0f0f] to-[#161616] border-b border-[#2a2a2a]">
       {/* Desktop header */}
       <div className="hidden lg:flex items-center justify-between max-w-7xl mx-auto px-4 py-3">
-        <Link to="/" className="text-xl font-extrabold text-[#f5f5f5] lowercase tracking-wide shrink-0 mr-4">
-          daegon charts
+        <Link to="/" className="dc-brand shrink-0 mr-4" aria-label="Daegon Charts home">
+          <span className="dc-brand-mark" aria-hidden="true">D</span>
+          <span className="dc-brand-word">aegon charts</span>
         </Link>
         <nav className="flex items-center justify-center gap-2 flex-1 min-w-0">
           {navItems.map((item) => (
@@ -265,9 +266,11 @@ function SiteHeader() {
         </div>
         <Link
           to="/"
-          className="absolute left-16 right-16 z-10 text-center text-lg font-extrabold text-[#f5f5f5] lowercase tracking-wide pointer-events-auto"
+          className="dc-brand dc-brand-mobile absolute left-16 right-16 z-10 justify-center pointer-events-auto"
+          aria-label="Daegon Charts home"
         >
-          daegon charts
+          <span className="dc-brand-mark" aria-hidden="true">D</span>
+          <span className="dc-brand-word">aegon charts</span>
         </Link>
         <div className="relative z-[120] w-11 h-11 flex items-center justify-center flex-shrink-0 pointer-events-auto touch-manipulation">
           <ThemeToggle />
