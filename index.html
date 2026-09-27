@@ -117,7 +117,7 @@
     .diff-wrap{width:32px;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground)}
     .diff-arrow{width:19px;height:19px}
     .diff-badge{font-size:10px;font-weight:800;line-height:1;letter-spacing:.05em}
-    .diff-new{background:#00E676;color:#000;padding:3px 5px}
+    .diff-new{background:#00E676;color:#000;padding:3px 5px;writing-mode:horizontal-tb;transform:none}
     .entry{min-width:0}
     .entry-title{font-weight:800;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
     .entry-title.one{font-size:20px}
@@ -541,6 +541,116 @@
       .cover{width:104px;height:104px}
       .chart-card:has(.rank-num.one) .desktop-row{grid-template-columns:62px 180px 36px minmax(0,1fr) auto}
       .chart-card:has(.rank-num.one) .cover.one{width:180px;height:180px}
+    }
+
+    @media(min-width:901px){
+      .chart-card{
+        min-height:192px;
+        padding:0 20px;
+      }
+      .desktop-row{
+        grid-template-columns:86px 148px 62px minmax(0,1fr) auto;
+        gap:14px;
+        min-height:190px;
+        align-items:center;
+      }
+      .rank-wrap{
+        width:86px;
+        align-items:center;
+      }
+      .rank-num{
+        min-width:86px;
+        width:86px;
+        font-size:35px;
+      }
+      .cover{
+        width:148px;
+        height:148px;
+      }
+      .diff-wrap{
+        width:62px;
+        justify-content:center;
+      }
+      .diff-badge{
+        writing-mode:horizontal-tb !important;
+        transform:none !important;
+        white-space:nowrap;
+        font-size:10px;
+        padding:4px 7px;
+      }
+      .entry-title{
+        font-size:20px;
+        line-height:1.1;
+      }
+      .artist{
+        font-size:18px;
+        line-height:1.15;
+        margin-top:6px;
+      }
+      .right{
+        min-width:300px;
+        margin-left:auto;
+        justify-content:flex-end;
+        gap:22px;
+      }
+      .award{
+        width:auto;
+        height:auto;
+        border:0 !important;
+        border-radius:0 !important;
+        font-size:20px;
+      }
+      .award i{
+        font-size:20px !important;
+      }
+      .metrics{
+        min-width:132px;
+        display:grid;
+        grid-template-columns:auto auto;
+        column-gap:12px;
+        row-gap:3px;
+        justify-content:end;
+        font-size:12px;
+        line-height:1.1;
+      }
+      .metrics .sep{display:none}
+      .actions{
+        width:42px;
+        gap:8px;
+        align-items:center;
+      }
+      .action{
+        width:42px;
+        height:42px;
+        font-size:14px;
+      }
+
+      .chart-card:has(.rank-num.one){
+        min-height:252px;
+        padding:0 20px;
+      }
+      .chart-card:has(.rank-num.one) .desktop-row{
+        grid-template-columns:86px 216px 62px minmax(0,1fr) auto;
+        min-height:250px;
+      }
+      .chart-card:has(.rank-num.one) .cover.one{
+        width:216px;
+        height:216px;
+        margin-left:0;
+        border-left:5px solid var(--accent);
+      }
+      .rank-num.one{
+        width:86px;
+        min-width:86px;
+        height:82px;
+        font-size:42px;
+      }
+      .chart-card:has(.rank-num.one) .entry-title.one{
+        font-size:24px;
+      }
+      .chart-card:has(.rank-num.one) .artist.one{
+        font-size:19px;
+      }
     }
 </style>
 </head>
@@ -1189,7 +1299,13 @@ function coverHtml(e,one,mobile=false){
   const icon=charts[state.active].kind==='artist'?'fa-user':charts[state.active].kind==='album'?'fa-compact-disc':'fa-music';
   return '<div class="'+cls+'" data-image-key="'+esc(itemKey(e))+'"><i class="fas '+icon+'" style="opacity:.3;font-size:24px"></i></div>';
 }
-function metricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';return '<div class="metrics"><span>LW '+esc(lw)+'</span><span class="sep">·</span><span>PEAK '+esc(e.peak||'-')+'</span><span class="sep">·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div>'}
+function metricsHtml(e){
+  return '<div class="metrics">'+
+    '<span>LW</span><strong>'+esc(e.lastWeek||'-')+'</strong>'+
+    '<span>PEAK</span><strong>'+esc(e.peak||'-')+'</strong>'+
+    '<span>WEEKS</span><strong>'+esc(e.weeks||'-')+'</strong>'+
+  '</div>';
+}
 function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';return '<div class="m-metrics"><span>LW '+esc(lw)+'</span><span>·</span><span>PEAK '+esc(e.peak||'-')+'</span><span>·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div>'}
 function detailHtml(e,cfg,data,date){
   const fields=detailFields(e,cfg),run=runEntries(e,data,date);
