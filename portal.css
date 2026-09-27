@@ -92,3 +92,158 @@
   .battle-grid{grid-template-columns:1fr}
   .battle-vs{min-height:36px}
 }
+
+
+/* Portal routes use the original daegoncharts navigation language.
+   Weekly routes keep the public weekly header untouched. */
+.portal-topnav{display:none}
+.portal-menu-toggle,.portal-mobile-drawer{display:none}
+.portal-mode .weekly-label{display:none}
+.portal-mode .brand-mark{display:none}
+.portal-mode .brand{font-size:20px;font-weight:800;color:#f5f5f5;letter-spacing:.02em;text-transform:lowercase}
+.portal-mode .brand-word{font-size:20px;font-weight:800;letter-spacing:.02em}
+.portal-mode .header-inner{max-width:1280px;padding:12px 16px;gap:16px}
+.portal-mode .portal-topnav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex:1;
+  min-width:0;
+}
+.portal-mode .portal-topnav a{
+  color:#9ca3af;
+  text-decoration:none;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.portal-mode .portal-topnav a:hover{color:#f5f5f5}
+.portal-mode .theme-btn{flex:0 0 auto}
+.weekly-mode .portal-topnav,
+.weekly-mode .portal-menu-toggle,
+.weekly-mode .portal-mobile-drawer{display:none!important}
+
+.portal-mode .portal-hero{
+  background:transparent;
+  border:0;
+  padding:8px 0 18px;
+  margin-bottom:10px;
+}
+.portal-mode .portal-kicker{color:var(--accent)}
+.portal-mode .portal-title{
+  font-size:34px;
+  text-transform:none;
+  letter-spacing:-.02em;
+}
+.portal-mode .portal-subtitle{max-width:760px}
+.portal-mode .portal-section-head{
+  border-bottom:0;
+  padding-bottom:0;
+  margin-bottom:14px;
+}
+.portal-mode .portal-section-head h2{
+  position:relative;
+  text-transform:none;
+  font-size:24px;
+  letter-spacing:-.01em;
+  padding-bottom:10px;
+}
+.portal-mode .portal-section-head h2::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:0;
+  width:48px;
+  height:3px;
+  background:var(--accent);
+}
+.portal-mode .portal-card,
+.portal-mode .portal-panel,
+.portal-mode .portal-sidebox,
+.portal-mode .portal-row,
+.portal-mode .portal-no1,
+.portal-mode .battle-card,
+.portal-mode .portal-statbox{
+  border:1px solid var(--border);
+  background:var(--card);
+}
+.portal-mode .portal-card,
+.portal-mode .portal-panel,
+.portal-mode .portal-sidebox,
+.portal-mode .battle-card{padding:16px}
+.portal-mode .portal-row{padding:12px}
+.portal-mode .portal-card.clickable:hover,
+.portal-mode .portal-row:hover{
+  border-color:var(--accent);
+}
+.portal-mode .portal-more{color:var(--accent)}
+.portal-mode .portal-btn.active,
+.portal-mode .portal-btn:hover{background:var(--accent);color:#000;border-color:var(--accent)}
+.portal-mode .portal-shell{grid-template-columns:minmax(0,1fr) 280px;gap:28px}
+.portal-mode .portal-sidebox h3{font-size:10px;letter-spacing:.12em}
+.portal-mode .portal-side-links a:hover{color:var(--accent)}
+
+@media(max-width:1000px){
+  .portal-mode .portal-topnav{gap:7px}
+  .portal-mode .portal-topnav a{font-size:9px}
+}
+@media(max-width:767px){
+  .portal-mode .header-inner{
+    position:relative;
+    min-height:62px;
+    padding:9px 14px;
+    justify-content:space-between;
+  }
+  .portal-mode .brand{
+    position:absolute;
+    left:64px;
+    right:64px;
+    text-align:center;
+    display:block;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+  }
+  .portal-mode .portal-topnav{display:none}
+  .portal-mode .portal-menu-toggle{
+    display:flex;
+    width:44px;
+    height:44px;
+    border:0;
+    background:transparent;
+    color:#f5f5f5;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+    order:-1;
+  }
+  .portal-mode .portal-mobile-drawer{
+    position:absolute;
+    left:0;
+    right:0;
+    top:100%;
+    z-index:130;
+    background:#0f0f0f;
+    border-top:1px solid #2a2a2a;
+    padding:10px 16px 14px;
+  }
+  .portal-mode .portal-mobile-drawer.open{display:block}
+  .portal-mode .portal-mobile-drawer a{
+    display:block;
+    padding:10px 0;
+    border-bottom:1px solid #2a2a2a;
+    color:#9ca3af;
+    text-decoration:none;
+    font-size:12px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .portal-mode .portal-mobile-drawer a:hover{color:var(--accent)}
+  .portal-mode .portal-title{font-size:28px}
+  .portal-mode .portal-section-head h2{font-size:20px}
+  .portal-mode .portal-shell{display:block}
+}
