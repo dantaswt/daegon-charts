@@ -3,537 +3,458 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>daegon charts — Weekly Charts</title>
+  <title>daegon charts — weekly music charts</title>
   <link rel="icon" type="image/png" href="https://i.imgur.com/jaBZ19n.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    (function(){
+      try{
+        var t=localStorage.getItem('theme');
+        if(t!=='light') document.documentElement.classList.add('dark');
+      }catch(e){}
+    })();
+  </script>
   <style>
     :root{
-      --page:#ececec;
-      --card:#fff;
-      --text:#111;
-      --muted:#777d89;
-      --border:#cfcfcf;
-      --soft:#f1f1f1;
-      --gold:#ffd400;
-      --orange:#ff7200;
+      --background:#e8e8e8;
+      --foreground:#1a1a1a;
+      --card:#ffffff;
+      --card-foreground:#1a1a1a;
+      --muted:#f0f0f0;
+      --muted-foreground:#6b7280;
+      --accent:#FF6D00;
+      --border:#d4d4d4;
+      --border-dark:#c0c0c0;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,Arial,sans-serif;
-      background:var(--page);
-      color:var(--text);
-      min-height:100vh;
+    html.dark{
+      --background:#1a1a1a;
+      --foreground:#f5f5f5;
+      --card:#0f0f0f;
+      --card-foreground:#f5f5f5;
+      --muted:#171717;
+      --muted-foreground:#9CA3AF;
+      --border:#2a2a2a;
+      --border-dark:#333333;
     }
-    header{
-      background:#fff;
-      border-bottom:1px solid #d7d7d7;
-      position:sticky;
-      top:0;
-      z-index:20;
+    *{box-sizing:border-box;border-radius:0!important}
+    html,body{margin:0;background:var(--background);color:var(--foreground);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+    body{min-height:100vh}
+    button,select{font:inherit}
+    button{cursor:pointer}
+    .shell{min-height:100vh;display:flex;flex-direction:column}
+    .site-header{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      background:linear-gradient(to bottom,#0f0f0f,#161616);
+      border-bottom:1px solid #2a2a2a;
     }
-    .header-inner,.main{
-      width:min(100%,1100px);
-      margin:0 auto;
-      padding-left:18px;
-      padding-right:18px;
+    .header-inner{
+      max-width:1280px;margin:0 auto;padding:12px 16px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
     }
-    .header-inner{padding-top:16px;padding-bottom:14px}
-    .brand{
-      margin:0;
-      text-align:center;
-      font-size:27px;
-      line-height:1;
-      font-weight:800;
-      text-transform:lowercase;
+    .brand{font-size:20px;font-weight:800;color:#f5f5f5;letter-spacing:.02em;text-transform:lowercase}
+    .weekly-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af}
+    .theme-btn{
+      width:44px;height:44px;border:1px solid var(--border);background:var(--card);color:var(--foreground);
+      display:flex;align-items:center;justify-content:center;transition:.15s;
     }
-    .subtitle{
-      text-align:center;
-      margin-top:5px;
-      font-size:12px;
-      color:#8b8f98;
-      font-weight:600;
+    .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .page{
+      flex:1;max-width:1280px;width:100%;margin:0 auto;padding:88px 12px 36px;
     }
-    .main{padding-top:18px;padding-bottom:110px}
-    .tabs{
-      display:flex;
-      gap:8px;
-      overflow-x:auto;
-      scrollbar-width:none;
-      padding:2px 0 12px;
+    .layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px}
+    .sidebar{position:sticky;top:96px;align-self:start}
+    .chart-nav{display:flex;flex-direction:column;gap:8px}
+    .chart-nav button{
+      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
+      font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:9px 14px;
+      transition:.15s;
     }
-    .tabs::-webkit-scrollbar{display:none}
-    .tab{
-      flex:0 0 auto;
-      border:1px solid #d0d0d0;
-      background:#fff;
-      color:#555b65;
-      border-radius:999px;
-      padding:10px 14px;
-      font:700 12px/1 Inter,sans-serif;
-      cursor:pointer;
+    .chart-nav button:hover,.chart-nav button.active{background:var(--accent);color:#000;border-color:var(--accent)}
+    .main{min-width:0}
+    .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
+    h1{margin:0;font-size:36px;line-height:1;font-weight:800;text-transform:uppercase;letter-spacing:-.02em}
+    .date-label{margin-top:6px;font-size:13px;color:var(--muted-foreground)}
+    .week-nav{display:flex;flex-direction:column;align-items:center;gap:8px;margin:8px 0 16px}
+    .week-label{font-size:12px;color:var(--muted-foreground);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+    .week-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+    .gold-btn{
+      min-height:44px;border:0;background:var(--accent);color:#000;font-weight:700;padding:9px 14px;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
     }
-    .tab.active{background:#111;color:#fff;border-color:#111}
-    .toolbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:end;
-      gap:15px;
-      margin:5px 0 14px;
+    .gold-btn:disabled{opacity:.4;cursor:not-allowed}
+    .date-select{
+      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
+      font-size:14px;font-weight:800;padding:9px 14px;min-width:175px;text-align:center;
     }
-    .chart-title{font-size:24px;font-weight:800;line-height:1.1}
-    .chart-date{font-size:12px;color:#858a94;margin-top:5px}
-    select{
-      background:#fff;
-      color:#222;
-      border:1px solid #cfcfcf;
-      border-radius:8px;
-      padding:9px 11px;
-      font:600 12px Inter,sans-serif;
-      max-width:180px;
+    .filters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:16px}
+    .filter{
+      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
+      padding:9px 12px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
     }
-    .cards{display:flex;flex-direction:column;gap:18px}
+    .filter.active{background:var(--accent);color:#000;border-color:var(--accent)}
+    .chart-list{display:flex;flex-direction:column;gap:12px;max-width:896px;margin:0 auto}
     .chart-card{
-      min-height:240px;
-      background:#fff;
-      border:1px solid var(--border);
-      box-shadow:0 3px 8px rgba(0,0,0,.10);
-      display:grid;
-      grid-template-columns:100px 180px minmax(0,1fr) 205px;
-      align-items:center;
-      column-gap:18px;
-      padding:16px 22px;
+      background:var(--card);color:var(--card-foreground);border:1px solid var(--border);
+      padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+      transition:transform .18s ease,box-shadow .18s ease;
     }
-    .rank-block{
-      height:100%;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:flex-start;
-      padding-top:12px;
+    .chart-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+    .desktop-row{
+      display:grid;grid-template-columns:auto auto auto minmax(0,1fr) auto;gap:12px;align-items:center;
     }
-    .rank{
-      font-size:56px;
-      line-height:.95;
-      font-weight:800;
-      letter-spacing:-2px;
+    .rank-wrap{width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .rank-num{font-size:30px;font-weight:900;min-width:64px;display:flex;align-items:center;justify-content:center}
+    .rank-num.one{font-size:36px;width:64px;height:64px;background:var(--accent);color:#000}
+    .weeks1{margin-top:3px;padding:2px 6px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
+    .cover{
+      width:96px;height:96px;background:var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--muted-foreground)
     }
-    .movement{
-      margin-top:14px;
-      color:#707785;
-      font-size:44px;
-      line-height:.8;
-      font-weight:500;
-    }
-    .art{
-      width:180px;
-      height:180px;
-      background:linear-gradient(135deg,#eeeeee,#dadada);
-      overflow:hidden;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .art img{width:100%;height:100%;object-fit:cover;display:block}
-    .note{
-      width:58px;
-      height:58px;
-      opacity:.22;
-    }
-    .info{min-width:0}
-    .entry-title{
-      font-size:30px;
-      line-height:1.08;
-      font-weight:800;
-      letter-spacing:-.5px;
-      word-break:normal;
-      overflow-wrap:anywhere;
-      margin-bottom:8px;
-    }
-    .number-one-badge{
-      display:inline-block;
-      background:var(--gold);
-      color:#111;
-      font-size:13px;
-      line-height:1;
-      font-weight:800;
-      padding:4px 7px;
-      margin:0 0 8px;
-    }
-    .artist{
-      color:var(--muted);
-      font-size:23px;
-      line-height:1.2;
-      margin-bottom:10px;
-    }
-    .meta{
-      display:flex;
-      flex-wrap:wrap;
-      align-items:center;
-      gap:10px;
-      color:var(--muted);
-      font-size:19px;
-      line-height:1.4;
-    }
-    .sep{color:#c2c4c8}
-    .actions{
-      height:100%;
-      display:grid;
-      grid-template-columns:72px 72px;
-      grid-template-rows:72px 72px;
-      gap:16px;
-      align-content:center;
-      justify-content:end;
-    }
+    .cover.one{width:180px;height:180px;border-left:4px solid var(--accent);margin-left:-12px}
+    .cover img{width:100%;height:100%;object-fit:cover;display:block}
+    .diff-wrap{width:32px;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground)}
+    .diff-arrow{width:19px;height:19px}
+    .diff-badge{font-size:10px;font-weight:800;line-height:1;letter-spacing:.05em}
+    .diff-new{background:#00E676;color:#000;padding:3px 5px}
+    .entry{min-width:0}
+    .entry-title{font-weight:800;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+    .entry-title.one{font-size:20px}
+    .artist{margin-top:3px;color:var(--muted-foreground);font-size:14px;line-height:1.25}
+    .artist.one{font-size:16px}
+    .badge-inline{display:inline-flex;margin-left:6px;padding:2px 5px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
+    .right{display:flex;align-items:center;gap:16px}
+    .award{width:24px;height:24px;border:2px solid currentColor;border-radius:9999px!important;display:flex;align-items:center;justify-content:center}
+    .metrics{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted-foreground);white-space:nowrap}
+    .metrics .sep{color:var(--border)}
+    .actions{display:flex;flex-direction:column;gap:8px}
     .action{
-      border:0;
-      background:var(--soft);
-      color:#111;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      width:72px;
-      height:72px;
+      width:32px;height:32px;border:0;background:var(--muted);color:var(--foreground);
+      display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:9999px!important;transition:.15s
     }
-    .action.round{border-radius:50%}
-    .action svg{width:31px;height:31px;fill:currentColor}
-    .action.play{grid-column:1;grid-row:1;border-radius:0}
-    .action.copy{grid-column:2;grid-row:1}
-    .action.add{grid-column:2;grid-row:2}
-    .gain-star{
-      grid-column:1;
-      grid-row:2;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:42px;
-      line-height:1;
-      color:#000;
+    .action:hover{background:var(--border)}
+    .details{
+      margin-top:12px;border:1px solid var(--border);background:var(--muted);padding:12px;
+      font-size:13px;color:var(--foreground)
     }
-    .gain-star.hidden{visibility:hidden}
-    .to-top{
-      position:fixed;
-      right:24px;
-      bottom:24px;
-      z-index:30;
-      width:92px;
-      height:92px;
-      border:0;
-      border-radius:50%;
-      background:var(--orange);
-      color:#000;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-      box-shadow:0 5px 15px rgba(0,0,0,.16);
+    .details-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+    .detail-box{background:var(--card);border:1px solid var(--border);padding:9px}
+    .detail-k{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-foreground)}
+    .detail-v{font-size:13px;font-weight:700;margin-top:3px}
+    .dropouts{max-width:896px;margin:28px auto 0;border:1px solid var(--border);background:var(--muted);padding:16px}
+    .dropouts-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:var(--muted-foreground);margin-bottom:10px}
+    .dropout{display:flex;gap:10px;align-items:center;border:1px solid var(--border-dark);background:var(--card);padding:10px;margin-top:8px}
+    .dropout-rank{font-weight:800}
+    .dropout-info{min-width:0}
+    .dropout-name{font-size:13px;font-weight:700}
+    .dropout-meta{font-size:10px;color:var(--muted-foreground);margin-top:2px}
+    .mobile-row{display:none}
+    .back-top{
+      position:fixed;right:18px;bottom:20px;z-index:120;width:48px;height:48px;border:0;background:var(--accent);color:#000;
+      border-radius:9999px!important;display:none;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.2)
     }
-    .to-top svg{width:48px;height:48px;fill:none;stroke:currentColor;stroke-width:2.5}
-    .loader-wrap{display:flex;justify-content:center;padding:70px 0}
-    .loader{
-      width:42px;height:42px;border-radius:50%;
-      border:4px solid #d8d8d8;border-top-color:#111;
-      animation:spin .8s linear infinite
-    }
+    .loader-wrap{display:flex;justify-content:center;padding:60px 0}
+    .loader{width:42px;height:42px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:9999px!important;animation:spin .8s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    .error{text-align:center;padding:60px 20px;color:#777}
-    .retry{margin-top:12px;border:0;background:#111;color:#fff;padding:10px 16px;border-radius:8px;font-weight:700}
-
-    @media(max-width:800px){
-      .main,.header-inner{padding-left:10px;padding-right:10px}
-      .chart-card{
-        min-height:190px;
-        grid-template-columns:70px 115px minmax(0,1fr) 110px;
-        column-gap:10px;
-        padding:12px 10px;
-      }
-      .rank-block{padding-top:8px}
-      .rank{font-size:42px}
-      .movement{font-size:32px;margin-top:10px}
-      .art{width:115px;height:115px}
-      .entry-title{font-size:23px}
-      .artist{font-size:18px}
-      .meta{font-size:15px;gap:7px}
-      .actions{
-        grid-template-columns:50px 50px;
-        grid-template-rows:50px 50px;
-        gap:10px;
-      }
-      .action{width:50px;height:50px}
-      .action svg{width:22px;height:22px}
-      .gain-star{font-size:30px}
-      .to-top{width:72px;height:72px;right:15px;bottom:15px}
-      .to-top svg{width:38px;height:38px}
+    .error{text-align:center;padding:48px 10px;color:var(--muted-foreground)}
+    .color-new{background:#bae6fd!important;color:#1a1a1a!important}
+    .color-re{background:#93c5fd!important;color:#1a1a1a!important}
+    .color-up1{background:#d1fae5!important;color:#1a1a1a!important}
+    .color-up10{background:#6ee7b7!important;color:#1a1a1a!important}
+    .color-down1{background:#fee2e2!important;color:#1a1a1a!important}
+    .color-down10{background:#fca5a5!important;color:#1a1a1a!important}
+    .site-footer{margin-top:auto;background:#0f0f0f;border-top:1px solid #2a2a2a;padding:28px 16px;text-align:center;color:#9ca3af;font-size:12px}
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:static}
+      .chart-nav{display:flex;flex-direction:row;overflow-x:auto;gap:0;margin-bottom:6px}
+      .chart-nav button{flex:0 0 auto;white-space:nowrap}
     }
-
-    @media(max-width:560px){
-      .brand{font-size:23px}
-      .toolbar{align-items:center}
-      .chart-title{font-size:20px}
-      .chart-card{
-        min-height:142px;
-        grid-template-columns:48px 86px minmax(0,1fr) 82px;
-        column-gap:8px;
-        padding:10px 7px;
-      }
-      .rank{font-size:32px;letter-spacing:-1px}
-      .movement{font-size:26px;margin-top:8px}
-      .art{width:86px;height:86px}
-      .note{width:36px;height:36px}
-      .entry-title{font-size:17px;line-height:1.12;margin-bottom:4px}
-      .artist{font-size:14px;margin-bottom:5px}
-      .meta{font-size:11.5px;gap:4px;line-height:1.25}
-      .number-one-badge{font-size:10px;padding:3px 5px;margin-bottom:5px}
-      .actions{
-        grid-template-columns:36px 36px;
-        grid-template-rows:36px 36px;
-        gap:8px;
-      }
-      .action{width:36px;height:36px}
-      .action svg{width:17px;height:17px}
-      .gain-star{font-size:24px}
-      .to-top{width:58px;height:58px}
-      .to-top svg{width:31px;height:31px}
+    @media(max-width:767px){
+      .page{padding-top:80px}
+      .header-inner{padding:9px 14px}
+      .brand{position:absolute;left:64px;right:64px;text-align:center;font-size:18px}
+      .weekly-label{visibility:hidden}
+      .title-row{justify-content:center;text-align:center}
+      h1{font-size:28px}
+      .desktop-row{display:none}
+      .mobile-row{display:flex;align-items:flex-start;gap:8px}
+      .chart-card{padding:13px 14px}
+      .m-rank{width:32px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:2px}
+      .m-rank-num{font-size:20px;font-weight:900;line-height:1}
+      .m-diff{height:20px;margin-top:3px;display:flex;align-items:center;justify-content:center}
+      .m-cover{width:64px;height:64px;background:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted-foreground)}
+      .m-cover.one{width:68px;height:68px;border-left:3px solid var(--accent)}
+      .m-cover img{width:100%;height:100%;object-fit:cover}
+      .m-entry{min-width:0;flex:1}
+      .m-title{font-size:13px;font-weight:800;line-height:1.15;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+      .m-artist{font-size:11px;color:var(--muted-foreground);line-height:1.15;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .m-metrics{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted-foreground);white-space:nowrap;margin-top:4px}
+      .m-actions{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+      .m-actions-top{display:flex;align-items:center;gap:6px}
+      .week-nav{margin-top:4px}
+      .filters{gap:6px}
+      .filter{padding:8px 10px}
     }
   </style>
 </head>
 <body>
-  <header>
+<div class="shell">
+  <header class="site-header">
     <div class="header-inner">
-      <h1 class="brand">daegon charts</h1>
-      <div class="subtitle">Weekly Charts</div>
+      <div class="weekly-label">WEEKLY CHARTS</div>
+      <div class="brand">daegon charts</div>
+      <button id="themeToggle" class="theme-btn" aria-label="Toggle theme"><i class="fas fa-sun"></i></button>
     </div>
   </header>
 
-  <main class="main">
-    <div id="tabs" class="tabs"></div>
+  <div class="page">
+    <div class="layout">
+      <aside class="sidebar"><div id="chartNav" class="chart-nav"></div></aside>
+      <main class="main">
+        <div class="title-row">
+          <div>
+            <h1 id="chartTitle"></h1>
+            <div id="dateLabel" class="date-label"></div>
+          </div>
+        </div>
 
-    <div class="toolbar">
-      <div>
-        <div id="chartTitle" class="chart-title"></div>
-        <div id="chartStatus" class="chart-date"></div>
+        <div class="week-nav">
+          <div class="week-label">Chart Week</div>
+          <div class="week-controls">
+            <button id="prevBtn" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
+            <select id="weekSelect" class="date-select"></select>
+            <button id="nextBtn" class="gold-btn">Next <i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div id="filters" class="filters">
+          <button class="filter active" data-filter="all">ALL</button>
+          <button class="filter" data-filter="debut">NEW</button>
+          <button class="filter" data-filter="re">RE</button>
+          <button class="filter" data-filter="rising"><i class="fas fa-arrow-up"></i></button>
+          <button class="filter" data-filter="falling"><i class="fas fa-arrow-down"></i></button>
+          <button class="filter" data-filter="static"><i class="fas fa-arrow-right"></i></button>
+          <button id="colorToggle" class="filter" title="Color movements"><i class="fas fa-palette"></i></button>
+        </div>
+
+        <div id="content" class="chart-list"><div class="loader-wrap"><div class="loader"></div></div></div>
+        <div id="dropouts"></div>
+
+        <div class="week-nav" style="margin-top:28px">
+          <div class="week-controls">
+            <button id="prevBtnBottom" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
+            <button id="nextBtnBottom" class="gold-btn">Next <i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="site-footer">Chart generated based on daegon charts archive.</footer>
+  <button id="backTop" class="back-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+</div>
+
+<script>
+const SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=';
+const charts={
+  songs:{title:'Hot 100',gid:'904867620',kind:'song'},
+  artists:{title:'Top 50 Artists',gid:'1568177610',kind:'artist'},
+  albums:{title:'Top 100 Albums',gid:'1940039611',kind:'album'},
+  radioSongs:{title:'Radio Songs',gid:'1681272096',kind:'song'},
+  topStreamingAlbums:{title:'Top Streaming Albums',gid:'1028545573',kind:'album'},
+  topAlbumSales:{title:'Top Album Sales',gid:'1111633725',kind:'album'},
+  streamingSongs:{title:'Streaming Songs',gid:'626144821',kind:'song'},
+  digitalSongsSales:{title:'Digital Songs Sales',gid:'302176914',kind:'song'}
+};
+const weeklyIds=Object.keys(charts);
+const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set()};
+const chartNav=document.getElementById('chartNav'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
+const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel'), weekSelect=document.getElementById('weekSelect');
+
+function parseCsvRow(line){
+  const out=[];let cur='',quoted=false;
+  for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(quoted&&line[i+1]==='"'){cur+='"';i++}else quoted=!quoted}else if(ch===','&&!quoted){out.push(cur);cur=''}else cur+=ch}
+  out.push(cur);return out;
+}
+function normalizeDate(v){
+  if(!v)return'';v=String(v).trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
+  const m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:v;
+}
+function findIndex(h,names){for(const n of names){const i=h.indexOf(n);if(i!==-1)return i}return -1}
+function val(r,i){return i>=0?(r[i]||'').trim():''}
+function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
+function fmtDate(d){try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}catch{return d}}
+function fmtShort(d){try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}catch{return d}}
+function parseNum(v){const n=parseInt(String(v??'').replace(/[^0-9-]/g,''),10);return Number.isFinite(n)?n:0}
+
+async function fetchChart(id){
+  if(state.cache.has(id))return state.cache.get(id);
+  const res=await Promise.race([fetch(SHEET+charts[id].gid+'&_='+Date.now()),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),15000))]);
+  if(!res.ok)throw new Error('HTTP '+res.status);
+  let csv=await res.text();if(csv.charCodeAt(0)===0xFEFF)csv=csv.slice(1);
+  const rows=csv.trim().split(/\r?\n/).map(parseCsvRow);
+  const h=rows[0].map(x=>x.toLowerCase().trim());
+  const idx={
+    date:findIndex(h,['date','chart date']),position:findIndex(h,['position','rank','pos']),diff:findIndex(h,['dif','diff','▲▼']),
+    song:findIndex(h,['song','title','track']),album:findIndex(h,['album']),artist:findIndex(h,['artist','artists']),
+    lw:findIndex(h,['last week','lw']),peak:findIndex(h,['peak']),weeks:findIndex(h,['weeks','wks']),weeksAt1:findIndex(h,['weeks at 1','wks at 1','weeks at #1']),
+    units:findIndex(h,['units']),totalUnits:findIndex(h,['total units','total']),sales:findIndex(h,['sales']),streams:findIndex(h,['streams']),airplay:findIndex(h,['airplay','audience']),
+    cover:findIndex(h,['cover','image','image url','cover url','artwork','artwork url'])
+  };
+  const byDate={};
+  for(const r of rows.slice(1)){const d=normalizeDate(r[idx.date]||'');if(!d)continue;(byDate[d]??=[]).push(r)}
+  Object.values(byDate).forEach(list=>list.sort((a,b)=>(parseInt(a[idx.position])||999)-(parseInt(b[idx.position])||999)));
+  const data={idx,byDate,dates:Object.keys(byDate).sort((a,b)=>new Date(a)-new Date(b))};
+  state.cache.set(id,data);return data;
+}
+
+function visibleCharts(date){
+  return date&&date<'2017-01-01'?['songs','artists','albums']:weeklyIds;
+}
+function renderNav(){
+  chartNav.innerHTML=visibleCharts(state.date).map(id=>`<button data-id="${id}" class="${id===state.active?'active':''}">${charts[id].title}</button>`).join('');
+  chartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date));
+}
+function diffType(diff){
+  const d=String(diff||'');
+  if(d==='NEW')return'debut';if(d==='RE')return're';if(d.startsWith('▲'))return'rising';if(d.startsWith('▼'))return'falling';return'static';
+}
+function diffHtml(diff){
+  const d=String(diff||'');
+  if(d==='NEW')return '<span class="diff-badge diff-new">NEW</span>';
+  if(d==='RE')return '<span class="diff-badge diff-new">RE-ENTRY</span>';
+  if(d.startsWith('▲'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M4 7l4-4 4 4"/></svg>';
+  if(d.startsWith('▼'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 13V3M4 9l4 4 4-4"/></svg>';
+  return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+}
+function colorClass(diff){
+  if(!state.diffColors)return'';
+  const d=String(diff||'');
+  if(d==='NEW')return'color-new';if(d==='RE')return'color-re';
+  if(d.startsWith('▲'))return parseNum(d.slice(1))>=10?'color-up10':'color-up1';
+  if(d.startsWith('▼'))return parseNum(d.slice(1))>=10?'color-down10':'color-down1';
+  return'';
+}
+function rowName(row,idx,kind){
+  if(kind==='song')return val(row,idx.song)||'Unknown';
+  if(kind==='album')return val(row,idx.album)||'Unknown';
+  return val(row,idx.artist)||'Unknown';
+}
+function coverHtml(url,one,mobile=false){
+  const cls=mobile?(one?'m-cover one':'m-cover'):(one?'cover one':'cover');
+  return `<div class="${cls}">${url?`<img src="${esc(url)}" loading="lazy" onerror="this.remove();this.parentElement.innerHTML='<i class=\'fas fa-music\'></i>'">`:'<i class="fas fa-music" style="opacity:.3;font-size:24px"></i>'}</div>`;
+}
+function metricsHtml(lw,peak,weeks){
+  return `<div class="metrics"><span>LW ${esc(lw||'-')}</span><span class="sep">·</span><span>PEAK ${esc(peak||'-')}</span><span class="sep">·</span><span>WEEKS ${esc(weeks||'-')}</span></div>`;
+}
+function mobileMetricsHtml(lw,peak,weeks){
+  return `<div class="m-metrics"><span>LW ${esc(lw||'-')}</span><span>·</span><span>PEAK ${esc(peak||'-')}</span><span>·</span><span>WEEKS ${esc(weeks||'-')}</span></div>`;
+}
+function detailHtml(row,i){
+  const fields=[['Units',val(row,i.units)],['Total Units',val(row,i.totalUnits)],['Sales',val(row,i.sales)],['Streams',val(row,i.streams)],['Airplay',val(row,i.airplay)]].filter(x=>x[1]);
+  if(!fields.length)return '<div class="details">Details shown. Press + again to close.</div>';
+  return `<div class="details"><div class="details-grid">${fields.map(([k,v])=>`<div class="detail-box"><div class="detail-k">${k}</div><div class="detail-v">${esc(v)}</div></div>`).join('')}</div></div>`;
+}
+function renderRows(data,date){
+  const cfg=charts[state.active],i=data.idx,all=data.byDate[date]||[];
+  const rows=all.filter(r=>state.filters.has('all')||state.filters.has(diffType(val(r,i.diff))));
+  if(!rows.length){content.innerHTML='<div class="error">No entries match these filters.</div>';return}
+  content.innerHTML=rows.map(r=>{
+    const pos=parseInt(val(r,i.position))||0,name=rowName(r,i,cfg.kind),artist=val(r,i.artist)||'Unknown',diff=val(r,i.diff),lw=val(r,i.lw)||'-',peak=val(r,i.peak)||'-',weeks=val(r,i.weeks)||'-',w1=parseInt(val(r,i.weeksAt1))||0,one=pos===1,cover=val(r,i.cover);
+    const key=`${date}|${pos}|${name}|${artist}`,open=state.details.has(key);
+    const copy=`#${pos} ${name}${cfg.kind!=='artist'?' — '+artist:''} | LW ${lw} | Peak ${peak} | Weeks ${weeks}`;
+    const star=(diff==='NEW'||diff==='RE'||diff.startsWith('▲'));
+    return `<article class="chart-card ${colorClass(diff)}" data-key="${esc(key)}">
+      <div class="desktop-row">
+        <div class="rank-wrap"><div class="rank-num ${one?'one':''}">${pos}</div>${one&&w1>=2?`<div class="weeks1">${w1} WEEKS</div>`:''}</div>
+        ${coverHtml(cover,one,false)}
+        <div class="diff-wrap">${diffHtml(diff)}</div>
+        <div class="entry">
+          <div class="entry-title ${one?'one':''}">${esc(name)}${!one&&w1>=2?`<span class="badge-inline">${w1}W AT #1</span>`:''}</div>
+          ${cfg.kind!=='artist'?`<div class="artist ${one?'one':''}">${esc(artist)}</div>`:''}
+        </div>
+        <div class="right">
+          ${star?'<span class="award" title="Gains in performance"><i class="fas fa-star" style="font-size:11px"></i></span>':''}
+          ${metricsHtml(lw,peak,weeks)}
+          <div class="actions">
+            ${cfg.kind==='song'?'<button class="action play" aria-label="Play preview"><i class="fas fa-play"></i></button>':''}
+            <button class="action copy" aria-label="Copy info" data-copy="${esc(copy)}"><i class="fas fa-copy"></i></button>
+            <button class="action details-btn" aria-label="Toggle details" data-key="${esc(key)}">${open?'−':'+'}</button>
+          </div>
+        </div>
       </div>
-      <select id="weekSelect"></select>
-    </div>
 
-    <div id="content" class="cards">
-      <div class="loader-wrap"><div class="loader"></div></div>
-    </div>
-  </main>
+      <div class="mobile-row">
+        <div class="m-rank"><div class="m-rank-num">${pos}</div><div class="m-diff">${diffHtml(diff)}</div>${one&&w1>=2?`<div class="weeks1" style="font-size:7px;padding:2px 4px">${w1}W AT #1</div>`:''}</div>
+        ${coverHtml(cover,one,true)}
+        <div class="m-entry"><div class="m-title">${esc(name)}${!one&&w1>=2?`<span class="badge-inline" style="font-size:7px">${w1}W AT #1</span>`:''}</div>${cfg.kind!=='artist'?`<div class="m-artist">${esc(artist)}</div>`:''}${mobileMetricsHtml(lw,peak,weeks)}</div>
+        <div class="m-actions"><div class="m-actions-top">${star?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':''}${cfg.kind==='song'?'<button class="action play"><i class="fas fa-play"></i></button>':''}<button class="action copy" data-copy="${esc(copy)}"><i class="fas fa-copy"></i></button></div><button class="action details-btn" data-key="${esc(key)}">${open?'−':'+'}</button></div>
+      </div>
+      ${open?detailHtml(r,i):''}
+    </article>`;
+  }).join('');
 
-  <button id="toTop" class="to-top" aria-label="Back to top">
-    <svg viewBox="0 0 24 24"><path d="M12 20V5M5.5 11.5 12 5l6.5 6.5"/></svg>
-  </button>
+  content.querySelectorAll('.copy').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copy||'');b.innerHTML='<i class="fas fa-check"></i>';setTimeout(()=>b.innerHTML='<i class="fas fa-copy"></i>',1200)}catch{}});
+  content.querySelectorAll('.details-btn').forEach(b=>b.onclick=()=>{const k=b.dataset.key;if(state.details.has(k))state.details.delete(k);else state.details.add(k);renderRows(data,date)});
+}
 
-  <script>
-    const SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=';
-    const charts={
-      songs:{title:'Hot 100',gid:'904867620',kind:'song'},
-      artists:{title:'Artist 50',gid:'1568177610',kind:'artist'},
-      albums:{title:'Top 100 Albums',gid:'1940039611',kind:'album'},
-      radioSongs:{title:'Radio Songs',gid:'1681272096',kind:'song'},
-      topStreamingAlbums:{title:'Top Streaming Albums',gid:'1028545573',kind:'album'},
-      topAlbumSales:{title:'Top Album Sales',gid:'1111633725',kind:'album'},
-      streamingSongs:{title:'Streaming Songs',gid:'626144821',kind:'song'},
-      digitalSongsSales:{title:'Digital Songs Sales',gid:'302176914',kind:'song'}
-    };
-    const state={active:'songs',cache:new Map()};
-    const tabs=document.getElementById('tabs');
-    const titleEl=document.getElementById('chartTitle');
-    const statusEl=document.getElementById('chartStatus');
-    const weekSelect=document.getElementById('weekSelect');
-    const content=document.getElementById('content');
+function renderDropouts(data,date){
+  const idx=data.dates.indexOf(date),i=data.idx;
+  if(idx<=0){dropoutsEl.innerHTML='';return}
+  const prev=data.byDate[data.dates[idx-1]]||[],curr=data.byDate[date]||[];
+  const keys=new Set(curr.map(r=>`${rowName(r,i,charts[state.active].kind).toLowerCase()}|${val(r,i.artist).toLowerCase()}`));
+  const outs=prev.filter(r=>!keys.has(`${rowName(r,i,charts[state.active].kind).toLowerCase()}|${val(r,i.artist).toLowerCase()}`));
+  if(!outs.length){dropoutsEl.innerHTML='';return}
+  dropoutsEl.innerHTML=`<div class="dropouts"><div class="dropouts-title">DROP-OUTS</div>${outs.map(r=>`<div class="dropout"><div class="dropout-rank">#${esc(val(r,i.position))}</div><div class="dropout-info"><div class="dropout-name">${esc(rowName(r,i,charts[state.active].kind))}</div><div class="dropout-meta">${charts[state.active].kind!=='artist'?esc(val(r,i.artist))+' · ':''}Peak #${esc(val(r,i.peak)||'-')} · Weeks ${esc(val(r,i.weeks)||'-')}</div></div></div>`).join('')}</div>`;
+}
 
-    function parseCsvRow(line){
-      const out=[];let cur='',quoted=false;
-      for(let i=0;i<line.length;i++){
-        const ch=line[i];
-        if(ch==='"'){
-          if(quoted&&line[i+1]==='"'){cur+='"';i++} else quoted=!quoted;
-        } else if(ch===','&&!quoted){out.push(cur);cur=''} else cur+=ch;
-      }
-      out.push(cur);return out;
-    }
-    function normalizeDate(value){
-      if(!value)return'';
-      const v=value.trim();
-      if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
-      const m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
-      return v;
-    }
-    function findIndex(header,names){
-      for(const name of names){const i=header.indexOf(name);if(i!==-1)return i}
-      return -1;
-    }
-    function formatDate(date){
-      const d=new Date(date+'T00:00:00');
-      if(Number.isNaN(d.getTime()))return date;
-      return new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
-    }
-    function value(row,idx){return idx>=0?(row[idx]||'').trim():''}
-    function esc(str){
-      return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
-    }
-    function moveInfo(pos,lw,diff){
-      const p=parseInt(pos),l=parseInt(lw);
-      if(String(lw).toUpperCase()==='NEW'||String(diff).toUpperCase()==='NEW')return {symbol:'★',gain:true};
-      if(String(lw).toUpperCase()==='RE'||String(diff).toUpperCase()==='RE')return {symbol:'↺',gain:false};
-      if(Number.isFinite(p)&&Number.isFinite(l)){
-        if(p<l)return {symbol:'↑',gain:true};
-        if(p>l)return {symbol:'↓',gain:false};
-        return {symbol:'→',gain:false};
-      }
-      return {symbol:'→',gain:false};
-    }
-    function noteSvg(){
-      return '<svg class="note" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.4a3.7 3.7 0 1 0 2 3.3V7h4V3h-6z"/></svg>';
-    }
-    function iconPlay(){return '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'}
-    function iconCopy(){return '<svg viewBox="0 0 24 24"><path d="M8 7h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm-4 9H3a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1h-2V4H3v10h1v2Z"/></svg>'}
-    function iconPlus(){return '<svg viewBox="0 0 24 24"><path d="M11 5h2v14h-2zM5 11h14v2H5z"/></svg>'}
+function syncWeekButtons(data){
+  const idx=data.dates.indexOf(state.date),prev=idx>0?data.dates[idx-1]:null,next=idx>=0&&idx<data.dates.length-1?data.dates[idx+1]:null;
+  for(const id of ['prevBtn','prevBtnBottom']){const b=document.getElementById(id);b.disabled=!prev;b.onclick=()=>prev&&setDate(prev,data)}
+  for(const id of ['nextBtn','nextBtnBottom']){const b=document.getElementById(id);b.disabled=!next;b.onclick=()=>next&&setDate(next,data)}
+}
+function setDate(date,data){
+  state.date=date;weekSelect.value=date;dateLabel.textContent='Chart week of '+fmtDate(date);renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);window.scrollTo({top:0,behavior:'smooth'});
+}
+async function loadChart(id,requestedDate=null){
+  state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';dropoutsEl.innerHTML='';
+  try{
+    const data=await fetchChart(id);if(!data.dates.length)throw new Error('No dates');
+    let date=requestedDate&&data.byDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];
+    state.date=date;
+    weekSelect.innerHTML=data.dates.slice().reverse().map(d=>`<option value="${d}">${fmtShort(d)}</option>`).join('');
+    weekSelect.value=date;weekSelect.onchange=()=>setDate(weekSelect.value,data);
+    dateLabel.textContent='Chart week of '+fmtDate(date);
+    renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);
+  }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" onclick="state.cache.delete(state.active);loadChart(state.active,state.date)">Try again</button></div>'}
+}
 
-    async function fetchChart(id){
-      if(state.cache.has(id))return state.cache.get(id);
-      const cfg=charts[id];
-      const response=await Promise.race([
-        fetch(SHEET+cfg.gid+'&_='+Date.now()),
-        new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),15000))
-      ]);
-      if(!response.ok)throw new Error('HTTP '+response.status);
-      let csv=await response.text();
-      if(csv.charCodeAt(0)===0xFEFF)csv=csv.slice(1);
-      const rows=csv.trim().split(/\r?\n/).map(parseCsvRow);
-      if(rows.length<2)throw new Error('No data');
-      const header=rows[0].map(x=>x.toLowerCase().trim());
-      const idx={
-        date:findIndex(header,['date','chart date']),
-        position:findIndex(header,['position','rank','pos']),
-        song:findIndex(header,['song','title','track']),
-        album:findIndex(header,['album']),
-        artist:findIndex(header,['artist','artists']),
-        lw:findIndex(header,['last week','lw']),
-        peak:findIndex(header,['peak']),
-        weeks:findIndex(header,['weeks','wks']),
-        weeksAt1:findIndex(header,['weeks at 1','wks at 1','weeks at #1']),
-        diff:findIndex(header,['dif','diff','▲▼']),
-        cover:findIndex(header,['cover','image','image url','cover url','artwork','artwork url'])
-      };
-      const byDate={};
-      for(const row of rows.slice(1)){
-        const date=normalizeDate(row[idx.date]||'');
-        if(!date)continue;
-        (byDate[date]??=[]).push(row);
-      }
-      for(const date of Object.keys(byDate)){
-        byDate[date].sort((a,b)=>(parseInt(a[idx.position])||999)-(parseInt(b[idx.position])||999));
-      }
-      const data={idx,byDate,dates:Object.keys(byDate).sort((a,b)=>new Date(a)-new Date(b))};
-      state.cache.set(id,data);
-      return data;
-    }
+document.getElementById('filters').querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.filter;
+  if(k==='all'){state.filters=new Set(['all'])}
+  else{state.filters.delete('all');if(state.filters.has(k))state.filters.delete(k);else state.filters.add(k);if(!state.filters.size)state.filters.add('all')}
+  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',state.filters.has(x.dataset.filter)));
+  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
+});
+document.getElementById('colorToggle').onclick=()=>{
+  state.diffColors=!state.diffColors;document.getElementById('colorToggle').classList.toggle('active',state.diffColors);
+  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
+};
+document.getElementById('themeToggle').onclick=()=>{
+  const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light')}catch{}
+  document.querySelector('#themeToggle i').className='fas '+(dark?'fa-sun':'fa-moon');
+};
+document.querySelector('#themeToggle i').className='fas '+(document.documentElement.classList.contains('dark')?'fa-sun':'fa-moon');
+const backTop=document.getElementById('backTop');
+window.addEventListener('scroll',()=>backTop.style.display=window.scrollY>300?'flex':'none');
+backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
-    function renderTabs(){
-      tabs.innerHTML=Object.entries(charts).map(([id,cfg])=>`<button class="tab ${id===state.active?'active':''}" data-id="${id}">${cfg.title}</button>`).join('');
-      tabs.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>loadChart(btn.dataset.id)));
-    }
-
-    function renderRows(id,data,date){
-      const cfg=charts[id], rows=data.byDate[date]||[], i=data.idx;
-      if(!rows.length){content.innerHTML='<div class="error">No entries for this week.</div>';return}
-      content.innerHTML=rows.map(row=>{
-        const pos=value(row,i.position)||'—';
-        const artist=value(row,i.artist)||'Unknown';
-        let name=artist;
-        if(cfg.kind==='song')name=value(row,i.song)||'Unknown';
-        if(cfg.kind==='album')name=value(row,i.album)||'Unknown';
-        const lw=value(row,i.lw)||'—';
-        const peak=value(row,i.peak)||pos;
-        const weeks=value(row,i.weeks)||'—';
-        const w1=value(row,i.weeksAt1);
-        const cover=value(row,i.cover);
-        const move=moveInfo(pos,lw,value(row,i.diff));
-        const copyText=`#${pos} — ${name}${cfg.kind!=='artist'?' — '+artist:''}`;
-        return `
-          <article class="chart-card">
-            <div class="rank-block">
-              <div class="rank">${esc(pos)}</div>
-              <div class="movement">${move.symbol}</div>
-            </div>
-
-            <div class="art">
-              ${cover ? `<img src="${esc(cover)}" alt="" loading="lazy" onerror="this.remove();this.parentElement.innerHTML=noteSvg()">` : noteSvg()}
-            </div>
-
-            <div class="info">
-              <div class="entry-title">${esc(name)}</div>
-              ${w1 && parseInt(w1)>0 ? `<div class="number-one-badge">${esc(w1)}W AT #1</div>` : ''}
-              ${cfg.kind!=='artist' ? `<div class="artist">${esc(artist)}</div>` : ''}
-              <div class="meta">
-                <span>LW ${esc(lw)}</span><span class="sep">·</span>
-                <span>PEAK ${esc(peak)}</span><span class="sep">·</span>
-                <span>WEEKS ${esc(weeks)}</span>
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="action play" title="Play" aria-label="Play">${iconPlay()}</button>
-              <button class="action round copy" title="Copy" aria-label="Copy" data-copy="${esc(copyText)}">${iconCopy()}</button>
-              <div class="gain-star ${move.gain?'':'hidden'}" title="Gainer">★</div>
-              <button class="action round add" title="Add" aria-label="Add">${iconPlus()}</button>
-            </div>
-          </article>
-        `;
-      }).join('');
-
-      content.querySelectorAll('.copy').forEach(btn=>{
-        btn.addEventListener('click',async()=>{
-          try{
-            await navigator.clipboard.writeText(btn.dataset.copy||'');
-            const old=btn.innerHTML;
-            btn.textContent='✓';
-            setTimeout(()=>btn.innerHTML=old,900);
-          }catch{}
-        });
-      });
-    }
-
-    async function loadChart(id){
-      state.active=id;
-      renderTabs();
-      const cfg=charts[id];
-      titleEl.textContent=cfg.title;
-      statusEl.textContent='Loading chart...';
-      weekSelect.style.visibility='hidden';
-      content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';
-      try{
-        const data=await fetchChart(id);
-        if(!data.dates.length)throw new Error('No dates');
-        const latest=data.dates[data.dates.length-1];
-        weekSelect.innerHTML=data.dates.slice().reverse().map(date=>`<option value="${date}">${formatDate(date)}</option>`).join('');
-        weekSelect.value=latest;
-        weekSelect.style.visibility='visible';
-        statusEl.textContent=formatDate(latest);
-        renderRows(id,data,latest);
-        weekSelect.onchange=()=>{
-          statusEl.textContent=formatDate(weekSelect.value);
-          renderRows(id,data,weekSelect.value);
-          window.scrollTo({top:0,behavior:'smooth'});
-        };
-      }catch(err){
-        statusEl.textContent='';
-        weekSelect.style.visibility='hidden';
-        content.innerHTML='<div class="error">Could not load this chart.<br><button id="retry" class="retry">Try again</button></div>';
-        document.getElementById('retry')?.addEventListener('click',()=>{state.cache.delete(id);loadChart(id)});
-      }
-    }
-
-    document.getElementById('toTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
-    renderTabs();
-    loadChart('songs');
-  </script>
+renderNav();
+loadChart('songs');
+</script>
 </body>
 </html>
