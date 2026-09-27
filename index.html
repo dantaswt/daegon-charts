@@ -2211,8 +2211,6 @@ function detailHtml(e,cfg,data,date,copy){
             const extras=[];
             if(x.peak)extras.push('Peak: '+esc(x.peak));
             if(x.weeks)extras.push('Weeks: '+esc(x.weeks));
-            if(x.points)extras.push('Points: '+esc(formatValue(x.points,cfg.id)));
-            if(x.totalUnits)extras.push('Total Units: '+esc(formatValue(x.totalUnits,cfg.id)));
             return '<button class="run-jump details-run-card" data-date="'+esc(x.date)+'">'+
               '<div class="details-run-head">'+
                 '<span>'+esc(fmtShort(x.date))+'</span>'+
