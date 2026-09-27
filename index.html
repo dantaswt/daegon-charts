@@ -347,6 +347,8 @@
 const SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
 const HIST='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOUyuJJRPQbmPbCZH4/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
 const HIST_SONGS='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOUyuJJRPQbmPbCZH4/gviz/tq?tq=select%20A,B,C,D,E,F,G,H,I,J&tqx=out:csv&gid=';
+const SUPABASE_URL='https://kvnzhuwmgadqicixbzvb.supabase.co';
+const SUPABASE_KEY='sb_publishable_h5gDNPl6krj8av3fJnVMbw_QiHf1P01';
 
 const charts={
   songs:{id:'songs',title:'Hot 100',kind:'song',url:SHEET+'904867620',secondaryUrl:HIST_SONGS+'1011796371'},
@@ -466,16 +468,59 @@ function computeDiffs(dates,entriesByDate){
     }
   }
 }
+async function loadSecondaryFromSupabase(chartId){
+  const cacheKey='supabase:'+chartId;
+  try{
+    const cached=sessionStorage.getItem(cacheKey);
+    const ts=Number(sessionStorage.getItem(cacheKey+':ts')||0);
+    if(cached&&Date.now()-ts<10*60*1000)return JSON.parse(cached);
+  }catch{}
+
+  const url=SUPABASE_URL+'/rest/v1/chart_data?select=chart_id,data&chart_type=eq.secondary&chart_id=like.'+encodeURIComponent(chartId+'_*')+'&order=chart_id.asc';
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),30000);
+  try{
+    const res=await fetch(url,{
+      headers:{apikey:SUPABASE_KEY,Accept:'application/json'},
+      signal:ctrl.signal
+    });
+    if(!res.ok)throw new Error('Supabase '+res.status);
+    const rows=await res.json();
+    const merged={};
+    for(const row of rows||[]){
+      const byDate=row?.data?.entriesByDate||{};
+      for(const [d,list] of Object.entries(byDate)){
+        if(!Array.isArray(list))continue;
+        (merged[d]??=[]).push(...list.map(e=>({...e})));
+      }
+    }
+    try{
+      sessionStorage.setItem(cacheKey,JSON.stringify(merged));
+      sessionStorage.setItem(cacheKey+':ts',String(Date.now()));
+    }catch{}
+    return merged;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
 async function loadWeekly(chartId){
   if(state.cache.has(chartId))return state.cache.get(chartId);
   const cfg=charts[chartId];
   const primaryPromise=fetchRows(cfg.url);
-  const secondaryPromise=cfg.secondaryUrl?fetchRows(cfg.secondaryUrl).catch(()=>null):Promise.resolve(null);
-  const [primaryRows,secondaryRows]=await Promise.all([primaryPromise,secondaryPromise]);
+  const secondaryPromise=cfg.secondaryUrl
+    ? loadSecondaryFromSupabase(chartId).catch(async()=>{
+        const rows=await fetchRows(cfg.secondaryUrl).catch(()=>null);
+        return rows?parseSheet(rows,cfg):null;
+      })
+    : Promise.resolve(null);
+  const [primaryRows,secondaryEntries]=await Promise.all([primaryPromise,secondaryPromise]);
   const entriesByDate=parseSheet(primaryRows,cfg);
-  if(secondaryRows){
-    const extra=parseSheet(secondaryRows,cfg);
-    for(const [d,list] of Object.entries(extra))(entriesByDate[d]??=[]).push(...list);
+  if(secondaryEntries){
+    for(const [d,list] of Object.entries(secondaryEntries)){
+      if(!Array.isArray(list))continue;
+      (entriesByDate[d]??=[]).push(...list.map(e=>({...e})));
+    }
   }
   const dates=Object.keys(entriesByDate).sort();
   for(const d of dates){
@@ -492,6 +537,8 @@ async function loadWeekly(chartId){
     const running=new Map(),prevPos=new Map();
     for(const d of dates){
       for(const e of entriesByDate[d]){
+        e.position=toInt(e.position);e.peak=toInt(e.peak);e.weeks=toInt(e.weeks);e.weeksAt1=toInt(e.weeksAt1);
+        e.name=String(e.name||'').trim();e.artist=String(e.artist||'').trim();
         const k=itemKey(e),st=running.get(k)||{weeks:0,peak:Infinity,weeksAt1:0};
         st.weeks++;st.peak=Math.min(st.peak,e.position);if(e.position===1)st.weeksAt1++;
         e.lastWeek=prevPos.has(k)?String(prevPos.get(k)):'';
