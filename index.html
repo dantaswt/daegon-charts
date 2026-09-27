@@ -420,6 +420,7 @@ const HIST='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOU
 const HIST_SONGS='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOUyuJJRPQbmPbCZH4/gviz/tq?tq=select%20A,B,C,D,E,F,G,H,I,J&tqx=out:csv&gid=';
 const SUPABASE_URL='https://kvnzhuwmgadqicixbzvb.supabase.co';
 const SUPABASE_KEY='sb_publishable_h5gDNPl6krj8av3fJnVMbw_QiHf1P01';
+const SUPABASE_ANON_JWT='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2bnpodXdtZ2FkcWljaXhienZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDYxNTYsImV4cCI6MjEwNDg4MjE1Nn0.7e6Fa7sCTUI9mqjNXhY7fXlp1EdATk2qSbSEVb9a4ss';
 
 const charts={
   songs:{id:'songs',title:'Hot 100',kind:'song',url:SHEET+'904867620',secondaryUrl:HIST_SONGS+'1011796371'},
@@ -434,7 +435,7 @@ const charts={
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
-  const imageCacheVersion='daegoncharts-rules-v1';
+  const imageCacheVersion='daegoncharts-rules-spotify-v1';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
     for(let i=localStorage.length-1;i>=0;i--){
       const k=localStorage.key(i);
@@ -851,6 +852,27 @@ async function searchWikidataArtist(name){
   }
   return '';
 }
+async function spotifyArtwork(name,artist,kind){
+  try{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),10000);
+    const r=await fetch(SUPABASE_URL+'/functions/v1/spotify-artwork',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_ANON_JWT,
+        'Authorization':'Bearer '+SUPABASE_ANON_JWT
+      },
+      body:JSON.stringify({name,artist,kind}),
+      signal:ctrl.signal
+    });
+    clearTimeout(timer);
+    if(!r.ok)return '';
+    const d=await r.json();
+    return usableImage(d?.imageUrl)?d.imageUrl:'';
+  }catch{return ''}
+}
+
 async function resolveImage(e,cfg){
   const key=cfg.kind+'|'+e.name+'|'+e.artist;
   if(state.images.has(key))return state.images.get(key);
@@ -1003,6 +1025,11 @@ async function resolveImage(e,cfg){
 
     // 5. Wikidata exact label + P18
     if(!url)url=await searchWikidataArtist(name);
+  }
+
+  // Final real-image fallback: Spotify through the secure Supabase edge function.
+  if(!url){
+    url=await spotifyArtwork(name,artist,cfg.kind);
   }
 
   // Never use a loose unrelated image.
