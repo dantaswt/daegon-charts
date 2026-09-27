@@ -707,3 +707,18 @@
   .ref-battle-trophy{padding:24px 28px}
   .ref-battle-trophy div{font-size:30px}
 }
+
+
+/* The reference daegoncharts app intentionally removes ordinary corner rounding globally. */
+.portal-mode .portal-page *,
+.portal-mode .portal-mobile-drawer *,
+.portal-mode .portal-topnav *{
+  border-radius:0!important;
+}
+.portal-mode .ref-battle-avatar{
+  border-radius:9999px!important;
+}
+.portal-mode .ref-fight,
+.portal-mode .ref-reset{
+  border-radius:9999px!important;
+}
