@@ -5,362 +5,533 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>daegon charts — Weekly Charts</title>
   <link rel="icon" type="image/png" href="https://i.imgur.com/jaBZ19n.png">
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --gold: #FFD700;
-      --bg: #000;
-      --panel: #101010;
-      --panel-2: #171717;
-      --border: #2a2a2a;
-      --muted: #9ca3af;
+    :root{
+      --page:#ececec;
+      --card:#fff;
+      --text:#111;
+      --muted:#777d89;
+      --border:#cfcfcf;
+      --soft:#f1f1f1;
+      --gold:#ffd400;
+      --orange:#ff7200;
     }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Inter, sans-serif;
-      background: var(--bg);
-      color: #fff;
-      min-height: 100vh;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,Arial,sans-serif;
+      background:var(--page);
+      color:var(--text);
+      min-height:100vh;
     }
-    .gold { color: var(--gold); }
-    .chart-tab {
-      border: 1px solid var(--border);
-      background: var(--panel);
-      color: #d1d5db;
-      border-radius: 999px;
-      padding: .55rem .85rem;
-      font-size: .78rem;
-      font-weight: 700;
-      white-space: nowrap;
-      transition: .2s;
+    header{
+      background:#fff;
+      border-bottom:1px solid #d7d7d7;
+      position:sticky;
+      top:0;
+      z-index:20;
     }
-    .chart-tab:hover { border-color: var(--gold); color: #fff; }
-    .chart-tab.active { background: var(--gold); color: #000; border-color: var(--gold); }
-    .chart-row {
-      background: #fff;
-      color: #111827;
-      border-radius: 12px;
-      padding: .9rem;
-      display: grid;
-      grid-template-columns: 48px minmax(0, 1fr) auto;
-      gap: .8rem;
-      align-items: center;
+    .header-inner,.main{
+      width:min(100%,1100px);
+      margin:0 auto;
+      padding-left:18px;
+      padding-right:18px;
     }
-    .rank {
-      font-size: 1.3rem;
-      font-weight: 800;
-      text-align: center;
+    .header-inner{padding-top:16px;padding-bottom:14px}
+    .brand{
+      margin:0;
+      text-align:center;
+      font-size:27px;
+      line-height:1;
+      font-weight:800;
+      text-transform:lowercase;
     }
-    .meta {
-      color: #6b7280;
-      font-size: .72rem;
-      line-height: 1.35;
+    .subtitle{
+      text-align:center;
+      margin-top:5px;
+      font-size:12px;
+      color:#8b8f98;
+      font-weight:600;
     }
-    .stats {
-      text-align: right;
-      color: #6b7280;
-      font-size: .68rem;
-      line-height: 1.45;
-      min-width: 68px;
+    .main{padding-top:18px;padding-bottom:110px}
+    .tabs{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      scrollbar-width:none;
+      padding:2px 0 12px;
     }
-    .stats strong { color: #111827; }
-    .loader {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 4px solid rgba(255,255,255,.15);
-      border-top-color: var(--gold);
-      animation: spin .9s linear infinite;
+    .tabs::-webkit-scrollbar{display:none}
+    .tab{
+      flex:0 0 auto;
+      border:1px solid #d0d0d0;
+      background:#fff;
+      color:#555b65;
+      border-radius:999px;
+      padding:10px 14px;
+      font:700 12px/1 Inter,sans-serif;
+      cursor:pointer;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    select {
-      background: var(--panel-2);
-      color: white;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: .6rem .8rem;
-      font-size: .8rem;
+    .tab.active{background:#111;color:#fff;border-color:#111}
+    .toolbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:15px;
+      margin:5px 0 14px;
     }
-    @media (max-width: 640px) {
-      .chart-row {
-        grid-template-columns: 40px minmax(0, 1fr) auto;
-        padding: .75rem;
-        gap: .65rem;
+    .chart-title{font-size:24px;font-weight:800;line-height:1.1}
+    .chart-date{font-size:12px;color:#858a94;margin-top:5px}
+    select{
+      background:#fff;
+      color:#222;
+      border:1px solid #cfcfcf;
+      border-radius:8px;
+      padding:9px 11px;
+      font:600 12px Inter,sans-serif;
+      max-width:180px;
+    }
+    .cards{display:flex;flex-direction:column;gap:18px}
+    .chart-card{
+      min-height:240px;
+      background:#fff;
+      border:1px solid var(--border);
+      box-shadow:0 3px 8px rgba(0,0,0,.10);
+      display:grid;
+      grid-template-columns:100px 180px minmax(0,1fr) 205px;
+      align-items:center;
+      column-gap:18px;
+      padding:16px 22px;
+    }
+    .rank-block{
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      padding-top:12px;
+    }
+    .rank{
+      font-size:56px;
+      line-height:.95;
+      font-weight:800;
+      letter-spacing:-2px;
+    }
+    .movement{
+      margin-top:14px;
+      color:#707785;
+      font-size:44px;
+      line-height:.8;
+      font-weight:500;
+    }
+    .art{
+      width:180px;
+      height:180px;
+      background:linear-gradient(135deg,#eeeeee,#dadada);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .art img{width:100%;height:100%;object-fit:cover;display:block}
+    .note{
+      width:58px;
+      height:58px;
+      opacity:.22;
+    }
+    .info{min-width:0}
+    .entry-title{
+      font-size:30px;
+      line-height:1.08;
+      font-weight:800;
+      letter-spacing:-.5px;
+      word-break:normal;
+      overflow-wrap:anywhere;
+      margin-bottom:8px;
+    }
+    .number-one-badge{
+      display:inline-block;
+      background:var(--gold);
+      color:#111;
+      font-size:13px;
+      line-height:1;
+      font-weight:800;
+      padding:4px 7px;
+      margin:0 0 8px;
+    }
+    .artist{
+      color:var(--muted);
+      font-size:23px;
+      line-height:1.2;
+      margin-bottom:10px;
+    }
+    .meta{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      font-size:19px;
+      line-height:1.4;
+    }
+    .sep{color:#c2c4c8}
+    .actions{
+      height:100%;
+      display:grid;
+      grid-template-columns:72px 72px;
+      grid-template-rows:72px 72px;
+      gap:16px;
+      align-content:center;
+      justify-content:end;
+    }
+    .action{
+      border:0;
+      background:var(--soft);
+      color:#111;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      width:72px;
+      height:72px;
+    }
+    .action.round{border-radius:50%}
+    .action svg{width:31px;height:31px;fill:currentColor}
+    .action.play{grid-column:1;grid-row:1;border-radius:0}
+    .action.copy{grid-column:2;grid-row:1}
+    .action.add{grid-column:2;grid-row:2}
+    .gain-star{
+      grid-column:1;
+      grid-row:2;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:42px;
+      line-height:1;
+      color:#000;
+    }
+    .gain-star.hidden{visibility:hidden}
+    .to-top{
+      position:fixed;
+      right:24px;
+      bottom:24px;
+      z-index:30;
+      width:92px;
+      height:92px;
+      border:0;
+      border-radius:50%;
+      background:var(--orange);
+      color:#000;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow:0 5px 15px rgba(0,0,0,.16);
+    }
+    .to-top svg{width:48px;height:48px;fill:none;stroke:currentColor;stroke-width:2.5}
+    .loader-wrap{display:flex;justify-content:center;padding:70px 0}
+    .loader{
+      width:42px;height:42px;border-radius:50%;
+      border:4px solid #d8d8d8;border-top-color:#111;
+      animation:spin .8s linear infinite
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error{text-align:center;padding:60px 20px;color:#777}
+    .retry{margin-top:12px;border:0;background:#111;color:#fff;padding:10px 16px;border-radius:8px;font-weight:700}
+
+    @media(max-width:800px){
+      .main,.header-inner{padding-left:10px;padding-right:10px}
+      .chart-card{
+        min-height:190px;
+        grid-template-columns:70px 115px minmax(0,1fr) 110px;
+        column-gap:10px;
+        padding:12px 10px;
       }
-      .rank { font-size: 1.15rem; }
-      .stats { font-size: .64rem; min-width: 62px; }
+      .rank-block{padding-top:8px}
+      .rank{font-size:42px}
+      .movement{font-size:32px;margin-top:10px}
+      .art{width:115px;height:115px}
+      .entry-title{font-size:23px}
+      .artist{font-size:18px}
+      .meta{font-size:15px;gap:7px}
+      .actions{
+        grid-template-columns:50px 50px;
+        grid-template-rows:50px 50px;
+        gap:10px;
+      }
+      .action{width:50px;height:50px}
+      .action svg{width:22px;height:22px}
+      .gain-star{font-size:30px}
+      .to-top{width:72px;height:72px;right:15px;bottom:15px}
+      .to-top svg{width:38px;height:38px}
+    }
+
+    @media(max-width:560px){
+      .brand{font-size:23px}
+      .toolbar{align-items:center}
+      .chart-title{font-size:20px}
+      .chart-card{
+        min-height:142px;
+        grid-template-columns:48px 86px minmax(0,1fr) 82px;
+        column-gap:8px;
+        padding:10px 7px;
+      }
+      .rank{font-size:32px;letter-spacing:-1px}
+      .movement{font-size:26px;margin-top:8px}
+      .art{width:86px;height:86px}
+      .note{width:36px;height:36px}
+      .entry-title{font-size:17px;line-height:1.12;margin-bottom:4px}
+      .artist{font-size:14px;margin-bottom:5px}
+      .meta{font-size:11.5px;gap:4px;line-height:1.25}
+      .number-one-badge{font-size:10px;padding:3px 5px;margin-bottom:5px}
+      .actions{
+        grid-template-columns:36px 36px;
+        grid-template-rows:36px 36px;
+        gap:8px;
+      }
+      .action{width:36px;height:36px}
+      .action svg{width:17px;height:17px}
+      .gain-star{font-size:24px}
+      .to-top{width:58px;height:58px}
+      .to-top svg{width:31px;height:31px}
     }
   </style>
 </head>
 <body>
-  <header class="border-b border-neutral-900 sticky top-0 bg-black/95 backdrop-blur z-20">
-    <div class="max-w-6xl mx-auto px-4 py-4">
-      <h1 class="text-center text-2xl md:text-3xl font-extrabold gold">daegon charts</h1>
-      <p class="text-center text-xs text-gray-500 mt-1">Weekly Charts</p>
+  <header>
+    <div class="header-inner">
+      <h1 class="brand">daegon charts</h1>
+      <div class="subtitle">Weekly Charts</div>
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto px-4 py-5 md:py-7">
-    <div id="tabs" class="flex gap-2 overflow-x-auto pb-3"></div>
+  <main class="main">
+    <div id="tabs" class="tabs"></div>
 
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-2 mb-5">
+    <div class="toolbar">
       <div>
-        <h2 id="chartTitle" class="text-xl md:text-2xl font-extrabold"></h2>
-        <p id="chartStatus" class="text-xs text-gray-500 mt-1"></p>
+        <div id="chartTitle" class="chart-title"></div>
+        <div id="chartStatus" class="chart-date"></div>
       </div>
-      <select id="weekSelect" class="hidden"></select>
+      <select id="weekSelect"></select>
     </div>
 
-    <div id="content" class="space-y-3">
-      <div class="flex justify-center py-16"><div class="loader"></div></div>
+    <div id="content" class="cards">
+      <div class="loader-wrap"><div class="loader"></div></div>
     </div>
   </main>
 
+  <button id="toTop" class="to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 24"><path d="M12 20V5M5.5 11.5 12 5l6.5 6.5"/></svg>
+  </button>
+
   <script>
-    const SHEET = 'https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=';
-
-    const charts = {
-      songs: { title: 'Hot 100', gid: '904867620', kind: 'song' },
-      artists: { title: 'Artist 50', gid: '1568177610', kind: 'artist' },
-      albums: { title: 'Top 100 Albums', gid: '1940039611', kind: 'album' },
-      radioSongs: { title: 'Radio Songs', gid: '1681272096', kind: 'song' },
-      topStreamingAlbums: { title: 'Top Streaming Albums', gid: '1028545573', kind: 'album' },
-      topAlbumSales: { title: 'Top Album Sales', gid: '1111633725', kind: 'album' },
-      streamingSongs: { title: 'Streaming Songs', gid: '626144821', kind: 'song' },
-      digitalSongsSales: { title: 'Digital Songs Sales', gid: '302176914', kind: 'song' }
+    const SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=';
+    const charts={
+      songs:{title:'Hot 100',gid:'904867620',kind:'song'},
+      artists:{title:'Artist 50',gid:'1568177610',kind:'artist'},
+      albums:{title:'Top 100 Albums',gid:'1940039611',kind:'album'},
+      radioSongs:{title:'Radio Songs',gid:'1681272096',kind:'song'},
+      topStreamingAlbums:{title:'Top Streaming Albums',gid:'1028545573',kind:'album'},
+      topAlbumSales:{title:'Top Album Sales',gid:'1111633725',kind:'album'},
+      streamingSongs:{title:'Streaming Songs',gid:'626144821',kind:'song'},
+      digitalSongsSales:{title:'Digital Songs Sales',gid:'302176914',kind:'song'}
     };
+    const state={active:'songs',cache:new Map()};
+    const tabs=document.getElementById('tabs');
+    const titleEl=document.getElementById('chartTitle');
+    const statusEl=document.getElementById('chartStatus');
+    const weekSelect=document.getElementById('weekSelect');
+    const content=document.getElementById('content');
 
-    const state = {
-      active: 'songs',
-      cache: new Map()
-    };
-
-    const tabs = document.getElementById('tabs');
-    const titleEl = document.getElementById('chartTitle');
-    const statusEl = document.getElementById('chartStatus');
-    const weekSelect = document.getElementById('weekSelect');
-    const content = document.getElementById('content');
-
-    function parseCsvRow(line) {
-      const out = [];
-      let cur = '';
-      let quoted = false;
-      for (let i = 0; i < line.length; i++) {
-        const ch = line[i];
-        if (ch === '"') {
-          if (quoted && line[i + 1] === '"') {
-            cur += '"';
-            i++;
-          } else {
-            quoted = !quoted;
-          }
-        } else if (ch === ',' && !quoted) {
-          out.push(cur);
-          cur = '';
-        } else {
-          cur += ch;
-        }
+    function parseCsvRow(line){
+      const out=[];let cur='',quoted=false;
+      for(let i=0;i<line.length;i++){
+        const ch=line[i];
+        if(ch==='"'){
+          if(quoted&&line[i+1]==='"'){cur+='"';i++} else quoted=!quoted;
+        } else if(ch===','&&!quoted){out.push(cur);cur=''} else cur+=ch;
       }
-      out.push(cur);
-      return out;
+      out.push(cur);return out;
     }
-
-    function normalizeDate(value) {
-      if (!value) return '';
-      const v = value.trim();
-      if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
-      const m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+    function normalizeDate(value){
+      if(!value)return'';
+      const v=value.trim();
+      if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
+      const m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
       return v;
     }
-
-    function findIndex(header, names) {
-      for (const name of names) {
-        const i = header.indexOf(name);
-        if (i !== -1) return i;
-      }
+    function findIndex(header,names){
+      for(const name of names){const i=header.indexOf(name);if(i!==-1)return i}
       return -1;
     }
-
-    function formatDate(date) {
-      const d = new Date(date + 'T00:00:00');
-      if (Number.isNaN(d.getTime())) return date;
-      return new Intl.DateTimeFormat('en-GB', {
-        day: '2-digit', month: '2-digit', year: 'numeric'
-      }).format(d);
+    function formatDate(date){
+      const d=new Date(date+'T00:00:00');
+      if(Number.isNaN(d.getTime()))return date;
+      return new Intl.DateTimeFormat('en-GB',{day:'2-digit',month:'2-digit',year:'numeric'}).format(d);
     }
+    function value(row,idx){return idx>=0?(row[idx]||'').trim():''}
+    function esc(str){
+      return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;");
+    }
+    function moveInfo(pos,lw,diff){
+      const p=parseInt(pos),l=parseInt(lw);
+      if(String(lw).toUpperCase()==='NEW'||String(diff).toUpperCase()==='NEW')return {symbol:'★',gain:true};
+      if(String(lw).toUpperCase()==='RE'||String(diff).toUpperCase()==='RE')return {symbol:'↺',gain:false};
+      if(Number.isFinite(p)&&Number.isFinite(l)){
+        if(p<l)return {symbol:'↑',gain:true};
+        if(p>l)return {symbol:'↓',gain:false};
+        return {symbol:'→',gain:false};
+      }
+      return {symbol:'→',gain:false};
+    }
+    function noteSvg(){
+      return '<svg class="note" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.4a3.7 3.7 0 1 0 2 3.3V7h4V3h-6z"/></svg>';
+    }
+    function iconPlay(){return '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>'}
+    function iconCopy(){return '<svg viewBox="0 0 24 24"><path d="M8 7h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Zm-4 9H3a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1h-2V4H3v10h1v2Z"/></svg>'}
+    function iconPlus(){return '<svg viewBox="0 0 24 24"><path d="M11 5h2v14h-2zM5 11h14v2H5z"/></svg>'}
 
-    async function fetchChart(id) {
-      if (state.cache.has(id)) return state.cache.get(id);
-
-      const cfg = charts[id];
-      const url = SHEET + cfg.gid + '&_=' + Date.now();
-
-      const response = await Promise.race([
-        fetch(url),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 15000))
+    async function fetchChart(id){
+      if(state.cache.has(id))return state.cache.get(id);
+      const cfg=charts[id];
+      const response=await Promise.race([
+        fetch(SHEET+cfg.gid+'&_='+Date.now()),
+        new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),15000))
       ]);
-
-      if (!response.ok) throw new Error('HTTP ' + response.status);
-
-      let csv = await response.text();
-      if (csv.charCodeAt(0) === 0xFEFF) csv = csv.slice(1);
-
-      const lines = csv.trim().split(/\r?\n/);
-      const rows = lines.map(parseCsvRow);
-      if (rows.length < 2) throw new Error('No data');
-
-      const header = rows[0].map(x => x.toLowerCase().trim());
-      const idx = {
-        date: findIndex(header, ['date','chart date']),
-        position: findIndex(header, ['position','rank','pos']),
-        song: findIndex(header, ['song','title','track']),
-        album: findIndex(header, ['album']),
-        artist: findIndex(header, ['artist','artists']),
-        lw: findIndex(header, ['last week','lw']),
-        peak: findIndex(header, ['peak']),
-        weeks: findIndex(header, ['weeks','wks']),
-        weeksAt1: findIndex(header, ['weeks at 1','wks at 1']),
-        diff: findIndex(header, ['dif','diff','▲▼']),
-        units: findIndex(header, ['units','spins','sales','streams','audience'])
+      if(!response.ok)throw new Error('HTTP '+response.status);
+      let csv=await response.text();
+      if(csv.charCodeAt(0)===0xFEFF)csv=csv.slice(1);
+      const rows=csv.trim().split(/\r?\n/).map(parseCsvRow);
+      if(rows.length<2)throw new Error('No data');
+      const header=rows[0].map(x=>x.toLowerCase().trim());
+      const idx={
+        date:findIndex(header,['date','chart date']),
+        position:findIndex(header,['position','rank','pos']),
+        song:findIndex(header,['song','title','track']),
+        album:findIndex(header,['album']),
+        artist:findIndex(header,['artist','artists']),
+        lw:findIndex(header,['last week','lw']),
+        peak:findIndex(header,['peak']),
+        weeks:findIndex(header,['weeks','wks']),
+        weeksAt1:findIndex(header,['weeks at 1','wks at 1','weeks at #1']),
+        diff:findIndex(header,['dif','diff','▲▼']),
+        cover:findIndex(header,['cover','image','image url','cover url','artwork','artwork url'])
       };
-
-      const byDate = {};
-      for (const row of rows.slice(1)) {
-        const date = normalizeDate(row[idx.date] || '');
-        if (!date) continue;
-        if (!byDate[date]) byDate[date] = [];
-        byDate[date].push(row);
+      const byDate={};
+      for(const row of rows.slice(1)){
+        const date=normalizeDate(row[idx.date]||'');
+        if(!date)continue;
+        (byDate[date]??=[]).push(row);
       }
-
-      for (const date of Object.keys(byDate)) {
-        byDate[date].sort((a,b) => (parseInt(a[idx.position]) || 999) - (parseInt(b[idx.position]) || 999));
+      for(const date of Object.keys(byDate)){
+        byDate[date].sort((a,b)=>(parseInt(a[idx.position])||999)-(parseInt(b[idx.position])||999));
       }
-
-      const data = {
-        idx,
-        byDate,
-        dates: Object.keys(byDate).sort((a,b) => new Date(a) - new Date(b))
-      };
-
-      state.cache.set(id, data);
+      const data={idx,byDate,dates:Object.keys(byDate).sort((a,b)=>new Date(a)-new Date(b))};
+      state.cache.set(id,data);
       return data;
     }
 
-    function renderTabs() {
-      tabs.innerHTML = Object.entries(charts).map(([id,cfg]) =>
-        `<button class="chart-tab ${id===state.active?'active':''}" data-id="${id}">${cfg.title}</button>`
-      ).join('');
+    function renderTabs(){
+      tabs.innerHTML=Object.entries(charts).map(([id,cfg])=>`<button class="tab ${id===state.active?'active':''}" data-id="${id}">${cfg.title}</button>`).join('');
+      tabs.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>loadChart(btn.dataset.id)));
+    }
 
-      tabs.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', () => loadChart(btn.dataset.id));
+    function renderRows(id,data,date){
+      const cfg=charts[id], rows=data.byDate[date]||[], i=data.idx;
+      if(!rows.length){content.innerHTML='<div class="error">No entries for this week.</div>';return}
+      content.innerHTML=rows.map(row=>{
+        const pos=value(row,i.position)||'—';
+        const artist=value(row,i.artist)||'Unknown';
+        let name=artist;
+        if(cfg.kind==='song')name=value(row,i.song)||'Unknown';
+        if(cfg.kind==='album')name=value(row,i.album)||'Unknown';
+        const lw=value(row,i.lw)||'—';
+        const peak=value(row,i.peak)||pos;
+        const weeks=value(row,i.weeks)||'—';
+        const w1=value(row,i.weeksAt1);
+        const cover=value(row,i.cover);
+        const move=moveInfo(pos,lw,value(row,i.diff));
+        const copyText=`#${pos} — ${name}${cfg.kind!=='artist'?' — '+artist:''}`;
+        return `
+          <article class="chart-card">
+            <div class="rank-block">
+              <div class="rank">${esc(pos)}</div>
+              <div class="movement">${move.symbol}</div>
+            </div>
+
+            <div class="art">
+              ${cover ? `<img src="${esc(cover)}" alt="" loading="lazy" onerror="this.remove();this.parentElement.innerHTML=noteSvg()">` : noteSvg()}
+            </div>
+
+            <div class="info">
+              <div class="entry-title">${esc(name)}</div>
+              ${w1 && parseInt(w1)>0 ? `<div class="number-one-badge">${esc(w1)}W AT #1</div>` : ''}
+              ${cfg.kind!=='artist' ? `<div class="artist">${esc(artist)}</div>` : ''}
+              <div class="meta">
+                <span>LW ${esc(lw)}</span><span class="sep">·</span>
+                <span>PEAK ${esc(peak)}</span><span class="sep">·</span>
+                <span>WEEKS ${esc(weeks)}</span>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="action play" title="Play" aria-label="Play">${iconPlay()}</button>
+              <button class="action round copy" title="Copy" aria-label="Copy" data-copy="${esc(copyText)}">${iconCopy()}</button>
+              <div class="gain-star ${move.gain?'':'hidden'}" title="Gainer">★</div>
+              <button class="action round add" title="Add" aria-label="Add">${iconPlus()}</button>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      content.querySelectorAll('.copy').forEach(btn=>{
+        btn.addEventListener('click',async()=>{
+          try{
+            await navigator.clipboard.writeText(btn.dataset.copy||'');
+            const old=btn.innerHTML;
+            btn.textContent='✓';
+            setTimeout(()=>btn.innerHTML=old,900);
+          }catch{}
+        });
       });
     }
 
-    function value(row, idx) {
-      return idx >= 0 ? (row[idx] || '').trim() : '';
-    }
-
-    function renderRows(id, data, date) {
-      const cfg = charts[id];
-      const rows = data.byDate[date] || [];
-      const i = data.idx;
-
-      if (!rows.length) {
-        content.innerHTML = '<div class="text-center text-gray-500 py-12">No entries for this week.</div>';
-        return;
-      }
-
-      content.innerHTML = rows.map(row => {
-        const pos = value(row, i.position) || '—';
-        const artist = value(row, i.artist) || 'Unknown';
-        let name = artist;
-        if (cfg.kind === 'song') name = value(row, i.song) || 'Unknown';
-        if (cfg.kind === 'album') name = value(row, i.album) || 'Unknown';
-
-        const lw = value(row, i.lw) || '—';
-        const peak = value(row, i.peak) || pos;
-        const weeks = value(row, i.weeks) || '—';
-        const weeksAt1 = value(row, i.weeksAt1);
-        const units = value(row, i.units);
-
-        return `
-          <div class="chart-row">
-            <div class="rank">${pos}</div>
-            <div class="min-w-0">
-              <div class="font-extrabold text-sm md:text-base truncate">${escapeHtml(name)}</div>
-              ${cfg.kind !== 'artist' ? `<div class="meta truncate">${escapeHtml(artist)}</div>` : ''}
-              ${units ? `<div class="meta mt-1">${escapeHtml(units)}</div>` : ''}
-            </div>
-            <div class="stats">
-              <div>LW <strong>${escapeHtml(lw)}</strong></div>
-              <div>Peak <strong>${escapeHtml(peak)}</strong></div>
-              <div>Weeks <strong>${escapeHtml(weeks)}</strong></div>
-              ${weeksAt1 ? `<div>#1 <strong>${escapeHtml(weeksAt1)}</strong></div>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll('&','&amp;')
-        .replaceAll('<','&lt;')
-        .replaceAll('>','&gt;')
-        .replaceAll('"','&quot;')
-        .replaceAll("'","&#039;");
-    }
-
-    async function loadChart(id) {
-      state.active = id;
+    async function loadChart(id){
+      state.active=id;
       renderTabs();
-
-      const cfg = charts[id];
-      titleEl.textContent = cfg.title;
-      statusEl.textContent = 'Loading chart...';
-      weekSelect.classList.add('hidden');
-      content.innerHTML = '<div class="flex justify-center py-16"><div class="loader"></div></div>';
-
-      try {
-        const data = await fetchChart(id);
-        if (!data.dates.length) throw new Error('No dates');
-
-        const latest = data.dates[data.dates.length - 1];
-
-        weekSelect.innerHTML = data.dates.slice().reverse().map(date =>
-          `<option value="${date}">${formatDate(date)}</option>`
-        ).join('');
-        weekSelect.value = latest;
-        weekSelect.classList.remove('hidden');
-
-        statusEl.textContent = formatDate(latest);
-        renderRows(id, data, latest);
-
-        weekSelect.onchange = () => {
-          statusEl.textContent = formatDate(weekSelect.value);
-          renderRows(id, data, weekSelect.value);
-          window.scrollTo({top: 0, behavior: 'smooth'});
+      const cfg=charts[id];
+      titleEl.textContent=cfg.title;
+      statusEl.textContent='Loading chart...';
+      weekSelect.style.visibility='hidden';
+      content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';
+      try{
+        const data=await fetchChart(id);
+        if(!data.dates.length)throw new Error('No dates');
+        const latest=data.dates[data.dates.length-1];
+        weekSelect.innerHTML=data.dates.slice().reverse().map(date=>`<option value="${date}">${formatDate(date)}</option>`).join('');
+        weekSelect.value=latest;
+        weekSelect.style.visibility='visible';
+        statusEl.textContent=formatDate(latest);
+        renderRows(id,data,latest);
+        weekSelect.onchange=()=>{
+          statusEl.textContent=formatDate(weekSelect.value);
+          renderRows(id,data,weekSelect.value);
+          window.scrollTo({top:0,behavior:'smooth'});
         };
-      } catch (err) {
-        statusEl.textContent = '';
-        content.innerHTML = `
-          <div class="text-center py-14">
-            <p class="text-red-400 mb-4">Could not load this chart.</p>
-            <button id="retry" class="chart-tab active">Try again</button>
-          </div>
-        `;
-        document.getElementById('retry')?.addEventListener('click', () => {
-          state.cache.delete(id);
-          loadChart(id);
-        });
+      }catch(err){
+        statusEl.textContent='';
+        weekSelect.style.visibility='hidden';
+        content.innerHTML='<div class="error">Could not load this chart.<br><button id="retry" class="retry">Try again</button></div>';
+        document.getElementById('retry')?.addEventListener('click',()=>{state.cache.delete(id);loadChart(id)});
       }
     }
 
+    document.getElementById('toTop').addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
     renderTabs();
     loadChart('songs');
   </script>
