@@ -404,3 +404,119 @@ span.award-icon {
 
 
 
+
+
+/* Daegon visual layer carried from the public site.
+   Functional behavior remains the original dynamic TanStack app. */
+.dc-brand{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:#f5f5f5;
+  text-decoration:none;
+  min-width:0;
+}
+.dc-brand-mark{
+  width:26px;
+  height:26px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--accent);
+  color:#090909;
+  font-size:15px;
+  font-weight:900;
+  letter-spacing:-.05em;
+  transform:skewX(-7deg);
+  box-shadow:3px 3px 0 #ffd54a;
+  flex:0 0 auto;
+}
+.dc-brand-word{
+  font-size:20px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:.02em;
+  text-transform:lowercase;
+  white-space:nowrap;
+}
+.dc-brand-mobile .dc-brand-mark{
+  width:23px;
+  height:23px;
+  font-size:13px;
+  box-shadow:2px 2px 0 #ffd54a;
+}
+.dc-brand-mobile .dc-brand-word{
+  font-size:17px;
+}
+
+.chart-card{
+  position:relative;
+  border-left:3px solid rgba(255,109,0,.34);
+}
+.chart-card::before{
+  content:"";
+  position:absolute;
+  left:-3px;
+  top:-1px;
+  bottom:-1px;
+  width:3px;
+  background:linear-gradient(180deg,var(--accent) 0%,#ffd54a 100%);
+  opacity:.42;
+  pointer-events:none;
+}
+.chart-card:hover::before{opacity:1}
+.chart-card:hover{
+  transform:translateX(2px) !important;
+  box-shadow:0 1px 0 rgba(255,109,0,.22),0 6px 18px rgba(0,0,0,.10) !important;
+}
+.chart-card.rank-1{
+  border-left-color:var(--accent);
+}
+.chart-card.rank-1 .rank-num{
+  position:relative;
+  background:linear-gradient(135deg,var(--accent) 0%,#ff8f00 72%,#ffd54a 100%);
+  color:#090909;
+  box-shadow:5px 5px 0 rgba(255,213,74,.42);
+  border:1px solid rgba(0,0,0,.12);
+}
+.chart-card.rank-1 .rank-num::after{
+  content:"#1";
+  position:absolute;
+  right:4px;
+  bottom:3px;
+  font-size:7px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.08em;
+  opacity:.55;
+}
+.weeks1,
+.badge-inline{
+  background:#111 !important;
+  color:#ffd54a !important;
+  border:1px solid rgba(255,213,74,.7) !important;
+  letter-spacing:.06em !important;
+}
+.dark .weeks1,
+.dark .badge-inline{
+  background:#090909 !important;
+  color:#ffd54a !important;
+}
+.chart-card.diff-colors-active::before{
+  background:rgba(0,0,0,.22);
+}
+@media(max-width:767px){
+  .dc-brand-mobile{
+    gap:7px;
+  }
+  .chart-card{
+    border-left-width:2px;
+  }
+  .chart-card::before{
+    left:-2px;
+    width:2px;
+  }
+  .chart-card:hover{
+    transform:none !important;
+  }
+}
