@@ -1176,6 +1176,82 @@
         align-items:center !important;
       }
     }
+
+    /* Details panel — ported from daegoncharts ChartRow */
+    .details-panel{
+      margin-top:12px;
+      width:100%;
+      background:var(--muted);
+      border:1px solid var(--border);
+      padding:12px;
+      font-size:14px;
+      color:var(--foreground);
+    }
+    .details-title{
+      font-weight:600;
+      margin-bottom:8px;
+      color:var(--foreground);
+    }
+    .details-run-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .details-run-card{
+      display:block;
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--card);
+      padding:12px;
+      color:var(--foreground);
+      text-align:left;
+      cursor:pointer;
+      transition:border-color .15s,background .15s;
+    }
+    .details-run-card:hover{
+      border-color:var(--accent);
+      background:var(--muted);
+    }
+    .details-run-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-size:14px;
+      color:var(--foreground);
+    }
+    .details-run-pos{
+      font-weight:600;
+      color:var(--accent);
+    }
+    .details-run-meta{
+      margin-top:8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      font-size:12px;
+      color:var(--muted-foreground);
+    }
+    .details-empty{
+      font-size:14px;
+      color:var(--muted-foreground);
+    }
+
+    @media(max-width:767px){
+      .details-panel{
+        margin-top:10px;
+        padding:12px;
+        font-size:13px;
+      }
+      .details-title{margin-bottom:8px}
+      .details-run-card{padding:12px}
+      .details-run-head{font-size:13px}
+      .details-run-meta{
+        margin-top:7px;
+        font-size:11px;
+        gap:7px;
+      }
+    }
 </style>
 </head>
 <body>
@@ -1837,10 +1913,28 @@ function metricsHtml(e){
 }
 function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';return '<div class="m-metrics"><span>LW '+esc(lw)+'</span><span>·</span><span>PEAK '+esc(e.peak||'-')+'</span><span>·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div>'}
 function detailHtml(e,cfg,data,date){
-  const fields=detailFields(e,cfg),run=runEntries(e,data,date);
-  return '<div class="details">'+
-    (fields.length?'<div class="details-grid">'+fields.map(([k,v])=>'<div class="detail-box"><div class="detail-k">'+esc(k)+'</div><div class="detail-v">'+esc(v)+'</div></div>').join('')+'</div>':'')+
-    (run.length?'<div style="margin-top:12px"><div class="detail-k" style="margin-bottom:7px">Chart run</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+run.slice(-30).map(x=>'<button class="detail-box run-jump" data-date="'+x.date+'" style="color:var(--foreground);cursor:pointer"><b>'+fmtShort(x.date)+'</b><br>#'+x.position+' · peak '+x.peak+' · '+x.weeks+'w</button>').join('')+'</div></div>':'')+
+  const run=runEntries(e,data,date);
+  if(!run.length){
+    return '<div class="details details-panel"><div class="details-empty">Details shown. Press + again to close.</div></div>';
+  }
+  return '<div class="details details-panel">'+
+    '<div class="details-title">Chart run</div>'+
+    '<div class="details-run-list">'+
+      run.map(x=>{
+        const extras=[];
+        if(x.peak)extras.push('Peak: '+esc(x.peak));
+        if(x.weeks)extras.push('Weeks: '+esc(x.weeks));
+        if(x.points)extras.push('Points: '+esc(formatValue(x.points,cfg.id)));
+        if(x.totalUnits)extras.push('Total Units: '+esc(formatValue(x.totalUnits,cfg.id)));
+        return '<button class="run-jump details-run-card" data-date="'+esc(x.date)+'">'+
+          '<div class="details-run-head">'+
+            '<span>'+esc(fmtShort(x.date))+'</span>'+
+            '<span class="details-run-pos">'+esc(x.position)+'</span>'+
+          '</div>'+
+          '<div class="details-run-meta">'+extras.map(v=>'<span>'+v+'</span>').join('')+'</div>'+
+        '</button>';
+      }).join('')+
+    '</div>'+
   '</div>';
 }
 function visibleChartTitle(name){
