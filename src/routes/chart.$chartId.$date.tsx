@@ -201,7 +201,7 @@ function WeeklyChartPage() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto w-full grid gap-6 lg:grid-cols-[280px_1fr]">
+    <div className="dc-weekly-current max-w-7xl mx-auto w-full grid gap-6 lg:grid-cols-[280px_1fr]">
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <ChartTypeNav activeId={chartId} date={date} />
       </aside>
