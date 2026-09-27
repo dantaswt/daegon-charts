@@ -218,6 +218,13 @@ function entityLink(e,kind,text){
   const p=entityPath(e,kind);
   return '<a class="portal-link" href="'+appHref(p)+'" data-portal-link="'+p+'">'+esc(text??e.name)+'</a>';
 }
+function refThumb(e,kind){
+  const round=kind==='artist'?' ref-thumb-round':'';
+  return '<div class="ref-thumb'+round+'" data-portal-image data-kind="'+kind+'" data-name="'+escAttr(e.name)+'" data-artist="'+escAttr(e.artist||e.name)+'"><i class="fas '+iconFor(kind)+'"></i></div>';
+}
+function refHero(word,title,sub){
+  return '<div class="ref-hero"><div class="ref-hero-bg">'+esc(word)+'</div><h1>'+esc(title)+'</h1><p>'+esc(sub)+'</p></div>';
+}
 
 function aggregateCatalog(data,kind){
   const m=new Map();
@@ -291,24 +298,48 @@ async function renderHome(){
 async function renderCatalog(kind){
   const id=chartIdForKind(kind);
   loading(labelFor(kind)+'s');
-  const data=await loadWeekly(id),items=aggregateCatalog(data,kind);
-  portalState.catalog=items;portalState.catalogKind=kind;
-  const main='<div class="portal-hero"><div class="portal-kicker">Archive</div><h1 class="portal-title">'+labelFor(kind)+'s</h1><p class="portal-subtitle">'+fmtNum(items.length)+' '+labelFor(kind).toLowerCase()+'s in the chart archive.</p></div>'+
-    '<div class="portal-toolbar"><input id="catalogSearch" class="portal-input" placeholder="Search '+labelFor(kind).toLowerCase()+'s…" autocomplete="off"><select id="catalogSort" class="portal-select"><option value="weeks">Most weeks</option><option value="peak">Best peak</option><option value="recent">Most recent</option><option value="name">Name</option></select></div>'+
-    '<div id="catalogRows"></div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(labelFor(kind)+'s','Browse '+labelFor(kind).toLowerCase()+' chart history.','/'+kind+'s');
-  const search=document.getElementById('catalogSearch'),sort=document.getElementById('catalogSort');
-  const redraw=()=>{
-    let arr=[...items],q=search.value.trim().toLowerCase();
-    if(q)arr=arr.filter(x=>(x.name+' '+(x.artist||'')).toLowerCase().includes(q));
-    if(sort.value==='peak')arr.sort((a,b)=>a.peak-b.peak||b.weeks-a.weeks);
-    else if(sort.value==='recent')arr.sort((a,b)=>b.last.localeCompare(a.last));
-    else if(sort.value==='name')arr.sort((a,b)=>a.name.localeCompare(b.name));
-    else arr.sort((a,b)=>b.weeks-a.weeks||a.peak-b.peak);
-    document.getElementById('catalogRows').innerHTML='<div class="portal-list">'+arr.slice(0,500).map((x,i)=>'<div class="portal-row"><div class="portal-row-rank">'+(i+1)+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">Peak #'+x.peak+' · '+x.weeks+' weeks'+(x.weeksAt1?' · '+x.weeksAt1+' at #1':'')+'</div></div>').join('')+'</div>';
-    bindLinks();
+  const data=await loadWeekly(id),items=aggregateCatalog(data,kind).map(x=>({...x,entries:x.weeks,slug:entitySlug(x,kind)}));
+  const letters=[...new Set(items.map(x=>(x.name||'').charAt(0).toUpperCase()).filter(Boolean))].sort();
+  let selected=letters[0]||'',searchValue=new URLSearchParams(location.search).get('q')||'';
+
+  const title=labelFor(kind)+'s';
+  const drawPage=()=>{
+    const q=searchValue.trim().toLowerCase();
+    const filtered=items.filter(x=>{
+      const matchesLetter=q||String(x.name||'').charAt(0).toUpperCase()===selected;
+      const hay=(x.name+' '+(x.artist||'')).toLowerCase();
+      return matchesLetter&&(!q||hay.includes(q));
+    });
+    const groups={};
+    for(const x of filtered){const l=String(x.name||'').charAt(0).toUpperCase();(groups[l]??=[]).push(x)}
+    const lettersHtml=letters.map(l=>'<button class="ref-letter '+(l===selected?'active':'')+'" data-letter="'+escAttr(l)+'">'+esc(l)+'</button>').join('');
+    const rows=Object.keys(groups).sort().map(l=>'<section class="ref-alpha-section"><h2>'+esc(l)+'</h2><div class="ref-catalog-grid">'+groups[l].map(x=>
+      '<a href="'+appHref(entityPath(x,kind))+'" data-portal-link="'+entityPath(x,kind)+'" class="ref-catalog-card">'+
+      refThumb(x,kind)+
+      '<div class="ref-catalog-copy"><div class="ref-catalog-title">'+esc(x.name)+'</div>'+
+      '<div class="ref-catalog-sub">'+(kind==='artist'?fmtNum(x.entries)+' entries':esc(x.artist)+' · '+fmtNum(x.entries)+' entries')+'</div></div></a>'
+    ).join('')+'</div></section>').join('');
+
+    portalEl.innerHTML=shellHtml(
+      refHero(title.toUpperCase(),title,fmtNum(items.length)+' '+title.toLowerCase()+' tracked across all charts')+
+      '<div class="ref-catalog-tools"><div class="ref-letters">'+lettersHtml+'</div><div class="ref-search-wrap"><input id="refCatalogSearch" type="search" placeholder="Search '+(kind==='artist'?'artists':kind+'s or artists')+'" value="'+escAttr(searchValue)+'"></div></div>'+
+      (filtered.length?rows:'<div class="ref-empty">No '+title.toLowerCase()+' found for that filter.</div>')
+    );
+    bindLinks();hydratePortalImages();
+    portalEl.querySelectorAll('[data-letter]').forEach(btn=>btn.onclick=()=>{selected=btn.dataset.letter;drawPage()});
+    const input=document.getElementById('refCatalogSearch');
+    if(input)input.oninput=e=>{
+      searchValue=e.target.value;
+      if(kind==='artist'){
+        const u=new URL(location.href);
+        if(searchValue)u.searchParams.set('q',searchValue);else u.searchParams.delete('q');
+        history.replaceState({},'',u.pathname+u.search);
+      }
+      drawPage();
+      const ni=document.getElementById('refCatalogSearch'); if(ni){ni.focus();ni.setSelectionRange(searchValue.length,searchValue.length)}
+    };
   };
-  search.oninput=redraw;sort.onchange=redraw;redraw();
+  setMode(true);setMeta(title,'Every '+labelFor(kind).toLowerCase()+' that has appeared on Daegon Charts.','/'+kind+'s');drawPage();
 }
 
 async function findEntity(kind,slug){
@@ -362,16 +393,34 @@ async function renderDetail(kind,slug){
 }
 
 async function renderNumberOnes(){
-  loading("Number One's");
-  const datasets=await Promise.all(['songs','albums','artists'].map(loadWeekly));
-  let rows=[];
-  datasets.forEach((d,i)=>{const id=['songs','albums','artists'][i];for(const date of d.dates){const e=(d.entriesByDate[date]||[])[0];if(e&&e.position===1)rows.push({id,date,e,kind:charts[id].kind})}});
-  rows.sort((a,b)=>b.date.localeCompare(a.date));
-  const main='<div class="portal-hero"><div class="portal-kicker">Archive</div><h1 class="portal-title">Number One’s</h1><p class="portal-subtitle">Every weekly No. 1 across the three main Daegon Charts.</p></div>'+
-    '<div class="portal-toolbar"><button class="portal-btn active" data-no1="all">All</button><button class="portal-btn" data-no1="songs">Songs</button><button class="portal-btn" data-no1="albums">Albums</button><button class="portal-btn" data-no1="artists">Artists</button></div><div id="no1Rows"></div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta("Number One's","Weekly number one archive.","/number-ones");
-  const draw=id=>{document.getElementById('no1Rows').innerHTML='<div class="portal-list">'+rows.filter(x=>id==='all'||x.id===id).slice(0,1000).map(x=>'<div class="portal-row"><div class="portal-row-rank">#1</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x.e,x.kind)+'</div><div class="portal-row-sub">'+(x.kind!=='artist'?esc(x.e.artist)+' · ':'')+esc(charts[x.id].title)+'</div></div><div class="portal-row-meta">'+fmtShort(x.date)+'</div></div>').join('')+'</div>';bindLinks()};
-  portalEl.querySelectorAll('[data-no1]').forEach(b=>b.onclick=()=>{portalEl.querySelectorAll('[data-no1]').forEach(x=>x.classList.toggle('active',x===b));draw(b.dataset.no1)});draw('all');
+  loading("#1's");
+  const ids=['songs','albums','artists','radioSongs','topStreamingAlbums','topAlbumSales','streamingSongs','digitalSongsSales'];
+  const datasets=await Promise.all(ids.map(async id=>{try{return await loadWeekly(id)}catch{return {chartId:id,dates:[],entriesByDate:{}}}}));
+  const allDates=[...new Set(datasets.flatMap(d=>d.dates||[]))].sort().reverse();
+  let selected=allDates[0]||'';
+
+  const draw=()=>{
+    const idx=allDates.indexOf(selected),prev=idx<allDates.length-1?allDates[idx+1]:null,next=idx>0?allDates[idx-1]:null;
+    const cards=datasets.map((data,i)=>{
+      const id=ids[i],cfg=charts[id],entry=(data.entriesByDate[selected]||[]).find(e=>e.position===1);
+      if(!entry)return '<div class="ref-no1-card"><div class="ref-no1-empty">No data</div></div>';
+      return '<div class="ref-no1-card"><div class="ref-no1-body">'+refThumb(entry,cfg.kind)+'<div class="ref-no1-copy"><div class="ref-no1-chart">'+esc(cfg.title)+'</div><div class="ref-no1-title">'+entityLink(entry,cfg.kind)+'</div>'+(cfg.kind!=='artist'?'<div class="ref-no1-artist">'+esc(entry.artist)+'</div>':'')+'</div></div><a class="ref-no1-view" href="'+appHref(chartPath(id,selected))+'">View Chart →</a></div>';
+    }).join('');
+    portalEl.innerHTML=shellHtml(
+      refHero("#1'S","#1's","The #1 hit on every chart this week")+
+      '<div class="ref-week"><div class="ref-week-label">Week</div><div class="ref-week-controls">'+
+      '<button id="refNo1Prev" class="ref-gold" '+(!prev?'disabled':'')+'><i class="fas fa-chevron-left"></i> Prev</button>'+
+      '<div class="ref-date-select-wrap"><button id="refNo1DateBtn" class="ref-date-btn">'+fmtDate(selected)+' <i class="fas fa-chevron-down"></i></button><div id="refNo1DateMenu" class="ref-date-menu">'+allDates.map(d=>'<button data-no1-date="'+d+'" class="'+(d===selected?'active':'')+'">'+fmtDate(d)+'</button>').join('')+'</div></div>'+
+      '<button id="refNo1Next" class="ref-gold" '+(!next?'disabled':'')+'>Next <i class="fas fa-chevron-right"></i></button></div></div>'+
+      '<div class="ref-no1-grid">'+cards+'</div>'
+    );
+    bindLinks();hydratePortalImages();
+    document.getElementById('refNo1Prev').onclick=()=>{if(prev){selected=prev;draw()}};
+    document.getElementById('refNo1Next').onclick=()=>{if(next){selected=next;draw()}};
+    document.getElementById('refNo1DateBtn').onclick=()=>document.getElementById('refNo1DateMenu').classList.toggle('open');
+    portalEl.querySelectorAll('[data-no1-date]').forEach(x=>x.onclick=()=>{selected=x.dataset.no1Date;draw()});
+  };
+  setMode(true);setMeta("#1's","See the #1 hit on every chart for any given week.","/number-ones");draw();
 }
 
 async function renderStats(){
@@ -455,17 +504,73 @@ async function renderAwards(){
 
 async function renderBattle(){
   loading('Chart Battle');
-  const kind=new URLSearchParams(location.search).get('kind')||portalState.battleKind||'song';portalState.battleKind=kind;
-  const data=await loadWeekly(chartIdForKind(kind)),items=aggregateCatalog(data,kind).slice(0,200);
-  const aSlug=new URLSearchParams(location.search).get('a')||entitySlug(items[0]||{},kind),bSlug=new URLSearchParams(location.search).get('b')||entitySlug(items[1]||items[0]||{},kind);
-  const a=items.find(x=>entitySlug(x,kind)===aSlug)||items[0],b=items.find(x=>entitySlug(x,kind)===bSlug)||items[1]||items[0];
-  const opts=sel=>items.map(x=>'<option value="'+entitySlug(x,kind)+'" '+(entitySlug(x,kind)===sel?'selected':'')+'>'+esc(x.name)+(kind!=='artist'?' — '+esc(x.artist):'')+'</option>').join('');
-  const card=x=>'<div class="battle-card"><h3>'+entityLink(x,kind)+'</h3>'+(kind!=='artist'?'<div class="portal-card-sub">'+esc(x.artist)+'</div>':'')+'<div class="portal-stats" style="margin-top:16px"><div class="portal-statbox"><div class="portal-stat">#'+x.peak+'</div><div class="portal-stat-sub">Peak</div></div><div class="portal-statbox"><div class="portal-stat">'+x.weeks+'</div><div class="portal-stat-sub">Weeks</div></div><div class="portal-statbox"><div class="portal-stat">'+x.weeksAt1+'</div><div class="portal-stat-sub">At #1</div></div><div class="portal-statbox"><div class="portal-stat">'+fmtShort(x.first)+'</div><div class="portal-stat-sub">Debut</div></div></div></div>';
-  const main='<div class="portal-hero"><div class="portal-kicker">Compare chart history</div><h1 class="portal-title">Chart Battle</h1><p class="portal-subtitle">Compare two songs, albums or artists from the archive.</p></div><div class="portal-toolbar"><select id="battleKind" class="portal-select"><option value="song" '+(kind==='song'?'selected':'')+'>Songs</option><option value="album" '+(kind==='album'?'selected':'')+'>Albums</option><option value="artist" '+(kind==='artist'?'selected':'')+'>Artists</option></select><select id="battleA" class="portal-select" style="flex:1">'+opts(entitySlug(a,kind))+'</select><select id="battleB" class="portal-select" style="flex:1">'+opts(entitySlug(b,kind))+'</select></div><div class="battle-grid">'+card(a)+'<div class="battle-vs">VS</div>'+card(b)+'</div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Battle','Compare chart histories.','/chart-battle');
-  const update=()=>go('/chart-battle?kind='+document.getElementById('battleKind').value+'&a='+encodeURIComponent(document.getElementById('battleA').value)+'&b='+encodeURIComponent(document.getElementById('battleB').value));
-  document.getElementById('battleKind').onchange=e=>go('/chart-battle?kind='+e.target.value);
-  document.getElementById('battleA').onchange=update;document.getElementById('battleB').onchange=update;
+  const artistData=await loadWeekly('artists');
+  const artists=aggregateCatalog(artistData,'artist').map(x=>x.name).sort((a,b)=>a.localeCompare(b));
+  const allIds=['songs','albums','artists','radioSongs','topStreamingAlbums','topAlbumSales','streamingSongs','digitalSongsSales'];
+  const allData=await Promise.all(allIds.map(async id=>{try{return await loadWeekly(id)}catch{return null}}));
+
+  let a1=null,a2=null,started=false,selectedChart='All';
+  const statsFor=name=>{
+    if(!name)return null;
+    let totalNo1s=0,totalTop10s=0,totalWeeks=0,totalEntries=0,totalUnits=0;
+    for(let i=0;i<allData.length;i++){
+      const d=allData[i],id=allIds[i]; if(!d)continue;
+      if(selectedChart!=='All'&&selectedChart!==id)continue;
+      const seen=new Map();
+      for(const date of d.dates)for(const e of d.entriesByDate[date]||[]){
+        const artist=d.chartId==='artists'?e.name:e.artist;
+        if(String(artist).toLowerCase()!==String(name).toLowerCase())continue;
+        const key=(d.chartId==='artists'?e.name:e.name+'|'+e.artist).toLowerCase();
+        let x=seen.get(key);if(!x){x={peak:e.position,weeks:0,units:0};seen.set(key,x)}
+        x.peak=Math.min(x.peak,e.position);x.weeks++;
+        const u=parseFloat(String(e.totalUnits||e.units||'0').replace(/[^0-9.]/g,''))||0;x.units=Math.max(x.units,u);
+      }
+      for(const x of seen.values()){if(x.peak===1)totalNo1s++;if(x.peak<=10)totalTop10s++;totalWeeks+=x.weeks;totalEntries++;totalUnits+=x.units}
+    }
+    return {totalNo1s,totalTop10s,totalWeeks,totalEntries,totalUnits};
+  };
+  const selectHtml=(label,id,value)=>'<div class="ref-battle-select"><label>'+label+'</label>'+(value?
+    '<div class="ref-selected-artist"><strong>'+esc(value)+'</strong><button data-clear="'+id+'"><i class="fas fa-times"></i></button></div>':
+    '<div class="ref-search-select"><i class="fas fa-search"></i><input data-artist-search="'+id+'" placeholder="Search artist..."><div class="ref-search-results" id="'+id+'Results"></div></div>')+'</div>';
+
+  const draw=()=>{
+    if(!started){
+      portalEl.innerHTML=shellHtml(
+        '<div class="ref-battle-page">'+refHero('BATTLE','Chart Battle','Select two artists and a chart to see who dominates').replace('<h1>','<h1><i class="fas fa-bolt"></i> ')+
+        '<div class="ref-battle-setup"><div class="ref-battle-picks">'+selectHtml('Artist 1','a1',a1)+'<div class="ref-vs">VS</div>'+selectHtml('Artist 2','a2',a2)+'</div>'+
+        '<div class="ref-chart-select"><label>Select Chart</label><select id="refBattleChart"><option value="All">All</option>'+allIds.map(id=>'<option value="'+id+'" '+(id===selectedChart?'selected':'')+'>'+esc(charts[id]?.title||id)+'</option>').join('')+'</select></div>'+
+        '<button id="refFight" class="ref-fight" '+(!(a1&&a2)?'disabled':'')+'>Fight!</button></div></div>'
+      );
+      const bindSearch=(id,setter)=>{
+        const input=portalEl.querySelector('[data-artist-search="'+id+'"]'),res=document.getElementById(id+'Results');
+        if(!input)return;
+        const show=()=>{const q=input.value.toLowerCase();const opts=artists.filter(x=>!q||x.toLowerCase().includes(q)).slice(0,50);res.innerHTML=opts.map(x=>'<button data-pick="'+id+'" data-name="'+escAttr(x)+'">'+esc(x)+'</button>').join('');res.classList.add('open');portalEl.querySelectorAll('[data-pick="'+id+'"]').forEach(b=>b.onmousedown=()=>{setter(b.dataset.name);draw()})};
+        input.onfocus=show;input.oninput=show;input.onblur=()=>setTimeout(()=>res.classList.remove('open'),200);
+      };
+      bindSearch('a1',v=>a1=v);bindSearch('a2',v=>a2=v);
+      portalEl.querySelectorAll('[data-clear]').forEach(b=>b.onclick=()=>{if(b.dataset.clear==='a1')a1=null;else a2=null;draw()});
+      document.getElementById('refBattleChart').onchange=e=>selectedChart=e.target.value;
+      document.getElementById('refFight').onclick=()=>{if(a1&&a2){started=true;draw()}};
+      return;
+    }
+    const s1=statsFor(a1),s2=statsFor(a2);
+    let p1=0,p2=0;
+    const comps=[['totalNo1s',false],['totalTop10s',false],['totalWeeks',false],['totalEntries',false],['totalUnits',false]];
+    for(const [k] of comps){if(s1[k]>s2[k])p1++;else if(s2[k]>s1[k])p2++}
+    const artistCard=(name,score,stats,win)=>'<div class="ref-battle-artist '+(win?'winner':'')+'">'+
+      '<div class="ref-battle-avatar" data-portal-image data-kind="artist" data-name="'+escAttr(name)+'" data-artist="'+escAttr(name)+'"><i class="fas fa-user"></i></div>'+
+      '<h2>'+esc(name)+'</h2><div class="ref-battle-score">'+score+'</div></div>';
+    const statRows=[
+      ["#1's",'totalNo1s'],["Top 10's",'totalTop10s'],['Weeks','totalWeeks'],['Entries','totalEntries'],['Units','totalUnits']
+    ].map(([label,k])=>'<div class="ref-battle-stat"><div class="ref-battle-stat-label">'+label+'</div><div class="ref-battle-stat-values"><strong class="'+(s1[k]>s2[k]?'better':'')+'">'+(k==='totalUnits'?fmtNum(s1[k]):s1[k])+'</strong><i class="fas fa-arrows-alt-h"></i><strong class="'+(s2[k]>s1[k]?'better':'')+'">'+(k==='totalUnits'?fmtNum(s2[k]):s2[k])+'</strong></div></div>').join('');
+    portalEl.innerHTML=shellHtml('<div class="ref-battle-page">'+
+      refHero('BATTLE','Chart Battle','Select two artists and a chart to see who dominates').replace('<h1>','<h1><i class="fas fa-bolt"></i> ')+
+      '<button id="refResetBattle" class="ref-reset"><i class="fas fa-redo"></i> New Battle</button>'+
+      '<div class="ref-battle-results">'+artistCard(a1,p1,s1,p1>p2)+'<div class="ref-battle-center"><div class="ref-battle-chart">'+esc(selectedChart==='All'?'All':charts[selectedChart]?.title||selectedChart)+'</div>'+statRows+'</div>'+artistCard(a2,p2,s2,p2>p1)+'</div>'+
+      '<div class="ref-battle-trophy"><i class="fas fa-trophy"></i><div>'+(p1>p2?esc(a1)+' WINS!':p2>p1?esc(a2)+' WINS!':"IT'S A TIE!")+'</div></div></div>');
+    document.getElementById('refResetBattle').onclick=()=>{a1=null;a2=null;started=false;draw()};hydratePortalImages();
+  };
+  setMode(true);setMeta('Chart Battle','Compare two artists in a head-to-head chart battle!','/chart-battle');draw();
 }
 
 async function renderSearch(){
