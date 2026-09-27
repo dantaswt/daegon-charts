@@ -210,13 +210,7 @@
     <header class="bg-black border-b border-gray-800 sticky top-0 z-20 shadow-sm">
         <div class="container mx-auto px-4 py-3 md:py-4 flex justify-between items-center">
             <h1 class="text-xl md:text-3xl font-extrabold"><span class="gold-title" id="mainTitle">daegon charts</span></h1>
-            <nav class="flex space-x-2 md:space-x-4 items-center">
-                <button id="navAllArtists" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">All Artists Entries</button>
-                <span class="text-gray-600">|</span>
-                <button id="navChartBeat" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">Chart Beat</button>
-                <span class="text-gray-600">|</span>
-                <button id="navStats" class="text-xs md:text-sm font-semibold text-gray-300 hover:text-accent transition-colors">Stats</button>
-            </nav>
+            <nav class="flex items-center"><span class="text-xs md:text-sm font-semibold text-gray-300">Weekly Charts</span></nav>
         </div>
     </header>
     <main id="app" class="flex-grow container mx-auto p-3 md:p-6 relative z-10"></main>
@@ -832,43 +826,31 @@
         
         function renderHome() {
             appState.currentView = 'home';
-            const h100=appState.chartBeatData.hot100[0], a50=appState.chartBeatData.artists[0], a100=appState.chartBeatData.top100Albums[0];
-            
-            const firstRowCharts = weeklyChartList.slice(0, 4);
-            const secondRowCharts = weeklyChartList.slice(4, 8);
-            
+
             appContainer.innerHTML = `<div class="max-w-7xl mx-auto">
-                <div class="text-center mb-8 md:mb-12"><h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">daegon charts</h2><p class="text-gray-400 text-sm md:text-base">Your personal charts based on Last.fm data. Track your most played songs, artists, and albums.</p></div>
-                
-                <div class="circle-cards-grid mb-12 md:mb-16">
-                    ${firstRowCharts.map(c=>`<div class="circle-card-container" data-chart="${c}"><div class="circle-card" id="circle-${c}"><div class="w-full h-full placeholder-art"><i class="fas ${chartsConfig[c]?.icon} text-2xl md:text-3xl text-gray-600"></i></div><div class="circle-card-content"><h3 class="circle-card-title">${chartsConfig[c]?.title}</h3></div></div><div class="circle-card-label text-xs md:text-sm">${chartsConfig[c]?.title}</div></div>`).join('')}
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-white">daegon charts</h2>
+                    <p class="text-gray-400 text-sm md:text-base">Weekly charts</p>
                 </div>
-                <div class="circle-cards-grid mb-12 md:mb-16">
-                    ${secondRowCharts.map(c=>`<div class="circle-card-container" data-chart="${c}"><div class="circle-card" id="circle-${c}"><div class="w-full h-full placeholder-art"><i class="fas ${chartsConfig[c]?.icon} text-2xl md:text-3xl text-gray-600"></i></div><div class="circle-card-content"><h3 class="circle-card-title">${chartsConfig[c]?.title}</h3></div></div><div class="circle-card-label text-xs md:text-sm">${chartsConfig[c]?.title}</div></div>`).join('')}
+
+                <div class="mb-12 md:mb-16">
+                    <h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Weekly Charts</h3>
+                    <div id="weeklyChartsGrid" class="weekly-charts-grid">
+                        ${weeklyChartList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}
+                    </div>
                 </div>
-                
-                ${(h100||a50||a100)?`<div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Chart Beat - Latest News</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">${h100?`<div class="blog-card cursor-pointer" onclick="showChartBeat('hot100')"><img src="${h100.imageUrl||'https://via.placeholder.com/400x200?text=No+Image'}" class="w-full h-40 md:h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'"><div class="p-3"><span class="text-xs text-accent font-semibold">${h100.publicationDate}</span><h4 class="font-bold text-sm md:text-lg mt-1 text-white line-clamp-2">${h100.title}</h4></div></div>`:''}${a50?`<div class="blog-card cursor-pointer" onclick="showChartBeat('artists')"><img src="${a50.imageUrl||'https://via.placeholder.com/400x200?text=No+Image'}" class="w-full h-40 md:h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'"><div class="p-3"><span class="text-xs text-accent font-semibold">${a50.publicationDate}</span><h4 class="font-bold text-sm md:text-lg mt-1 text-white line-clamp-2">${a50.title}</h4></div></div>`:''}${a100?`<div class="blog-card cursor-pointer" onclick="showChartBeat('top100Albums')"><img src="${a100.imageUrl||'https://via.placeholder.com/400x200?text=No+Image'}" class="w-full h-40 md:h-48 object-cover" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'"><div class="p-3"><span class="text-xs text-accent font-semibold">${a100.publicationDate}</span><h4 class="font-bold text-sm md:text-lg mt-1 text-white line-clamp-2">${a100.title}</h4></div></div>`:''}</div></div>`:''}
-                
-                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Weekly Charts</h3><div id="weeklyChartsGrid" class="weekly-charts-grid">${weeklyChartList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
-                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title text-white">Year-End Charts</h3><div id="yearEndChartsGrid" class="weekly-charts-grid">${yearEndList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
-                <div class="mb-12 md:mb-16"><h3 class="text-xl md:text-2xl font-bold mb-6 section-title goat-title text-white">Greatest of All Time</h3><div id="goatChartsGrid" class="weekly-charts-grid">${goatList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('')}</div></div>
             </div>`;
-            
-            document.querySelectorAll('.chart-card, .circle-card-container').forEach(el=>el.addEventListener('click',()=>showChart(el.dataset.chart)));
-            setTimeout(()=>loadCircleImages(),100);
+
+            document.querySelectorAll('.chart-card').forEach(el=>el.addEventListener('click',()=>showChart(el.dataset.chart)));
             setupBackToTop();
         }
-        
+
         function updateHomeCharts() {
             const weeklyGrid = document.getElementById('weeklyChartsGrid');
-            const yearEndGrid = document.getElementById('yearEndChartsGrid');
-            const goatGrid = document.getElementById('goatChartsGrid');
             if (weeklyGrid) weeklyGrid.innerHTML = weeklyChartList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('');
-            if (yearEndGrid) yearEndGrid.innerHTML = yearEndList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('');
-            if (goatGrid) goatGrid.innerHTML = goatList.map(c=>renderChartCard(c, chartsConfig[c]?.title)).join('');
             document.querySelectorAll('.chart-card').forEach(el=>el.addEventListener('click',()=>showChart(el.dataset.chart)));
         }
-        
+
         async function loadCircleImages() {
             for(let ct of weeklyChartList) {
                 let top = appState.top3Data[ct]?.[0];
@@ -1350,19 +1332,16 @@
                 if (appState.currentView === 'home') updateHomeCharts();
             };
 
-            fetchChartData('songs').then(ok => refreshHome('songs', ok));
-            setTimeout(() => fetchChartData('artists').then(ok => refreshHome('artists', ok)), 500);
-            setTimeout(() => fetchChartData('albums').then(ok => refreshHome('albums', ok)), 1000);
-
-            setTimeout(() => fetchChartBeat(), 2500);
+            weeklyChartList.forEach((ct, index) => {
+                setTimeout(() => {
+                    fetchChartData(ct).then(ok => refreshHome(ct, ok));
+                }, index * 300);
+            });
         }
 
         document.addEventListener('DOMContentLoaded',()=>{
             init();
             document.getElementById('mainTitle').addEventListener('click',()=>{ appState.navigationHistory=[]; renderHome(); });
-            document.getElementById('navAllArtists').addEventListener('click',()=>showAllArtists());
-            document.getElementById('navChartBeat').addEventListener('click',()=>showChartBeat('hot100'));
-            document.getElementById('navStats').addEventListener('click',()=>showStats());
             closeModal.addEventListener('click',()=>modal.classList.remove('active'));
             modal.addEventListener('click',e=>{ if(e.target===modal) modal.classList.remove('active'); });
         });
