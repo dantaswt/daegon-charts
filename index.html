@@ -435,7 +435,7 @@ const charts={
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
-  const imageCacheVersion='real-artwork-only-v4';
+  const imageCacheVersion='stable-song-artwork-v5';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
     for(let i=localStorage.length-1;i>=0;i--){
       const k=localStorage.key(i);
@@ -764,6 +764,19 @@ function exactArtist(a,b){
 function exactTitle(a,b){
   return exactish(a,b);
 }
+function artworkIdentityTitle(kind,value){
+  let x=comparable(value);
+  if(kind==='song'){
+    x=x
+      .replace(/\bpt\s*(\d+)\b/g,'part $1')
+      .replace(/\bpart\s*(\d+)\b/g,'part $1')
+      .replace(/\b(?:radio edit|single version|album version|edit|remaster(?:ed)?(?: \d{4})?|mono|stereo|explicit|clean)\b/g,'')
+      .replace(/\b(?:feat|ft|featuring)\b.*$/g,'')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+  return x;
+}
 function usableImage(url){
   if(!url)return false;
   const u=String(url).toLowerCase();
@@ -874,7 +887,7 @@ async function spotifyArtwork(name,artist,kind){
 }
 
 async function resolveImage(e,cfg){
-  const key=cfg.kind+'|'+e.name+'|'+e.artist;
+  const key=cfg.kind+'|'+artworkIdentityTitle(cfg.kind,e.name)+'|'+comparable(e.artist||e.name);
   if(state.images.has(key))return state.images.get(key);
 
   const persistedKey='img:'+key;
