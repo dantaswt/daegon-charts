@@ -271,6 +271,77 @@
       .week-picker-option{min-height:40px;padding:7px 9px;font-size:12px}
       .week-picker-menu{max-height:260px}
     }
+
+    /* Responsive week selector */
+    .week-controls{width:100%}
+    .week-picker{min-width:0;max-width:220px;flex:1 1 175px}
+    .week-picker-button{min-width:0;width:100%}
+    @media(max-width:767px){
+      .week-controls{
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        gap:6px;
+        width:100%;
+        max-width:100%;
+        align-items:center;
+      }
+      .week-picker{
+        width:100%;
+        min-width:0;
+        max-width:none;
+        flex:none;
+      }
+      .week-picker-button{
+        width:100%;
+        min-width:0;
+        max-width:100%;
+        min-height:40px;
+        padding:7px 8px;
+        font-size:12px;
+        gap:6px;
+      }
+      #weekPickerLabel{
+        display:block;
+        min-width:0;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+      }
+      .week-picker-menu{
+        left:0;
+        right:0;
+        width:100%;
+        min-width:100%;
+        max-width:100%;
+        max-height:52vh;
+      }
+      .week-picker-option{
+        width:100%;
+        min-height:40px;
+        padding:8px 6px;
+        font-size:12px;
+      }
+      .week-controls .gold-btn{
+        min-width:0;
+        min-height:40px;
+        padding:7px 9px;
+        gap:5px;
+        font-size:11px;
+        white-space:nowrap;
+      }
+    }
+    @media(max-width:390px){
+      .week-controls{gap:4px}
+      .week-controls .gold-btn{
+        padding:7px 7px;
+        font-size:10px;
+      }
+      .week-picker-button{
+        padding:7px 6px;
+        font-size:11px;
+      }
+      .week-picker-button i{font-size:9px}
+    }
 </style>
 </head>
 <body>
