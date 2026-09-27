@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn } from "./client-server-fn";
 import { getWeeklyChart, computeYearEndGenerated, getYearEndGenerated, type YECEntry } from "./charts.functions";
 import { chartsConfig } from "./charts-config";
 import { getTopLatinAlbums } from "./latin-albums-chart";
