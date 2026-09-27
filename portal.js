@@ -4,6 +4,17 @@
 const PORTAL_ROUTES=new Set(['','songs','albums','artists','number-ones','stats','year-end','decade-end','goat','chart-beat','awards','chart-battle','search','song','album','artist']);
 const mainChartIds={song:'songs',album:'albums',artist:'artists'};
 const periodLimits={songs:100,albums:100,artists:50};
+const PORTAL_SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
+const officialYearEnd={
+  songs:{gid:'530686468',kind:'song',title:'Daegon 100'},
+  albums:{gid:'897935603',kind:'album',title:'Daegon Albums 100'},
+  artists:{gid:'1597569311',kind:'artist',title:'Daegon Artists 50'}
+};
+const officialGoat={
+  songs:{gid:'1157278896',kind:'song',title:'Greatest of All Time Songs'},
+  albums:{gid:'1548244755',kind:'album',title:'Greatest of All Time Albums'},
+  artists:{gid:'222299678',kind:'artist',title:'Greatest of All Time Artists'}
+};
 let portalEl=null,weeklyEl=null,navEl=null;
 const portalState={catalog:null,catalogKind:null,battleKind:'song'};
 
@@ -44,6 +55,53 @@ function escAttr(v){return esc(String(v??''))}
 function iconFor(kind){return kind==='artist'?'fa-user':kind==='album'?'fa-compact-disc':'fa-music'}
 function labelFor(kind){return kind==='artist'?'Artist':kind==='album'?'Album':'Song'}
 function chartIdForKind(kind){return mainChartIds[kind]||'songs'}
+function pFind(header,names){
+  const h=header.map(x=>String(x||'').trim().toLowerCase());
+  for(const n of names){const i=h.indexOf(n.toLowerCase());if(i>=0)return i}
+  return -1;
+}
+function pInt(v){
+  let x=String(v??'').replace(/[^0-9-]/g,'');
+  const n=parseInt(x,10);return Number.isFinite(n)?n:0;
+}
+async function loadOfficialRanking(cfg,{yearly=false}={}){
+  const rows=await fetchCsv(PORTAL_SHEET+cfg.gid);
+  if(!rows?.length)return yearly?{years:[],entriesByYear:{}}:{entries:[]};
+  const header=rows[0];
+  const idx={
+    year:pFind(header,['year','ano']),
+    pos:pFind(header,['position','rank','pos']),
+    song:pFind(header,['song','title','track']),
+    album:pFind(header,['album']),
+    artist:pFind(header,['artist','artists']),
+    peak:pFind(header,['peak']),
+    weeks:pFind(header,['weeks','wks']),
+    units:pFind(header,['units','points','sales','streams','audience']),
+    total:pFind(header,['total units','total'])
+  };
+  const nameIdx=cfg.kind==='artist'?idx.artist:cfg.kind==='album'?idx.album:idx.song;
+  const parseRow=r=>({
+    position:pInt(r[idx.pos]),
+    name:String(r[nameIdx]??'').trim(),
+    artist:String(r[idx.artist]??'').trim(),
+    peak:pInt(r[idx.peak]),
+    weeks:pInt(r[idx.weeks]),
+    units:idx.units>=0?String(r[idx.units]??'').trim():'',
+    totalUnits:idx.total>=0?String(r[idx.total]??'').trim():''
+  });
+  if(yearly){
+    const entriesByYear={};
+    for(const r of rows.slice(1)){
+      const year=String(r[idx.year]??'').trim(),e=parseRow(r);
+      if(!year||!e.position||!e.name)continue;
+      (entriesByYear[year]??=[]).push(e);
+    }
+    for(const y of Object.keys(entriesByYear))entriesByYear[y].sort((a,b)=>a.position-b.position);
+    return {years:Object.keys(entriesByYear).sort((a,b)=>Number(b)-Number(a)),entriesByYear};
+  }
+  const entries=rows.slice(1).map(parseRow).filter(e=>e.position&&e.name).sort((a,b)=>a.position-b.position);
+  return {entries};
+}
 
 function ensureShell(){
   weeklyEl=document.querySelector('.layout');
@@ -331,29 +389,45 @@ async function renderStats(){
 async function renderPeriod(type,kindSeg){
   const chartId={songs:'songs',albums:'albums',artists:'artists'}[kindSeg]||'songs',kind=charts[chartId].kind;
   loading(type==='year'?'Year-End':'Decade-End');
+  if(type==='year'){
+    const cfg=officialYearEnd[kindSeg]||officialYearEnd.songs;
+    const official=await loadOfficialRanking(cfg,{yearly:true});
+    const selected=new URLSearchParams(location.search).get('year')||official.years[0];
+    const arr=official.entriesByYear[selected]||[];
+    const path='/year-end/'+kindSeg;
+    const options=official.years.map(v=>'<option value="'+v+'" '+(v===selected?'selected':'')+'>'+v+'</option>').join('');
+    const main='<div class="portal-hero"><div class="portal-kicker">Year-End Charts</div><h1 class="portal-title">'+esc(cfg.title)+'</h1><p class="portal-subtitle">Official Daegon Charts year-end ranking.</p></div>'+
+      '<div class="portal-toolbar"><select id="periodChart" class="portal-select"><option value="songs" '+(kindSeg==='songs'?'selected':'')+'>Songs</option><option value="albums" '+(kindSeg==='albums'?'selected':'')+'>Albums</option><option value="artists" '+(kindSeg==='artists'?'selected':'')+'>Artists</option></select><select id="periodValue" class="portal-select">'+options+'</select></div>'+
+      '<div class="portal-list">'+arr.map(x=>'<div class="portal-row"><div class="portal-row-rank">'+x.position+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">'+(x.peak?'Peak #'+x.peak:'')+(x.weeks?' · '+x.weeks+' weeks':'')+'</div></div>').join('')+'</div>';
+    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Year-End Charts','Official Daegon Charts year-end rankings.',path);
+    document.getElementById('periodChart').onchange=e=>go('/year-end/'+e.target.value);
+    document.getElementById('periodValue').onchange=e=>{history.replaceState({},'',appHref(path)+'?year='+encodeURIComponent(e.target.value));renderPeriod('year',kindSeg)};
+    return;
+  }
   const data=await loadWeekly(chartId),years=[...new Set(data.dates.map(d=>d.slice(0,4)))].sort().reverse();
   const decades=[...new Set(years.map(y=>Math.floor(Number(y)/10)*10))].sort((a,b)=>b-a);
-  const selected=type==='year'?(new URLSearchParams(location.search).get('year')||years[0]):String(new URLSearchParams(location.search).get('decade')||decades[0]);
-  const pred=type==='year'?d=>d.startsWith(selected+'-'):d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10;
+  const selected=String(new URLSearchParams(location.search).get('decade')||decades[0]);
+  const pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10;
   const arr=aggregatePeriod(data,chartId,pred).slice(0,100);
-  const path='/'+(type==='year'?'year-end':'decade-end')+'/'+kindSeg;
-  const options=(type==='year'?years:decades.map(String)).map(v=>'<option value="'+v+'" '+(String(v)===String(selected)?'selected':'')+'>'+v+(type==='decade'?'s':'')+'</option>').join('');
-  const main='<div class="portal-hero"><div class="portal-kicker">'+(type==='year'?'Annual ranking':'Decade ranking')+'</div><h1 class="portal-title">'+(type==='year'?'Year-End':'Decade-End')+' '+esc(charts[chartId].title)+'</h1><p class="portal-subtitle">Calculated from weekly chart performance across the selected period.</p></div>'+
+  const path='/decade-end/'+kindSeg;
+  const options=decades.map(String).map(v=>'<option value="'+v+'" '+(v===selected?'selected':'')+'>'+v+'s</option>').join('');
+  const main='<div class="portal-hero"><div class="portal-kicker">Decade-End</div><h1 class="portal-title">'+esc(charts[chartId].title)+'</h1><p class="portal-subtitle">Decade ranking generated from the weekly archive.</p></div>'+
     '<div class="portal-toolbar"><select id="periodChart" class="portal-select"><option value="songs" '+(kindSeg==='songs'?'selected':'')+'>Songs</option><option value="albums" '+(kindSeg==='albums'?'selected':'')+'>Albums</option><option value="artists" '+(kindSeg==='artists'?'selected':'')+'>Artists</option></select><select id="periodValue" class="portal-select">'+options+'</select></div>'+
     '<div class="portal-list">'+arr.map((x,i)=>'<div class="portal-row"><div class="portal-row-rank">'+(i+1)+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">'+x.weeks+' weeks · Peak #'+x.peak+'</div></div>').join('')+'</div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(type==='year'?'Year-End Charts':'Decade-End Charts','Period rankings from the Daegon Charts archive.',path);
-  document.getElementById('periodChart').onchange=e=>go('/'+(type==='year'?'year-end':'decade-end')+'/'+e.target.value);
-  document.getElementById('periodValue').onchange=e=>{const q=type==='year'?'year':'decade';history.replaceState({},'',appHref(path)+'?'+q+'='+encodeURIComponent(e.target.value));renderPeriod(type,kindSeg)};
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Decade-End Charts','Daegon Charts decade rankings.',path);
+  document.getElementById('periodChart').onchange=e=>go('/decade-end/'+e.target.value);
+  document.getElementById('periodValue').onchange=e=>{history.replaceState({},'',appHref(path)+'?decade='+encodeURIComponent(e.target.value));renderPeriod('decade',kindSeg)};
 }
 
 async function renderGoat(kindSeg){
-  const chartId={songs:'songs',albums:'albums',artists:'artists'}[kindSeg]||'songs',kind=charts[chartId].kind;
+  const cfg=officialGoat[kindSeg]||officialGoat.songs,kind=cfg.kind;
   loading('Greatest of All Time');
-  const data=await loadWeekly(chartId),arr=aggregatePeriod(data,chartId,()=>true).slice(0,100);
-  const main='<div class="portal-hero"><div class="portal-kicker">All-time ranking</div><h1 class="portal-title">Greatest of All Time — '+esc(charts[chartId].title)+'</h1><p class="portal-subtitle">All weekly chart performance combined across the full archive.</p></div>'+
+  const {entries}=await loadOfficialRanking(cfg);
+  const arr=entries.slice(0,100);
+  const main='<div class="portal-hero"><div class="portal-kicker">Greatest of All Time</div><h1 class="portal-title">'+esc(cfg.title)+'</h1><p class="portal-subtitle">Official all-time ranking from the Daegon Charts archive.</p></div>'+
     '<div class="portal-toolbar"><button class="portal-btn '+(kindSeg==='songs'?'active':'')+'" data-goat="songs">Songs</button><button class="portal-btn '+(kindSeg==='albums'?'active':'')+'" data-goat="albums">Albums</button><button class="portal-btn '+(kindSeg==='artists'?'active':'')+'" data-goat="artists">Artists</button></div>'+
-    '<div class="portal-list">'+arr.map((x,i)=>'<div class="portal-row"><div class="portal-row-rank">'+(i+1)+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">'+x.weeks+' weeks · '+x.weeksAt1+' at #1</div></div>').join('')+'</div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Greatest of All Time','All-time Daegon Charts rankings.','/goat/'+kindSeg);
+    '<div class="portal-list">'+arr.map(x=>'<div class="portal-row"><div class="portal-row-rank">'+x.position+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">'+(x.peak?'Peak #'+x.peak:'')+(x.weeks?' · '+x.weeks+' weeks':'')+'</div></div>').join('')+'</div>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Greatest of All Time','Official Daegon Charts all-time rankings.','/goat/'+kindSeg);
   portalEl.querySelectorAll('[data-goat]').forEach(b=>b.onclick=()=>go('/goat/'+b.dataset.goat));
 }
 
