@@ -163,6 +163,7 @@ function setMode(portal){
   ensureShell();
   document.body.classList.toggle('portal-mode',!!portal);
   document.body.classList.toggle('weekly-mode',!portal);
+  document.body.classList.add('global-bars-weekly');
   const footer=document.querySelector('.site-footer');
   if(portal){
     weeklyEl.style.display='none';
