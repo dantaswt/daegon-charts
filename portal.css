@@ -2106,3 +2106,33 @@ body.global-bars-weekly .site-header{
     padding-top:34px!important;
   }
 }
+
+/* === ABSOLUTE GLOBAL BRAND CENTER v4 === */
+html body .site-header .header-inner{
+  position:relative!important;
+}
+
+html body .site-header .brand{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  right:auto!important;
+  bottom:auto!important;
+  transform:translate(-50%,-50%)!important;
+  margin:0!important;
+  width:max-content!important;
+  max-width:calc(100% - 140px)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  white-space:nowrap!important;
+  z-index:20!important;
+}
+
+@media(min-width:768px){
+  html body .site-header .brand{
+    grid-column:auto!important;
+    justify-self:auto!important;
+  }
+}
