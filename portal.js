@@ -137,7 +137,7 @@ function ensureShell(){
     mobileBtn.id='portalMenuToggle';
     mobileBtn.className='portal-menu-toggle';
     mobileBtn.setAttribute('aria-label','Menu');
-    mobileBtn.innerHTML='<i class="fas fa-bars"></i>';
+    mobileBtn.innerHTML='<span class="portal-hamb"><span></span><span></span><span></span></span>';
     const mobileMenu=document.createElement('div');
     mobileMenu.id='portalMobileMenu';
     mobileMenu.className='portal-mobile-drawer';
