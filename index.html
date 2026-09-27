@@ -342,6 +342,245 @@
       }
       .week-picker-button i{font-size:9px}
     }
+
+    .desktop-view-actions{display:none}
+
+    @media(min-width:901px){
+      .site-header{display:none}
+      .page{
+        max-width:1580px;
+        padding:42px 28px 48px;
+      }
+      .layout{
+        grid-template-columns:350px minmax(0,1fr);
+        gap:48px;
+        align-items:start;
+      }
+      .sidebar{
+        position:sticky;
+        top:42px;
+      }
+      .chart-nav{gap:10px}
+      .chart-nav button{
+        min-height:54px;
+        font-size:16px;
+        letter-spacing:.025em;
+        background:#ececec;
+        border-color:#d0d0d0;
+      }
+      .chart-nav button.active{
+        background:var(--accent);
+        border-color:var(--accent);
+      }
+      .main{min-width:0}
+      .title-row{
+        min-height:72px;
+        margin:0 0 10px;
+        align-items:flex-start;
+      }
+      h1{
+        font-size:44px;
+        line-height:.96;
+        letter-spacing:-.035em;
+      }
+      .date-label{
+        margin-top:8px;
+        font-size:16px;
+      }
+      .desktop-view-actions{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-top:10px;
+      }
+      .view-toggle{display:flex}
+      .view-btn,.download-chart-btn{
+        min-height:54px;
+        border:1px solid var(--border);
+        font-weight:800;
+        font-size:13px;
+        letter-spacing:.02em;
+      }
+      .view-btn{
+        min-width:82px;
+        padding:0 14px;
+        background:#eee;
+        color:#111;
+      }
+      .view-btn.active{
+        background:var(--accent);
+        border-color:var(--accent);
+      }
+      .download-chart-btn{
+        background:var(--accent);
+        color:#000;
+        border-color:var(--accent);
+        padding:0 18px;
+        display:flex;
+        align-items:center;
+        gap:9px;
+        white-space:nowrap;
+      }
+      .week-nav{
+        margin:8px 0 18px;
+        gap:10px;
+      }
+      .week-label{font-size:12px}
+      .week-controls{gap:14px}
+      .gold-btn{
+        min-height:54px;
+        padding:0 20px;
+        font-size:16px;
+      }
+      .week-picker{
+        flex:0 0 190px;
+        max-width:190px;
+      }
+      .week-picker-button{
+        min-height:54px;
+        font-size:15px;
+        background:#eee;
+      }
+      .filters{
+        gap:8px;
+        margin-bottom:18px;
+      }
+      .filter{
+        min-height:54px;
+        min-width:50px;
+        padding:0 14px;
+        font-size:11px;
+      }
+      .chart-list{
+        max-width:none;
+        width:100%;
+        gap:14px;
+      }
+      .chart-card{
+        padding:0 18px;
+        min-height:154px;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+      }
+      .desktop-row{
+        grid-template-columns:74px 118px 44px minmax(0,1fr) auto;
+        gap:14px;
+        min-height:152px;
+      }
+      .rank-wrap{
+        width:74px;
+        height:100%;
+      }
+      .rank-num{
+        min-width:74px;
+        font-size:35px;
+      }
+      .cover{
+        width:118px;
+        height:118px;
+      }
+      .diff-wrap{
+        width:44px;
+        font-size:20px;
+      }
+      .diff-arrow{
+        width:22px;
+        height:22px;
+      }
+      .entry-title{
+        font-size:19px;
+        line-height:1.15;
+      }
+      .artist{
+        font-size:17px;
+        margin-top:4px;
+      }
+      .badge-inline{
+        font-size:8px;
+        vertical-align:middle;
+      }
+      .right{
+        gap:18px;
+      }
+      .award{
+        width:24px;
+        height:24px;
+        border:0;
+        font-size:18px;
+      }
+      .award i{font-size:18px!important}
+      .metrics{
+        min-width:112px;
+        display:grid;
+        grid-template-columns:auto auto;
+        column-gap:14px;
+        row-gap:2px;
+        font-size:12px;
+        text-align:right;
+      }
+      .metrics .sep{display:none}
+      .actions{
+        gap:8px;
+      }
+      .action{
+        width:40px;
+        height:40px;
+        font-size:14px;
+      }
+
+      /* Number one follows the larger reference card. */
+      .chart-card:has(.rank-num.one){
+        min-height:250px;
+        padding-left:18px;
+      }
+      .chart-card:has(.rank-num.one) .desktop-row{
+        min-height:248px;
+        grid-template-columns:74px 214px 44px minmax(0,1fr) auto;
+      }
+      .chart-card:has(.rank-num.one) .rank-wrap{
+        align-self:stretch;
+        justify-content:center;
+      }
+      .rank-num.one{
+        width:74px;
+        height:78px;
+        min-width:74px;
+        font-size:42px;
+      }
+      .chart-card:has(.rank-num.one) .cover.one{
+        width:214px;
+        height:214px;
+        margin-left:-14px;
+        border-left:5px solid var(--accent);
+      }
+      .chart-card:has(.rank-num.one) .entry-title.one{
+        font-size:24px;
+      }
+      .chart-card:has(.rank-num.one) .artist.one{
+        font-size:18px;
+      }
+      .weeks1{
+        font-size:9px;
+        padding:3px 8px;
+      }
+      .dropouts{max-width:none}
+      .site-footer{display:none}
+    }
+
+    @media(min-width:901px) and (max-width:1250px){
+      .page{padding-left:20px;padding-right:20px}
+      .layout{grid-template-columns:270px minmax(0,1fr);gap:28px}
+      .chart-nav button{font-size:14px}
+      .desktop-view-actions{gap:8px}
+      .download-chart-btn{padding:0 12px}
+      .chart-card{padding-left:12px;padding-right:12px}
+      .desktop-row{grid-template-columns:62px 104px 36px minmax(0,1fr) auto;gap:10px}
+      .rank-wrap,.rank-num{width:62px;min-width:62px}
+      .cover{width:104px;height:104px}
+      .chart-card:has(.rank-num.one) .desktop-row{grid-template-columns:62px 180px 36px minmax(0,1fr) auto}
+      .chart-card:has(.rank-num.one) .cover.one{width:180px;height:180px}
+    }
 </style>
 </head>
 <body>
@@ -369,6 +608,13 @@
           <div>
             <h1 id="chartTitle"></h1>
             <div id="dateLabel" class="date-label"></div>
+          </div>
+          <div class="desktop-view-actions">
+            <div class="view-toggle">
+              <button id="top10Btn" class="view-btn active" type="button">TOP 10</button>
+              <button id="fullChartBtn" class="view-btn" type="button">FULL CHART</button>
+            </div>
+            <button id="downloadChartBtn" class="download-chart-btn" type="button"><i class="fas fa-download"></i> Download Image</button>
           </div>
         </div>
 
@@ -433,7 +679,7 @@ const charts={
   digitalSongsSales:{id:'digitalSongsSales',title:'Digital Songs Sales',kind:'song',url:SHEET+'302176914'}
 };
 const weeklyIds=Object.keys(charts);
-const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
+const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null,desktopLimit:10};
 try{
   const imageCacheVersion='artist-priority-v6';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
@@ -998,7 +1244,9 @@ function detailHtml(e,cfg,data,date){
   '</div>';
 }
 function renderRows(data,date){
-  const cfg=charts[state.active],all=data.entriesByDate[date]||[],rows=all.filter(e=>state.filters.has('all')||state.filters.has(diffType(e.diff)));
+  const cfg=charts[state.active],all=data.entriesByDate[date]||[];
+  let rows=all.filter(e=>state.filters.has('all')||state.filters.has(diffType(e.diff)));
+  if(window.matchMedia('(min-width:901px)').matches && state.desktopLimit===10) rows=rows.slice(0,10);
   if(!rows.length){content.innerHTML='<div class="error">No entries match these filters.</div>';return}
   content.innerHTML=rows.map(e=>{
     const one=e.position===1,w1=e.weeksAt1||0,key=date+'|'+e.position+'|'+e.name+'|'+e.artist,open=state.details.has(key),award=awardsFor(e,all,state.active),copy=copyText(e,cfg,date,data);
@@ -1084,6 +1332,27 @@ document.getElementById('filters').querySelectorAll('[data-filter]').forEach(b=>
 document.getElementById('colorToggle').onclick=()=>{state.diffColors=!state.diffColors;document.getElementById('colorToggle').classList.toggle('active',state.diffColors);const data=state.cache.get(state.active);if(data)renderRows(data,state.date)};
 document.getElementById('themeToggle').onclick=()=>{const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light')}catch{}document.querySelector('#themeToggle i').className='fas '+(dark?'fa-sun':'fa-moon')};
 document.querySelector('#themeToggle i').className='fas '+(document.documentElement.classList.contains('dark')?'fa-sun':'fa-moon');
+const top10Btn=document.getElementById('top10Btn');
+const fullChartBtn=document.getElementById('fullChartBtn');
+const downloadChartBtn=document.getElementById('downloadChartBtn');
+
+function syncDesktopViewButtons(){
+  top10Btn?.classList.toggle('active',state.desktopLimit===10);
+  fullChartBtn?.classList.toggle('active',state.desktopLimit!==10);
+}
+top10Btn.onclick=()=>{
+  state.desktopLimit=10;syncDesktopViewButtons();
+  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
+};
+fullChartBtn.onclick=()=>{
+  state.desktopLimit=Infinity;syncDesktopViewButtons();
+  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
+};
+downloadChartBtn.onclick=()=>{
+  window.print();
+};
+syncDesktopViewButtons();
+
 const backTop=document.getElementById('backTop');window.addEventListener('scroll',()=>backTop.style.display=window.scrollY>300?'flex':'none');backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
 mobileMoreCharts.onclick=()=>{
