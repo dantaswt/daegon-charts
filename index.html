@@ -1480,6 +1480,52 @@
         line-height:1.4;
       }
     }
+
+    .bottom-week-nav{
+      margin-top:28px !important;
+    }
+    .bottom-week-nav .week-controls{
+      display:flex !important;
+      justify-content:center !important;
+      gap:10px !important;
+      width:auto !important;
+    }
+    .bottom-nav-btn{
+      width:104px !important;
+      min-width:104px !important;
+      min-height:38px !important;
+      padding:7px 12px !important;
+      background:var(--muted) !important;
+      color:var(--foreground) !important;
+      border:1px solid var(--border) !important;
+      font-size:12px !important;
+      font-weight:700 !important;
+    }
+    .bottom-nav-btn:hover:not(:disabled){
+      border-color:var(--accent) !important;
+      color:var(--accent) !important;
+      background:var(--card) !important;
+    }
+    .bottom-nav-btn:disabled{
+      opacity:.4 !important;
+    }
+    @media(max-width:767px){
+      .bottom-week-nav{
+        margin-top:20px !important;
+      }
+      .bottom-week-nav .week-controls{
+        display:flex !important;
+        grid-template-columns:none !important;
+        gap:8px !important;
+      }
+      .bottom-nav-btn{
+        width:92px !important;
+        min-width:92px !important;
+        min-height:36px !important;
+        padding:6px 10px !important;
+        font-size:11px !important;
+      }
+    }
 </style>
 </head>
 <body>
@@ -1539,10 +1585,10 @@
         <div id="content" class="chart-list"><div class="loader-wrap"><div class="loader"></div></div></div>
         <div id="dropouts"></div>
 
-        <div class="week-nav" style="margin-top:28px">
+        <div class="week-nav bottom-week-nav">
           <div class="week-controls">
-            <button id="prevBtnBottom" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
-            <button id="nextBtnBottom" class="gold-btn">Next <i class="fas fa-chevron-right"></i></button>
+            <button id="prevBtnBottom" class="gold-btn bottom-nav-btn"><i class="fas fa-chevron-left"></i> Prev</button>
+            <button id="nextBtnBottom" class="gold-btn bottom-nav-btn">Next <i class="fas fa-chevron-right"></i></button>
           </div>
         </div>
       </main>
