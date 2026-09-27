@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createServerFn } from "./client-server-fn";
 import { getWeeklyChart, type ChartEntry, type WeeklyChartData } from "./charts.functions";
 
 const RELEASES_URL = "https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=1618822736";
