@@ -122,9 +122,7 @@
 }
 .portal-mode .portal-topnav a:hover{color:#f5f5f5}
 .portal-mode .theme-btn{flex:0 0 auto}
-.weekly-mode .portal-topnav,
-.weekly-mode .portal-menu-toggle,
-.weekly-mode .portal-mobile-drawer{display:none!important}
+.weekly-mode .portal-topnav{display:none!important}
 
 .portal-mode .portal-hero{
   background:transparent;
@@ -1749,5 +1747,43 @@ body.global-bars-weekly .weekly-label{
     align-items:center!important;
     justify-content:center!important;
     z-index:20!important;
+  }
+}
+
+
+/* === GLOBAL MOBILE DRAWER FUNCTIONALITY ===
+   The hamburger is global, so its drawer must work on Weekly and portal routes alike. */
+@media(max-width:767px){
+  body.global-bars-weekly .portal-mobile-drawer{
+    display:none!important;
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    top:100%!important;
+    z-index:130!important;
+    background:#0f0f0f!important;
+    border-top:1px solid #2a2a2a!important;
+    padding:10px 16px 14px!important;
+  }
+
+  body.global-bars-weekly .portal-mobile-drawer.open{
+    display:block!important;
+  }
+
+  body.global-bars-weekly .portal-mobile-drawer a{
+    display:block!important;
+    padding:12px 0!important;
+    border-bottom:1px solid #2a2a2a!important;
+    color:#9ca3af!important;
+    text-decoration:none!important;
+    font-size:12px!important;
+    font-weight:800!important;
+    text-transform:uppercase!important;
+    letter-spacing:.08em!important;
+  }
+
+  body.global-bars-weekly .portal-mobile-drawer a:hover,
+  body.global-bars-weekly .portal-mobile-drawer a:focus{
+    color:var(--accent)!important;
   }
 }
