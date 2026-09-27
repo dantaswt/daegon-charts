@@ -10,6 +10,8 @@
   <meta property="og:title" content="Daegon Charts — Weekly Music Charts & Historical Archive">
   <meta property="og:description" content="Independent weekly rankings, chart runs and historical music chart data for songs, albums and artists.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://daegoncharts.pages.dev/">
+  <link rel="canonical" href="https://daegoncharts.pages.dev/">
   <link rel="icon" type="image/png" href="https://i.imgur.com/jaBZ19n.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1953,7 +1955,7 @@
         <section class="site-about-note" aria-labelledby="about-chart-heading">
           <h2 id="about-chart-heading">About Daegon Charts</h2>
           <p>Daegon Charts is an independent music-ranking project and historical archive. The weekly pages organize songs, albums and artists into original rankings and preserve chart movement, peak, weeks charted, weeks at number one and historical chart runs.</p>
-          <p>The project combines structured music-performance data with a consistent chart methodology designed for continuity across weeks and years. It is not affiliated with Billboard, Spotify, Last.fm or any record label. Learn more about how the rankings are built in the <a href="methodology.html">methodology</a>.</p>
+          <p>The project combines structured music-performance data with a consistent chart methodology designed for continuity across weeks and years. It is not affiliated with Billboard, Spotify, Last.fm or any record label. Learn more about how the rankings are built in the <a href="/methodology">methodology</a>.</p>
         </section>
       </main>
     </div>
@@ -1961,11 +1963,11 @@
 
   <footer class="site-footer">
     <nav class="footer-links" aria-label="Site information">
-      <a href="about.html">About</a>
-      <a href="methodology.html">Methodology</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="contact.html">Contact</a>
-      <a href="terms.html">Terms</a>
+      <a href="/about">About</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/contact">Contact</a>
+      <a href="/terms">Terms</a>
     </nav>
     <div class="footer-copy">Daegon Charts — independent weekly music charts and historical archive.</div>
   </footer>
@@ -1990,6 +1992,58 @@ const charts={
   streamingSongs:{id:'streamingSongs',title:'Streaming Songs',kind:'song',url:SHEET+'626144821'},
   digitalSongsSales:{id:'digitalSongsSales',title:'Digital Songs Sales',kind:'song',url:SHEET+'302176914'}
 };
+const SITE_ORIGIN='https://daegoncharts.pages.dev';
+const chartSlugs={
+  songs:'daegon-100',
+  albums:'daegon-albums-100',
+  artists:'daegon-artists-50',
+  radioSongs:'radio-songs',
+  streamingSongs:'streaming-songs',
+  digitalSongsSales:'digital-songs-sales',
+  topStreamingAlbums:'top-streaming-albums',
+  topAlbumSales:'top-album-sales'
+};
+const slugToChart=Object.fromEntries(Object.entries(chartSlugs).map(([id,slug])=>[slug,id]));
+function sitePath(path){
+  const base=location.hostname.endsWith('github.io')?'/daegon-charts':'';
+  return base+(path.startsWith('/')?path:'/'+path);
+}
+function chartPath(id,date){
+  const slug=chartSlugs[id]||id;
+  return '/chart/'+slug+(date?'/'+date:'');
+}
+function parseRoute(){
+  const parts=location.pathname.split('/').filter(Boolean);
+  const ci=parts.indexOf('chart');
+  if(ci>=0){
+    const slug=parts[ci+1]||'';
+    const id=slugToChart[slug];
+    const date=parts[ci+2]||null;
+    if(id)return{id,date};
+  }
+  return{id:'songs',date:null};
+}
+function syncDocumentMeta(id,date){
+  const cfg=charts[id];
+  const path=chartPath(id,date);
+  const canonical=SITE_ORIGIN+path;
+  const title=(cfg?.title||'Daegon Charts')+(date?' — '+fmtDate(date):'')+' | Daegon Charts';
+  const description=(cfg?.title||'Daegon Charts')+(date?' for '+fmtDate(date):'')+'. Explore rank, movement, peak, weeks charted and historical chart runs on Daegon Charts.';
+  document.title=title;
+  let d=document.querySelector('meta[name="description"]');if(d)d.setAttribute('content',description);
+  let c=document.querySelector('link[rel="canonical"]');if(c)c.setAttribute('href',canonical);
+  let ogu=document.querySelector('meta[property="og:url"]');if(ogu)ogu.setAttribute('content',canonical);
+  let ogt=document.querySelector('meta[property="og:title"]');if(ogt)ogt.setAttribute('content',title);
+  let ogd=document.querySelector('meta[property="og:description"]');if(ogd)ogd.setAttribute('content',description);
+}
+function updateBrowserRoute(id,date,replace=false){
+  const target=sitePath(chartPath(id,date));
+  if(location.pathname!==target){
+    history[replace?'replaceState':'pushState']({chartId:id,date},'',target);
+  }
+  syncDocumentMeta(id,date);
+}
+
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
@@ -2201,14 +2255,14 @@ function renderNav(){
   const ids=visibleCharts(state.date);
 
   desktopChartNav.innerHTML=ids.map(id=>'<button data-id="'+id+'" class="'+(id===state.active?'active':'')+'">'+charts[id].title+'</button>').join('');
-  desktopChartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date));
+  desktopChartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date,{routeMode:'push'}));
 
   mobileActiveChart.textContent=charts[state.active].title;
   mobileChartMenu.innerHTML=ids.filter(id=>id!==state.active).map(id=>'<button data-id="'+id+'">'+charts[id].title+'</button>').join('');
   mobileChartMenu.querySelectorAll('button').forEach(b=>b.onclick=()=>{
     mobileChartMenu.classList.remove('open');
     mobileMoreCharts.textContent='+ More Charts';
-    loadChart(b.dataset.id,state.date);
+    loadChart(b.dataset.id,state.date,{routeMode:'push'});
   });
 }
 function diffType(diff){const d=String(diff||'');if(d==='NEW')return'debut';if(d==='RE')return're';if(d.startsWith('▲'))return'rising';if(d.startsWith('▼'))return'falling';return'static'}
@@ -2718,24 +2772,26 @@ function syncWeekButtons(data){
   for(const id of ['prevBtn','prevBtnBottom']){const b=document.getElementById(id);b.disabled=!prev;b.onclick=()=>prev&&setDate(prev,data)}
   for(const id of ['nextBtn','nextBtnBottom']){const b=document.getElementById(id);b.disabled=!next;b.onclick=()=>next&&setDate(next,data)}
 }
-function setDate(date,data){
+function setDate(date,data,{routeMode='push',scroll=true}={}){
   state.date=date;
+  updateBrowserRoute(state.active,date,routeMode==='replace');
   dateLabel.textContent='Chart week of '+fmtDate(date);
   renderWeekPicker(data);
   renderNav();
   syncWeekButtons(data);
   renderRows(data,date);
   renderDropouts(data,date);
-  window.scrollTo({top:0,behavior:'smooth'});
+  if(scroll)window.scrollTo({top:0,behavior:'smooth'});
 }
-async function loadChart(id,requestedDate=null){
+async function loadChart(id,requestedDate=null,{routeMode='push',scroll=true}={}){
   state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';dropoutsEl.innerHTML='';
   try{
     const data=await loadWeekly(id);if(!data.dates.length)throw new Error('No dates');
     let date=requestedDate&&data.entriesByDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];state.date=date;
+    updateBrowserRoute(id,date,routeMode==='replace');
     renderWeekPicker(data);
     dateLabel.textContent='Chart week of '+fmtDate(date);renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);
-  }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" id="retryChart">Try again</button></div>';document.getElementById('retryChart').onclick=()=>{state.cache.delete(state.active);loadChart(state.active,state.date)}}
+  }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" id="retryChart">Try again</button></div>';document.getElementById('retryChart').onclick=()=>{state.cache.delete(state.active);loadChart(state.active,state.date,{routeMode:'replace'})}}
 }
 
 document.getElementById('filters').querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
@@ -2784,7 +2840,13 @@ document.addEventListener('click',function(e){
   if(!weekPicker.contains(e.target)) weekPicker.classList.remove('open');
 });
 
-renderNav();loadChart('songs');
+window.addEventListener('popstate',()=>{
+  const route=parseRoute();
+  loadChart(route.id,route.date,{routeMode:'replace',scroll:false});
+});
+const initialRoute=parseRoute();
+renderNav();
+loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 </script>
 </body>
 </html>
