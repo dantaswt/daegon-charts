@@ -1219,3 +1219,174 @@
     background:#f5f5f5;
   }
 }
+
+
+/* Global bars: every route uses the Weekly header identity. */
+.global-bars-weekly .site-header{
+  background:linear-gradient(to bottom,#0f0f0f,#161616)!important;
+  border-bottom:1px solid #2a2a2a!important;
+}
+.global-bars-weekly .header-inner{
+  max-width:1280px!important;
+  margin:0 auto!important;
+  padding:12px 16px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:16px!important;
+  min-height:auto!important;
+}
+.global-bars-weekly .weekly-label{
+  display:block!important;
+  visibility:visible!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  text-transform:uppercase!important;
+  letter-spacing:.12em!important;
+  color:#9ca3af!important;
+  flex:0 0 auto!important;
+}
+.global-bars-weekly .brand{
+  position:static!important;
+  left:auto!important;
+  right:auto!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:9px!important;
+  overflow:visible!important;
+  white-space:nowrap!important;
+  text-overflow:clip!important;
+  color:#f5f5f5!important;
+  text-transform:none!important;
+  letter-spacing:0!important;
+}
+.global-bars-weekly .brand-mark{
+  display:inline-flex!important;
+  width:26px!important;
+  height:26px!important;
+  align-items:center!important;
+  justify-content:center!important;
+  background:var(--accent)!important;
+  color:#090909!important;
+  font-size:15px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:-.05em!important;
+  transform:skewX(-7deg)!important;
+  box-shadow:3px 3px 0 #ffd54a!important;
+  flex:0 0 auto!important;
+}
+.global-bars-weekly .brand-word{
+  display:block!important;
+  font-size:20px!important;
+  line-height:1!important;
+  font-weight:900!important;
+  letter-spacing:-.035em!important;
+  text-transform:lowercase!important;
+  overflow:visible!important;
+  max-width:none!important;
+  white-space:nowrap!important;
+}
+.global-bars-weekly .theme-btn{
+  width:44px!important;
+  height:44px!important;
+  flex:0 0 44px!important;
+  border:1px solid var(--border)!important;
+  background:var(--card)!important;
+  color:var(--foreground)!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+.global-bars-weekly .theme-btn:hover{
+  border-color:var(--accent)!important;
+  color:var(--accent)!important;
+}
+
+/* Portal navigation sits beneath/within the same Weekly bar without replacing it. */
+.global-bars-weekly.portal-mode .portal-topnav{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex:1;
+  min-width:0;
+}
+.global-bars-weekly.portal-mode .portal-topnav a{
+  color:#9ca3af;
+  text-decoration:none;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
+.global-bars-weekly.portal-mode .portal-topnav a:hover{color:#f5f5f5}
+
+@media(max-width:767px){
+  .global-bars-weekly .header-inner{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    padding:9px 14px!important;
+    min-height:62px!important;
+    gap:10px!important;
+  }
+  .global-bars-weekly .weekly-label{
+    visibility:hidden!important;
+    width:44px!important;
+    flex:0 0 44px!important;
+    overflow:hidden!important;
+  }
+  .global-bars-weekly .brand{
+    position:absolute!important;
+    left:64px!important;
+    right:64px!important;
+    width:auto!important;
+    max-width:none!important;
+    justify-content:center!important;
+    gap:7px!important;
+    overflow:hidden!important;
+  }
+  .global-bars-weekly .brand-mark{
+    width:23px!important;
+    height:23px!important;
+    font-size:13px!important;
+    box-shadow:2px 2px 0 #ffd54a!important;
+  }
+  .global-bars-weekly .brand-word{
+    font-size:18px!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .global-bars-weekly .theme-btn{
+    width:44px!important;
+    height:44px!important;
+    flex:0 0 44px!important;
+    margin-left:auto!important;
+  }
+  .global-bars-weekly.portal-mode .portal-topnav{display:none!important}
+  .global-bars-weekly.portal-mode .portal-menu-toggle{
+    display:flex!important;
+    position:absolute!important;
+    left:14px!important;
+    top:9px!important;
+    width:44px!important;
+    height:44px!important;
+    margin:0!important;
+    z-index:3!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:transparent!important;
+    border:0!important;
+  }
+  .global-bars-weekly.portal-mode .weekly-label{
+    visibility:hidden!important;
+  }
+}
