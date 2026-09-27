@@ -10,8 +10,8 @@
   <meta property="og:title" content="Daegon Charts — Weekly Music Charts & Historical Archive">
   <meta property="og:description" content="Independent weekly rankings, chart runs and historical music chart data for songs, albums and artists.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://daegoncharts.pages.dev/">
-  <link rel="canonical" href="https://daegoncharts.pages.dev/">
+  <meta property="og:url" content="https://daegoncharts.com.br/">
+  <link rel="canonical" href="https://daegoncharts.com.br/">
   <link rel="icon" type="image/png" href="https://i.imgur.com/jaBZ19n.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css">\n</head>
+  <link rel="stylesheet" href="portal.css">\n</head>
 <body>
 <div class="shell">
   <header class="site-header">
@@ -2841,12 +2841,15 @@ document.addEventListener('click',function(e){
 });
 
 window.addEventListener('popstate',()=>{
+  if(window.DaegonPortal&&window.DaegonPortal.handles())return;
   const route=parseRoute();
   loadChart(route.id,route.date,{routeMode:'replace',scroll:false});
 });
 const initialRoute=parseRoute();
 renderNav();
-loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
+if(/\\/chart\\//.test(location.pathname)){
+  loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
+}
 </script>
-<script src="/portal.js"></script>\n</body>
+<script src="portal.js"></script>\n</body>
 </html>
