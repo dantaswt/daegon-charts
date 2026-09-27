@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-DiK4U9sA.js";var t=e(),n=()=>(0,t.jsx)(`div`,{className:`text-center py-16 gold font-bold`,children:`Not found`});export{n as notFoundComponent};

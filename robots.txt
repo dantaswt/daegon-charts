@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://daegoncharts.com.br/sitemap.xml

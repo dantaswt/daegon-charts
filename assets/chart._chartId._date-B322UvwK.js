@@ -1,0 +1,1 @@
+import{t as e}from"./jsx-runtime-DiK4U9sA.js";var t=e(),n=()=>(0,t.jsxs)(`div`,{className:`text-center py-16`,children:[(0,t.jsx)(`h2`,{className:`text-2xl font-bold gold`,children:`Chart week not found`}),(0,t.jsx)(`p`,{className:`text-muted-foreground mt-2`,children:`That chart or date has no data.`})]});export{n as notFoundComponent};
