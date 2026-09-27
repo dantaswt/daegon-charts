@@ -171,17 +171,14 @@ function setMode(portal){
     brand.innerHTML='<span class="brand-mark" aria-hidden="true">D</span><span class="brand-word">aegon charts</span>';
   }
 
-  const footer=document.querySelector('.site-footer');
   if(portal){
     weeklyEl.style.display='none';
     portalEl.classList.add('active');
     portalEl.removeAttribute('hidden');
-    if(footer)footer.innerHTML='<div class="ref-footer-links"><a href="'+appHref('/artists')+'" data-portal-link="/artists">Artists</a><span>|</span><a href="'+appHref('/albums')+'" data-portal-link="/albums">Albums</a><span>|</span><a href="'+appHref('/songs')+'" data-portal-link="/songs">Songs</a></div><div class="ref-footer-copy"><p>Chart generated based on daegon charts archive.</p><p>Powered by TanStack Start.</p></div>';
   }else{
     weeklyEl.style.display='';
     portalEl.classList.remove('active');
     portalEl.setAttribute('hidden','');
-    if(footer)footer.innerHTML='<nav class="footer-links" aria-label="Site information"><a href="/about">About</a><a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/contact">Contact</a><a href="/terms">Terms</a></nav><div class="footer-copy">Daegon Charts — independent weekly music charts and historical archive.</div>';
   }
 }
 function loading(title='Loading'){
