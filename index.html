@@ -617,7 +617,10 @@
             const cfg = chartsConfig[ct]; if(!cfg) return false;
             const url = `${cfg.url}&_=${Date.now()}`;
             try {
-                const res = await fetch(url);
+                const res = await Promise.race([
+                    fetch(url),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error(`Timeout loading ${ct}`)), 12000))
+                ]);
                 if(!res.ok) throw new Error(`Failed to fetch ${ct}`);
                 let csv = await res.text();
                 if(csv.charCodeAt(0)===0xFEFF) csv=csv.substring(1);
@@ -1320,38 +1323,54 @@
         }
         
         async function init(){
-            showMessage('loading','Loading charts...');
-            try{
-                const priorityCharts = [...weeklyChartList];
-                await Promise.all(priorityCharts.map(ct => fetchChartData(ct)));
-                
-                for(let ct of weeklyChartList) {
-                    let dates = Object.keys(appState.chartData[ct]||{});
-                    if(dates.length) {
-                        appState.sharedDate = dates[dates.length-1];
-                        break;
-                    }
+            // Render the interface immediately. Individual charts fill in as their data arrives.
+            renderHome();
+
+            const coreCharts = ['songs', 'artists', 'albums'];
+            const secondaryWeeklyCharts = weeklyChartList.filter(ct => !coreCharts.includes(ct));
+
+            const refreshAfterLoad = (ct, ok) => {
+                if (!ok) return;
+
+                if (!appState.sharedDate && weeklyChartList.includes(ct)) {
+                    const dates = Object.keys(appState.chartData[ct] || {});
+                    if (dates.length) appState.sharedDate = dates[dates.length - 1];
                 }
-                
-                renderHome();
-                
-                const backgroundCharts = [...yearEndList, ...goatList, 'artistStats', 'statsData'];
-                backgroundCharts.forEach(ct => {
-                    fetchChartData(ct).then(() => {
-                        if (ct.includes('yearEnd') || ct.includes('goat')) {
-                            updateHomeCharts();
-                        }
-                        if (ct === 'artistStats' && appState.currentView === 'allArtists') {
-                            showAllArtists();
-                        }
-                    });
+
+                if (appState.currentView === 'home') {
+                    updateHomeCharts();
+                    setTimeout(() => loadCircleImages(), 50);
+                }
+            };
+
+            // Prioritize the three principal charts, but never block the page on them.
+            coreCharts.forEach(ct => {
+                fetchChartData(ct).then(ok => refreshAfterLoad(ct, ok));
+            });
+
+            // Load the remaining weekly charts independently in the background.
+            secondaryWeeklyCharts.forEach(ct => {
+                fetchChartData(ct).then(ok => refreshAfterLoad(ct, ok));
+            });
+
+            // Year-end, GOAT, artist stats and stats are lower-priority background requests.
+            const backgroundCharts = [...yearEndList, ...goatList, 'artistStats', 'statsData'];
+            backgroundCharts.forEach(ct => {
+                fetchChartData(ct).then(ok => {
+                    if (!ok) return;
+                    if ((ct.includes('yearEnd') || ct.includes('goat')) && appState.currentView === 'home') {
+                        updateHomeCharts();
+                    }
+                    if (ct === 'artistStats' && appState.currentView === 'allArtists') {
+                        showAllArtists();
+                    }
                 });
-                
-                setTimeout(() => fetchChartBeat(), 500);
-                
-            } catch(e){ console.error(e); showMessage('error','Error loading data: '+e.message); }
+            });
+
+            // Chart Beat is deliberately delayed so it cannot hold up the main charts.
+            setTimeout(() => fetchChartBeat(), 800);
         }
-        
+
         document.addEventListener('DOMContentLoaded',()=>{
             init();
             document.getElementById('mainTitle').addEventListener('click',()=>{ appState.navigationHistory=[]; renderHome(); });
