@@ -75,17 +75,22 @@ function ensureShell(){
       brand.onclick=()=>go('/');
       brand.onkeydown=e=>{if(e.key==='Enter'||e.key===' ')go('/')};
     }
-    const select=document.createElement('select');
-    select.id='portalMobileNav';
-    select.className='portal-mobile-menu';
-    select.setAttribute('aria-label','Site navigation');
-    select.innerHTML='<option value="">Menu</option>'+[
+    const mobileBtn=document.createElement('button');
+    mobileBtn.id='portalMenuToggle';
+    mobileBtn.className='portal-menu-toggle';
+    mobileBtn.setAttribute('aria-label','Menu');
+    mobileBtn.innerHTML='<i class="fas fa-bars"></i>';
+    const mobileMenu=document.createElement('div');
+    mobileMenu.id='portalMobileMenu';
+    mobileMenu.className='portal-mobile-drawer';
+    mobileMenu.innerHTML=[
       ['Home','/'],['Weekly','/chart/daegon-100'],['Songs','/songs'],['Albums','/albums'],['Artists','/artists'],
       ["#1's",'/number-ones'],['Stats','/stats'],['Year-End','/year-end'],['Decade-End','/decade-end'],
       ['GOAT','/goat'],['Chart Beat','/chart-beat'],['Awards','/awards'],['Battle','/chart-battle'],['Search','/search']
-    ].map(([l,p])=>'<option value="'+p+'">'+l+'</option>').join('');
-    select.onchange=()=>{if(select.value)go(select.value);select.value=''};
-    head.insertBefore(select,theme);
+    ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
+    mobileBtn.onclick=()=>mobileMenu.classList.toggle('open');
+    head.insertBefore(mobileBtn,theme);
+    document.querySelector('.site-header').appendChild(mobileMenu);
   }
 }
 
