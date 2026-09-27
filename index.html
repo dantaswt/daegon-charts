@@ -10,266 +10,22 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script>
-    (function(){
-      try{
-        var t=localStorage.getItem('theme');
-        if(t!=='light') document.documentElement.classList.add('dark');
-      }catch(e){}
-    })();
-  </script>
-  <style>
-    :root{
-      --background:#e8e8e8;
-      --foreground:#1a1a1a;
-      --card:#ffffff;
-      --card-foreground:#1a1a1a;
-      --muted:#f0f0f0;
-      --muted-foreground:#6b7280;
-      --accent:#FF6D00;
-      --border:#d4d4d4;
-      --border-dark:#c0c0c0;
-    }
-    html.dark{
-      --background:#1a1a1a;
-      --foreground:#f5f5f5;
-      --card:#0f0f0f;
-      --card-foreground:#f5f5f5;
-      --muted:#171717;
-      --muted-foreground:#9CA3AF;
-      --border:#2a2a2a;
-      --border-dark:#333333;
-    }
-    *{box-sizing:border-box;border-radius:0!important}
-    html,body{margin:0;background:var(--background);color:var(--foreground);font-family:Inter,ui-sans-serif,system-ui,sans-serif}
-    body{min-height:100vh}
-    button,select{font:inherit}
-    button{cursor:pointer}
-    .shell{min-height:100vh;display:flex;flex-direction:column}
-    .site-header{
-      position:fixed;top:0;left:0;right:0;z-index:100;
-      background:linear-gradient(to bottom,#0f0f0f,#161616);
-      border-bottom:1px solid #2a2a2a;
-    }
-    .header-inner{
-      max-width:1280px;margin:0 auto;padding:12px 16px;
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-    }
-    .brand{font-size:20px;font-weight:800;color:#f5f5f5;letter-spacing:.02em;text-transform:lowercase}
-    .weekly-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af}
-    .theme-btn{
-      width:44px;height:44px;border:1px solid var(--border);background:var(--card);color:var(--foreground);
-      display:flex;align-items:center;justify-content:center;transition:.15s;
-    }
-    .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
-    .page{
-      flex:1;max-width:1280px;width:100%;margin:0 auto;padding:88px 12px 36px;
-    }
-    .layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px}
-    .sidebar{position:sticky;top:96px;align-self:start}
-    .chart-nav{display:flex;flex-direction:column;gap:8px}
-    .chart-nav button{
-      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
-      font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:9px 14px;
-      transition:.15s;
-    }
-    .chart-nav button:hover,.chart-nav button.active{background:var(--accent);color:#000;border-color:var(--accent)}
-    .main{min-width:0}
-    .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
-    h1{margin:0;font-size:36px;line-height:1;font-weight:800;text-transform:uppercase;letter-spacing:-.02em}
-    .date-label{margin-top:6px;font-size:13px;color:var(--muted-foreground)}
-    .week-nav{display:flex;flex-direction:column;align-items:center;gap:8px;margin:8px 0 16px}
-    .week-label{font-size:12px;color:var(--muted-foreground);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
-    .week-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
-    .gold-btn{
-      min-height:44px;border:0;background:var(--accent);color:#000;font-weight:700;padding:9px 14px;
-      display:inline-flex;align-items:center;justify-content:center;gap:8px;
-    }
-    .gold-btn:disabled{opacity:.4;cursor:not-allowed}
-    .date-select{
-      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
-      font-size:14px;font-weight:800;padding:9px 14px;min-width:175px;text-align:center;
-    }
-    .filters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:16px}
-    .filter{
-      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
-      padding:9px 12px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
-    }
-    .filter.active{background:var(--accent);color:#000;border-color:var(--accent)}
-    .chart-list{display:flex;flex-direction:column;gap:12px;max-width:896px;margin:0 auto}
-    .chart-card{
-      background:var(--card);color:var(--card-foreground);border:1px solid var(--border);
-      padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
-      transition:transform .18s ease,box-shadow .18s ease;
-    }
-    .chart-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
-    .desktop-row{
-      display:grid;grid-template-columns:auto auto auto minmax(0,1fr) auto;gap:12px;align-items:center;
-    }
-    .rank-wrap{width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center}
-    .rank-num{font-size:30px;font-weight:900;min-width:64px;display:flex;align-items:center;justify-content:center}
-    .rank-num.one{font-size:36px;width:64px;height:64px;background:var(--accent);color:#000}
-    .weeks1{margin-top:3px;padding:2px 6px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
-    .cover{
-      width:96px;height:96px;background:var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--muted-foreground)
-    }
-    .cover.one{width:180px;height:180px;border-left:4px solid var(--accent);margin-left:-12px}
-    .cover img{width:100%;height:100%;object-fit:cover;display:block}
-    .diff-wrap{width:32px;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground)}
-    .diff-arrow{width:19px;height:19px}
-    .diff-badge{font-size:10px;font-weight:800;line-height:1;letter-spacing:.05em}
-    .diff-new{background:#00E676;color:#000;padding:3px 5px}
-    .entry{min-width:0}
-    .entry-title{font-weight:800;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
-    .entry-title.one{font-size:20px}
-    .artist{margin-top:3px;color:var(--muted-foreground);font-size:14px;line-height:1.25}
-    .artist.one{font-size:16px}
-    .badge-inline{display:inline-flex;margin-left:6px;padding:2px 5px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
-    .right{display:flex;align-items:center;gap:16px}
-    .award{width:24px;height:24px;border:2px solid currentColor;border-radius:9999px!important;display:flex;align-items:center;justify-content:center}
-    .metrics{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted-foreground);white-space:nowrap}
-    .metrics .sep{color:var(--border)}
-    .actions{display:flex;flex-direction:column;gap:8px}
-    .action{
-      width:32px;height:32px;border:0;background:var(--muted);color:var(--foreground);
-      display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:9999px!important;transition:.15s
-    }
-    .action:hover{background:var(--border)}
-    .details{
-      margin-top:12px;border:1px solid var(--border);background:var(--muted);padding:12px;
-      font-size:13px;color:var(--foreground)
-    }
-    .details-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
-    .detail-box{background:var(--card);border:1px solid var(--border);padding:9px}
-    .detail-k{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-foreground)}
-    .detail-v{font-size:13px;font-weight:700;margin-top:3px}
-    .dropouts{max-width:896px;margin:28px auto 0;border:1px solid var(--border);background:var(--muted);padding:16px}
-    .dropouts-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:var(--muted-foreground);margin-bottom:10px}
-    .dropout{display:flex;gap:10px;align-items:center;border:1px solid var(--border-dark);background:var(--card);padding:10px;margin-top:8px}
-    .dropout-rank{font-weight:800}
-    .dropout-info{min-width:0}
-    .dropout-name{font-size:13px;font-weight:700}
-    .dropout-meta{font-size:10px;color:var(--muted-foreground);margin-top:2px}
-    .mobile-row{display:none}
-    .back-top{
-      position:fixed;right:18px;bottom:20px;z-index:120;width:48px;height:48px;border:0;background:var(--accent);color:#000;
-      border-radius:9999px!important;display:none;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.2)
-    }
-    .loader-wrap{display:flex;justify-content:center;padding:60px 0}
-    .loader{width:42px;height:42px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:9999px!important;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .error{text-align:center;padding:48px 10px;color:var(--muted-foreground)}
-    .color-new{background:#bae6fd!important;color:#1a1a1a!important}
-    .color-re{background:#93c5fd!important;color:#1a1a1a!important}
-    .color-up1{background:#d1fae5!important;color:#1a1a1a!important}
-    .color-up10{background:#6ee7b7!important;color:#1a1a1a!important}
-    .color-down1{background:#fee2e2!important;color:#1a1a1a!important}
-    .color-down10{background:#fca5a5!important;color:#1a1a1a!important}
-    .site-footer{margin-top:auto;background:#0f0f0f;border-top:1px solid #2a2a2a;padding:28px 16px;text-align:center;color:#9ca3af;font-size:12px}
-    @media(max-width:900px){
-      .layout{grid-template-columns:1fr}
-      .sidebar{position:static}
-      .chart-nav{display:flex;flex-direction:row;overflow-x:auto;gap:0;margin-bottom:6px}
-      .chart-nav button{flex:0 0 auto;white-space:nowrap}
-    }
-    @media(max-width:767px){
-      .page{padding-top:80px}
-      .header-inner{padding:9px 14px}
-      .brand{position:absolute;left:64px;right:64px;text-align:center;font-size:18px}
-      .weekly-label{visibility:hidden}
-      .title-row{justify-content:center;text-align:center}
-      h1{font-size:28px}
-      .desktop-row{display:none}
-      .mobile-row{display:flex;align-items:flex-start;gap:8px}
-      .chart-card{padding:13px 14px}
-      .m-rank{width:32px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:2px}
-      .m-rank-num{font-size:20px;font-weight:900;line-height:1}
-      .m-diff{height:20px;margin-top:3px;display:flex;align-items:center;justify-content:center}
-      .m-cover{width:64px;height:64px;background:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted-foreground)}
-      .m-cover.one{width:68px;height:68px;border-left:3px solid var(--accent)}
-      .m-cover img{width:100%;height:100%;object-fit:cover}
-      .m-entry{min-width:0;flex:1}
-      .m-title{font-size:13px;font-weight:800;line-height:1.15;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
-      .m-artist{font-size:11px;color:var(--muted-foreground);line-height:1.15;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-      .m-metrics{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted-foreground);white-space:nowrap;margin-top:4px}
-      .m-actions{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
-      .m-actions-top{display:flex;align-items:center;gap:6px}
-      .week-nav{margin-top:4px}
-      .filters{gap:6px}
-      .filter{padding:8px 10px}
-    }
-  </style>
-</head>
-<body>
-<div class="shell">
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="weekly-label">WEEKLY CHARTS</div>
-      <div class="brand">daegon charts</div>
-      <button id="themeToggle" class="theme-btn" aria-label="Toggle theme"><i class="fas fa-sun"></i></button>
-    </div>
-  </header>
+const SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
+const HIST='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOUyuJJRPQbmPbCZH4/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
+const HIST_SONGS='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOUyuJJRPQbmPbCZH4/gviz/tq?tq=select%20A,B,C,D,E,F,G,H,I,J&tqx=out:csv&gid=';
 
-  <div class="page">
-    <div class="layout">
-      <aside class="sidebar"><div id="chartNav" class="chart-nav"></div></aside>
-      <main class="main">
-        <div class="title-row">
-          <div>
-            <h1 id="chartTitle"></h1>
-            <div id="dateLabel" class="date-label"></div>
-          </div>
-        </div>
-
-        <div class="week-nav">
-          <div class="week-label">Chart Week</div>
-          <div class="week-controls">
-            <button id="prevBtn" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
-            <select id="weekSelect" class="date-select"></select>
-            <button id="nextBtn" class="gold-btn">Next <i class="fas fa-chevron-right"></i></button>
-          </div>
-        </div>
-
-        <div id="filters" class="filters">
-          <button class="filter active" data-filter="all">ALL</button>
-          <button class="filter" data-filter="debut">NEW</button>
-          <button class="filter" data-filter="re">RE</button>
-          <button class="filter" data-filter="rising"><i class="fas fa-arrow-up"></i></button>
-          <button class="filter" data-filter="falling"><i class="fas fa-arrow-down"></i></button>
-          <button class="filter" data-filter="static"><i class="fas fa-arrow-right"></i></button>
-          <button id="colorToggle" class="filter" title="Color movements"><i class="fas fa-palette"></i></button>
-        </div>
-
-        <div id="content" class="chart-list"><div class="loader-wrap"><div class="loader"></div></div></div>
-        <div id="dropouts"></div>
-
-        <div class="week-nav" style="margin-top:28px">
-          <div class="week-controls">
-            <button id="prevBtnBottom" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
-            <button id="nextBtnBottom" class="gold-btn">Next <i class="fas fa-chevron-right"></i></button>
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
-
-  <footer class="site-footer">Chart generated based on daegon charts archive.</footer>
-  <button id="backTop" class="back-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
-</div>
-
-<script>
-const SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=';
 const charts={
-  songs:{title:'Hot 100',gid:'904867620',kind:'song'},
-  artists:{title:'Top 50 Artists',gid:'1568177610',kind:'artist'},
-  albums:{title:'Top 100 Albums',gid:'1940039611',kind:'album'},
-  radioSongs:{title:'Radio Songs',gid:'1681272096',kind:'song'},
-  topStreamingAlbums:{title:'Top Streaming Albums',gid:'1028545573',kind:'album'},
-  topAlbumSales:{title:'Top Album Sales',gid:'1111633725',kind:'album'},
-  streamingSongs:{title:'Streaming Songs',gid:'626144821',kind:'song'},
-  digitalSongsSales:{title:'Digital Songs Sales',gid:'302176914',kind:'song'}
+  songs:{id:'songs',title:'Hot 100',kind:'song',url:SHEET+'904867620',secondaryUrl:HIST_SONGS+'1011796371'},
+  artists:{id:'artists',title:'Artist 50',kind:'artist',url:SHEET+'1568177610',secondaryUrl:HIST+'1959135946'},
+  albums:{id:'albums',title:'Top 100 Albums',kind:'album',url:SHEET+'1940039611',secondaryUrl:HIST+'765580865'},
+  radioSongs:{id:'radioSongs',title:'Radio Songs',kind:'song',url:SHEET+'1681272096'},
+  topStreamingAlbums:{id:'topStreamingAlbums',title:'Top Streaming Albums',kind:'album',url:SHEET+'1028545573'},
+  topAlbumSales:{id:'topAlbumSales',title:'Top Album Sales',kind:'album',url:SHEET+'1111633725'},
+  streamingSongs:{id:'streamingSongs',title:'Streaming Songs',kind:'song',url:SHEET+'626144821'},
+  digitalSongsSales:{id:'digitalSongsSales',title:'Digital Songs Sales',kind:'song',url:SHEET+'302176914'}
 };
 const weeklyIds=Object.keys(charts);
-const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set()};
+const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 const chartNav=document.getElementById('chartNav'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
 const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel'), weekSelect=document.getElementById('weekSelect');
 
@@ -280,49 +36,149 @@ function parseCsvRow(line){
 }
 function normalizeDate(v){
   if(!v)return'';v=String(v).trim();
-  if(/^\d{4}-\d{2}-\d{2}$/.test(v))return v;
-  const m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  return m?`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`:v;
+  if(v.includes('/')){const p=v.split('/');if(p.length===3)return p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0')}
+  return v;
 }
-function findIndex(h,names){for(const n of names){const i=h.indexOf(n);if(i!==-1)return i}return -1}
+function findIdx(h,names){const lower=h.map(x=>String(x).toLowerCase().trim());for(const n of names){const i=lower.indexOf(n.toLowerCase());if(i!==-1)return i}return -1}
+function toInt(v){
+  let x=String(v??'').trim();if(!x||x==='-')return 0;
+  x=x.replace(/[^0-9.,\-]/g,'');if(!x)return 0;
+  if(x.includes('.')&&((x.match(/\./g)||[]).length>1||/^\d+\.\d{3}$/.test(x)))x=x.replace(/\./g,'');
+  x=x.replace(/,/g,'');const n=parseInt(x,10);return Number.isFinite(n)?n:0;
+}
 function val(r,i){return i>=0?(r[i]||'').trim():''}
 function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
 function fmtDate(d){try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}catch{return d}}
 function fmtShort(d){try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}catch{return d}}
-function parseNum(v){const n=parseInt(String(v??'').replace(/[^0-9-]/g,''),10);return Number.isFinite(n)?n:0}
+function itemKey(e){return (e.name||'').toLowerCase()+'|'+(e.artist||'').toLowerCase()}
+function computeChartPoints(position,chartId){const n=['songs','streamingSongs','radioSongs','digitalSongsSales'].includes(chartId)?100:50;return Math.round(1000*Math.pow(Math.max(0,(n-position+1))/n,1.5))}
+function formatValue(v,chartId,isStream=false){
+  const num=toInt(v);if(!num)return String(v??'-')||'-';
+  if((isStream||['radioSongs','topStreamingAlbums','streamingSongs'].includes(chartId))){
+    if(num>=1000000)return (num/1000000).toFixed(1).replace(/\.0$/,'')+'B';
+    if(num>=1000)return Math.round(num/1000)+'M';
+  }
+  return num.toLocaleString('en-US');
+}
+function certification(units,type){
+  if(type==='song'){if(units>=12000000)return'2x Diamond';if(units>=6000000)return'Diamond';if(units>=600000){const x=Math.floor(units/600000);return x>=2?x+'x Platinum':'Platinum'}if(units>=400000)return'Gold';if(units>=200000)return'Silver'}
+  else{if(units>=20000000)return'2x Diamond';if(units>=10000000)return'Diamond';if(units>=1000000){const x=Math.floor(units/1000000);return x>=2?x+'x Platinum':'Platinum'}if(units>=500000)return'Gold'}
+  return'';
+}
+async function fetchText(url,retries=3){
+  const cached=sessionStorage.getItem('csv:'+url);
+  const ts=Number(sessionStorage.getItem('csvts:'+url)||0);
+  if(cached&&Date.now()-ts<10*60*1000)return cached;
+  let last;
+  for(let attempt=0;attempt<=retries;attempt++){
+    try{
+      const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),30000);
+      const res=await fetch(url,{cache:'default',signal:ctrl.signal});clearTimeout(timer);
+      if(res.status===429&&attempt<retries){await new Promise(r=>setTimeout(r,1000*(attempt+1)));continue}
+      if(!res.ok)throw new Error('CSV '+res.status);
+      let text=await res.text();if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+      try{sessionStorage.setItem('csv:'+url,text);sessionStorage.setItem('csvts:'+url,String(Date.now()))}catch{}
+      return text;
+    }catch(e){last=e;if(attempt<retries)await new Promise(r=>setTimeout(r,1000*(attempt+1)))}
+  }
+  throw last||new Error('CSV failed');
+}
+async function fetchRows(url){const text=await fetchText(url);return text.trim().split(/\r?\n/).filter(Boolean).map(parseCsvRow)}
 
-async function fetchChart(id){
-  if(state.cache.has(id))return state.cache.get(id);
-  const res=await Promise.race([fetch(SHEET+charts[id].gid+'&_='+Date.now()),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),15000))]);
-  if(!res.ok)throw new Error('HTTP '+res.status);
-  let csv=await res.text();if(csv.charCodeAt(0)===0xFEFF)csv=csv.slice(1);
-  const rows=csv.trim().split(/\r?\n/).map(parseCsvRow);
-  const h=rows[0].map(x=>x.toLowerCase().trim());
+const ALBUM_OVERRIDES={anitta:{'versions of me':'Girl from Rio'},waneesa:{'w (2005)':'W','w':'W'}};
+function parseSheet(rows,cfg){
+  if(!rows.length)return{};
+  const h=rows[0].map(x=>String(x).toLowerCase().trim());
   const idx={
-    date:findIndex(h,['date','chart date']),position:findIndex(h,['position','rank','pos']),diff:findIndex(h,['dif','diff','▲▼']),
-    song:findIndex(h,['song','title','track']),album:findIndex(h,['album']),artist:findIndex(h,['artist','artists']),
-    lw:findIndex(h,['last week','lw']),peak:findIndex(h,['peak']),weeks:findIndex(h,['weeks','wks']),weeksAt1:findIndex(h,['weeks at 1','wks at 1','weeks at #1']),
-    units:findIndex(h,['units']),totalUnits:findIndex(h,['total units','total']),sales:findIndex(h,['sales']),streams:findIndex(h,['streams']),airplay:findIndex(h,['airplay','audience']),
-    cover:findIndex(h,['cover','image','image url','cover url','artwork','artwork url'])
+    date:findIdx(h,['date','chart date']),position:findIdx(h,['position','rank','pos']),diff:findIdx(h,['dif','diff','▲▼']),
+    song:findIdx(h,['song','title','track']),album:findIdx(h,['album']),artist:findIdx(h,['artist','artists']),
+    lastWeek:findIdx(h,['last week','lw','last wk','prev week','previous week']),peak:findIdx(h,['peak']),weeks:findIdx(h,['weeks','wks']),
+    weeksAt1:findIdx(h,['weeks at 1','wks at 1','week at #1','week at 1','weeks at #1']),points:findIdx(h,['points']),
+    sales:findIdx(h,['sales','sales/streams','sales/streaming','pure sales']),streams:findIdx(h,['streams','sea','streaming']),
+    airplay:findIdx(h,['airplay']),audience:findIdx(h,['audience']),certification:findIdx(h,['certification']),
+    units:findIdx(h,['units','spins','sales','streams','audience']),totalUnits:findIdx(h,['total units','total']),
+    totalStreams:findIdx(h,['total streams','total streaming']),totalSales:findIdx(h,['total sales'])
   };
-  const byDate={};
-  for(const r of rows.slice(1)){const d=normalizeDate(r[idx.date]||'');if(!d)continue;(byDate[d]??=[]).push(r)}
-  Object.values(byDate).forEach(list=>list.sort((a,b)=>(parseInt(a[idx.position])||999)-(parseInt(b[idx.position])||999)));
-  const data={idx,byDate,dates:Object.keys(byDate).sort((a,b)=>new Date(a)-new Date(b))};
-  state.cache.set(id,data);return data;
+  if(cfg.id==='radioSongs'){const a=h.indexOf('audience');if(a!==-1)idx.units=a}
+  const nameIdx=cfg.kind==='artist'?idx.artist:cfg.kind==='album'?idx.album:idx.song;
+  const out={};
+  for(const r of rows.slice(1)){
+    const date=normalizeDate(r[idx.date]);if(!date)continue;
+    const rawName=val(r,nameIdx),rawArtist=val(r,idx.artist);
+    const finalName=(ALBUM_OVERRIDES[rawArtist.toLowerCase()]||{})[rawName.toLowerCase()]||rawName;
+    const e={
+      position:toInt(r[idx.position]),diff:idx.diff>=0?val(r,idx.diff):'',name:finalName,artist:rawArtist,
+      album:idx.album>=0?val(r,idx.album):'',peak:toInt(r[idx.peak]),weeks:toInt(r[idx.weeks]),weeksAt1:idx.weeksAt1>=0?toInt(r[idx.weeksAt1]):0,
+      lastWeek:idx.lastWeek>=0?val(r,idx.lastWeek):'',points:idx.points>=0?val(r,idx.points):'',sales:idx.sales>=0?val(r,idx.sales):'',
+      streams:idx.streams>=0?val(r,idx.streams):'',airplay:idx.airplay>=0?val(r,idx.airplay):'',audience:idx.audience>=0?val(r,idx.audience):'',
+      certification:idx.certification>=0?val(r,idx.certification):'',units:idx.units>=0?val(r,idx.units):'',totalUnits:idx.totalUnits>=0?val(r,idx.totalUnits):'',
+      totalStreams:idx.totalStreams>=0?val(r,idx.totalStreams):'',totalSales:idx.totalSales>=0?val(r,idx.totalSales):''
+    };
+    if(!e.name||!e.position)continue;(out[date]??=[]).push(e);
+  }
+  return out;
+}
+function computeDiffs(dates,entriesByDate){
+  const seen=new Map();
+  for(let di=0;di<dates.length;di++){
+    const d=dates[di],prev=dates[di-1],prevMap=new Map();
+    if(prev)for(const e of entriesByDate[prev]||[])prevMap.set(itemKey(e),e.position);
+    for(const e of entriesByDate[d]||[]){
+      const key=itemKey(e),p=prevMap.get(key);
+      if(p==null)e.diff=seen.has(key)?'RE':'NEW';
+      else{const move=p-e.position;e.diff=move>0?'▲'+move:move<0?'▼'+Math.abs(move):'='}
+      if(!seen.has(key))seen.set(key,d);
+    }
+  }
+}
+async function loadWeekly(chartId){
+  if(state.cache.has(chartId))return state.cache.get(chartId);
+  const cfg=charts[chartId];
+  const primaryPromise=fetchRows(cfg.url);
+  const secondaryPromise=cfg.secondaryUrl?fetchRows(cfg.secondaryUrl).catch(()=>null):Promise.resolve(null);
+  const [primaryRows,secondaryRows]=await Promise.all([primaryPromise,secondaryPromise]);
+  const entriesByDate=parseSheet(primaryRows,cfg);
+  if(secondaryRows){
+    const extra=parseSheet(secondaryRows,cfg);
+    for(const [d,list] of Object.entries(extra))(entriesByDate[d]??=[]).push(...list);
+  }
+  const dates=Object.keys(entriesByDate).sort();
+  for(const d of dates){
+    entriesByDate[d].sort((a,b)=>a.position-b.position);
+    const byKey=new Map(),dedup=[];
+    for(const e of entriesByDate[d]){
+      const k=itemKey(e),existing=byKey.get(k);
+      if(!existing){byKey.set(k,e);dedup.push(e)}
+      else if(e.position<existing.position){const ix=dedup.indexOf(existing);if(ix>=0)dedup[ix]=e;byKey.set(k,e)}
+    }
+    entriesByDate[d]=dedup.sort((a,b)=>a.position-b.position);
+  }
+  if(cfg.secondaryUrl){
+    const running=new Map(),prevPos=new Map();
+    for(const d of dates){
+      for(const e of entriesByDate[d]){
+        const k=itemKey(e),st=running.get(k)||{weeks:0,peak:Infinity,weeksAt1:0};
+        st.weeks++;st.peak=Math.min(st.peak,e.position);if(e.position===1)st.weeksAt1++;
+        e.lastWeek=prevPos.has(k)?String(prevPos.get(k)):'';
+        e.weeks=st.weeks;e.peak=st.peak;e.weeksAt1=st.weeksAt1||0;
+        if(chartId==='songs'&&!e.points)e.points=String(computeChartPoints(e.position,'songs'));
+        else if(chartId!=='songs'&&!e.units)e.units=String(computeChartPoints(e.position,chartId));
+        running.set(k,st);
+      }
+      prevPos.clear();for(const e of entriesByDate[d])prevPos.set(itemKey(e),e.position);
+    }
+  }
+  computeDiffs(dates,entriesByDate);
+  const data={chartId,title:cfg.title,kind:cfg.kind,dates,entriesByDate};
+  state.cache.set(chartId,data);return data;
 }
 
-function visibleCharts(date){
-  return date&&date<'2017-01-01'?['songs','artists','albums']:weeklyIds;
-}
+function visibleCharts(date){return date&&date<'2017-01-01'?['songs','artists','albums']:weeklyIds}
 function renderNav(){
-  chartNav.innerHTML=visibleCharts(state.date).map(id=>`<button data-id="${id}" class="${id===state.active?'active':''}">${charts[id].title}</button>`).join('');
+  chartNav.innerHTML=visibleCharts(state.date).map(id=>'<button data-id="'+id+'" class="'+(id===state.active?'active':'')+'">'+charts[id].title+'</button>').join('');
   chartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date));
 }
-function diffType(diff){
-  const d=String(diff||'');
-  if(d==='NEW')return'debut';if(d==='RE')return're';if(d.startsWith('▲'))return'rising';if(d.startsWith('▼'))return'falling';return'static';
-}
+function diffType(diff){const d=String(diff||'');if(d==='NEW')return'debut';if(d==='RE')return're';if(d.startsWith('▲'))return'rising';if(d.startsWith('▼'))return'falling';return'static'}
 function diffHtml(diff){
   const d=String(diff||'');
   if(d==='NEW')return '<span class="diff-badge diff-new">NEW</span>';
@@ -332,86 +188,178 @@ function diffHtml(diff){
   return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
 }
 function colorClass(diff){
-  if(!state.diffColors)return'';
-  const d=String(diff||'');
+  if(!state.diffColors)return'';const d=String(diff||'');
   if(d==='NEW')return'color-new';if(d==='RE')return'color-re';
-  if(d.startsWith('▲'))return parseNum(d.slice(1))>=10?'color-up10':'color-up1';
-  if(d.startsWith('▼'))return parseNum(d.slice(1))>=10?'color-down10':'color-down1';
+  if(d.startsWith('▲'))return toInt(d.slice(1))>=10?'color-up10':'color-up1';
+  if(d.startsWith('▼'))return toInt(d.slice(1))>=10?'color-down10':'color-down1';
   return'';
 }
-function rowName(row,idx,kind){
-  if(kind==='song')return val(row,idx.song)||'Unknown';
-  if(kind==='album')return val(row,idx.album)||'Unknown';
-  return val(row,idx.artist)||'Unknown';
+function rowName(e,cfg){return e.name||'Unknown'}
+
+function awardsFor(e,entries,chartId){
+  const eligible=(chartId==='songs'||chartId==='albums')&&(e.diff==='NEW'||e.diff==='RE'||String(e.diff).startsWith('▲'));
+  if(!eligible)return{hasStar:false,gainer:false};
+  let maxStreams=0,streamKey='',maxSales=0,salesKey='';
+  for(const x of entries){
+    const st=toInt(x.streams);if(st>maxStreams){maxStreams=st;streamKey=itemKey(x)}
+    const sa=toInt(x.sales);if(sa>maxSales){maxSales=sa;salesKey=itemKey(x)}
+  }
+  const k=itemKey(e),g=(maxStreams>0&&streamKey===k)||(maxSales>0&&salesKey===k);
+  return{hasStar:true,gainer:g};
 }
-function coverHtml(url,one,mobile=false){
+function detailFields(e,cfg){
+  const out=[];
+  if(cfg.id==='artists'){
+    out.push(['Units',formatValue(e.units,cfg.id)],['Total Units',formatValue(e.totalUnits,cfg.id)],['Sales',formatValue(e.sales,cfg.id)],['Total Sales',formatValue(e.totalSales,cfg.id)],['Streams',formatValue(e.streams,cfg.id,true)],['Total Streams',formatValue(e.totalStreams,cfg.id,true)]);
+  }else if(cfg.id==='songs'){
+    if(e.points)out.push(['Points',formatValue(e.points,cfg.id)]);
+    out.push(['Streams',formatValue(e.streams,cfg.id,true)]);
+    if(e.airplay)out.push(['Airplay',formatValue(e.airplay,cfg.id,true)]);
+    out.push(['Sales',formatValue(e.sales,cfg.id)],['Units',formatValue(e.units,cfg.id)]);
+    if(e.totalUnits)out.push(['Total Units',formatValue(e.totalUnits,cfg.id)]);
+  }else if(cfg.id==='albums'){
+    out.push(['Units',formatValue(e.units,cfg.id)]);
+    if(e.totalUnits)out.push(['Total Units',formatValue(e.totalUnits,cfg.id)]);
+    out.push(['Pure Sales',formatValue(e.sales,cfg.id)],['SEA',formatValue(e.streams,cfg.id,true)]);
+  }else if(cfg.id==='radioSongs'){
+    out.push(['Audience',formatValue(e.audience||e.units,cfg.id,true)]);
+  }else if(cfg.id==='topStreamingAlbums'||cfg.id==='streamingSongs'){
+    out.push(['Streams',formatValue(e.streams||e.units,cfg.id,true)]);
+    if(e.totalStreams)out.push(['Total Streams',formatValue(e.totalStreams,cfg.id,true)]);
+  }else if(cfg.id==='topAlbumSales'||cfg.id==='digitalSongsSales'){
+    out.push(['Sales',formatValue(e.sales||e.units,cfg.id)]);
+    if(e.totalSales)out.push(['Total Sales',formatValue(e.totalSales,cfg.id)]);
+  }
+  const cert=e.certification||((cfg.id==='songs'||cfg.id==='albums')?certification(toInt(e.totalUnits),cfg.kind):'');
+  if(cert)out.push(['Certification',cert]);
+  return out.filter(x=>x[1]&&x[1]!=='-'&&x[1]!=='0');
+}
+function runEntries(e,data,date){
+  const k=itemKey(e),arr=[];
+  for(const d of data.dates){if(d>date)break;for(const x of data.entriesByDate[d]||[])if(itemKey(x)===k)arr.push({date:d,...x})}
+  return arr;
+}
+function wordOrdinal(n){
+  const w=['zeroth','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth','eleventh','twelfth','thirteenth','fourteenth','fifteenth','sixteenth','seventeenth','eighteenth','nineteenth','twentieth'];
+  return n>=0&&n<=20?w[n]:n+'th';
+}
+function copyText(e,cfg,date,data){
+  let copyDiff=e.diff;if(copyDiff==='NEW')copyDiff='new';else if(copyDiff==='RE')copyDiff='re';else if(String(copyDiff).startsWith('▲'))copyDiff='+'+copyDiff.slice(1);else if(String(copyDiff).startsWith('▼'))copyDiff='-'+copyDiff.slice(1);
+  const isNew=e.diff==='NEW',isUp=String(e.diff).startsWith('▲'),isRe=e.diff==='RE',atPeak=e.position===e.peak,w1=e.weeksAt1||0;
+  const pos=isNew?'#'+e.position+'(new)':'#'+e.position+'('+copyDiff+')';
+  let detail='';
+  if(cfg.kind==='album'&&isNew){
+    const units=toInt(e.units),streams=toInt(e.streams),sales=toInt(e.sales),parts=[];
+    if(streams)parts.push((streams/1000).toLocaleString('en-US')+' million on-demand streams');
+    if(sales)parts.push(sales.toLocaleString('en-US')+' pure sales');
+    detail=(units?units.toLocaleString('en-US'):'')+(parts.length?' ['+parts.join(' | ')+'].':'.');
+  }else if(cfg.kind==='album'&&e.units){
+    detail=formatValue(e.units,cfg.id)+(e.totalUnits?' ('+formatValue(e.totalUnits,cfg.id)+' units since release)':'');
+  }
+  const run=runEntries(e,data,date),weeksAtPeak=run.filter(x=>x.position===e.peak).length;
+  let annotation='';
+  if(atPeak&&isUp&&!isNew&&e.position===1&&w1>1)annotation='*re-peak; '+wordOrdinal(w1)+' week at #1*';
+  else if(e.position===1&&w1>1)annotation='*'+wordOrdinal(w1)+' week at #1*';
+  else if(atPeak&&(isUp||isRe)&&!isNew)annotation='*new peak*';
+  else if(e.peak===1&&w1>=1)annotation=w1>1?'*peak: #1 for '+w1+' weeks*':'*peak: #1*';
+  else if(e.peak>0&&weeksAtPeak>1)annotation='*peak: #'+e.peak+' for '+weeksAtPeak+' weeks*';
+  else annotation='*peak: #'+e.peak+'*';
+  const weeksPart=isNew?'':'['+e.weeks+' weeks].';
+  return ['Daegon\'s '+cfg.title+':',pos,e.name+',',e.artist,detail,weeksPart,isNew?'':annotation].filter(Boolean).join(' ')+'\n\nChart dated '+fmtDate(date)+'.';
+}
+
+async function resolveImage(e,cfg){
+  const key=cfg.kind+'|'+e.name+'|'+e.artist;if(state.images.has(key))return state.images.get(key);
+  let url='';
+  try{
+    if(cfg.kind==='artist'){
+      const lf='https://ws.audioscrobbler.com/2.0/?method=artist.getinfo&api_key=8fc896e5a34e6491b19710f4f1212a34&artist='+encodeURIComponent(e.name)+'&format=json';
+      const d=await fetch(lf).then(r=>r.ok?r.json():null);const imgs=d?.artist?.image||[];for(const im of [...imgs].reverse()){if(im['#text']){url=im['#text'];break}}
+    }
+    if(!url){
+      const term=cfg.kind==='artist'?e.name:(e.name+' '+e.artist);
+      const entity=cfg.kind==='album'?'album':'song';
+      const d=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(term)+'&entity='+entity+'&limit=8').then(r=>r.ok?r.json():null);
+      const hit=(d?.results||[]).find(x=>cfg.kind==='artist'||!e.artist||String(x.artistName||'').toLowerCase().includes(e.artist.toLowerCase().split(' ')[0]))||(d?.results||[])[0];
+      if(hit?.artworkUrl100)url=hit.artworkUrl100.replace('100x100bb','600x600bb');
+    }
+  }catch{}
+  state.images.set(key,url);return url;
+}
+async function resolvePreview(e){
+  const key=e.name+'|'+e.artist;if(state.previews.has(key))return state.previews.get(key);
+  let p='';try{const d=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(e.name+' '+e.artist)+'&entity=song&limit=5').then(r=>r.ok?r.json():null);const hit=(d?.results||[]).find(x=>String(x.trackName||'').toLowerCase()===e.name.toLowerCase())||(d?.results||[])[0];p=hit?.previewUrl||''}catch{}
+  state.previews.set(key,p);return p;
+}
+async function hydrateImages(cfg,rows){
+  const nodes=[...content.querySelectorAll('[data-image-key]')].slice(0,30);
+  for(const node of nodes){
+    const key=node.dataset.imageKey;const e=rows.find(x=>itemKey(x)===key);if(!e)continue;
+    const url=await resolveImage(e,cfg);if(url&&node.isConnected)node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async">';
+  }
+}
+async function playEntry(e,btn){
+  if(state.audio){state.audio.pause();state.audio=null;if(state.playingBtn)state.playingBtn.innerHTML='<i class="fas fa-play"></i>'}
+  if(state.playingBtn===btn){state.playingBtn=null;return}
+  const p=await resolvePreview(e);if(!p)return;
+  const a=new Audio(p);state.audio=a;state.playingBtn=btn;btn.innerHTML='<i class="fas fa-pause"></i>';a.play().catch(()=>{});
+  a.onended=()=>{btn.innerHTML='<i class="fas fa-play"></i>';state.audio=null;state.playingBtn=null};
+}
+
+function coverHtml(e,one,mobile=false){
   const cls=mobile?(one?'m-cover one':'m-cover'):(one?'cover one':'cover');
-  return `<div class="${cls}">${url?`<img src="${esc(url)}" loading="lazy" onerror="this.remove();this.parentElement.innerHTML='<i class=\'fas fa-music\'></i>'">`:'<i class="fas fa-music" style="opacity:.3;font-size:24px"></i>'}</div>`;
+  const icon=charts[state.active].kind==='artist'?'fa-user':charts[state.active].kind==='album'?'fa-compact-disc':'fa-music';
+  return '<div class="'+cls+'" data-image-key="'+esc(itemKey(e))+'"><i class="fas '+icon+'" style="opacity:.3;font-size:24px"></i></div>';
 }
-function metricsHtml(lw,peak,weeks){
-  return `<div class="metrics"><span>LW ${esc(lw||'-')}</span><span class="sep">·</span><span>PEAK ${esc(peak||'-')}</span><span class="sep">·</span><span>WEEKS ${esc(weeks||'-')}</span></div>`;
-}
-function mobileMetricsHtml(lw,peak,weeks){
-  return `<div class="m-metrics"><span>LW ${esc(lw||'-')}</span><span>·</span><span>PEAK ${esc(peak||'-')}</span><span>·</span><span>WEEKS ${esc(weeks||'-')}</span></div>`;
-}
-function detailHtml(row,i){
-  const fields=[['Units',val(row,i.units)],['Total Units',val(row,i.totalUnits)],['Sales',val(row,i.sales)],['Streams',val(row,i.streams)],['Airplay',val(row,i.airplay)]].filter(x=>x[1]);
-  if(!fields.length)return '<div class="details">Details shown. Press + again to close.</div>';
-  return `<div class="details"><div class="details-grid">${fields.map(([k,v])=>`<div class="detail-box"><div class="detail-k">${k}</div><div class="detail-v">${esc(v)}</div></div>`).join('')}</div></div>`;
+function metricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';return '<div class="metrics"><span>LW '+esc(lw)+'</span><span class="sep">·</span><span>PEAK '+esc(e.peak||'-')+'</span><span class="sep">·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div>'}
+function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';return '<div class="m-metrics"><span>LW '+esc(lw)+'</span><span>·</span><span>PEAK '+esc(e.peak||'-')+'</span><span>·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div>'}
+function detailHtml(e,cfg,data,date){
+  const fields=detailFields(e,cfg),run=runEntries(e,data,date);
+  return '<div class="details">'+
+    (fields.length?'<div class="details-grid">'+fields.map(([k,v])=>'<div class="detail-box"><div class="detail-k">'+esc(k)+'</div><div class="detail-v">'+esc(v)+'</div></div>').join('')+'</div>':'')+
+    (run.length?'<div style="margin-top:12px"><div class="detail-k" style="margin-bottom:7px">Chart run</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+run.slice(-30).map(x=>'<button class="detail-box run-jump" data-date="'+x.date+'" style="color:var(--foreground);cursor:pointer"><b>'+fmtShort(x.date)+'</b><br>#'+x.position+' · peak '+x.peak+' · '+x.weeks+'w</button>').join('')+'</div></div>':'')+
+  '</div>';
 }
 function renderRows(data,date){
-  const cfg=charts[state.active],i=data.idx,all=data.byDate[date]||[];
-  const rows=all.filter(r=>state.filters.has('all')||state.filters.has(diffType(val(r,i.diff))));
+  const cfg=charts[state.active],all=data.entriesByDate[date]||[],rows=all.filter(e=>state.filters.has('all')||state.filters.has(diffType(e.diff)));
   if(!rows.length){content.innerHTML='<div class="error">No entries match these filters.</div>';return}
-  content.innerHTML=rows.map(r=>{
-    const pos=parseInt(val(r,i.position))||0,name=rowName(r,i,cfg.kind),artist=val(r,i.artist)||'Unknown',diff=val(r,i.diff),lw=val(r,i.lw)||'-',peak=val(r,i.peak)||'-',weeks=val(r,i.weeks)||'-',w1=parseInt(val(r,i.weeksAt1))||0,one=pos===1,cover=val(r,i.cover);
-    const key=`${date}|${pos}|${name}|${artist}`,open=state.details.has(key);
-    const copy=`#${pos} ${name}${cfg.kind!=='artist'?' — '+artist:''} | LW ${lw} | Peak ${peak} | Weeks ${weeks}`;
-    const star=(diff==='NEW'||diff==='RE'||diff.startsWith('▲'));
-    return `<article class="chart-card ${colorClass(diff)}" data-key="${esc(key)}">
-      <div class="desktop-row">
-        <div class="rank-wrap"><div class="rank-num ${one?'one':''}">${pos}</div>${one&&w1>=2?`<div class="weeks1">${w1} WEEKS</div>`:''}</div>
-        ${coverHtml(cover,one,false)}
-        <div class="diff-wrap">${diffHtml(diff)}</div>
-        <div class="entry">
-          <div class="entry-title ${one?'one':''}">${esc(name)}${!one&&w1>=2?`<span class="badge-inline">${w1}W AT #1</span>`:''}</div>
-          ${cfg.kind!=='artist'?`<div class="artist ${one?'one':''}">${esc(artist)}</div>`:''}
-        </div>
-        <div class="right">
-          ${star?'<span class="award" title="Gains in performance"><i class="fas fa-star" style="font-size:11px"></i></span>':''}
-          ${metricsHtml(lw,peak,weeks)}
-          <div class="actions">
-            ${cfg.kind==='song'?'<button class="action play" aria-label="Play preview"><i class="fas fa-play"></i></button>':''}
-            <button class="action copy" aria-label="Copy info" data-copy="${esc(copy)}"><i class="fas fa-copy"></i></button>
-            <button class="action details-btn" aria-label="Toggle details" data-key="${esc(key)}">${open?'−':'+'}</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="mobile-row">
-        <div class="m-rank"><div class="m-rank-num">${pos}</div><div class="m-diff">${diffHtml(diff)}</div>${one&&w1>=2?`<div class="weeks1" style="font-size:7px;padding:2px 4px">${w1}W AT #1</div>`:''}</div>
-        ${coverHtml(cover,one,true)}
-        <div class="m-entry"><div class="m-title">${esc(name)}${!one&&w1>=2?`<span class="badge-inline" style="font-size:7px">${w1}W AT #1</span>`:''}</div>${cfg.kind!=='artist'?`<div class="m-artist">${esc(artist)}</div>`:''}${mobileMetricsHtml(lw,peak,weeks)}</div>
-        <div class="m-actions"><div class="m-actions-top">${star?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':''}${cfg.kind==='song'?'<button class="action play"><i class="fas fa-play"></i></button>':''}<button class="action copy" data-copy="${esc(copy)}"><i class="fas fa-copy"></i></button></div><button class="action details-btn" data-key="${esc(key)}">${open?'−':'+'}</button></div>
-      </div>
-      ${open?detailHtml(r,i):''}
-    </article>`;
+  content.innerHTML=rows.map(e=>{
+    const one=e.position===1,w1=e.weeksAt1||0,key=date+'|'+e.position+'|'+e.name+'|'+e.artist,open=state.details.has(key),award=awardsFor(e,all,state.active),copy=copyText(e,cfg,date,data);
+    return '<article class="chart-card '+colorClass(e.diff)+'" data-key="'+esc(key)+'">'+
+      '<div class="desktop-row">'+
+        '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div>'+(one&&w1>=2?'<div class="weeks1">'+w1+' WEEKS</div>':'')+'</div>'+
+        coverHtml(e,one,false)+
+        '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
+        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+esc(e.name)+(!one&&w1>=2?'<span class="badge-inline">'+w1+'W AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+esc(e.artist)+'</div>':'')+'</div>'+
+        '<div class="right">'+(award.hasStar?'<span class="award" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><i class="fas fa-star" style="font-size:11px"></i></span>':'')+
+          metricsHtml(e)+
+          '<div class="actions">'+(cfg.kind==='song'?'<button class="action play" data-entry="'+esc(itemKey(e))+'" aria-label="Play preview"><i class="fas fa-play"></i></button>':'')+
+          '<button class="action copy" aria-label="Copy info" data-copy="'+esc(copy)+'"><i class="fas fa-copy"></i></button>'+
+          '<button class="action details-btn" aria-label="Toggle details" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="mobile-row">'+
+        '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div>'+(one&&w1>=2?'<div class="weeks1" style="font-size:7px;padding:2px 4px">'+w1+'W AT #1</div>':'')+'</div>'+
+        coverHtml(e,one,true)+
+        '<div class="m-entry"><div class="m-title">'+esc(e.name)+(!one&&w1>=2?'<span class="badge-inline" style="font-size:7px">'+w1+'W AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
+        '<div class="m-actions"><div class="m-actions-top">'+(award.hasStar?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':'')+(cfg.kind==='song'?'<button class="action play" data-entry="'+esc(itemKey(e))+'"><i class="fas fa-play"></i></button>':'')+'<button class="action copy" data-copy="'+esc(copy)+'"><i class="fas fa-copy"></i></button></div><button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+      '</div>'+
+      (open?detailHtml(e,cfg,data,date):'')+
+    '</article>';
   }).join('');
 
   content.querySelectorAll('.copy').forEach(b=>b.onclick=async()=>{try{await navigator.clipboard.writeText(b.dataset.copy||'');b.innerHTML='<i class="fas fa-check"></i>';setTimeout(()=>b.innerHTML='<i class="fas fa-copy"></i>',1200)}catch{}});
   content.querySelectorAll('.details-btn').forEach(b=>b.onclick=()=>{const k=b.dataset.key;if(state.details.has(k))state.details.delete(k);else state.details.add(k);renderRows(data,date)});
+  content.querySelectorAll('.run-jump').forEach(b=>b.onclick=()=>setDate(b.dataset.date,data));
+  content.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const e=all.find(x=>itemKey(x)===b.dataset.entry);if(e)playEntry(e,b)});
+  hydrateImages(cfg,rows);
 }
-
 function renderDropouts(data,date){
-  const idx=data.dates.indexOf(date),i=data.idx;
-  if(idx<=0){dropoutsEl.innerHTML='';return}
-  const prev=data.byDate[data.dates[idx-1]]||[],curr=data.byDate[date]||[];
-  const keys=new Set(curr.map(r=>`${rowName(r,i,charts[state.active].kind).toLowerCase()}|${val(r,i.artist).toLowerCase()}`));
-  const outs=prev.filter(r=>!keys.has(`${rowName(r,i,charts[state.active].kind).toLowerCase()}|${val(r,i.artist).toLowerCase()}`));
+  const idx=data.dates.indexOf(date);if(idx<=0){dropoutsEl.innerHTML='';return}
+  const prev=data.entriesByDate[data.dates[idx-1]]||[],curr=data.entriesByDate[date]||[],keys=new Set(curr.map(itemKey)),outs=prev.filter(e=>!keys.has(itemKey(e)));
   if(!outs.length){dropoutsEl.innerHTML='';return}
-  dropoutsEl.innerHTML=`<div class="dropouts"><div class="dropouts-title">DROP-OUTS</div>${outs.map(r=>`<div class="dropout"><div class="dropout-rank">#${esc(val(r,i.position))}</div><div class="dropout-info"><div class="dropout-name">${esc(rowName(r,i,charts[state.active].kind))}</div><div class="dropout-meta">${charts[state.active].kind!=='artist'?esc(val(r,i.artist))+' · ':''}Peak #${esc(val(r,i.peak)||'-')} · Weeks ${esc(val(r,i.weeks)||'-')}</div></div></div>`).join('')}</div>`;
+  dropoutsEl.innerHTML='<div class="dropouts"><div class="dropouts-title">DROP-OUTS</div>'+outs.map(e=>'<div class="dropout"><div class="dropout-rank">#'+e.position+'</div><div class="dropout-info"><div class="dropout-name">'+esc(e.name)+'</div><div class="dropout-meta">'+(charts[state.active].kind!=='artist'?esc(e.artist)+' · ':'')+'Peak #'+esc(e.peak||'-')+' · Weeks '+esc(e.weeks||'-')+'</div></div></div>').join('')+'</div>';
 }
-
 function syncWeekButtons(data){
   const idx=data.dates.indexOf(state.date),prev=idx>0?data.dates[idx-1]:null,next=idx>=0&&idx<data.dates.length-1?data.dates[idx+1]:null;
   for(const id of ['prevBtn','prevBtnBottom']){const b=document.getElementById(id);b.disabled=!prev;b.onclick=()=>prev&&setDate(prev,data)}
@@ -423,38 +371,25 @@ function setDate(date,data){
 async function loadChart(id,requestedDate=null){
   state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';dropoutsEl.innerHTML='';
   try{
-    const data=await fetchChart(id);if(!data.dates.length)throw new Error('No dates');
-    let date=requestedDate&&data.byDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];
-    state.date=date;
-    weekSelect.innerHTML=data.dates.slice().reverse().map(d=>`<option value="${d}">${fmtShort(d)}</option>`).join('');
+    const data=await loadWeekly(id);if(!data.dates.length)throw new Error('No dates');
+    let date=requestedDate&&data.entriesByDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];state.date=date;
+    weekSelect.innerHTML=data.dates.slice().reverse().map(d=>'<option value="'+d+'">'+fmtShort(d)+'</option>').join('');
     weekSelect.value=date;weekSelect.onchange=()=>setDate(weekSelect.value,data);
-    dateLabel.textContent='Chart week of '+fmtDate(date);
-    renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);
-  }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" onclick="state.cache.delete(state.active);loadChart(state.active,state.date)">Try again</button></div>'}
+    dateLabel.textContent='Chart week of '+fmtDate(date);renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);
+  }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" id="retryChart">Try again</button></div>';document.getElementById('retryChart').onclick=()=>{state.cache.delete(state.active);loadChart(state.active,state.date)}}
 }
 
 document.getElementById('filters').querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
-  const k=b.dataset.filter;
-  if(k==='all'){state.filters=new Set(['all'])}
-  else{state.filters.delete('all');if(state.filters.has(k))state.filters.delete(k);else state.filters.add(k);if(!state.filters.size)state.filters.add('all')}
+  const k=b.dataset.filter;if(k==='all')state.filters=new Set(['all']);else{state.filters.delete('all');if(state.filters.has(k))state.filters.delete(k);else state.filters.add(k);if(!state.filters.size)state.filters.add('all')}
   document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',state.filters.has(x.dataset.filter)));
   const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
 });
-document.getElementById('colorToggle').onclick=()=>{
-  state.diffColors=!state.diffColors;document.getElementById('colorToggle').classList.toggle('active',state.diffColors);
-  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
-};
-document.getElementById('themeToggle').onclick=()=>{
-  const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light')}catch{}
-  document.querySelector('#themeToggle i').className='fas '+(dark?'fa-sun':'fa-moon');
-};
+document.getElementById('colorToggle').onclick=()=>{state.diffColors=!state.diffColors;document.getElementById('colorToggle').classList.toggle('active',state.diffColors);const data=state.cache.get(state.active);if(data)renderRows(data,state.date)};
+document.getElementById('themeToggle').onclick=()=>{const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light')}catch{}document.querySelector('#themeToggle i').className='fas '+(dark?'fa-sun':'fa-moon')};
 document.querySelector('#themeToggle i').className='fas '+(document.documentElement.classList.contains('dark')?'fa-sun':'fa-moon');
-const backTop=document.getElementById('backTop');
-window.addEventListener('scroll',()=>backTop.style.display=window.scrollY>300?'flex':'none');
-backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+const backTop=document.getElementById('backTop');window.addEventListener('scroll',()=>backTop.style.display=window.scrollY>300?'flex':'none');backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
 
-renderNav();
-loadChart('songs');
+renderNav();loadChart('songs');
 </script>
 </body>
 </html>
