@@ -342,30 +342,13 @@
       }
       .week-picker-button i{font-size:9px}
     }
-
-    .mode-switch{display:flex;gap:6px;align-items:center}
-    .mode-btn{
-      border:1px solid #333;background:#171717;color:#aaa;
-      min-height:34px;padding:7px 10px;font-size:10px;font-weight:900;
-      letter-spacing:.08em;cursor:pointer
-    }
-    .mode-btn.active{background:var(--accent);border-color:var(--accent);color:#000}
-    .yec-total{font-size:11px;font-weight:900;color:var(--accent);white-space:nowrap}
-    @media(max-width:767px){
-      .mode-switch{gap:4px}
-      .mode-btn{min-height:32px;padding:6px 8px;font-size:9px}
-      .yec-total{font-size:9px}
-    }
 </style>
 </head>
 <body>
 <div class="shell">
   <header class="site-header">
     <div class="header-inner">
-      <div class="mode-switch">
-        <button id="weeklyMode" class="mode-btn active" type="button">WEEKLY</button>
-        <button id="yearEndMode" class="mode-btn" type="button">YEAR-END</button>
-      </div>
+      <div class="weekly-label">WEEKLY CHARTS</div>
       <div class="brand">daegon charts</div>
       <button id="themeToggle" class="theme-btn" aria-label="Toggle theme"><i class="fas fa-sun"></i></button>
     </div>
@@ -390,7 +373,7 @@
         </div>
 
         <div class="week-nav">
-          <div id="periodLabel" class="week-label">Chart Week</div>
+          <div class="week-label">Chart Week</div>
           <div class="week-controls">
             <button id="prevBtn" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
             <div id="weekPicker" class="week-picker">
@@ -450,17 +433,7 @@ const charts={
   digitalSongsSales:{id:'digitalSongsSales',title:'Digital Songs Sales',kind:'song',url:SHEET+'302176914'}
 };
 const weeklyIds=Object.keys(charts);
-const yecTitles={
-  songs:'Year-End Hot 100',
-  artists:'Year-End Artists',
-  albums:'Year-End Albums',
-  radioSongs:'Year-End Radio Songs',
-  topStreamingAlbums:'Year-End Top Streaming Albums',
-  topAlbumSales:'Year-End Top Album Sales',
-  streamingSongs:'Year-End Streaming Songs',
-  digitalSongsSales:'Year-End Digital Songs Sales'
-};
-const state={mode:'weekly',active:'songs',cache:new Map(),yecCache:new Map(),yecYear:null,filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
+const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
   const imageCacheVersion='daegoncharts-rules-spotify-v1';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
@@ -475,7 +448,6 @@ try{
 const desktopChartNav=document.getElementById('desktopChartNav'), mobileActiveChart=document.getElementById('mobileActiveChart'), mobileMoreCharts=document.getElementById('mobileMoreCharts'), mobileChartMenu=document.getElementById('mobileChartMenu'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
 const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel');
 const weekPicker=document.getElementById('weekPicker'), weekPickerButton=document.getElementById('weekPickerButton'), weekPickerLabel=document.getElementById('weekPickerLabel'), weekPickerMenu=document.getElementById('weekPickerMenu');
-const weeklyMode=document.getElementById('weeklyMode'), yearEndMode=document.getElementById('yearEndMode'), periodLabel=document.getElementById('periodLabel'), filtersEl=document.getElementById('filters');
 
 function parseCsvRow(line){
   const out=[];let cur='',quoted=false;
@@ -668,19 +640,17 @@ async function loadWeekly(chartId){
 
 function visibleCharts(date){return date&&date<'2017-01-01'?['songs','artists','albums']:weeklyIds}
 function renderNav(){
-  const ids=state.mode==='yec'?weeklyIds:visibleCharts(state.date);
-  const label=id=>state.mode==='yec'?(yecTitles[id]||charts[id].title):charts[id].title;
-  const activate=id=>state.mode==='yec'?loadYecChart(id,state.yecYear):loadChart(id,state.date);
+  const ids=visibleCharts(state.date);
 
-  desktopChartNav.innerHTML=ids.map(id=>'<button data-id="'+id+'" class="'+(id===state.active?'active':'')+'">'+label(id)+'</button>').join('');
-  desktopChartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>activate(b.dataset.id));
+  desktopChartNav.innerHTML=ids.map(id=>'<button data-id="'+id+'" class="'+(id===state.active?'active':'')+'">'+charts[id].title+'</button>').join('');
+  desktopChartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date));
 
-  mobileActiveChart.textContent=label(state.active);
-  mobileChartMenu.innerHTML=ids.filter(id=>id!==state.active).map(id=>'<button data-id="'+id+'">'+label(id)+'</button>').join('');
+  mobileActiveChart.textContent=charts[state.active].title;
+  mobileChartMenu.innerHTML=ids.filter(id=>id!==state.active).map(id=>'<button data-id="'+id+'">'+charts[id].title+'</button>').join('');
   mobileChartMenu.querySelectorAll('button').forEach(b=>b.onclick=()=>{
     mobileChartMenu.classList.remove('open');
     mobileMoreCharts.textContent='+ More Charts';
-    activate(b.dataset.id);
+    loadChart(b.dataset.id,state.date);
   });
 }
 function diffType(diff){const d=String(diff||'');if(d==='NEW')return'debut';if(d==='RE')return're';if(d.startsWith('▲'))return'rising';if(d.startsWith('▼'))return'falling';return'static'}
@@ -1172,103 +1142,6 @@ function renderDropouts(data,date){
   if(!outs.length){dropoutsEl.innerHTML='';return}
   dropoutsEl.innerHTML='<div class="dropouts"><div class="dropouts-title">DROP-OUTS</div>'+outs.map(e=>'<div class="dropout"><div class="dropout-rank">#'+e.position+'</div><div class="dropout-info"><div class="dropout-name">'+esc(e.name)+'</div><div class="dropout-meta">'+(charts[state.active].kind!=='artist'?esc(e.artist)+' · ':'')+'Peak #'+esc(e.peak||'-')+' · Weeks '+esc(e.weeks||'-')+'</div></div></div>').join('')+'</div>';
 }
-async function fetchYec(chartId,year=''){
-  const cacheKey=chartId+'|'+(year||'latest');
-  const cached=state.yecCache.get(cacheKey);
-  if(cached)return cached;
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),45000);
-  try{
-    const r=await fetch(SUPABASE_URL+'/functions/v1/year-end-charts?chartId='+encodeURIComponent(chartId)+(year?'&year='+encodeURIComponent(year):''),{
-      headers:{apikey:SUPABASE_ANON_JWT,Authorization:'Bearer '+SUPABASE_ANON_JWT},
-      signal:ctrl.signal
-    });
-    if(!r.ok)throw new Error('YEC '+r.status);
-    const data=await r.json();
-    if(data.error)throw new Error(data.error);
-    state.yecCache.set(cacheKey,data);
-    state.yecCache.set(chartId+'|'+data.year,data);
-    return data;
-  }finally{clearTimeout(timer)}
-}
-function yecMetricLabel(chartId){
-  if(chartId==='songs')return'POINTS';
-  if(chartId==='radioSongs')return'AUDIENCE';
-  if(chartId==='streamingSongs'||chartId==='topStreamingAlbums')return'STREAMS';
-  if(chartId==='topAlbumSales'||chartId==='digitalSongsSales')return'SALES';
-  return'UNITS';
-}
-function formatYecMetric(v,chartId){
-  const n=toInt(v);
-  if(['radioSongs','streamingSongs','topStreamingAlbums'].includes(chartId)){
-    if(n>=1000000000)return(n/1000000000).toFixed(1).replace(/\.0$/,'')+'B';
-    if(n>=1000000)return(n/1000000).toFixed(1).replace(/\.0$/,'')+'M';
-  }
-  return n.toLocaleString('en-US');
-}
-function renderYearPicker(data){
-  weekPickerLabel.textContent=data.year;
-  weekPickerMenu.innerHTML=data.years.map(y=>'<button class="week-picker-option '+(y===data.year?'selected':'')+'" data-year="'+y+'">'+y+'</button>').join('');
-  weekPickerMenu.querySelectorAll('.week-picker-option').forEach(btn=>btn.onclick=()=>{
-    weekPicker.classList.remove('open');
-    if(btn.dataset.year!==state.yecYear)loadYecChart(state.active,btn.dataset.year);
-  });
-  requestAnimationFrame(()=>{const selected=weekPickerMenu.querySelector('.selected');if(selected)selected.scrollIntoView({block:'center'})});
-}
-function syncYearButtons(data){
-  const idx=data.years.indexOf(data.year);
-  const older=idx>=0&&idx<data.years.length-1?data.years[idx+1]:null;
-  const newer=idx>0?data.years[idx-1]:null;
-  for(const id of ['prevBtn','prevBtnBottom']){const b=document.getElementById(id);b.disabled=!older;b.onclick=()=>older&&loadYecChart(state.active,older)}
-  for(const id of ['nextBtn','nextBtnBottom']){const b=document.getElementById(id);b.disabled=!newer;b.onclick=()=>newer&&loadYecChart(state.active,newer)}
-}
-function renderYecRows(data){
-  const cfg=charts[state.active],rows=data.entries||[];
-  if(!rows.length){content.innerHTML='<div class="error">No Year-End entries for this year.</div>';return}
-  content.innerHTML=rows.map(e=>{
-    const one=e.position===1;
-    const total=formatYecMetric(e.totalUnits,state.active);
-    const metric=yecMetricLabel(state.active);
-    return '<article class="chart-card">'+
-      '<div class="desktop-row">'+
-        '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div>'+(one&&e.weeksAt1?'<div class="weeks1">'+e.weeksAt1+'W AT #1</div>':'')+'</div>'+
-        coverHtml(e,one,false)+
-        '<div class="diff-wrap"><span class="yec-total">'+metric+'</span></div>'+
-        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+esc(e.name)+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+esc(e.artist)+'</div>':'')+'</div>'+
-        '<div class="right"><div class="yec-total">'+esc(total)+'</div><div class="metrics"><span>PEAK '+esc(e.peak||'-')+'</span><span class="sep">·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div></div>'+
-      '</div>'+
-      '<div class="mobile-row">'+
-        '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div></div>'+
-        coverHtml(e,one,true)+
-        '<div class="m-entry"><div class="m-title">'+esc(e.name)+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(e.artist)+'</div>':'')+'<div class="m-metrics"><span>PEAK '+esc(e.peak||'-')+'</span><span>·</span><span>WEEKS '+esc(e.weeks||'-')+'</span><span>·</span><span>'+metric+' '+esc(total)+'</span></div></div>'+
-      '</div>'+
-    '</article>';
-  }).join('');
-  hydrateImages(cfg,rows);
-}
-async function loadYecChart(id,requestedYear=null){
-  state.mode='yec';state.active=id;state.details.clear();
-  weeklyMode.classList.remove('active');yearEndMode.classList.add('active');
-  filtersEl.style.display='none';dropoutsEl.innerHTML='';periodLabel.textContent='Year';
-  chartTitle.textContent=yecTitles[id]||charts[id].title;
-  content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';
-  try{
-    const data=await fetchYec(id,requestedYear||'');
-    state.yecYear=data.year;
-    dateLabel.textContent='Year-End chart for '+data.year;
-    renderYearPicker(data);renderNav();syncYearButtons(data);renderYecRows(data);
-  }catch(e){
-    content.innerHTML='<div class="error">Year-End chart did not load.<br><button class="gold-btn" style="margin-top:12px" id="retryYec">Try again</button></div>';
-    const b=document.getElementById('retryYec');if(b)b.onclick=()=>{state.yecCache.clear();loadYecChart(id,requestedYear)};
-  }
-}
-function setMode(mode){
-  if(mode==='yec'){loadYecChart(state.active,state.yecYear);return}
-  state.mode='weekly';weeklyMode.classList.add('active');yearEndMode.classList.remove('active');
-  filtersEl.style.display='flex';periodLabel.textContent='Chart Week';
-  loadChart(state.active,state.date);
-}
-
 function renderWeekPicker(data){
   weekPickerLabel.textContent=fmtShort(state.date);
   weekPickerMenu.innerHTML=data.dates.map(d=>'<button class="week-picker-option '+(d===state.date?'selected':'')+'" data-date="'+d+'">'+fmtShort(d)+'</button>').join('');
@@ -1299,9 +1172,7 @@ function setDate(date,data){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 async function loadChart(id,requestedDate=null){
-  state.mode='weekly';state.active=id;state.details.clear();
-  weeklyMode.classList.add('active');yearEndMode.classList.remove('active');filtersEl.style.display='flex';periodLabel.textContent='Chart Week';
-  chartTitle.textContent=charts[id].title;content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';dropoutsEl.innerHTML='';
+  state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';dropoutsEl.innerHTML='';
   try{
     const data=await loadWeekly(id);if(!data.dates.length)throw new Error('No dates');
     let date=requestedDate&&data.entriesByDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];state.date=date;
@@ -1355,9 +1226,6 @@ weekPickerButton.addEventListener('touchend',function(e){
 document.addEventListener('click',function(e){
   if(!weekPicker.contains(e.target)) weekPicker.classList.remove('open');
 });
-
-weeklyMode.onclick=()=>setMode('weekly');
-yearEndMode.onclick=()=>setMode('yec');
 
 renderNav();loadChart('songs');
 </script>
