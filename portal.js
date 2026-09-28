@@ -874,6 +874,12 @@ async function loadYecExact(chartId){
   const cfg=officialYearEnd[chartId];if(!cfg)throw new Error('Unknown Year-End chart');
   return computeYearEndExact(cfg.weeklyId);
 }
+function goatHistoricalPerformance(position,kind){
+  const pos=Math.max(1,Number(position)||1);
+  if(kind==='song')return Math.max(1,101-pos);
+  if(pos>50)return 0;
+  return 100*Math.pow(Math.max(0,(51-pos)/50),1.5);
+}
 async function computeGoatExact(chartId){
   if(generatedGoatCache.has(chartId))return generatedGoatCache.get(chartId);
   const job=(async()=>{
@@ -885,12 +891,15 @@ async function computeGoatExact(chartId){
         const key=(e.name+'||'+e.artist).toLowerCase();
         if(!aggregated[key])aggregated[key]={
           position:0,name:e.name,artist:e.artist,peak:e.peak||e.position,weeks:0,weeksAt1:0,
-          totalUnits:0,totalStreams:0,totalSales:0,totalAudience:0,totalPoints:0,kind:cfg.kind
+          chartPerformance:0,totalUnits:0,totalStreams:0,totalSales:0,totalAudience:0,totalPoints:0,kind:cfg.kind
         };
         const x=aggregated[key];
+        const pos=Number(e.position)||999;
         x.weeks++;
-        x.peak=Math.min(x.peak||999,e.peak||e.position||999);
-        x.weeksAt1+=(e.weeksAt1||0);
+        x.peak=Math.min(x.peak||999,e.peak||pos||999);
+        if(pos===1)x.weeksAt1++;
+        x.chartPerformance+=goatHistoricalPerformance(pos,cfg.kind);
+        // Keep raw totals only for backwards-compatible detail data; they no longer drive GOAT ranking.
         x.totalUnits+=metricNumber(e.units);
         x.totalStreams+=metricNumber(e.streams);
         x.totalSales+=metricNumber(e.sales);
@@ -899,7 +908,7 @@ async function computeGoatExact(chartId){
       }
     }
     const entries=Object.values(aggregated)
-      .sort((a,b)=>b.weeks-a.weeks||a.peak-b.peak)
+      .sort((a,b)=>b.chartPerformance-a.chartPerformance||b.weeks-a.weeks||b.weeksAt1-a.weeksAt1||a.peak-b.peak)
       .slice(0,500)
       .map((e,i)=>({...e,position:i+1}));
     return {entries,kind:cfg.kind,title:cfg.title};
@@ -1025,16 +1034,16 @@ async function renderDecadeIndex(){
 async function renderGoatIndex(){
   loading('Greatest of All Time');
   const [songs,albums,artists]=await Promise.all([computeGoatExact('goatSongs'),computeGoatExact('goatAlbums'),computeGoatExact('goatArtists')]);
-  const topSongs=[...songs.entries].sort((a,b)=>b.totalPoints-a.totalPoints).slice(0,5).map((e,i)=>({...e,position:i+1}));
-  const topAlbums=[...albums.entries].sort((a,b)=>b.totalUnits-a.totalUnits).slice(0,5).map((e,i)=>({...e,position:i+1}));
-  const topArtists=[...artists.entries].sort((a,b)=>b.totalUnits-a.totalUnits).slice(0,5).map((e,i)=>({...e,position:i+1}));
+  const topSongs=[...songs.entries].sort((a,b)=>b.chartPerformance-a.chartPerformance||b.weeks-a.weeks).slice(0,5).map((e,i)=>({...e,position:i+1}));
+  const topAlbums=[...albums.entries].sort((a,b)=>b.chartPerformance-a.chartPerformance||b.weeks-a.weeks).slice(0,5).map((e,i)=>({...e,position:i+1}));
+  const topArtists=[...artists.entries].sort((a,b)=>b.chartPerformance-a.chartPerformance||b.weeks-a.weeks).slice(0,5).map((e,i)=>({...e,position:i+1}));
   const allCharts=exactGoatIds.map(id=>({id,title:officialGoat[id].title}));
   const main='<div class="orig-page">'+originalHero('GREATEST OF ALL TIME','Greatest of All Time','Long-term rankings built from the complete weekly archive')+
     editorialBlock(
       'What Greatest of All Time means here',
       [
-        'The GOAT pages aggregate the project’s weekly history instead of relying on a one-time editorial ranking. Songs, albums and artists accumulate their relevant chart totals across every available week, so longevity and sustained performance remain visible in the all-time view.',
-        'Each GOAT chart can be explored by multiple measures such as points, units, audience, sales, streams or weeks on chart where those metrics are available. The underlying weekly pages remain accessible so a high all-time placement can be traced back to actual chart history.'
+        'The GOAT pages normalize every weekly chart from 2000 onward to the historical 2000–2009 scale, so later consumption-based eras do not receive an artificial numerical advantage.',
+        'Chart Performance uses that common historical scale across every week: Songs run from 100 points at No. 1 to 1 point at No. 100, while Albums and Artists use the original 2000–2009 curved 50-position scale. Weeks on Chart is available as a separate longevity view.'
       ],
       [['/methodology','How chart metrics are calculated'],['/number-ones','Browse every No. 1']]
     )+
@@ -1343,7 +1352,7 @@ async function renderGoat(chartSeg){
 
   const data=await computeGoatExact(chartSeg);
   const isRadio=chartSeg==='goatRadio';
-  let sort=chartSeg==='goatSongs'?'points':isRadio?'audience':'units';
+  let sort='performance';
   let search='';
   let page=1;
   let mobileExpanded=false;
@@ -1351,33 +1360,25 @@ async function renderGoat(chartSeg){
   const PAGE_SIZE=50;
 
   const sortOptions=[
-    ...(chartSeg==='goatSongs'?[['points','Total Points']]:[]),
-    ...(isRadio?[['audience','Total Audience']]:[]),
-    ['units','Total Units'],
-    ...((chartSeg==='goatSongs'||chartSeg==='goatAlbums')?[['sales','Total Sales'],['streams','Total Streams']]:[]),
+    ['performance','Chart Performance'],
     ['weeks','Weeks on Chart']
   ];
 
   const metricValue=e=>{
-    if(sort==='units')return fmtNum(e.totalUnits||0)+' units';
-    if(sort==='streams')return fmtNum(e.totalStreams||0)+' streams';
-    if(sort==='sales')return fmtNum(e.totalSales||0)+' sales';
-    if(sort==='audience')return fmtNum(e.totalAudience||0)+' audience';
-    if(sort==='points')return fmtNum(e.totalPoints||0)+' points';
+    if(sort==='performance'){
+      const n=Number(e.chartPerformance||0);
+      return n.toLocaleString('en-US',{maximumFractionDigits:1})+' performance';
+    }
     return (e.weeks||0)+' weeks';
   };
 
   const draw=()=>{
     let sorted=[...data.entries];
     const sorters={
-      units:(a,b)=>b.totalUnits-a.totalUnits||a.peak-b.peak,
-      streams:(a,b)=>b.totalStreams-a.totalStreams||a.peak-b.peak,
-      sales:(a,b)=>b.totalSales-a.totalSales||a.peak-b.peak,
-      audience:(a,b)=>b.totalAudience-a.totalAudience||a.peak-b.peak,
-      points:(a,b)=>b.totalPoints-a.totalPoints||a.peak-b.peak,
-      weeks:(a,b)=>b.weeks-a.weeks||a.peak-b.peak
+      performance:(a,b)=>b.chartPerformance-a.chartPerformance||b.weeks-a.weeks||b.weeksAt1-a.weeksAt1||a.peak-b.peak,
+      weeks:(a,b)=>b.weeks-a.weeks||b.chartPerformance-a.chartPerformance||b.weeksAt1-a.weeksAt1||a.peak-b.peak
     };
-    sorted.sort(sorters[sort]||sorters.weeks);
+    sorted.sort(sorters[sort]||sorters.performance);
     sorted=sorted.map((e,i)=>({...e,position:i+1}));
 
     let filtered=sorted;
