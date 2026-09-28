@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-number1-fill-29">
+  <link rel="stylesheet" href="/portal.css?v=20260927-artist-number1-clean-30">
 
 <!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
 <style id="yec-goat-mobile-critical">
@@ -2264,13 +2264,42 @@ html.dark .sk{
 }
 </style>
 
-/* WEEKLY_NUMBER1_ARTIST_FILL_V29 */
-<style id="weekly-number1-artist-fill-v29">
-.weekly-artist-art.one .artwork-slot img,
+
+
+<!-- WEEKLY_ARTIST_NUMBER1_CLEAN_V30 -->
+<style id="weekly-artist-number1-clean-v30">
+/* Artist #1: same image treatment as every other artist.
+   Keep only the orange outer ring and desktop size distinction. */
+.cover.one.weekly-artist-art::after,
+.m-cover.one.weekly-artist-art::after{
+  content:none!important;
+  display:none!important;
+}
+
+.cover.one.weekly-artist-art .artwork-slot,
+.m-cover.one.weekly-artist-art .artwork-slot{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  background:transparent!important;
+}
+
 .cover.one.weekly-artist-art .artwork-slot img,
 .m-cover.one.weekly-artist-art .artwork-slot img{
-  width:156%!important;
-  height:156%!important;
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:134%!important;
+  height:134%!important;
+  max-width:none!important;
+  max-height:none!important;
+  transform:translate(-50%,-50%)!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  border-radius:0!important;
 }
 </style>
 
@@ -3274,6 +3303,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-number1-fill-29"></script>
+<script src="/portal.js?v=20260927-artist-number1-clean-30"></script>
 </body>
 </html>
