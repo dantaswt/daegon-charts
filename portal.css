@@ -3508,3 +3508,62 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .exact-goat-page{padding-left:20px!important;padding-right:20px!important}
   .exact-goat-sidebar{width:230px!important;flex-basis:230px!important}
 }
+
+/* === CIRCULAR ARTIST ARTWORK YEC GOAT v21 === */
+/* Artist charts only: use large circular portraits, never the square artwork frame */
+.exact-art.exact-artist-art,
+.exact-mobile-art.exact-artist-art{
+  background:transparent!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+
+.exact-art.exact-artist-art .ref-thumb,
+.exact-art.exact-artist-art .ref-thumb img,
+.exact-mobile-art.exact-artist-art .ref-thumb,
+.exact-mobile-art.exact-artist-art .ref-thumb img{
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  border-radius:50%!important;
+  object-fit:cover!important;
+  background:transparent!important;
+}
+
+@media(min-width:768px){
+  .exact-art.exact-artist-art{
+    width:88px!important;
+    height:88px!important;
+    flex:0 0 88px!important;
+    border-left:0!important;
+  }
+
+  .exact-art.exact-artist-art.first{
+    width:104px!important;
+    height:104px!important;
+    flex:0 0 104px!important;
+    border-left:0!important;
+    box-shadow:0 0 0 4px var(--accent)!important;
+  }
+}
+
+@media(max-width:767px){
+  .exact-mobile-art.exact-artist-art{
+    width:72px!important;
+    height:72px!important;
+    flex:0 0 72px!important;
+    border-left:0!important;
+  }
+
+  .exact-mobile-art.exact-artist-art.first{
+    width:80px!important;
+    height:80px!important;
+    flex:0 0 80px!important;
+    border-left:0!important;
+    box-shadow:0 0 0 3px var(--accent)!important;
+  }
+}
