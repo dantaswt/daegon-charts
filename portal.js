@@ -201,6 +201,10 @@ function loading(title='Loading'){
 function setMeta(title,desc,path){
   document.title=title+' | Daegon Charts';
   const d=document.querySelector('meta[name="description"]');if(d)d.content=desc;
+  let robots=document.querySelector('meta[name="robots"]');
+  if(!robots){robots=document.createElement('meta');robots.name='robots';document.head.appendChild(robots)}
+  const noindexPaths=new Set(['/search','/chart-battle','/awards']);
+  robots.content=noindexPaths.has(path)?'noindex,follow':'index,follow,max-image-preview:large';
   const c=document.querySelector('link[rel="canonical"]');if(c)c.href='https://daegoncharts.com.br'+path;
   const u=document.querySelector('meta[property="og:url"]');if(u)u.content='https://daegoncharts.com.br'+path;
   const t=document.querySelector('meta[property="og:title"]');if(t)t.content=document.title;
