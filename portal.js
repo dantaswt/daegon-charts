@@ -538,20 +538,71 @@ async function computeGenderYecExact(category){
   }
   return {years:base.years,entriesByYear,kind:'artist',title:category==='FEMALE'?'Top Artists — Female':category==='MALE'?'Top Artists — Male':'Top Artists — Duo/Group'};
 }
+const CURATED_NEW_ARTISTS_EXACT={
+  "2017":["camila cabello","dua lipa","julia michaels","prettymuch","mgk","niall horan","pabllo vittar","marian hill","zara larsson","harry styles","neiked","louis tomlinson","blackpink","poppy","iza","zayn"],
+  "2018":["jão","declan mckenna","duda beat","post malone","cardi b","lil peep","ava max","(g)i-dle","iza","bebe rexha","hayley kiyoko","the aces","gustavo mioto","bazzi","louisa johnson","luísa sonza","khalid","greeicy","lauv"],
+  "2019":["billie eilish","lizzo","lil nas x","mc tha","rosalía","kim petras","bad bunny","normani","dinah jane","luísa sonza","blaya","mahmundi","paloma mami","lewis capaldi","davi sabbag"],
+  "2020":["doja cat","chloe x halle","conan gray","megan thee stallion","rina sawayama","aminé","summer walker","alma","karol g","dadá boladão","alina baraz","yung beef"],
+  "2021":["olivia rodrigo","marina sena","potyguara bardo","phoebe bridgers","don l","clarissa","juliette","nathy peluso","chlöe","lisa","giveon","c. tangana","faye webster","slayyyter","måneskin","day","paloma mami","annikko","chameleo"],
+  "2022":["jovem dionisio","tate mcrae","steve lacy","dove cameron","omar apollo","lele pons","elley duhé","gayle","urias","sabrina carpenter","veridiana benassi","latto","newjeans","maria becerra","måneskin","orville peck","flo","liniker","rebelde la serie","pedro sampaio"],
+  "2023":["newjeans","bizarrap","gracie abrams","raye","melanie fiona","maria becerra","eslabon armando","la cruz","käärijä","doechii","emilia","clarissa","coi leray","coco jones","jung kook","ice spice"],
+  "2024":["chappell roan","beabadoobee","sevdaliza","tyla","addison rae","dasha","benson boone","rosé","caroline polachek","wicked movie cast","flo","magdalena bay","ayra starr","ice spice"],
+  "2025":["lola young","pinkpantheress","guitarricadelafuente","katseye","jade","reneé rapp","lucas pretti","sombr","ravyn lenae","cynthia erivo","huntr/x","mariah the scientist","olivia dean","amaarae","laufey","os garotin","rose gray","destin conrad"]
+};
 async function computeNewArtistsExact(){
-  const data=await loadWeekly('artists'),years={};
-  const ever=new Set();
-  for(const date of data.dates){
-    const year=date.slice(0,4);if(!years[year])years[year]={};
-    for(const e of data.entriesByDate[date]||[]){
-      const key=e.name.toLowerCase(),first=!ever.has(key);ever.add(key);
-      if(!first)continue;
-      years[year][key]={position:0,name:e.name,artist:e.artist||e.name,peak:e.peak||e.position,weeks:e.weeks||1,weeksAt1:e.weeksAt1||0,totalUnits:metricNumber(e.units),kind:'artist'};
+  const chartData=await loadWeekly('artists');
+  const years={};
+
+  for(const date of chartData.dates){
+    const year=date.slice(0,4);
+    const entries=chartData.entriesByDate[date]||[];
+    if(!years[year])years[year]={};
+
+    const curated=CURATED_NEW_ARTISTS_EXACT[year];
+    if(!curated)continue;
+
+    for(const e of entries){
+      const name=String(e.name||'').trim();
+      const artist=String(e.artist||name).trim();
+      const key=(name+'||'+artist).toLowerCase();
+
+      if(!curated.some(c=>c.toLowerCase()===name.toLowerCase()))continue;
+
+      if(!years[year][key]){
+        years[year][key]={
+          position:0,
+          name,
+          artist,
+          peak:e.peak||e.position||999,
+          weeks:0,
+          weeksAt1:0,
+          totalUnits:0,
+          kind:'artist'
+        };
+      }
+
+      const entry=years[year][key];
+      entry.weeks+=1;
+      if((e.peak||e.position||999)<entry.peak)entry.peak=e.peak||e.position;
+      entry.weeksAt1+=(e.weeksAt1||0);
+      entry.totalUnits+=metricNumber(e.units??0);
     }
   }
+
   const entriesByYear={};
-  for(const [y,o] of Object.entries(years))entriesByYear[y]=Object.values(o).sort((a,b)=>b.totalUnits-a.totalUnits||a.peak-b.peak).slice(0,10).map((e,i)=>({...e,position:i+1}));
-  return {years:Object.keys(entriesByYear).sort().reverse(),entriesByYear,kind:'artist',title:'Top New Artists'};
+  for(const [year,items] of Object.entries(years)){
+    entriesByYear[year]=Object.values(items)
+      .sort((a,b)=>b.totalUnits-a.totalUnits||a.peak-b.peak)
+      .slice(0,10)
+      .map((e,i)=>({...e,position:i+1}));
+  }
+
+  return {
+    years:Object.keys(entriesByYear).sort().reverse(),
+    entriesByYear,
+    kind:'artist',
+    title:'Year-End New Artists'
+  };
 }
 async function loadYecExact(chartId){
   if(chartId==='yecHot100Artists')return computeArtistAggregateExact('songs','Hot 100 — Artists','points');
