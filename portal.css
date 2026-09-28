@@ -2496,7 +2496,7 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
 .orig-period-layout{max-width:1280px;margin:0 auto;width:100%;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;padding-bottom:64px}
 .orig-period-side{position:sticky;top:92px;align-self:start}
 .orig-period-side-links{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
-.orig-period-side-links a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);text-decoration:none;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.orig-period-side-links a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);text-decoration:none;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;text-align:center;line-height:1.2}
 .orig-period-side-links a.active{background:var(--accent);border-color:var(--accent);color:#000}
 .orig-period-back{display:block;padding:16px;border:1px solid var(--border);background:var(--card);color:var(--muted-foreground);text-decoration:none;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
 .orig-period-back:hover{border-color:var(--accent);color:var(--accent)}
