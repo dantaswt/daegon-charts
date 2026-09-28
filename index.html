@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-circular-artist-art-21">
+  <link rel="stylesheet" href="/portal.css?v=20260927-weekly-artist-circle-22">
 
 <!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
 <style id="yec-goat-mobile-critical">
@@ -2127,6 +2127,70 @@
   .exact-goat-search-wrap input{box-sizing:border-box!important;width:100%!important;min-height:42px!important}
   .exact-results-count{font-size:10px!important}
   .exact-goat-desktop-metric{display:none!important}
+}
+</style>
+
+
+/* WEEKLY_ARTIST_CIRCULAR_V22 */
+<style id="weekly-artist-circular-v22">
+/* Weekly Artists 50 only */
+.weekly-artist-art{
+  background:transparent!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  border-left:0!important;
+}
+.weekly-artist-art .artwork-slot{
+  width:100%!important;
+  height:100%!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  background:transparent!important;
+}
+.weekly-artist-art .artwork-slot img{
+  width:100%!important;
+  height:100%!important;
+  max-width:none!important;
+  max-height:none!important;
+  object-fit:cover!important;
+  border-radius:50%!important;
+}
+
+@media(min-width:768px){
+  .cover.weekly-artist-art{
+    width:88px!important;
+    height:88px!important;
+    flex:0 0 88px!important;
+  }
+  .cover.one.weekly-artist-art{
+    width:104px!important;
+    height:104px!important;
+    flex:0 0 104px!important;
+    box-shadow:0 0 0 4px var(--accent)!important;
+  }
+
+  /* Do not keep the special square #1 cover sizing on the artist chart */
+  .chart-card:has(.rank-num.one) .cover.one.weekly-artist-art{
+    width:104px!important;
+    height:104px!important;
+  }
+}
+
+@media(max-width:767px){
+  .m-cover.weekly-artist-art{
+    width:72px!important;
+    height:72px!important;
+    flex:0 0 72px!important;
+  }
+  .m-cover.one.weekly-artist-art{
+    width:80px!important;
+    height:80px!important;
+    flex:0 0 80px!important;
+    box-shadow:0 0 0 3px var(--accent)!important;
+  }
 }
 </style>
 
@@ -2853,8 +2917,8 @@ async function playEntry(e,btn){
 }
 
 function coverHtml(e,one,mobile=false){
-  const cls=mobile?(one?'m-cover one':'m-cover'):(one?'cover one':'cover');
   const kind=charts[state.active].kind;
+  const cls=(mobile?(one?'m-cover one':'m-cover'):(one?'cover one':'cover'))+(kind==='artist'?' weekly-artist-art':'');
   const icon=kind==='artist'?'fa-user':kind==='album'?'fa-compact-disc':'fa-music';
   const play=(!mobile&&kind==='song')
     ? '<button class="cover-play play" data-entry="'+esc(itemKey(e))+'" aria-label="Play preview"><i class="fas fa-play"></i></button>'
@@ -3106,6 +3170,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-circular-artist-art-21"></script>
+<script src="/portal.js?v=20260927-weekly-artist-circle-22"></script>
 </body>
 </html>
