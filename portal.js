@@ -490,46 +490,177 @@ async function findEntity(kind,slug){
   }
   return {data,found};
 }
-async function renderDetail(kind,slug){
-  loading(labelFor(kind));
-  const {data,found}=await findEntity(kind,slug);
-  if(!found){renderNotFound();return}
-  const runs=[];
-  for(const d of data.dates){
-    const e=(data.entriesByDate[d]||[]).find(x=>entitySlug(x,kind)===slug);
-    if(e)runs.push({...e,date:d});
+function detailStat(label,value,accent=false){
+  return '<div class="orig-detail-stat'+(accent?' accent':'')+'"><div class="orig-detail-stat-label">'+esc(label)+'</div><div class="orig-detail-stat-value">'+esc(String(value??'—'))+'</div></div>';
+}
+function detailActions(name,kind){
+  return '<div class="orig-detail-actions">'+
+    '<button type="button" class="orig-detail-action" data-detail-favorite="'+escAttr(kind+':'+name)+'" title="Favorite"><i class="far fa-star"></i></button>'+
+    '<button type="button" class="orig-detail-action" data-detail-share title="Share"><i class="fas fa-share-alt"></i></button>'+
+  '</div>';
+}
+function bindDetailActions(title){
+  const fav=portalEl.querySelector('[data-detail-favorite]');
+  if(fav){
+    const key='dc:fav:'+fav.dataset.detailFavorite;
+    const sync=()=>{let on=false;try{on=localStorage.getItem(key)==='1'}catch{}fav.classList.toggle('active',on);fav.innerHTML='<i class="'+(on?'fas':'far')+' fa-star"></i>'};
+    sync();
+    fav.onclick=()=>{try{localStorage.setItem(key,localStorage.getItem(key)==='1'?'0':'1')}catch{}sync()};
   }
-  const peak=Math.min(...runs.map(x=>x.position)),weeks=runs.length,weeksAt1=runs.filter(x=>x.position===1).length,first=runs[0]?.date,last=runs[runs.length-1]?.date;
-  let extras='';
-  if(kind==='artist'){
-    const [songs,albums]=await Promise.all([loadWeekly('songs'),loadWeekly('albums')]);
-    const artist=String(found.name).toLowerCase(),collect=(d,k)=>{
-      const m=new Map();
-      for(const date of d.dates)for(const e of d.entriesByDate[date]||[])if(String(e.artist).toLowerCase()===artist){
-        const key=itemKey(e),x=m.get(key)||{...e,peak:e.position,weeks:0};x.peak=Math.min(x.peak,e.position);x.weeks++;m.set(key,x)
-      }
-      return [...m.values()].sort((a,b)=>a.peak-b.peak||b.weeks-a.weeks);
-    };
-    const ss=collect(songs,'song').slice(0,20),aa=collect(albums,'album').slice(0,20);
-    extras='<section class="portal-section"><div class="portal-section-head"><h2>Charting Songs</h2></div><div class="portal-list">'+ss.map(e=>'<div class="portal-row"><div class="portal-row-rank">#'+e.peak+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(e,'song')+'</div></div><div class="portal-row-meta">'+e.weeks+' weeks</div></div>').join('')+'</div></section>'+
-      '<section class="portal-section"><div class="portal-section-head"><h2>Charting Albums</h2></div><div class="portal-list">'+aa.map(e=>'<div class="portal-row"><div class="portal-row-rank">#'+e.peak+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(e,'album')+'</div></div><div class="portal-row-meta">'+e.weeks+' weeks</div></div>').join('')+'</div></section>';
-  }else if(kind==='album'){
-    const songs=await loadWeekly('songs'),albumName=String(found.name).toLowerCase(),tracks=new Map();
-    for(const d of songs.dates)for(const e of songs.entriesByDate[d]||[])if(String(e.album||'').toLowerCase()===albumName){
-      const k=itemKey(e),x=tracks.get(k)||{...e,peak:e.position,weeks:0};x.peak=Math.min(x.peak,e.position);x.weeks++;tracks.set(k,x)
+  const share=portalEl.querySelector('[data-detail-share]');
+  if(share)share.onclick=async()=>{try{if(navigator.share)await navigator.share({title,url:location.href});else await navigator.clipboard.writeText(location.href)}catch{}};
+}
+function detailRunGrid(title,chartId,runs){
+  if(!runs.length)return '';
+  const sorted=[...runs].sort((a,b)=>a.date.localeCompare(b.date));
+  const peak=Math.min(...sorted.map(x=>Number(x.position)||999));
+  const weeks=sorted.length;
+  const weeksAt1=sorted.filter(x=>Number(x.position)===1).length;
+  let cells='';
+  sorted.forEach((x,i)=>{
+    if(i){
+      const prev=new Date(sorted[i-1].date+'T00:00:00'),cur=new Date(x.date+'T00:00:00');
+      const gap=Math.round((cur-prev)/(7*86400000))-1;
+      if(gap>0)cells+='<span class="orig-run-out" title="Out for '+gap+' week'+(gap>1?'s':'')+'">OUT'+(gap>1?' '+gap+'x':'')+'</span>';
     }
-    const arr=[...tracks.values()].sort((a,b)=>a.peak-b.peak||b.weeks-a.weeks);
-    if(arr.length)extras='<section class="portal-section"><div class="portal-section-head"><h2>Charting Tracks</h2></div><div class="portal-list">'+arr.map(e=>'<div class="portal-row"><div class="portal-row-rank">#'+e.peak+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(e,'song')+'</div><div class="portal-row-sub">'+esc(e.artist)+'</div></div><div class="portal-row-meta">'+e.weeks+' weeks</div></div>').join('')+'</div></section>';
-  }
-  const displayArtist=kind!=='artist'&&found.artist?'<p class="portal-subtitle">'+esc(found.artist)+'</p>':'';
-  const main='<div class="portal-hero"><div style="display:flex;gap:18px;align-items:center">'+thumb(found,kind,110)+'<div><div class="portal-kicker">'+labelFor(kind)+' history</div><h1 class="portal-title">'+esc(found.name)+'</h1>'+displayArtist+'</div></div></div>'+
-    '<div class="portal-stats"><div class="portal-statbox"><div class="portal-stat">#'+peak+'</div><div class="portal-stat-sub">Peak</div></div><div class="portal-statbox"><div class="portal-stat">'+weeks+'</div><div class="portal-stat-sub">Weeks</div></div><div class="portal-statbox"><div class="portal-stat">'+weeksAt1+'</div><div class="portal-stat-sub">Weeks at #1</div></div><div class="portal-statbox"><div class="portal-stat">'+fmtShort(first)+'</div><div class="portal-stat-sub">First entry</div></div></div>'+
-    '<section class="portal-section" style="margin-top:24px"><div class="portal-section-head"><h2>Chart Run</h2><span class="portal-more">'+fmtShort(first)+' — '+fmtShort(last)+'</span></div><div class="portal-panel portal-timeline">'+
-      [...runs].reverse().map(x=>'<div class="portal-run"><span>'+fmtShort(x.date)+'</span><strong>#'+x.position+'</strong><span>Peak #'+(x.peak||peak)+' · Week '+(x.weeks||'')+(x.diff?' · '+esc(x.diff):'')+'</span></div>').join('')+
-    '</div></section>'+extras;
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(found.name,found.name+' chart history on Daegon Charts.',entityPath(found,kind));hydratePortalImages();
+    const pos=Number(x.position)||0;
+    const tone=pos<=10?' top10':pos<=25?' top25':pos<=50?' top50':'';
+    cells+='<a class="orig-run-cell'+tone+'" href="'+appHref(chartPath(chartId,x.date))+'" title="'+fmtDate(x.date)+' — #'+pos+'">'+pos+'</a>';
+  });
+  return '<section class="orig-run-card">'+
+    '<div class="orig-run-title">'+esc(title)+'</div>'+
+    '<div class="orig-run-chips"><span>Peak #'+peak+'</span><span>'+weeks+' weeks</span>'+(weeksAt1?'<span class="no1">'+weeksAt1+' #1'+(weeksAt1>1?'s':'')+'</span>':'')+'</div>'+
+    '<div class="orig-run-grid">'+cells+'</div>'+
+  '</section>';
 }
 
+async function renderItemDetailExact(kind,slug,found){
+  const ids=kind==='song'?['songs','digitalSongsSales','streamingSongs','radioSongs']:['albums','topStreamingAlbums','topAlbumSales'];
+  const labels={songs:'Hot 100',digitalSongsSales:'Digital Songs Sales',streamingSongs:'Streaming Songs',radioSongs:'Radio Songs',albums:'Top 100 Albums',topStreamingAlbums:'Top Streaming Albums',topAlbumSales:'Top Album Sales'};
+  const datasets=await Promise.all(ids.map(id=>loadWeekly(id).catch(()=>null)));
+  const grids=[];
+  for(let i=0;i<ids.length;i++){
+    const data=datasets[i];if(!data)continue;
+    const runs=[];
+    for(const date of data.dates){
+      const e=(data.entriesByDate[date]||[]).find(x=>entitySlug(x,kind)===slug);
+      if(e)runs.push({...e,date});
+    }
+    if(runs.length)grids.push({id:ids[i],title:labels[ids[i]]||charts[ids[i]]?.title||ids[i],runs});
+  }
+  const primary=grids.find(g=>g.id===(kind==='song'?'songs':'albums'))||grids[0];
+  const allRuns=primary?.runs||[];
+  const peak=allRuns.length?Math.min(...allRuns.map(x=>Number(x.position)||999)):'—';
+  const weeks=allRuns.length;
+  const latest=allRuns[allRuns.length-1]||found;
+  const metric=(...keys)=>{for(const k of keys){const v=latest?.[k];if(v!==undefined&&v!==null&&String(v).trim()!=='')return fmtNum(metricNumber(v))}return null};
+  const back=kind==='song'?'/chart/daegon-100':'/chart/daegon-albums-100';
+  const backLabel=kind==='song'?'Back to Hot 100':'Back to Albums';
+  const art='<div class="orig-detail-cover" data-portal-image data-kind="'+kind+'" data-name="'+escAttr(found.name)+'" data-artist="'+escAttr(found.artist||found.name)+'"><i class="fas '+iconFor(kind)+'"></i></div>';
+  let stats=detailStat('Peak','#'+peak)+detailStat('Weeks',weeks);
+  if(kind==='song'){
+    const points=metric('totalPoints','points'),units=metric('totalUnits','units'),sales=metric('totalSales','sales'),streams=metric('totalStreams','streams'),aud=metric('totalAudience','audience');
+    if(points)stats+=detailStat('Points',points); if(units)stats+=detailStat('Total Units',units); if(sales)stats+=detailStat('Sales',sales); if(streams)stats+=detailStat('Streams',streams); if(aud)stats+=detailStat('Audience',aud);
+  }else{
+    stats+=detailStat('Total Units',metric('totalUnits','units')||'—')+detailStat('Sales',metric('totalSales','sales')||'—')+detailStat('Streams',metric('totalStreams','streams')||'—');
+  }
+  const main='<div class="orig-detail-page">'+
+    '<a class="orig-detail-back" href="'+appHref(back)+'"><i class="fas fa-arrow-left"></i> '+backLabel+'</a>'+
+    '<section class="orig-detail-hero-card">'+art+
+      '<div class="orig-detail-hero-copy">'+
+        '<a class="orig-detail-artist-link" href="'+appHref('/artist/'+slugify(found.artist||''))+'">'+esc(found.artist||'')+'</a>'+
+        '<h1>'+esc(found.name)+'</h1>'+
+        detailActions(found.name,kind)+
+        '<div class="orig-detail-stats">'+stats+'</div>'+
+      '</div>'+
+    '</section>'+
+    '<section class="orig-detail-runs"><div class="orig-detail-section-head"><h2>Chart Runs</h2></div>'+
+      grids.map(g=>detailRunGrid(g.title,g.id,g.runs)).join('')+
+    '</section>'+
+  '</div>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(found.name+' — '+(found.artist||''),found.name+' chart history on Daegon Charts.',entityPath(found,kind));
+  bindLinks();hydratePortalImages();bindDetailActions(found.name);
+}
+
+async function renderArtistDetailExact(slug,found){
+  const artistName=found.name;
+  const chartDefs=[
+    ['songs','Hot 100 Songs','song'],['digitalSongsSales','Digital Songs Sales','song'],['streamingSongs','Streaming Songs','song'],['radioSongs','Top 40 Radio','song'],
+    ['albums','Top 100 Albums','album'],['topAlbumSales','Top Album Sales','album'],['topStreamingAlbums','Top Streaming Albums','album']
+  ];
+  const artistData=await loadWeekly('artists');
+  const artistRuns=[];
+  for(const date of artistData.dates){
+    const e=(artistData.entriesByDate[date]||[]).find(x=>slugify(x.name)===slugify(artistName));
+    if(e)artistRuns.push({...e,date});
+  }
+  const collected=[];
+  for(const [id,title,entryKind] of chartDefs){
+    const data=await loadWeekly(id).catch(()=>null);if(!data)continue;
+    const map=new Map();
+    for(const date of data.dates)for(const e of data.entriesByDate[date]||[]){
+      if(String(e.artist||'').trim().toLowerCase()!==artistName.trim().toLowerCase())continue;
+      const key=itemKey(e),x=map.get(key)||{item:e.name,artist:e.artist,peak:999,weeks:0,weeksAt1:0,firstEntry:date,peakDate:date,kind:entryKind};
+      const p=Number(e.position)||999;x.weeks++;if(p<x.peak){x.peak=p;x.peakDate=date}if(p===1)x.weeksAt1++;map.set(key,x);
+    }
+    const entries=[...map.values()].sort((a,b)=>a.peak-b.peak||b.weeks-a.weeks);
+    if(entries.length)collected.push({id,title,entryKind,entries});
+  }
+  let selected=collected[0]?.id||'';
+  let expanded=false;
+  const peak=artistRuns.length?Math.min(...artistRuns.map(x=>Number(x.position)||999)):null;
+  const weeks=artistRuns.length;
+
+  const draw=()=>{
+    const group=collected.find(x=>x.id===selected)||collected[0];
+    const entries=group?.entries||[];
+    const visible=expanded?entries:entries.slice(0,5);
+    const no1s=entries.filter(e=>e.peak===1).length,top10=entries.filter(e=>e.peak<=10).length;
+    const table=entries.length?'<div class="orig-artist-table-wrap"><table class="orig-artist-table"><thead><tr><th>'+(group?.entryKind==='album'?'Album':'Song')+'</th><th>Debut Date</th><th>Peak Pos.</th><th>Peak Date</th><th>Wks. on Chart</th></tr></thead><tbody>'+
+      visible.map(e=>'<tr><td><strong><a href="'+appHref(entityPath({name:e.item,artist:artistName},group.entryKind))+'">'+esc(e.item)+'</a></strong><small>'+esc(artistName)+'</small></td><td>'+fmtShort(e.firstEntry)+'</td><td><b>#'+e.peak+'</b>'+(e.weeksAt1?'<em>'+e.weeksAt1+' WKS</em>':'')+'</td><td>'+fmtShort(e.peakDate)+'</td><td><b>'+e.weeks+'</b></td></tr>').join('')+
+      '</tbody></table>'+(entries.length>5?'<div class="orig-artist-expand"><button data-artist-expand>'+(expanded?'Show less':'Show all '+entries.length+' entries')+'</button></div>':'')+'</div>':
+      '<div class="orig-detail-empty">No entries found for this chart.</div>';
+
+    const main='<div class="orig-artist-detail-page">'+
+      '<a class="orig-detail-back" href="'+appHref('/artists')+'"><i class="fas fa-arrow-left"></i> All artists</a>'+
+      '<section class="orig-artist-name-hero"><h1>'+esc(artistName)+'</h1>'+detailActions(artistName,'artist')+'</section>'+
+      '<div class="orig-artist-main-stats">'+
+        (peak!==null?detailStat('Artist 50 Peak','#'+peak,true):'')+
+        (weeks?detailStat('Artist 50 Weeks',weeks):'')+
+      '</div>'+
+      '<section class="orig-artist-profile">'+
+        '<div class="orig-artist-profile-image" data-portal-image data-kind="artist" data-name="'+escAttr(artistName)+'" data-artist="'+escAttr(artistName)+'"><i class="fas fa-user"></i></div>'+
+        '<p>'+esc(artistName)+' has '+collected.reduce((s,g)=>s+g.entries.length,0)+' chart entries across all charts.</p>'+
+      '</section>'+
+      '<div class="orig-artist-tabs"><button class="active"><i class="fas fa-chart-line"></i> Charts</button><button><i class="fas fa-trophy"></i> Awards</button></div>'+
+      (group?'<section class="orig-artist-chart-area">'+
+        '<div class="orig-artist-summary">'+
+          '<div class="chart-name">'+esc(group.title)+'</div>'+
+          '<div><strong>'+no1s+'</strong><span>NO. 1 HITS</span></div>'+
+          '<div><strong>'+entries.length+'</strong><span>TITLES</span></div>'+
+          '<div><strong>'+top10+'</strong><span>TOP 10 HITS</span></div>'+
+        '</div>'+
+        '<select id="origArtistChartSelect">'+collected.map(g=>'<option value="'+escAttr(g.id)+'" '+(g.id===group.id?'selected':'')+'>'+esc(g.title)+'</option>').join('')+'</select>'+
+        table+
+      '</section>':'')+
+      '<div class="orig-detail-bottom-back"><a href="'+appHref('/artists')+'"><i class="fas fa-arrow-left"></i> Browse all artists</a></div>'+
+    '</div>';
+
+    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(artistName+' — chart history',artistName+' chart history and entries.',entityPath(found,'artist'));
+    bindLinks();hydratePortalImages();bindDetailActions(artistName);
+    const sel=document.getElementById('origArtistChartSelect');if(sel)sel.onchange=e=>{selected=e.target.value;expanded=false;draw()};
+    const ex=portalEl.querySelector('[data-artist-expand]');if(ex)ex.onclick=()=>{expanded=!expanded;draw()};
+  };
+  draw();
+}
+
+async function renderDetail(kind,slug){
+  loading(labelFor(kind));
+  const {found}=await findEntity(kind,slug);
+  if(!found){renderNotFound();return}
+  if(kind==='artist')return renderArtistDetailExact(slug,found);
+  return renderItemDetailExact(kind,slug,found);
+}
 
 
 const generatedYecCache=new Map();
