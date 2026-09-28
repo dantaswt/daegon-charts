@@ -3139,3 +3139,117 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
     display:none!important;
   }
 }
+
+/* === HARD MOBILE VIEWPORT FIX YEC GOAT v11 === */
+@media(max-width:767px){
+  html,body{
+    max-width:100%!important;
+    overflow-x:hidden!important;
+  }
+
+  body.portal-mode .portal-page,
+  body.portal-mode .portal-main,
+  body.portal-mode .portal-shell,
+  body.portal-mode .orig-period-layout,
+  body.portal-mode .orig-period-main,
+  body.portal-mode .orig-period-list,
+  body.portal-mode .orig-goat-layout,
+  body.portal-mode .orig-goat-main{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    left:auto!important;
+    right:auto!important;
+    transform:none!important;
+  }
+
+  body.portal-mode .portal-page{
+    padding-left:0!important;
+    padding-right:0!important;
+    overflow-x:hidden!important;
+  }
+
+  body.portal-mode .portal-shell{
+    display:block!important;
+  }
+
+  body.portal-mode .orig-period-layout,
+  body.portal-mode .orig-goat-layout{
+    display:block!important;
+    padding-left:8px!important;
+    padding-right:8px!important;
+    overflow-x:hidden!important;
+  }
+
+  body.portal-mode .orig-period-side,
+  body.portal-mode .orig-goat-side{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    transform:none!important;
+  }
+
+  body.portal-mode .orig-period-side-links{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 0 12px!important;
+  }
+
+  body.portal-mode .orig-period-back,
+  body.portal-mode .orig-goat-side .orig-period-back{
+    display:none!important;
+  }
+
+  body.portal-mode .orig-period-main,
+  body.portal-mode .orig-goat-main{
+    position:static!important;
+    padding:0!important;
+    overflow:visible!important;
+  }
+
+  body.portal-mode .orig-period-list{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:8px!important;
+    padding:0!important;
+  }
+
+  body.portal-mode .orig-period-card,
+  body.portal-mode .orig-period-card.first{
+    box-sizing:border-box!important;
+    position:relative!important;
+    left:auto!important;
+    right:auto!important;
+    transform:none!important;
+    margin:0!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    grid-template-columns:30px 64px minmax(0,1fr) 34px!important;
+  }
+
+  body.portal-mode .orig-period-card.first{
+    grid-template-columns:30px 68px minmax(0,1fr) 34px!important;
+  }
+
+  body.portal-mode .orig-period-entry{
+    width:auto!important;
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  body.portal-mode .orig-goat-top3,
+  body.portal-mode .orig-goat-search{
+    width:100%!important;
+    max-width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+}
