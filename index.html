@@ -1889,7 +1889,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-performance-34">
+  <link rel="stylesheet" href="/portal.css?v=20260927-css-cleanup-36">
 
 <!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
 <style id="yec-goat-mobile-critical">
@@ -2141,99 +2141,6 @@
   .exact-goat-desktop-metric{display:none!important}
 }
 </style>
-
-
-<!-- WEEKLY_ARTIST_CIRCULAR_V22 -->
-<style id="weekly-artist-circular-v22">
-/* Weekly Artists 50 only */
-.weekly-artist-art{
-  background:transparent!important;
-  border-radius:50%!important;
-  overflow:hidden!important;
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  border-left:0!important;
-}
-.weekly-artist-art .artwork-slot{
-  width:100%!important;
-  height:100%!important;
-  border-radius:50%!important;
-  overflow:hidden!important;
-  background:transparent!important;
-}
-.weekly-artist-art .artwork-slot img{
-  width:100%!important;
-  height:100%!important;
-  max-width:none!important;
-  max-height:none!important;
-  object-fit:cover!important;
-  border-radius:50%!important;
-}
-
-@media(min-width:768px){
-  .cover.weekly-artist-art{
-    width:88px!important;
-    height:88px!important;
-    flex:0 0 88px!important;
-  }
-  .cover.one.weekly-artist-art{
-    width:104px!important;
-    height:104px!important;
-    flex:0 0 104px!important;
-    box-shadow:0 0 0 4px var(--accent)!important;
-  }
-
-  /* Do not keep the special square #1 cover sizing on the artist chart */
-  .chart-card:has(.rank-num.one) .cover.one.weekly-artist-art{
-    width:104px!important;
-    height:104px!important;
-  }
-}
-
-@media(max-width:767px){
-  .m-cover.weekly-artist-art{
-    width:72px!important;
-    height:72px!important;
-    flex:0 0 72px!important;
-  }
-  .m-cover.one.weekly-artist-art{
-    width:72px!important;
-    height:72px!important;
-    flex:0 0 72px!important;
-    box-shadow:0 0 0 3px var(--accent)!important;
-  }
-}
-</style>
-
-
-<!-- WEEKLY_ARTIST_IMAGE_FILL_V23 -->
-<style id="weekly-artist-image-fill-v23">
-/* Fill circular artist frames even when provider artwork contains built-in padding */
-.weekly-artist-art .artwork-slot{
-  position:relative!important;
-  width:100%!important;
-  height:100%!important;
-  overflow:hidden!important;
-  border-radius:50%!important;
-  background:transparent!important;
-}
-.weekly-artist-art .artwork-slot img{
-  position:absolute!important;
-  left:50%!important;
-  top:50%!important;
-  width:134%!important;
-  height:134%!important;
-  max-width:none!important;
-  max-height:none!important;
-  transform:translate(-50%,-50%)!important;
-  object-fit:cover!important;
-  object-position:center center!important;
-  border-radius:0!important;
-}
-</style>
-
-
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -2275,10 +2182,6 @@ html.dark .sk{
   .sk-cover-mobile-one.sk-circle{width:72px;height:72px;flex:0 0 72px}
 }
 </style>
-
-
-
-
 
 <!-- WEEKLY_ARTIST_FINAL_PARITY_V31 -->
 <style id="weekly-artist-final-parity-v31">
@@ -2938,7 +2841,6 @@ function generatedFallbackImage(e,cfg){
   return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
 }
 
-
 const HARDCODED_ALBUM_IMAGES={
   checkmate:'https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da841ebe14cc216c7be9269638d7',
   solo:'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02c0f23c0d2af5ec63daef87f0',
@@ -3415,6 +3317,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-performance-35"></script>
+<script src="/portal.js?v=20260927-css-cleanup-36"></script>
 </body>
 </html>
