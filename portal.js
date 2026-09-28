@@ -844,13 +844,13 @@ async function renderPeriod(type,chartSeg){
       return '<div class="exact-chart-card '+(isFirst?'first':'')+'">'+
         '<div class="exact-desktop-row">'+
           '<div class="exact-rank '+(isFirst?'first':'')+'">'+pos+'</div>'+
-          '<div class="exact-art '+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div>'+
+          '<div class="exact-art '+(kind==='artist'?'exact-artist-art ':'')+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div>'+
           '<div class="exact-entry"><div class="exact-title">'+entityLink(e,kind)+'</div>'+(kind!=='artist'?'<div class="exact-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
           '<button type="button" class="exact-plus" data-yec-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
         '</div>'+
         '<div class="exact-mobile-row">'+
           '<div class="exact-mobile-rank">'+pos+'</div>'+
-          '<div class="exact-mobile-art '+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div>'+
+          '<div class="exact-mobile-art '+(kind==='artist'?'exact-artist-art ':'')+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div>'+
           '<div class="exact-mobile-copy"><div class="exact-mobile-title">'+entityLink(e,kind)+'</div>'+(kind!=='artist'?'<div class="exact-mobile-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
           '<button type="button" class="exact-plus" data-yec-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
         '</div>'+
@@ -1010,14 +1010,14 @@ async function renderGoat(chartSeg){
       return '<div class="exact-chart-card '+(isFirst?'first':'')+'">'+
         '<div class="exact-desktop-row">'+
           '<div class="exact-rank '+(isFirst?'first':'')+'">'+e.position+'</div>'+
-          '<div class="exact-art '+(isFirst?'first':'')+'">'+refThumb(e,data.kind)+'</div>'+
+          '<div class="exact-art '+(data.kind==='artist'?'exact-artist-art ':'')+(isFirst?'first':'')+'">'+refThumb(e,data.kind)+'</div>'+
           '<div class="exact-entry"><div class="exact-title">'+entityLink(e,data.kind)+'</div>'+(data.kind!=='artist'?'<div class="exact-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
           '<div class="exact-goat-desktop-metric">'+esc(metricValue(e))+'</div>'+
           '<button type="button" class="exact-plus" data-goat-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
         '</div>'+
         '<div class="exact-mobile-row">'+
           '<div class="exact-mobile-rank">'+e.position+'</div>'+
-          '<div class="exact-mobile-art '+(isFirst?'first':'')+'">'+refThumb(e,data.kind)+'</div>'+
+          '<div class="exact-mobile-art '+(data.kind==='artist'?'exact-artist-art ':'')+(isFirst?'first':'')+'">'+refThumb(e,data.kind)+'</div>'+
           '<div class="exact-mobile-copy"><div class="exact-mobile-title">'+entityLink(e,data.kind)+'</div>'+(data.kind!=='artist'?'<div class="exact-mobile-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
           '<button type="button" class="exact-plus" data-goat-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
         '</div>'+
