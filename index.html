@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-weekly-style-fix-25">
+  <link rel="stylesheet" href="/portal.css?v=20260927-skeleton-26">
 
 <!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
 <style id="yec-goat-mobile-critical">
@@ -2221,6 +2221,48 @@
 }
 </style>
 
+
+<!-- WEEKLY_SKELETON_V26 -->
+<style id="weekly-skeleton-v26">
+@keyframes daegonSkeletonShimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+.sk{
+  display:block;
+  border-radius:4px;
+  background:linear-gradient(90deg,var(--muted) 25%,rgba(255,255,255,.55) 50%,var(--muted) 75%);
+  background-size:200% 100%;
+  animation:daegonSkeletonShimmer 1.25s linear infinite;
+}
+html.dark .sk{
+  background:linear-gradient(90deg,#232323 25%,#343434 50%,#232323 75%);
+  background-size:200% 100%;
+}
+.skeleton-card{pointer-events:none}
+.sk-rank{width:34px;height:30px;margin:0 auto}
+.sk-cover{width:96px;height:96px}
+.sk-cover-one{width:180px;height:180px}
+.sk-circle{border-radius:50%!important}
+.sk-diff{width:26px;height:22px}
+.sk-title{width:min(330px,75%);height:20px}
+.sk-sub{width:min(220px,55%);height:14px;margin-top:8px}
+.sk-metric{width:120px;height:14px}
+.sk-action{width:32px;height:32px;border-radius:50%}
+.sk-rank-mobile{width:24px;height:24px}
+.sk-diff-mobile{width:20px;height:16px;margin-top:6px}
+.sk-cover-mobile{width:64px;height:64px}
+.sk-cover-mobile-one{width:68px;height:68px}
+.sk-title-mobile{width:72%;height:16px}
+.sk-sub-mobile{width:48%;height:12px;margin-top:6px}
+.sk-meta-mobile{width:78%;height:10px;margin-top:8px}
+.sk-action-mobile{width:32px;height:32px;border-radius:50%}
+@media(max-width:767px){
+  .skeleton-card{min-height:84px}
+  .sk-cover-mobile.sk-circle{width:72px;height:72px;flex:0 0 72px}
+  .sk-cover-mobile-one.sk-circle{width:80px;height:80px;flex:0 0 80px}
+}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -2999,6 +3041,30 @@ function detailHtml(e,cfg,data,date,copy){
 function visibleChartTitle(name){
   return String(name||'').replace(/\s*[\(\[]?\s*(?:feat\.?|ft\.?|featuring)\s+[^\)\]]+[\)\]]?\s*$/i,'').trim()||String(name||'');
 }
+
+function weeklySkeleton(kind='song'){
+  const artist=kind==='artist';
+  const rows=Array.from({length:7},(_,i)=>{
+    const one=i===0;
+    return '<article class="chart-card skeleton-card">'+
+      '<div class="desktop-row">'+
+        '<div class="rank-wrap"><div class="sk sk-rank"></div></div>'+
+        '<div class="sk sk-cover '+(artist?'sk-circle ':'')+(one?'sk-cover-one':'')+'"></div>'+
+        '<div class="diff-wrap"><div class="sk sk-diff"></div></div>'+
+        '<div class="entry"><div class="sk sk-title"></div>'+(artist?'':'<div class="sk sk-sub"></div>')+'</div>'+
+        '<div class="right"><div class="sk sk-metric"></div><div class="sk sk-action"></div></div>'+
+      '</div>'+
+      '<div class="mobile-row">'+
+        '<div class="m-rank"><div class="sk sk-rank-mobile"></div><div class="sk sk-diff-mobile"></div></div>'+
+        '<div class="sk sk-cover-mobile '+(artist?'sk-circle ':'')+(one?'sk-cover-mobile-one':'')+'"></div>'+
+        '<div class="m-entry"><div class="sk sk-title-mobile"></div>'+(artist?'':'<div class="sk sk-sub-mobile"></div>')+'<div class="sk sk-meta-mobile"></div></div>'+
+        '<div class="m-actions"><div class="sk sk-action-mobile"></div></div>'+
+      '</div>'+
+    '</article>';
+  }).join('');
+  return '<div class="skeleton-list" aria-hidden="true">'+rows+'</div>';
+}
+
 function renderRows(data,date){
   const cfg=charts[state.active],all=data.entriesByDate[date]||[],rows=all.filter(e=>state.filters.has('all')||state.filters.has(diffType(e.diff)));
   if(!rows.length){content.innerHTML='<div class="error">No entries match these filters.</div>';return}
@@ -3130,7 +3196,7 @@ function setDate(date,data,{routeMode='push',scroll=true}={}){
   if(scroll)window.scrollTo({top:0,behavior:'smooth'});
 }
 async function loadChart(id,requestedDate=null,{routeMode='push',scroll=true}={}){
-  state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML='<div class="loader-wrap"><div class="loader"></div></div>';dropoutsEl.innerHTML='';
+  state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML=weeklySkeleton(charts[id].kind);dropoutsEl.innerHTML='';
   try{
     const data=await loadWeekly(id);if(!data.dates.length)throw new Error('No dates');
     let date=requestedDate&&data.entriesByDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];state.date=date;
@@ -3197,6 +3263,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-weekly-style-fix-25"></script>
+<script src="/portal.js?v=20260927-skeleton-26"></script>
 </body>
 </html>
