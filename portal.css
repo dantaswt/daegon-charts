@@ -2610,3 +2610,9 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .orig-goat-top3>div{padding:16px 8px}
   .orig-goat-top3 span{width:48px;height:48px;font-size:20px}
 }
+
+/* === YEC GOAT EXACT POLISH v9 === */
+.orig-bottom-control{margin-top:40px}
+.orig-goat-search{position:relative;margin:0 0 14px}
+.orig-goat-search input{width:100%;min-height:40px;padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:14px;outline:none}
+.orig-goat-search input:focus{border-color:var(--accent)}
