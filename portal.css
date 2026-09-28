@@ -2531,3 +2531,82 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .orig-awards-bar nav{order:3;width:100%;gap:14px}
   .orig-awards-search{display:none}
 }
+
+/* === ORIGINAL DETAIL ROUTES v8 === */
+.orig-period-layout{max-width:1280px;margin:0 auto;width:100%;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;padding-bottom:64px}
+.orig-period-side{position:sticky;top:92px;align-self:start}
+.orig-period-side-links{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.orig-period-side-links a{display:flex;align-items:center;justify-content:center;min-height:44px;padding:8px 16px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);text-decoration:none;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.orig-period-side-links a.active{background:var(--accent);border-color:var(--accent);color:#000}
+.orig-period-back{display:block;padding:16px;border:1px solid var(--border);background:var(--card);color:var(--muted-foreground);text-decoration:none;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.orig-period-back:hover{border-color:var(--accent);color:var(--accent)}
+.orig-period-main{min-width:0}
+.orig-period-heading{text-align:center;margin:0 0 16px}
+.orig-period-heading h1{margin:0;font-size:36px;line-height:1.1;font-weight:900}
+.orig-period-list{display:flex;flex-direction:column;gap:12px;max-width:896px;margin:0 auto}
+.orig-period-card{position:relative;display:grid;grid-template-columns:64px 96px minmax(0,1fr) 40px;gap:12px;align-items:center;min-height:126px;padding:14px 16px;border:1px solid var(--border);background:var(--card)}
+.orig-period-card.first{min-height:214px}
+.orig-period-rank{width:64px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900}
+.orig-period-rank.first{height:64px;background:var(--accent);color:#000;font-size:36px}
+.orig-period-art{width:96px;height:96px;overflow:hidden;background:var(--muted)}
+.orig-period-art.first{width:180px;height:180px;border-left:4px solid var(--accent)}
+.orig-period-art .ref-thumb{width:100%!important;height:100%!important;border:0!important}
+.orig-period-entry{min-width:0}
+.orig-period-name{font-size:16px;font-weight:800;line-height:1.2}
+.orig-period-card.first .orig-period-name{font-size:20px}
+.orig-period-name a{color:inherit;text-decoration:none}
+.orig-period-name a:hover{color:var(--accent);text-decoration:underline}
+.orig-period-artist{margin-top:3px;color:var(--muted-foreground);font-size:14px}
+.orig-period-more{width:32px;height:32px;border:0;background:var(--muted);color:var(--foreground);display:flex;align-items:center;justify-content:center}
+.orig-period-details{display:none;grid-column:1/-1;margin:0 0 2px;padding:12px;border:1px solid var(--border);background:var(--muted);grid-template-columns:repeat(3,1fr);gap:12px}
+.orig-period-details.open{display:grid}
+.orig-period-details div{text-align:center}
+.orig-period-details span{display:block;color:var(--accent);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.orig-period-details strong{display:block;margin-top:4px;font-size:14px}
+.orig-goat-layout{max-width:1280px;margin:0 auto;display:flex;gap:32px;padding:0 24px 64px}
+.orig-goat-side{width:288px;flex:0 0 288px;position:sticky;top:92px;align-self:flex-start}
+.orig-goat-box{padding:16px;margin-bottom:16px;border:1px solid var(--border);background:var(--card)}
+.orig-goat-box .orig-eyebrow{margin-bottom:12px}
+.orig-goat-box select{width:100%;padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:14px;font-weight:700}
+.orig-goat-box a{display:block;padding:8px;color:var(--foreground);text-decoration:none;font-size:14px;font-weight:700}
+.orig-goat-box a:hover,.orig-goat-box a.active{color:var(--accent);background:rgba(255,109,0,.08)}
+.orig-goat-main{min-width:0;flex:1}
+.orig-goat-hero{position:relative;text-align:center;padding:32px 0 40px;margin-bottom:24px;overflow:hidden}
+.orig-goat-hero>div{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:6rem;font-weight:900;opacity:.06;text-transform:uppercase;pointer-events:none;white-space:nowrap}
+.orig-goat-hero h1{position:relative;z-index:1;margin:0;color:var(--accent);font-size:48px;text-transform:uppercase;line-height:1}
+.orig-goat-hero p{position:relative;z-index:1;color:var(--muted-foreground);font-size:14px;margin:8px 0 0}
+.orig-goat-top3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+.orig-goat-top3>div{position:relative;padding:24px 16px;text-align:center;border:1px solid var(--border);background:var(--card)}
+.orig-goat-top3>div.first{border-color:var(--accent);background:rgba(255,109,0,.05)}
+.orig-goat-top3>div.first::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--accent)}
+.orig-goat-top3 span{width:64px;height:64px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:var(--muted);font-size:24px;font-weight:900}
+.orig-goat-top3 .first span{background:var(--accent);color:#000}
+.orig-goat-top3 strong{display:block;font-size:15px}
+.orig-goat-top3 small{display:block;margin-top:4px;color:var(--muted-foreground);font-size:12px}
+.orig-goat-metric{text-align:right;color:var(--accent);font-size:13px;font-weight:900;white-space:nowrap}
+@media(max-width:900px){
+  .orig-period-layout{grid-template-columns:1fr}
+  .orig-period-side{position:static}
+  .orig-period-side-links{display:flex;flex-direction:row;overflow-x:auto;gap:0}
+  .orig-period-side-links a{flex:0 0 auto}
+  .orig-goat-layout{display:block;padding:0 12px 48px}
+  .orig-goat-side{width:auto;position:static}
+}
+@media(max-width:767px){
+  .orig-period-layout{padding:0 8px 48px}
+  .orig-period-heading h1{font-size:28px}
+  .orig-period-card{grid-template-columns:32px 64px minmax(0,1fr) 32px;gap:8px;min-height:auto;padding:10px 9px}
+  .orig-period-card.first{min-height:auto}
+  .orig-period-rank{width:32px;font-size:20px}
+  .orig-period-rank.first{height:auto;background:transparent;color:var(--foreground);font-size:20px}
+  .orig-period-art,.orig-period-art.first{width:64px;height:64px;border-left:0}
+  .orig-period-art.first{width:68px;height:68px;border-left:3px solid var(--accent)}
+  .orig-period-name,.orig-period-card.first .orig-period-name{font-size:13px}
+  .orig-period-artist{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .orig-period-details{grid-template-columns:repeat(3,1fr);padding:10px}
+  .orig-goat-hero>div{font-size:4rem}
+  .orig-goat-hero h1{font-size:34px}
+  .orig-goat-top3{gap:8px}
+  .orig-goat-top3>div{padding:16px 8px}
+  .orig-goat-top3 span{width:48px;height:48px;font-size:20px}
+}
