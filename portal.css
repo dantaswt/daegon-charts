@@ -3613,3 +3613,10 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .portal-sk-title{width:78%;height:14px}
   .portal-sk-sub{width:52%;height:10px;margin-top:6px}
 }
+
+/* === NUMBER1 ARTIST PORTRAIT FILL v29 === */
+.exact-art.exact-artist-art.first .ref-thumb img,
+.exact-mobile-art.exact-artist-art.first .ref-thumb img{
+  width:156%!important;
+  height:156%!important;
+}
