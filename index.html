@@ -19,8 +19,16 @@
   <link rel="icon" type="image/png" href="https://i.imgur.com/jaBZ19n.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://docs.google.com" crossorigin>
+  <link rel="preconnect" href="https://kvnzhuwmgadqicixbzvb.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//itunes.apple.com">
+  <link rel="dns-prefetch" href="//raw.githubusercontent.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </noscript>
   <script>
     (function(){
       try{
@@ -1881,7 +1889,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-editorial-32">
+  <link rel="stylesheet" href="/portal.css?v=20260927-performance-34">
 
 <!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
 <style id="yec-goat-mobile-critical">
@@ -2364,6 +2372,19 @@ html.dark .sk{
     ]
   }
   </script>
+<!-- PERFORMANCE_RENDERING_V34 -->
+<style id="performance-rendering-v34">
+.chart-card,.dropout{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 112px;
+}
+@media(max-width:767px){
+  .chart-card{contain-intrinsic-size:auto 98px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
 </head>
 <body>
 <div class="shell">
@@ -3044,7 +3065,6 @@ async function resolvePreview(e){
 async function hydrateImages(cfg,rows){
   const nodes=[...content.querySelectorAll('[data-image-key]')];
   const byKey=new Map();
-
   for(const node of nodes){
     const key=node.dataset.imageKey;
     if(!key)continue;
@@ -3055,28 +3075,56 @@ async function hydrateImages(cfg,rows){
   const entries=[...byKey.keys()]
     .map(key=>rows.find(x=>itemKey(x)===key))
     .filter(Boolean);
+  const entryByKey=new Map(entries.map(e=>[itemKey(e),e]));
+  const loaded=new Set();
 
-  const concurrency=6;
-  let cursor=0;
-
-  async function worker(){
-    while(cursor<entries.length){
-      const e=entries[cursor++];
-      const key=itemKey(e);
+  async function loadKey(key,priority=false){
+    if(!key||loaded.has(key))return;
+    loaded.add(key);
+    const e=entryByKey.get(key);
+    if(!e)return;
+    try{
       const url=await resolveImage(e,cfg);
-      if(!url)continue;
-
+      if(!url)return;
       for(const node of byKey.get(key)||[]){
-        if(node.isConnected){
-          const slot=node.querySelector('.artwork-slot');
-          if(slot) slot.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
-          else node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
-        }
+        if(!node.isConnected)continue;
+        const attrs=priority?' loading="eager" fetchpriority="high" decoding="async"':' loading="lazy" decoding="async"';
+        const image='<img src="'+esc(url)+'"'+attrs+' onerror="this.onerror=null;this.remove();">';
+        const slot=node.querySelector('.artwork-slot');
+        if(slot)slot.innerHTML=image;else node.innerHTML=image;
       }
-    }
+    }catch{}
   }
 
-  await Promise.all(Array.from({length:Math.min(concurrency,entries.length)},()=>worker()));
+  // Resolve only what can affect the first screen immediately.
+  const immediate=entries.slice(0,8);
+  let cursor=0;
+  async function worker(){
+    while(cursor<immediate.length){
+      const index=cursor++;
+      await loadKey(itemKey(immediate[index]),index===0);
+    }
+  }
+  Promise.all(Array.from({length:Math.min(4,immediate.length)},()=>worker())).catch(()=>{});
+
+  // Everything else is resolved only when it approaches the viewport.
+  if('IntersectionObserver' in window){
+    const observer=new IntersectionObserver(items=>{
+      for(const item of items){
+        if(!item.isIntersecting)continue;
+        observer.unobserve(item.target);
+        loadKey(item.target.dataset.imageKey,false);
+      }
+    },{rootMargin:'700px 0px'});
+    for(const e of entries.slice(8)){
+      const key=itemKey(e);
+      const node=(byKey.get(key)||[])[0];
+      if(node)observer.observe(node);
+    }
+  }else{
+    const rest=()=>entries.slice(8).forEach(e=>loadKey(itemKey(e),false));
+    if('requestIdleCallback' in window)requestIdleCallback(rest,{timeout:1800});else setTimeout(rest,250);
+  }
 }
 async function playEntry(e,btn){
   if(state.audio){state.audio.pause();state.audio=null;if(state.playingBtn)state.playingBtn.innerHTML='<i class="fas fa-play"></i>'}
@@ -3367,6 +3415,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-index-quality-33"></script>
+<script src="/portal.js?v=20260927-performance-34"></script>
 </body>
 </html>
