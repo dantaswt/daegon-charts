@@ -3669,3 +3669,15 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
     padding-top:0!important;
   }
 }
+
+
+/* Route isolation: portal pages and weekly charts must never render together */
+body.portal-mode #weeklyView,
+body.portal-mode .page > #weeklyView{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+body:not(.portal-mode) #portalPage{
+  display:none!important;
+}
