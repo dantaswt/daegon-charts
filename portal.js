@@ -1165,11 +1165,70 @@ async function renderPeriod(type,chartSeg){
 
 async function renderDecadeDetailExact(chartSeg){
   const oldMap={songs:'songs',albums:'albums',artists:'artists'},weeklyId=oldMap[chartSeg]||'songs';
-  const data=await loadWeekly(weeklyId),years=[...new Set(data.dates.map(d=>Number(d.slice(0,4))))].sort((a,b)=>b-a),decades=[...new Set(years.map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a);
-  const selected=String(new URLSearchParams(location.search).get('decade')||decades[0]||'2000'),pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10,arr=aggregateDecadePeriod(data,weeklyId,pred).slice(0,100);
+  const data=await loadWeekly(weeklyId);
+  const years=[...new Set(data.dates.map(d=>Number(d.slice(0,4))))].sort((a,b)=>b-a);
+  const decades=[...new Set(years.map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a).map(String);
+  let selected=String(new URLSearchParams(location.search).get('decade')||decades[0]||'2000');
+  if(!decades.includes(selected))selected=decades[0]||selected;
+
   const path='/decade-end/'+chartSeg,kind=charts[weeklyId].kind,title=charts[weeklyId].title;
-  const main='<div class="orig-period-layout"><aside class="orig-period-side"><div class="orig-period-side-links">'+['songs','albums','artists'].map(id=>'<a href="'+appHref('/decade-end/'+id)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(charts[id].title)+'</a>').join('')+'</div><a class="orig-period-back" href="'+appHref('/decade-end')+'"><i class="fas fa-arrow-left"></i> All Decade-End</a></aside><main class="orig-period-main"><div class="orig-period-heading"><h1>'+esc(title)+'</h1></div><div class="orig-period-list">'+arr.map((e,i)=>'<div class="orig-period-card"><div class="orig-period-rank">'+(i+1)+'</div><div class="orig-period-art">'+refThumb(e,kind)+'</div><div class="orig-period-entry"><div class="orig-period-name">'+entityLink(e,kind)+'</div></div></div>').join('')+'</div></main></div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);bindLinks();hydratePortalImages();
+
+  const draw=()=>{
+    const pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10;
+    const arr=aggregateDecadePeriod(data,weeklyId,pred).slice(0,100);
+    const values=decades.map(x=>x+'s');
+    const selectedLabel=selected+'s';
+
+    const main='<div class="orig-period-layout">'+
+      '<aside class="orig-period-side">'+
+        '<div class="orig-period-side-links">'+
+          ['songs','albums','artists'].map(id=>'<a href="'+appHref('/decade-end/'+id)+'?decade='+encodeURIComponent(selected)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(charts[id].title)+'</a>').join('')+
+        '</div>'+
+        '<a class="orig-period-back" href="'+appHref('/decade-end')+'?decade='+encodeURIComponent(selected)+'"><i class="fas fa-arrow-left"></i> All Decade-End</a>'+
+      '</aside>'+
+      '<main class="orig-period-main">'+
+        '<div class="orig-period-heading"><h1>'+esc(title)+'</h1></div>'+
+        originalYearControls('Decade',values,selectedLabel,'decadedetail')+
+        '<div class="orig-period-list">'+
+          arr.map((e,i)=>'<div class="orig-period-card">'+
+            '<div class="orig-period-rank">'+(i+1)+'</div>'+
+            '<div class="orig-period-art">'+refThumb(e,kind)+'</div>'+
+            '<div class="orig-period-entry">'+
+              '<div class="orig-period-name">'+entityLink(e,kind)+'</div>'+
+              (kind!=='artist'&&e.artist?'<div class="orig-period-artist">'+esc(e.artist)+'</div>':'')+
+            '</div>'+
+          '</div>').join('')+
+        '</div>'+
+      '</main>'+
+    '</div>';
+
+    setMode(true);
+    portalEl.innerHTML=shellHtml(main);
+    setMeta('Decade-End - '+title,title+' decade-end rankings for the '+selected+'s.',path);
+    bindLinks();
+    hydratePortalImages();
+
+    const change=v=>{
+      selected=String(v).replace(/s$/,'');
+      history.replaceState({},'',appHref(path)+'?decade='+encodeURIComponent(selected));
+      draw();
+    };
+
+    const toggle=portalEl.querySelector('[data-decadedetail-toggle]');
+    const menu=portalEl.querySelector('[data-decadedetail-menu]');
+    if(toggle&&menu)toggle.onclick=()=>menu.classList.toggle('open');
+    portalEl.querySelectorAll('[data-decadedetail-value]').forEach(b=>b.onclick=()=>change(b.dataset.decadedetailValue));
+
+    const idx=values.indexOf(selectedLabel);
+    const prev=idx<values.length-1?values[idx+1]:null;
+    const next=idx>0?values[idx-1]:null;
+    const pb=portalEl.querySelector('[data-decadedetail-prev]');
+    const nb=portalEl.querySelector('[data-decadedetail-next]');
+    if(pb)pb.onclick=()=>prev&&change(prev);
+    if(nb)nb.onclick=()=>next&&change(next);
+  };
+
+  draw();
 }
 
 async function renderGoat(chartSeg){
