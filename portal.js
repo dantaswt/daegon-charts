@@ -172,11 +172,13 @@ function setMode(portal){
   }
 
   if(portal){
+    weeklyEl.classList.add('route-hidden');
     weeklyEl.setAttribute('hidden','');
     weeklyEl.style.setProperty('display','none','important');
     portalEl.classList.add('active');
     portalEl.removeAttribute('hidden');
   }else{
+    weeklyEl.classList.remove('route-hidden');
     weeklyEl.removeAttribute('hidden');
     weeklyEl.style.removeProperty('display');
     portalEl.classList.remove('active');
