@@ -2190,3 +2190,200 @@ html body .site-header .brand{
     justify-self:end!important;
   }
 }
+
+/* === CANONICAL WEEKLY HEADER ON EVERY ROUTE v6 === */
+body.global-header-canonical.global-bars-weekly.global-site-shell .site-header{
+  position:fixed!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  width:100%!important;
+  z-index:1000!important;
+  background:linear-gradient(to bottom,#0f0f0f,#161616)!important;
+  border-bottom:1px solid #2a2a2a!important;
+}
+
+body.global-header-canonical.global-bars-weekly.global-site-shell .weekly-label,
+body.global-header-canonical.global-bars-weekly.global-site-shell .portal-search-btn{
+  display:none!important;
+}
+
+body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
+  position:relative!important;
+  width:100%!important;
+  max-width:1280px!important;
+  margin:0 auto!important;
+}
+
+@media(max-width:767px){
+  body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
+    height:62px!important;
+    min-height:62px!important;
+    padding:9px 14px!important;
+    display:grid!important;
+    grid-template-columns:44px minmax(0,1fr) 44px!important;
+    align-items:center!important;
+    gap:8px!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .portal-topnav{
+    display:none!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .portal-menu-toggle{
+    display:flex!important;
+    position:static!important;
+    inset:auto!important;
+    grid-column:1!important;
+    grid-row:1!important;
+    width:44px!important;
+    height:44px!important;
+    margin:0!important;
+    padding:0!important;
+    justify-self:start!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:transparent!important;
+    border:0!important;
+    color:#f5f5f5!important;
+    z-index:30!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .portal-hamb{
+    width:22px!important;
+    height:16px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:space-between!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .portal-hamb span{
+    display:block!important;
+    width:22px!important;
+    height:2px!important;
+    background:#f5f5f5!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .brand{
+    position:static!important;
+    inset:auto!important;
+    transform:none!important;
+    grid-column:2!important;
+    grid-row:1!important;
+    justify-self:center!important;
+    align-self:center!important;
+    width:max-content!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:0!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    z-index:20!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .brand-mark{
+    display:inline-flex!important;
+    width:23px!important;
+    height:23px!important;
+    min-width:23px!important;
+    max-width:23px!important;
+    flex:0 0 23px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    margin:0!important;
+    padding:0!important;
+    background:var(--accent)!important;
+    color:#090909!important;
+    font-size:13px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    letter-spacing:-.05em!important;
+    transform:skewX(-7deg)!important;
+    box-shadow:2px 2px 0 #ffd54a!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .brand-word{
+    display:inline-block!important;
+    margin:0!important;
+    padding:0!important;
+    font-size:18px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:.02em!important;
+    text-transform:lowercase!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .theme-btn{
+    display:flex!important;
+    position:static!important;
+    inset:auto!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    margin:0!important;
+    padding:0!important;
+    justify-self:end!important;
+    align-items:center!important;
+    justify-content:center!important;
+    z-index:30!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .portal-mobile-drawer{
+    top:62px!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .page{
+    padding-top:74px!important;
+  }
+}
+
+@media(min-width:768px){
+  body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
+    min-height:68px!important;
+    padding:12px 16px!important;
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:16px!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .brand{
+    position:static!important;
+    inset:auto!important;
+    transform:none!important;
+    grid-column:1!important;
+    justify-self:start!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:9px!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .portal-topnav{
+    display:flex!important;
+    grid-column:2!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+    min-width:0!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .theme-btn{
+    position:static!important;
+    grid-column:3!important;
+    justify-self:end!important;
+  }
+
+  body.global-header-canonical.global-bars-weekly.global-site-shell .portal-menu-toggle{
+    display:none!important;
+  }
+}
