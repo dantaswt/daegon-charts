@@ -172,11 +172,13 @@ function setMode(portal){
   }
 
   if(portal){
-    weeklyEl.style.display='none';
+    weeklyEl.setAttribute('hidden','');
+    weeklyEl.style.setProperty('display','none','important');
     portalEl.classList.add('active');
     portalEl.removeAttribute('hidden');
   }else{
-    weeklyEl.style.display='';
+    weeklyEl.removeAttribute('hidden');
+    weeklyEl.style.removeProperty('display');
     portalEl.classList.remove('active');
     portalEl.setAttribute('hidden','');
   }
