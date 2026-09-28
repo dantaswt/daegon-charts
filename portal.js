@@ -626,48 +626,76 @@ async function renderStats(){
 }
 
 async function renderPeriod(type,kindSeg){
-  const chartId={songs:'songs',albums:'albums',artists:'artists'}[kindSeg]||'songs',kind=charts[chartId].kind;
+  const map={songs:'songs',albums:'albums',artists:'artists'};
+  const chartId=map[kindSeg]||'songs',kind=charts[chartId].kind;
   loading(type==='year'?'Year-End':'Decade-End');
+
+  let values=[],selected='',arr=[],title='',backPath='',path='';
   if(type==='year'){
     const cfg=officialYearEnd[kindSeg]||officialYearEnd.songs;
     const official=await loadOfficialRanking(cfg,{yearly:true});
-    const selected=new URLSearchParams(location.search).get('year')||official.years[0];
-    const arr=official.entriesByYear[selected]||[];
-    const path='/year-end/'+kindSeg;
-    const options=official.years.map(v=>'<option value="'+v+'" '+(v===selected?'selected':'')+'>'+v+'</option>').join('');
-    const main='<div class="portal-hero"><div class="portal-kicker">Year-End Charts</div><h1 class="portal-title">'+esc(cfg.title)+'</h1><p class="portal-subtitle">Official Daegon Charts year-end ranking.</p></div>'+
-      '<div class="portal-toolbar"><select id="periodChart" class="portal-select"><option value="songs" '+(kindSeg==='songs'?'selected':'')+'>Songs</option><option value="albums" '+(kindSeg==='albums'?'selected':'')+'>Albums</option><option value="artists" '+(kindSeg==='artists'?'selected':'')+'>Artists</option></select><select id="periodValue" class="portal-select">'+options+'</select></div>'+
-      '<div class="portal-list">'+arr.map(x=>'<div class="portal-row"><div class="portal-row-rank">'+x.position+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">'+(x.peak?'Peak #'+x.peak:'')+(x.weeks?' · '+x.weeks+' weeks':'')+'</div></div>').join('')+'</div>';
-    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Year-End Charts','Official Daegon Charts year-end rankings.',path);
-    document.getElementById('periodChart').onchange=e=>go('/year-end/'+e.target.value);
-    document.getElementById('periodValue').onchange=e=>{history.replaceState({},'',appHref(path)+'?year='+encodeURIComponent(e.target.value));renderPeriod('year',kindSeg)};
-    return;
+    values=official.years||[];
+    selected=new URLSearchParams(location.search).get('year')||values[0]||'';
+    arr=official.entriesByYear[selected]||[];
+    title=cfg.title;backPath='/year-end';path='/year-end/'+kindSeg;
+  }else{
+    const data=await loadWeekly(chartId);
+    const years=[...new Set(data.dates.map(d=>Number(d.slice(0,4))))].sort((a,b)=>b-a);
+    values=[...new Set(years.map(y=>String(Math.floor(y/10)*10)))].sort((a,b)=>Number(b)-Number(a));
+    selected=String(new URLSearchParams(location.search).get('decade')||values[0]||'');
+    const pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10;
+    arr=aggregatePeriod(data,chartId,pred).slice(0,100).map((x,i)=>({...x,position:i+1}));
+    title=charts[chartId].title;backPath='/decade-end';path='/decade-end/'+kindSeg;
   }
-  const data=await loadWeekly(chartId),years=[...new Set(data.dates.map(d=>d.slice(0,4)))].sort().reverse();
-  const decades=[...new Set(years.map(y=>Math.floor(Number(y)/10)*10))].sort((a,b)=>b-a);
-  const selected=String(new URLSearchParams(location.search).get('decade')||decades[0]);
-  const pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10;
-  const arr=aggregatePeriod(data,chartId,pred).slice(0,100);
-  const path='/decade-end/'+kindSeg;
-  const options=decades.map(String).map(v=>'<option value="'+v+'" '+(v===selected?'selected':'')+'>'+v+'s</option>').join('');
-  const main='<div class="portal-hero"><div class="portal-kicker">Decade-End</div><h1 class="portal-title">'+esc(charts[chartId].title)+'</h1><p class="portal-subtitle">Decade ranking generated from the weekly archive.</p></div>'+
-    '<div class="portal-toolbar"><select id="periodChart" class="portal-select"><option value="songs" '+(kindSeg==='songs'?'selected':'')+'>Songs</option><option value="albums" '+(kindSeg==='albums'?'selected':'')+'>Albums</option><option value="artists" '+(kindSeg==='artists'?'selected':'')+'>Artists</option></select><select id="periodValue" class="portal-select">'+options+'</select></div>'+
-    '<div class="portal-list">'+arr.map((x,i)=>'<div class="portal-row"><div class="portal-row-rank">'+(i+1)+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">'+x.weeks+' weeks · Peak #'+x.peak+'</div></div>').join('')+'</div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Decade-End Charts','Daegon Charts decade rankings.',path);
-  document.getElementById('periodChart').onchange=e=>go('/decade-end/'+e.target.value);
-  document.getElementById('periodValue').onchange=e=>{history.replaceState({},'',appHref(path)+'?decade='+encodeURIComponent(e.target.value));renderPeriod('decade',kindSeg)};
+
+  const listHtml=arr.map((e,i)=>{
+    const pos=e.position||i+1,isFirst=pos===1;
+    return '<div class="orig-period-card '+(isFirst?'first':'')+'"><div class="orig-period-rank '+(isFirst?'first':'')+'">'+pos+'</div><div class="orig-period-art '+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div><div class="orig-period-entry"><div class="orig-period-name">'+entityLink(e,kind)+'</div>'+(kind!=='artist'?'<div class="orig-period-artist">'+esc(e.artist||'')+'</div>':'')+'</div><button class="orig-period-more" data-period-detail="'+i+'" aria-label="Toggle details"><i class="fas fa-plus"></i></button><div class="orig-period-details" data-period-panel="'+i+'"><div><span>'+(kind==='artist'?'Entries':'Peak')+'</span><strong>'+(kind==='artist'?(e.entries||1):'#'+(e.peak||pos))+'</strong></div><div><span>Weeks</span><strong>'+(e.weeks||'—')+'</strong></div><div><span>Units</span><strong>'+esc(String(e.totalUnits||e.units||'—'))+'</strong></div></div></div>';
+  }).join('');
+
+  const chartOptions=[
+    {id:'songs',label:type==='year'?'Hot 100':'Hot 100'},
+    {id:'albums',label:type==='year'?'Top 100 Albums':'Top 100 Albums'},
+    {id:'artists',label:type==='year'?'Artist 50':'Artist 50'}
+  ];
+  const main='<div class="orig-period-layout"><aside class="orig-period-side"><div class="orig-period-side-links">'+chartOptions.map(x=>'<a href="'+appHref((type==='year'?'/year-end/':'/decade-end/')+x.id)+'" class="'+(x.id===kindSeg?'active':'')+'">'+esc(x.label)+'</a>').join('')+'</div><a class="orig-period-back" href="'+appHref(backPath)+'"><i class="fas fa-arrow-left"></i> All '+(type==='year'?'Year-End':'Decade-End')+'</a></aside><main class="orig-period-main"><div class="orig-period-heading"><h1>'+esc(title)+'</h1></div>'+originalYearControls(type==='year'?'Year':'Decade',type==='year'?values:values.map(v=>v+'s'),type==='year'?selected:selected+'s','detailperiod')+'<div class="orig-period-list">'+listHtml+'</div></main></div>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(type==='year'?'Year-End Charts':'Decade-End Charts',title,path);bindLinks();hydratePortalImages();
+
+  const displayValues=type==='year'?values:values.map(v=>v+'s'),displaySelected=type==='year'?selected:selected+'s';
+  const change=v=>{
+    selected=type==='year'?v:String(v).replace(/s$/,'');
+    history.replaceState({},'',appHref(path)+'?'+(type==='year'?'year':'decade')+'='+encodeURIComponent(selected));
+    renderPeriod(type,kindSeg);
+  };
+  const toggle=portalEl.querySelector('[data-detailperiod-toggle]'),menu=portalEl.querySelector('[data-detailperiod-menu]');
+  if(toggle&&menu)toggle.onclick=()=>menu.classList.toggle('open');
+  portalEl.querySelectorAll('[data-detailperiod-value]').forEach(b=>b.onclick=()=>change(b.dataset.detailperiodValue));
+  const idx=displayValues.indexOf(displaySelected),prev=idx<displayValues.length-1?displayValues[idx+1]:null,next=idx>0?displayValues[idx-1]:null;
+  const pb=portalEl.querySelector('[data-detailperiod-prev]'),nb=portalEl.querySelector('[data-detailperiod-next]');
+  if(pb)pb.onclick=()=>prev&&change(prev);if(nb)nb.onclick=()=>next&&change(next);
+  portalEl.querySelectorAll('[data-period-detail]').forEach(b=>b.onclick=()=>{const p=portalEl.querySelector('[data-period-panel="'+b.dataset.periodDetail+'"]');if(p){p.classList.toggle('open');b.querySelector('i').className='fas '+(p.classList.contains('open')?'fa-minus':'fa-plus')}});
 }
 
 async function renderGoat(kindSeg){
   const cfg=officialGoat[kindSeg]||officialGoat.songs,kind=cfg.kind;
   loading('Greatest of All Time');
   const {entries}=await loadOfficialRanking(cfg);
-  const arr=entries.slice(0,100);
-  const main='<div class="portal-hero"><div class="portal-kicker">Greatest of All Time</div><h1 class="portal-title">'+esc(cfg.title)+'</h1><p class="portal-subtitle">Official all-time ranking from the Daegon Charts archive.</p></div>'+
-    '<div class="portal-toolbar"><button class="portal-btn '+(kindSeg==='songs'?'active':'')+'" data-goat="songs">Songs</button><button class="portal-btn '+(kindSeg==='albums'?'active':'')+'" data-goat="albums">Albums</button><button class="portal-btn '+(kindSeg==='artists'?'active':'')+'" data-goat="artists">Artists</button></div>'+
-    '<div class="portal-list">'+arr.map(x=>'<div class="portal-row"><div class="portal-row-rank">'+x.position+'</div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="portal-row-sub">'+esc(x.artist)+'</div>':'')+'</div><div class="portal-row-meta">'+(x.peak?'Peak #'+x.peak:'')+(x.weeks?' · '+x.weeks+' weeks':'')+'</div></div>').join('')+'</div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Greatest of All Time','Official Daegon Charts all-time rankings.','/goat/'+kindSeg);
-  portalEl.querySelectorAll('[data-goat]').forEach(b=>b.onclick=()=>go('/goat/'+b.dataset.goat));
+  let sort='position';
+  const draw=()=>{
+    let arr=[...(entries||[])];
+    if(sort==='weeks')arr.sort((a,b)=>(b.weeks||0)-(a.weeks||0));
+    else if(sort==='peak')arr.sort((a,b)=>(a.peak||999)-(b.peak||999)||(b.weeks||0)-(a.weeks||0));
+    else arr.sort((a,b)=>(a.position||999)-(b.position||999));
+    const top=arr.slice(0,3);
+    const cards=arr.slice(0,100).map((e,i)=>{
+      const pos=e.position||i+1,isFirst=pos===1;
+      return '<div class="orig-period-card '+(isFirst?'first':'')+'"><div class="orig-period-rank '+(isFirst?'first':'')+'">'+pos+'</div><div class="orig-period-art '+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div><div class="orig-period-entry"><div class="orig-period-name">'+entityLink(e,kind)+'</div>'+(kind!=='artist'?'<div class="orig-period-artist">'+esc(e.artist||'')+'</div>':'')+'</div><div class="orig-goat-metric">'+(sort==='weeks'?(e.weeks||'—')+' weeks':sort==='peak'?'Peak #'+(e.peak||'—'):'')+'</div></div>';
+    }).join('');
+    const main='<div class="orig-goat-layout"><aside class="orig-goat-side"><div class="orig-goat-box"><div class="orig-eyebrow">Sort By</div><select id="origGoatSort"><option value="position" '+(sort==='position'?'selected':'')+'>Overall Rank</option><option value="weeks" '+(sort==='weeks'?'selected':'')+'>Weeks on Chart</option><option value="peak" '+(sort==='peak'?'selected':'')+'>Peak Position</option></select></div><div class="orig-goat-box"><div class="orig-eyebrow">Charts</div><a class="'+(kindSeg==='songs'?'active':'')+'" href="'+appHref('/goat/songs')+'">Greatest Songs</a><a class="'+(kindSeg==='albums'?'active':'')+'" href="'+appHref('/goat/albums')+'">Greatest Albums</a><a class="'+(kindSeg==='artists'?'active':'')+'" href="'+appHref('/goat/artists')+'">Greatest Artists</a></div><a class="orig-period-back" href="'+appHref('/goat')+'"><i class="fas fa-arrow-left"></i> All Greatest of All Time</a></aside><main class="orig-goat-main"><div class="orig-goat-hero"><div>Greatest of All Time</div><h1>'+esc(cfg.title)+'</h1><p>The definitive all-time rankings</p></div><div class="orig-goat-top3">'+top.map((e,i)=>'<div class="'+(i===0?'first':'')+'"><span>'+(i+1)+'</span><strong>'+esc(e.name)+'</strong>'+(kind!=='artist'?'<small>'+esc(e.artist||'')+'</small>':'')+'</div>').join('')+'</div><div class="orig-period-list">'+cards+'</div></main></div>';
+    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Greatest of All Time',cfg.title,'/goat/'+kindSeg);bindLinks();hydratePortalImages();
+    document.getElementById('origGoatSort').onchange=e=>{sort=e.target.value;draw()};
+  };
+  draw();
 }
 
 async function renderChartBeat(){
