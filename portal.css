@@ -3543,9 +3543,9 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 
   .exact-art.exact-artist-art.first{
-    width:88px!important;
-    height:88px!important;
-    flex:0 0 88px!important;
+    width:104px!important;
+    height:104px!important;
+    flex:0 0 104px!important;
     border-left:0!important;
     box-shadow:0 0 0 4px var(--accent)!important;
   }
