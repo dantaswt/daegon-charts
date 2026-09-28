@@ -1002,7 +1002,14 @@ async function renderDecadeIndex(){
       originalTop5('Daegon Artists 50',aggregate(data[2],'artists'),'artist','/decade-end/artists?decade='+selected)+
       originalChartGrid('Songs',[{id:'songs',title:'Daegon 100'},{id:'radio',title:'Radio Songs'},{id:'digital-songs-sales',title:'Digital Songs Sales'},{id:'streaming-songs',title:'Streaming Songs'}],'/decade-end/')+
       originalChartGrid('Albums',[{id:'albums',title:'Daegon Albums 100'},{id:'top-album-sales',title:'Top Album Sales'},{id:'top-streaming-albums',title:'Top Streaming Albums'}],'/decade-end/')+
-      originalChartGrid('Artists',[{id:'artists',title:'Daegon Artists 50'}],'/decade-end/')+
+      originalChartGrid('Artists',[
+        {id:'artists',title:'Daegon Artists 50'},
+        {id:'hot100Artists',title:'Daegon 100 — Artists'},
+        {id:'artistFemale',title:'Top Artists — Female'},
+        {id:'artistMale',title:'Top Artists — Male'},
+        {id:'artistDuoGroup',title:'Top Artists — Duo/Group'},
+        {id:'albumsArtists',title:'Daegon Albums 100 — Artists'}
+      ],'/decade-end/')+
     '</div>';
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Decade-End Charts','The definitive decade-end rankings across every chart.','/decade-end');
     const vals=decades.map(x=>x+'s'),sel=selected+'s',idx=vals.indexOf(sel),prev=idx<vals.length-1?vals[idx+1]:null,next=idx>0?vals[idx-1]:null;
@@ -1209,26 +1216,83 @@ async function renderPeriod(type,chartSeg){
   draw();
 }
 
+
+const decadeArtistViews={
+  artists:{title:'Daegon Artists 50',source:'artists',metric:'units'},
+  hot100Artists:{title:'Daegon 100 — Artists',source:'songs',metric:'points'},
+  artistFemale:{title:'Top Artists — Female',source:'artists',metric:'units',category:'FEMALE'},
+  artistMale:{title:'Top Artists — Male',source:'artists',metric:'units',category:'MALE'},
+  artistDuoGroup:{title:'Top Artists — Duo/Group',source:'artists',metric:'units',category:'GROUP'},
+  albumsArtists:{title:'Daegon Albums 100 — Artists',source:'albums',metric:'units'}
+};
+async function aggregateDecadeArtists(sourceId,metricField,predicate,category){
+  const data=await loadWeekly(sourceId);
+  const meta=category?await loadExactArtistMetadata():null;
+  const m=new Map();
+  for(const d of data.dates){
+    if(!predicate(d))continue;
+    for(const e of data.entriesByDate[d]||[]){
+      const artist=sourceId==='artists'?e.name:e.artist;
+      if(!artist)continue;
+      if(category){
+        const md=meta?.[slugify(artist)];
+        if(!(md?.categoryConfirmed&&md.category===category))continue;
+      }
+      const key=String(artist).trim().toLowerCase();
+      let x=m.get(key);
+      if(!x){
+        x={name:artist,artist,score:0,totalMetric:0,weeks:0,peak:Number(e.position)||100,weeksAt1:0,lastEntry:e,kind:'artist'};
+        m.set(key,x);
+      }
+      const value=metricNumber(e[metricField]??0);
+      x.score+=value;
+      x.totalMetric+=value;
+      x.weeks++;
+      x.peak=Math.min(x.peak,Number(e.position)||100);
+      if(Number(e.position)===1)x.weeksAt1++;
+      x.lastEntry=e;
+    }
+  }
+  return [...m.values()].sort((a,b)=>b.totalMetric-a.totalMetric||b.weeks-a.weeks||a.peak-b.peak);
+}
+
 async function renderDecadeDetailExact(chartSeg){
-  const oldMap={songs:'songs',albums:'albums',artists:'artists'},weeklyId=oldMap[chartSeg]||'songs';
+  const baseMap={songs:'songs',albums:'albums'};
+  const artistView=decadeArtistViews[chartSeg]||null;
+  const weeklyId=artistView?.source||baseMap[chartSeg]||'songs';
   const data=await loadWeekly(weeklyId);
   const years=[...new Set(data.dates.map(d=>Number(d.slice(0,4))))].sort((a,b)=>b-a);
   const decades=[...new Set(years.map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a).map(String);
   let selected=String(new URLSearchParams(location.search).get('decade')||decades[0]||'2000');
   if(!decades.includes(selected))selected=decades[0]||selected;
 
-  const path='/decade-end/'+chartSeg,kind=charts[weeklyId].kind,title=charts[weeklyId].title;
+  const path='/decade-end/'+chartSeg;
+  const kind=artistView?'artist':charts[weeklyId].kind;
+  const title=artistView?.title||charts[weeklyId].title;
+  const navItems=[
+    ['songs','Daegon 100'],
+    ['albums','Daegon Albums 100'],
+    ['artists','Daegon Artists 50'],
+    ['hot100Artists','Daegon 100 — Artists'],
+    ['artistFemale','Top Artists — Female'],
+    ['artistMale','Top Artists — Male'],
+    ['artistDuoGroup','Top Artists — Duo/Group'],
+    ['albumsArtists','Daegon Albums 100 — Artists']
+  ];
 
-  const draw=()=>{
+  const draw=async()=>{
     const pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10;
-    const arr=aggregateDecadePeriod(data,weeklyId,pred).slice(0,100);
+    const arr=(artistView
+      ? await aggregateDecadeArtists(artistView.source,artistView.metric,pred,artistView.category)
+      : aggregateDecadePeriod(data,weeklyId,pred)
+    ).slice(0,100);
     const values=decades.map(x=>x+'s');
     const selectedLabel=selected+'s';
 
     const main='<div class="orig-period-layout">'+
       '<aside class="orig-period-side">'+
         '<div class="orig-period-side-links">'+
-          ['songs','albums','artists'].map(id=>'<a href="'+appHref('/decade-end/'+id)+'?decade='+encodeURIComponent(selected)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(charts[id].title)+'</a>').join('')+
+          navItems.map(([id,label])=>'<a href="'+appHref('/decade-end/'+id)+'?decade='+encodeURIComponent(selected)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(label)+'</a>').join('')+
         '</div>'+
         '<a class="orig-period-back" href="'+appHref('/decade-end')+'?decade='+encodeURIComponent(selected)+'"><i class="fas fa-arrow-left"></i> All Decade-End</a>'+
       '</aside>'+
@@ -1259,22 +1323,18 @@ async function renderDecadeDetailExact(chartSeg){
       history.replaceState({},'',appHref(path)+'?decade='+encodeURIComponent(selected));
       draw();
     };
-
     const toggle=portalEl.querySelector('[data-decadedetail-toggle]');
     const menu=portalEl.querySelector('[data-decadedetail-menu]');
     if(toggle&&menu)toggle.onclick=()=>menu.classList.toggle('open');
     portalEl.querySelectorAll('[data-decadedetail-value]').forEach(b=>b.onclick=()=>change(b.dataset.decadedetailValue));
 
-    const idx=values.indexOf(selectedLabel);
-    const prev=idx<values.length-1?values[idx+1]:null;
-    const next=idx>0?values[idx-1]:null;
-    const pb=portalEl.querySelector('[data-decadedetail-prev]');
-    const nb=portalEl.querySelector('[data-decadedetail-next]');
+    const idx=values.indexOf(selectedLabel),prev=idx<values.length-1?values[idx+1]:null,next=idx>0?values[idx-1]:null;
+    const pb=portalEl.querySelector('[data-decadedetail-prev]'),nb=portalEl.querySelector('[data-decadedetail-next]');
     if(pb)pb.onclick=()=>prev&&change(prev);
     if(nb)nb.onclick=()=>next&&change(next);
   };
 
-  draw();
+  await draw();
 }
 
 async function renderGoat(chartSeg){
