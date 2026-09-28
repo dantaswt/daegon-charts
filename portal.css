@@ -3530,15 +3530,16 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
 .exact-art.exact-artist-art .ref-thumb img,
 .exact-mobile-art.exact-artist-art .ref-thumb img{
   position:absolute!important;
-  inset:0!important;
-  width:100%!important;
-  height:100%!important;
+  left:50%!important;
+  top:50%!important;
+  width:134%!important;
+  height:134%!important;
   max-width:none!important;
   max-height:none!important;
-  transform:none!important;
+  transform:translate(-50%,-50%)!important;
   object-fit:cover!important;
   object-position:center center!important;
-  border-radius:50%!important;
+  border-radius:0!important;
 }
 
 .portal-skeleton-wrap{max-width:960px;margin:0 auto;padding:24px 16px 56px}
