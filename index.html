@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-weekly-artist-circle-22">
+  <link rel="stylesheet" href="/portal.css?v=20260927-artist-fill-23">
 
 <!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
 <style id="yec-goat-mobile-critical">
@@ -2191,6 +2191,33 @@
     flex:0 0 80px!important;
     box-shadow:0 0 0 3px var(--accent)!important;
   }
+}
+</style>
+
+
+/* WEEKLY_ARTIST_IMAGE_FILL_V23 */
+<style id="weekly-artist-image-fill-v23">
+/* Fill circular artist frames even when provider artwork contains built-in padding */
+.weekly-artist-art .artwork-slot{
+  position:relative!important;
+  width:100%!important;
+  height:100%!important;
+  overflow:hidden!important;
+  border-radius:50%!important;
+  background:transparent!important;
+}
+.weekly-artist-art .artwork-slot img{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:118%!important;
+  height:118%!important;
+  max-width:none!important;
+  max-height:none!important;
+  transform:translate(-50%,-50%)!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  border-radius:0!important;
 }
 </style>
 
@@ -3170,6 +3197,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-weekly-artist-circle-22"></script>
+<script src="/portal.js?v=20260927-artist-fill-23"></script>
 </body>
 </html>
