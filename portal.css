@@ -1,4 +1,4 @@
-/* Daegon Charts portal layer — functional parity pages before final identity pass */
+
 .portal-page{display:none;max-width:1280px;margin:0 auto;padding:4px 0 28px}
 .portal-page.active{display:block}
 .portal-shell{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:28px}
@@ -93,9 +93,6 @@
   .battle-vs{min-height:36px}
 }
 
-
-/* Portal routes use the original daegoncharts navigation language.
-   Weekly routes keep the public weekly header untouched. */
 .portal-topnav{display:none}
 .portal-menu-toggle,.portal-mobile-drawer{display:none}
 .portal-mode .weekly-label{display:none}
@@ -122,7 +119,6 @@
 }
 .portal-mode .portal-topnav a:hover{color:#f5f5f5}
 .portal-mode .theme-btn{flex:0 0 auto}
-
 
 .portal-mode .portal-hero{
   background:transparent;
@@ -246,8 +242,6 @@
   .portal-mode .portal-shell{display:block}
 }
 
-
-/* Exact daegoncharts route patterns — catalogs, #1s and Chart Battle */
 .ref-hero{
   position:relative;
   text-align:center;
@@ -706,8 +700,6 @@
   .ref-battle-trophy div{font-size:30px}
 }
 
-
-/* The reference daegoncharts app intentionally removes ordinary corner rounding globally. */
 .portal-mode .portal-page *,
 .portal-mode .portal-mobile-drawer *,
 .portal-mode .portal-topnav *{
@@ -721,8 +713,6 @@
   border-radius:9999px!important;
 }
 
-
-/* Home shell: same left-sidebar composition as daegoncharts */
 .portal-mode .ref-standalone{
   max-width:1152px;
   margin:0 auto;
@@ -829,7 +819,6 @@
   }
 }
 
-
 .portal-search-btn{
   display:none;
   width:44px;height:44px;
@@ -867,8 +856,6 @@
   }
 }
 
-
-/* Home port from daegoncharts */
 .ref-home-hero{
   position:relative;
   text-align:center;
@@ -1139,8 +1126,6 @@
   .ref-battle-float strong{font-size:18px;text-transform:uppercase}
 }
 
-
-/* Mobile portal header: fixed 3-column layout (menu | brand | theme). */
 @media(max-width:767px){
   .portal-mode .header-inner{
     display:grid!important;
@@ -1218,8 +1203,6 @@
   }
 }
 
-
-/* Global bars: every route uses the Weekly header identity. */
 .global-bars-weekly .site-header{
   background:linear-gradient(to bottom,#0f0f0f,#161616)!important;
   border-bottom:1px solid #2a2a2a!important;
@@ -1307,7 +1290,6 @@
   color:var(--accent)!important;
 }
 
-/* Portal navigation sits beneath/within the same Weekly bar without replacing it. */
 .global-bars-weekly.portal-mode .portal-topnav{
   display:flex;
   align-items:center;
@@ -1387,7 +1369,7 @@
   .global-bars-weekly.portal-mode .weekly-label{
     visibility:hidden!important;
   }
-  /* Portal mobile header = daegoncharts: hamburger | centered title | theme */
+
   .global-bars-weekly.portal-mode .header-inner{
     position:relative!important;
     display:grid!important;
@@ -1459,10 +1441,6 @@
 
 }
 
-
-/* === FINAL MOBILE PORTAL HEADER OVERRIDE ===
-   Exact daegoncharts structure: hamburger | centered D+aegon charts | theme.
-   Kept at EOF deliberately so older experimental header rules cannot override it. */
 @media (max-width:767px){
   body.global-bars-weekly.portal-mode .header-inner{
     position:relative!important;
@@ -1589,8 +1567,6 @@
   }
 }
 
-
-/* === GLOBAL HEADER: identical on EVERY route, including Weekly Charts === */
 body.global-bars-weekly .site-header{
   position:fixed!important;
   top:0!important;
@@ -1750,9 +1726,6 @@ body.global-bars-weekly .weekly-label{
   }
 }
 
-
-/* === GLOBAL MOBILE DRAWER FUNCTIONALITY ===
-   The hamburger is global, so its drawer must work on Weekly and portal routes alike. */
 @media(max-width:767px){
   body.global-bars-weekly .portal-mobile-drawer{
     display:none!important;
@@ -1788,10 +1761,6 @@ body.global-bars-weekly .weekly-label{
   }
 }
 
-
-/* === ONE SITE SHELL ===
-   Header, menu, theme and footer are identical on every app route.
-   Only the page content changes between Weekly and the archive/portal views. */
 body.global-site-shell .site-header{
   position:fixed!important;
   top:0!important;
@@ -1941,9 +1910,6 @@ body.global-site-shell .portal-search-btn{display:none!important}
   }
 }
 
-
-/* === FROZEN GLOBAL MOBILE HEADER GEOMETRY ===
-   Same coordinates and dimensions on every route/state. */
 @media (max-width:767px){
   html body .site-header{
     position:fixed!important;
@@ -2070,7 +2036,6 @@ body.global-site-shell .portal-search-btn{display:none!important}
   }
 }
 
-/* === TRUE ONE GLOBAL HEADER v3 === */
 html body .site-header,
 body.global-site-shell .site-header,
 body.global-bars-weekly .site-header{
@@ -2107,7 +2072,6 @@ body.global-bars-weekly .site-header{
   }
 }
 
-/* === ABSOLUTE GLOBAL BRAND CENTER v4 === */
 html body .site-header .header-inner{
   position:relative!important;
 }
@@ -2137,7 +2101,6 @@ html body .site-header .brand{
   }
 }
 
-/* === MOBILE HEADER TRUE CENTER v5 === */
 @media(max-width:767px){
   html body .site-header .header-inner{
     position:relative!important;
@@ -2191,7 +2154,6 @@ html body .site-header .brand{
   }
 }
 
-/* === CANONICAL WEEKLY HEADER ON EVERY ROUTE v6 === */
 body.global-header-canonical.global-bars-weekly.global-site-shell .site-header{
   position:fixed!important;
   top:0!important;
@@ -2388,7 +2350,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 }
 
-/* === ORIGINAL DAEGONCHARTS ROUTE PORT v7 === */
 .orig-page{max-width:1024px;margin:0 auto;padding:0 24px 64px}
 .orig-hero{position:relative;text-align:center;padding:40px 0 56px;margin-bottom:32px;overflow:hidden}
 .orig-hero-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;user-select:none;font-size:5rem;font-weight:900;color:var(--foreground);opacity:.06;text-transform:uppercase;letter-spacing:-.05em;line-height:1;white-space:nowrap}
@@ -2532,7 +2493,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .orig-awards-search{display:none}
 }
 
-/* === ORIGINAL DETAIL ROUTES v8 === */
 .orig-period-layout{max-width:1280px;margin:0 auto;width:100%;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;padding-bottom:64px}
 .orig-period-side{position:sticky;top:92px;align-self:start}
 .orig-period-side-links{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
@@ -2611,14 +2571,11 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .orig-goat-top3 span{width:48px;height:48px;font-size:20px}
 }
 
-/* === YEC GOAT EXACT POLISH v9 === */
 .orig-bottom-control{margin-top:40px}
 .orig-goat-search{position:relative;margin:0 0 14px}
 .orig-goat-search input{width:100%;min-height:40px;padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:14px;outline:none}
 .orig-goat-search input:focus{border-color:var(--accent)}
 
-/* === YEC GOAT RESPONSIVE DESKTOP MOBILE v10 === */
-/* Desktop/tablet baseline */
 @media(min-width:901px){
   .orig-page{
     max-width:1024px!important;
@@ -2714,7 +2671,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 }
 
-/* Tablet */
 @media(min-width:768px) and (max-width:900px){
   .orig-page{
     max-width:100%!important;
@@ -2776,7 +2732,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 }
 
-/* Mobile */
 @media(max-width:767px){
   .orig-page{
     width:100%!important;
@@ -2898,7 +2853,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
     line-height:1.25!important;
   }
 
-  /* YEC detail */
   .orig-period-layout{
     display:block!important;
     width:100%!important;
@@ -3018,7 +2972,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
     font-size:12px!important;
   }
 
-  /* GOAT detail */
   .orig-goat-layout{
     display:block!important;
     width:100%!important;
@@ -3140,7 +3093,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 }
 
-/* === HARD MOBILE VIEWPORT FIX YEC GOAT v11 === */
 @media(max-width:767px){
   html,body{
     max-width:100%!important;
@@ -3254,7 +3206,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 }
 
-/* === EXACT ORIGINAL MOBILE YEC GOAT STRUCTURE v12 === */
 .exact-mobile-only{display:none}
 .exact-desktop-only{display:block}
 
@@ -3509,8 +3460,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .exact-goat-sidebar{width:230px!important;flex-basis:230px!important}
 }
 
-/* === CIRCULAR ARTIST ARTWORK YEC GOAT v21 === */
-/* Artist charts only: use large circular portraits, never the square artwork frame */
 .exact-art.exact-artist-art,
 .exact-mobile-art.exact-artist-art{
   background:transparent!important;
@@ -3568,7 +3517,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 }
 
-/* === ARTIST PORTRAIT FILL YEC GOAT v23 === */
 .exact-art.exact-artist-art .ref-thumb,
 .exact-mobile-art.exact-artist-art .ref-thumb{
   position:relative!important;
@@ -3590,7 +3538,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   border-radius:0!important;
 }
 
-/* === PORTAL SKELETON v26 === */
 .portal-skeleton-wrap{max-width:960px;margin:0 auto;padding:24px 16px 56px}
 .portal-sk-heading{width:min(420px,72%);height:42px;margin:8px auto 24px}
 .portal-sk-control{width:min(520px,84%);height:52px;margin:0 auto 28px}
@@ -3614,9 +3561,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   .portal-sk-sub{width:52%;height:10px;margin-top:6px}
 }
 
-
-
-/* === ADSENSE EDITORIAL CONTENT v32 === */
 .editorial-block{
   max-width:900px;
   margin:0 auto 32px;
@@ -3695,7 +3639,6 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   }
 }
 
-/* === PERFORMANCE CONTAINMENT v34 === */
 .ref-catalog-card,
 .portal-row,
 .orig-record-row,
