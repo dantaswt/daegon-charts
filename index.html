@@ -2277,6 +2277,12 @@ html.dark .sk{
   }
   </script>
 <!-- PERFORMANCE_RENDERING_V34 -->
+<style id="weekly-route-isolation-v38">
+#weeklyView[hidden],
+.layout[hidden]{
+  display:none!important;
+}
+</style>
 <style id="performance-rendering-v34">
 .chart-card,.dropout{
   content-visibility:auto;
@@ -2301,7 +2307,7 @@ html.dark .sk{
   </header>
 
   <div class="page">
-    <div class="layout">
+    <div class="layout" id="weeklyView" hidden>
       <aside class="sidebar">
     <div id="desktopChartNav" class="chart-nav desktop-chart-nav"></div>
     <div class="mobile-chart-nav">
@@ -3291,6 +3297,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-images-restored-37"></script>
+<script src="/portal.js?v=20260928-weekly-isolation-38"></script>
 </body>
 </html>
