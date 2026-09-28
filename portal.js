@@ -988,6 +988,14 @@ async function renderDecadeIndex(){
   const aggregate=(d,id)=>aggregateDecadePeriod(d,id,x=>Number(x.slice(0,4))>=Number(selected)&&Number(x.slice(0,4))<Number(selected)+10).slice(0,5).map((x,i)=>({...x,position:i+1}));
   const draw=()=>{
     const main='<div class="orig-page">'+originalHero('DECADE-END CHARTS','Decade-End Charts','The definitive decade-end rankings across every chart')+
+      editorialBlock(
+        'How the Decade-End Charts work',
+        [
+          'Decade-End Charts combine the weekly Daegon archive across the selected ten-year period, so the ranking reflects sustained performance throughout the decade rather than one isolated year or a single peak week.',
+          'Songs are ranked by accumulated points, while Albums and Artists are ranked by accumulated units. Weeks charted and best peak are used only as secondary tie-breakers when accumulated performance is equal.'
+        ],
+        [['/methodology','See the full methodology'],['/stats','Explore chart records']]
+      )+
       originalYearControls('Decade',decades.map(x=>x+'s'),selected+'s','decade')+
       originalTop5('Daegon 100',aggregate(data[0],'songs'),'song','/decade-end/songs?decade='+selected)+
       originalTop5('Daegon Albums 100',aggregate(data[1],'albums'),'album','/decade-end/albums?decade='+selected)+
