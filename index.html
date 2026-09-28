@@ -2302,7 +2302,7 @@ function updateBrowserRoute(id,date,replace=false){
 const weeklyIds=Object.keys(charts);
 const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
 try{
-  const imageCacheVersion='artist-priority-v6';
+  const imageCacheVersion='artist-priority-v7-apple-deezer-spotify';
   if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
     for(let i=localStorage.length-1;i>=0;i--){
       const k=localStorage.key(i);
@@ -3106,6 +3106,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-daegon-names-19"></script>
+<script src="/portal.js?v=20260927-apple-artist-images-20"></script>
 </body>
 </html>
