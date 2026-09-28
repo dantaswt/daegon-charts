@@ -202,8 +202,8 @@ function loading(title='Loading'){
   setMode(true);
   portalEl.innerHTML=portalSkeleton(title);
 }
-function setMeta(title,desc,path){
-  document.title=title+' | Daegon Charts';
+function setMeta(title,desc,path,exactTitle=false){
+  document.title=exactTitle?title:title+' | Daegon Charts';
   const d=document.querySelector('meta[name="description"]');if(d)d.content=desc;
   let robots=document.querySelector('meta[name="robots"]');
   if(!robots){robots=document.createElement('meta');robots.name='robots';document.head.appendChild(robots)}
@@ -400,7 +400,7 @@ async function renderHome(){
     '<div id="refTopCharts">'+topSection('songs')+'</div>'+numberOnes+first+beat+
     '<a href="'+appHref('/chart-battle')+'" data-portal-link="/chart-battle" class="ref-battle-float"><span>VS</span><div><small>New Mini-Game!</small><strong>Play Chart Battle 🏆</strong></div></a>';
 
-  setMode(true);portalEl.innerHTML=shellHtml(main,true);setMeta('Daegon Charts','Weekly music charts, year-end rankings and greatest of all time lists.','/');
+  setMode(true);portalEl.innerHTML=shellHtml(main,true);setMeta('Daegon Charts — Weekly Music Charts & Historical Archive','Weekly music charts, year-end rankings and greatest of all time lists.','/',true);
   bindLinks();hydratePortalImages();bindHomeSidebar();
 
   let active='songs';
