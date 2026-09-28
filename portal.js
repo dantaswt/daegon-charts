@@ -302,6 +302,42 @@ function aggregatePeriod(data,chartId,predicate){
 }
 function latestEntry(data){const d=data.dates[data.dates.length-1]||'';return {date:d,entries:data.entriesByDate[d]||[]}}
 
+function editorialBlock(title,paragraphs,links=[]){
+  return '<section class="editorial-block">'+
+    '<div class="editorial-kicker">About this section</div>'+
+    '<h2>'+esc(title)+'</h2>'+
+    paragraphs.map(p=>'<p>'+p+'</p>').join('')+
+    (links.length?'<div class="editorial-links">'+links.map(x=>'<a href="'+appHref(x[0])+'">'+esc(x[1])+' <i class="fas fa-arrow-right"></i></a>').join('')+'</div>':'')+
+  '</section>';
+}
+
+function catalogEditorial(kind){
+  if(kind==='song')return editorialBlock(
+    'Explore every song in the Daegon chart archive',
+    [
+      'This directory brings together songs that have appeared on the Daegon 100 across the project’s weekly history. It is designed as an index into the archive rather than a popularity list: each entry links to its own chart history, peak position and week-by-week run.',
+      'The archive preserves the same title and artist identity rules used by the weekly chart so historical runs stay connected instead of being split across spelling variants or duplicated credits.'
+    ],
+    [['/methodology','How the rankings are built'],['/chart/daegon-100','Open the current Daegon 100']]
+  );
+  if(kind==='album')return editorialBlock(
+    'Explore the Daegon Albums archive',
+    [
+      'This directory collects albums that have charted in Daegon Albums 100. Each album page links its historical performance back to the weekly archive, including peak, weeks charted and available charting tracks.',
+      'Album rankings are kept separate from song performance so catalog titles are not automatically boosted simply because an artist has a successful single. The project methodology explains how album performance and historical continuity are handled.'
+    ],
+    [['/methodology','Read the album methodology'],['/chart/daegon-albums-100','Open the current albums chart']]
+  );
+  return editorialBlock(
+    'Explore artists across the Daegon archive',
+    [
+      'The artist directory indexes performers who have appeared in Daegon Artists 50. Artist pages consolidate weekly chart history and connect an artist to charting songs and albums, making the directory a navigation layer for the wider archive.',
+      'Artist credits are normalized so the archive follows the project’s main-artist rules and avoids splitting the same performer across aliases, capitalization differences or secondary featuring credits.'
+    ],
+    [['/methodology','Read the crediting methodology'],['/chart/daegon-artists-50','Open the current artists chart']]
+  );
+}
+
 async function renderHome(){
   loading('Home');
   // Match the real daegoncharts home loader: only the three primary charts are blocking.
@@ -345,6 +381,14 @@ async function renderHome(){
     '</div></section>';
 
   const main='<div class="ref-home-hero"><div>CHARTS</div><h1>daegon charts</h1><p>Weekly music charts, year-end rankings & greatest of all time lists</p></div>'+
+    editorialBlock(
+      'An independent weekly music chart and historical archive',
+      [
+        'Daegon Charts follows songs, albums and artists week by week, preserving movement, peaks, weeks charted and long-term chart runs in one continuous archive. The main rankings are original Daegon Charts outputs rather than copies of a commercial chart.',
+        'Beyond the current week, the site generates year-end and all-time rankings from the underlying weekly history. That means the archive can be explored from several angles while keeping the same underlying chart record.'
+      ],
+      [['/methodology','Read the methodology'],['/about','About the project']]
+    )+
     '<div id="refTopCharts">'+topSection('songs')+'</div>'+numberOnes+first+beat+
     '<a href="'+appHref('/chart-battle')+'" data-portal-link="/chart-battle" class="ref-battle-float"><span>VS</span><div><small>New Mini-Game!</small><strong>Play Chart Battle 🏆</strong></div></a>';
 
@@ -407,6 +451,7 @@ async function renderCatalog(kind){
 
     portalEl.innerHTML=shellHtml(
       refHero(title.toUpperCase(),title,fmtNum(items.length)+' '+title.toLowerCase()+' tracked across all charts')+
+      catalogEditorial(kind)+
       '<div class="ref-catalog-tools"><div class="ref-letters">'+lettersHtml+'</div><div class="ref-search-wrap"><input id="refCatalogSearch" type="search" placeholder="Search '+(kind==='artist'?'artists':kind+'s or artists')+'" value="'+escAttr(searchValue)+'"></div></div>'+
       (filtered.length?rows:'<div class="ref-empty">No '+title.toLowerCase()+' found for that filter.</div>')
     );
@@ -703,7 +748,15 @@ async function renderYearEndIndex(){
     {id:'yecHot100Artists',title:'Daegon 100 — Artists'},{id:'yecArtist50Female',title:'Top Artists — Female'},{id:'yecArtist50Male',title:'Top Artists — Male'},{id:'yecArtist50DuoGroup',title:'Top Artists — Duo/Group'},{id:'yearEndNewArtists',title:'Top New Artists'},{id:'yecTop100AlbumsArtists',title:'Daegon Albums 100 — Artists'},{id:'yecRadioSongsArtists',title:'Radio Songs — Artists'}
   ];
   const draw=()=>{
-    const main='<div class="orig-page">'+originalHero('YEAR-END CHARTS','Year-End Charts','The definitive year-end rankings across every chart')+
+    const main='<div class="orig-page">'+originalHero('YEAR-END CHARTS','Year-End Charts','Annual rankings generated from the weekly Daegon chart history')+
+      editorialBlock(
+        'How the Year-End Charts work',
+        [
+          'Year-End Charts are calculated from the weekly Daegon archive for the selected calendar year. They reward sustained chart performance across the year rather than simply reproducing one week or importing a separate year-end list.',
+          'Songs, albums and artists use the performance metric attached to their weekly chart. Additional artist views — including Female, Male, Duo/Group and New Artists — are filtered from the same underlying history using the project’s artist metadata and curated eligibility rules.'
+        ],
+        [['/methodology','See the full methodology'],['/stats','Explore chart records']]
+      )+
       originalYearControls('Year',years,selected,'year')+
       originalTop5('Daegon 100',(songs.entriesByYear[selected]||[]).slice(0,5),'song','/year-end/yearEndSongs')+
       originalTop5('Daegon Albums 100',(albums.entriesByYear[selected]||[]).slice(0,5),'album','/year-end/yearEndAlbums')+
@@ -760,7 +813,15 @@ async function renderGoatIndex(){
   const topAlbums=[...albums.entries].sort((a,b)=>b.totalUnits-a.totalUnits).slice(0,5).map((e,i)=>({...e,position:i+1}));
   const topArtists=[...artists.entries].sort((a,b)=>b.totalUnits-a.totalUnits).slice(0,5).map((e,i)=>({...e,position:i+1}));
   const allCharts=exactGoatIds.map(id=>({id,title:officialGoat[id].title}));
-  const main='<div class="orig-page">'+originalHero('GREATEST OF ALL TIME','Greatest of All Time','The definitive all-time rankings')+
+  const main='<div class="orig-page">'+originalHero('GREATEST OF ALL TIME','Greatest of All Time','Long-term rankings built from the complete weekly archive')+
+    editorialBlock(
+      'What Greatest of All Time means here',
+      [
+        'The GOAT pages aggregate the project’s weekly history instead of relying on a one-time editorial ranking. Songs, albums and artists accumulate their relevant chart totals across every available week, so longevity and sustained performance remain visible in the all-time view.',
+        'Each GOAT chart can be explored by multiple measures such as points, units, audience, sales, streams or weeks on chart where those metrics are available. The underlying weekly pages remain accessible so a high all-time placement can be traced back to actual chart history.'
+      ],
+      [['/methodology','How chart metrics are calculated'],['/number-ones','Browse every No. 1']]
+    )+
     originalTop5('Greatest Songs',topSongs,'song','/goat/goatSongs')+
     originalTop5('Greatest Albums',topAlbums,'album','/goat/goatAlbums')+
     originalTop5('Greatest Artists',topArtists,'artist','/goat/goatArtists')+
@@ -1111,9 +1172,19 @@ async function renderChartBeat(){
   const draw=()=>{
     const d=data[ids.indexOf(active)],dates=[...(d?.dates||[])].reverse(),entries=d?.entriesByDate?.[date]||[],no1=entries[0],debuts=entries.filter(x=>x.diff==='NEW').slice(0,5);
     const mover=[...entries].filter(x=>String(x.diff).startsWith('▲')).sort((a,b)=>toInt(String(b.diff).slice(1))-toInt(String(a.diff).slice(1)))[0];
-    const article='<article class="orig-beat-article">'+(no1?'<h2>'+esc(no1.name)+' leads the '+esc(charts[active].title)+'</h2><p><strong>'+esc(no1.artist||no1.name)+'</strong> holds the No. 1 position for the week of '+fmtDate(date)+'.</p>':'')+(debuts.length?'<h3>New entries</h3><p>'+debuts.map(x=>'<strong>'+esc(x.name)+'</strong>').join(', ')+' make their chart debut this week.</p>':'')+(mover?'<h3>Biggest mover</h3><p>'+esc(mover.name)+' posts the week’s biggest upward move ('+esc(mover.diff)+').</p>':'')+'</article>';
+    const top10=entries.slice(0,10),returners=entries.filter(x=>x.diff==='RE').slice(0,5),steady=entries.filter(x=>String(x.diff)==='0').slice(0,5);
+    const article='<article class="orig-beat-article">'+
+      '<div class="editorial-kicker">Weekly analysis</div>'+
+      (no1?'<h2>'+esc(no1.name)+' leads the '+esc(charts[active].title)+'</h2><p><strong>'+esc(no1.artist||no1.name)+'</strong> holds No. 1 for the chart week of '+fmtDate(date)+'. The chart below is read from the same weekly dataset used throughout the archive, so movement and historical runs remain directly traceable to the source week.</p>':'')+
+      (top10.length?'<h3>Inside the Top 10</h3><p>The week’s Top 10 contains '+top10.length+' entries. '+top10.slice(0,3).map((x,i)=>(i+1)+'. <strong>'+esc(x.name)+'</strong>').join(' · ')+' lead the upper tier.</p>':'')+
+      (debuts.length?'<h3>New entries</h3><p>'+debuts.map(x=>'<strong>'+esc(x.name)+'</strong>').join(', ')+' '+(debuts.length===1?'makes':'make')+' a first chart appearance this week.</p>':'')+
+      (returners.length?'<h3>Returns</h3><p>'+returners.map(x=>'<strong>'+esc(x.name)+'</strong>').join(', ')+' return to the ranking after appearing in an earlier week.</p>':'')+
+      (mover?'<h3>Biggest upward move</h3><p><strong>'+esc(mover.name)+'</strong> posts the strongest climb among the entries shown this week ('+esc(mover.diff)+').</p>':'')+
+      (steady.length?'<h3>Holding position</h3><p>'+steady.slice(0,3).map(x=>'<strong>'+esc(x.name)+'</strong>').join(', ')+' remain at the same rank as the previous chart week.</p>':'')+
+      '<div class="beat-method-note"><strong>About Chart Beat:</strong> this page summarizes movements already present in the Daegon weekly chart. It does not add a separate editorial score to the rankings. <a href="'+appHref('/methodology')+'">Read the methodology →</a></div>'+
+    '</article>';
     const main='<div class="orig-beat-layout"><aside class="orig-beat-side"><h2>Chart Beat</h2><div class="orig-beat-charts">'+ids.map(id=>'<button data-beat-chart="'+id+'" class="'+(id===active?'active':'')+'"><i class="fas '+(charts[id].icon||'fa-chart-bar')+'"></i>'+esc(charts[id].title)+'</button>').join('')+'</div><h3>Weeks</h3><div class="orig-beat-weeks">'+dates.slice(0,80).map(x=>'<button data-beat-date="'+x+'" class="'+(x===date?'active':'')+'">'+fmtDate(x)+'</button>').join('')+'</div></aside><main class="orig-beat-main"><div class="orig-beat-title"><h1>Chart Beat</h1><p>'+esc(charts[active].title)+' · '+fmtDate(date)+'</p></div><div class="orig-beat-actions"><a href="'+appHref(chartPath(active,date))+'" class="orig-view"><i class="fas fa-chart-bar"></i> View Raw Chart</a></div>'+article+'</main></div>';
-    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat','Weekly chart analysis.','/chart-beat');bindLinks();
+    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat','Weekly analysis of No. 1s, debuts, returns and movement across Daegon Charts.','/chart-beat');bindLinks();
     portalEl.querySelectorAll('[data-beat-chart]').forEach(b=>b.onclick=()=>{active=b.dataset.beatChart;const dd=data[ids.indexOf(active)];date=(dd?.dates||[]).slice(-1)[0]||'';draw()});
     portalEl.querySelectorAll('[data-beat-date]').forEach(b=>b.onclick=()=>{date=b.dataset.beatDate;draw()});
   };
