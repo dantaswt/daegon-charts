@@ -64,6 +64,28 @@ function pInt(v){
   let x=String(v??'').replace(/[^0-9-]/g,'');
   const n=parseInt(x,10);return Number.isFinite(n)?n:0;
 }
+async function fetchCsv(url){
+  if(typeof fetchRows==='function') return fetchRows(url);
+  const res=await fetch(url,{cache:'default'});
+  if(!res.ok) throw new Error('CSV '+res.status);
+  let text=await res.text();
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+  const parseLine=(line)=>{
+    const out=[];let cur='',q=false;
+    for(let i=0;i<line.length;i++){
+      const ch=line[i];
+      if(ch==='"'){
+        if(q&&line[i+1]==='"'){cur+='"';i++}
+        else q=!q;
+      }else if(ch===','&&!q){out.push(cur);cur=''}
+      else cur+=ch;
+    }
+    out.push(cur);
+    return out;
+  };
+  return text.trim().split(/\r?\n/).filter(Boolean).map(parseLine);
+}
+
 async function loadOfficialRanking(cfg,{yearly=false}={}){
   const rows=await fetchCsv(PORTAL_SHEET+cfg.gid);
   if(!rows?.length)return yearly?{years:[],entriesByYear:{}}:{entries:[]};
