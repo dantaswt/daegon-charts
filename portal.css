@@ -2616,3 +2616,526 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
 .orig-goat-search{position:relative;margin:0 0 14px}
 .orig-goat-search input{width:100%;min-height:40px;padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:14px;outline:none}
 .orig-goat-search input:focus{border-color:var(--accent)}
+
+/* === YEC GOAT RESPONSIVE DESKTOP MOBILE v10 === */
+/* Desktop/tablet baseline */
+@media(min-width:901px){
+  .orig-page{
+    max-width:1024px!important;
+    padding-left:24px!important;
+    padding-right:24px!important;
+  }
+  .orig-top5-row{
+    justify-content:center!important;
+    overflow:visible!important;
+  }
+  .orig-top5-card{
+    width:140px!important;
+    flex:0 0 140px!important;
+  }
+  .orig-top5-card.lead{
+    width:220px!important;
+    flex:0 0 220px!important;
+  }
+  .orig-chart-grid{
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  }
+
+  .orig-period-layout{
+    grid-template-columns:280px minmax(0,1fr)!important;
+    gap:24px!important;
+    padding-left:24px!important;
+    padding-right:24px!important;
+  }
+  .orig-period-side{
+    display:block!important;
+    position:sticky!important;
+    top:92px!important;
+  }
+  .orig-period-side-links{
+    flex-direction:column!important;
+    overflow:visible!important;
+    gap:8px!important;
+  }
+  .orig-period-main{
+    min-width:0!important;
+  }
+  .orig-period-card{
+    grid-template-columns:64px 96px minmax(0,1fr) 40px!important;
+    gap:12px!important;
+    padding:14px 16px!important;
+    min-height:126px!important;
+  }
+  .orig-period-card.first{
+    min-height:214px!important;
+  }
+  .orig-period-art{
+    width:96px!important;
+    height:96px!important;
+  }
+  .orig-period-art.first{
+    width:180px!important;
+    height:180px!important;
+    border-left:4px solid var(--accent)!important;
+  }
+  .orig-period-rank{
+    width:64px!important;
+    font-size:30px!important;
+  }
+  .orig-period-rank.first{
+    height:64px!important;
+    background:var(--accent)!important;
+    color:#000!important;
+    font-size:36px!important;
+  }
+  .orig-period-name{
+    font-size:16px!important;
+  }
+  .orig-period-card.first .orig-period-name{
+    font-size:20px!important;
+  }
+
+  .orig-goat-layout{
+    display:flex!important;
+    gap:32px!important;
+    padding-left:24px!important;
+    padding-right:24px!important;
+  }
+  .orig-goat-side{
+    display:block!important;
+    width:288px!important;
+    flex:0 0 288px!important;
+    position:sticky!important;
+    top:92px!important;
+  }
+  .orig-goat-main{
+    min-width:0!important;
+    flex:1!important;
+  }
+}
+
+/* Tablet */
+@media(min-width:768px) and (max-width:900px){
+  .orig-page{
+    max-width:100%!important;
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+  .orig-top5-row{
+    justify-content:center!important;
+    overflow-x:auto!important;
+  }
+  .orig-chart-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  }
+
+  .orig-period-layout{
+    display:block!important;
+    padding:0 20px 56px!important;
+  }
+  .orig-period-side{
+    position:static!important;
+    margin-bottom:20px!important;
+  }
+  .orig-period-side-links{
+    display:flex!important;
+    flex-direction:row!important;
+    overflow-x:auto!important;
+    gap:8px!important;
+    padding-bottom:4px!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+  .orig-period-side-links::-webkit-scrollbar{display:none!important}
+  .orig-period-side-links a{
+    flex:0 0 auto!important;
+    min-width:160px!important;
+  }
+
+  .orig-goat-layout{
+    display:block!important;
+    padding:0 20px 56px!important;
+  }
+  .orig-goat-side{
+    width:auto!important;
+    position:static!important;
+    margin-bottom:20px!important;
+  }
+  .orig-goat-box:nth-child(2){
+    display:flex!important;
+    gap:8px!important;
+    overflow-x:auto!important;
+    padding-bottom:12px!important;
+  }
+  .orig-goat-box:nth-child(2) .orig-eyebrow{
+    display:none!important;
+  }
+  .orig-goat-box:nth-child(2) a{
+    flex:0 0 auto!important;
+    border:1px solid var(--border)!important;
+  }
+}
+
+/* Mobile */
+@media(max-width:767px){
+  .orig-page{
+    width:100%!important;
+    max-width:none!important;
+    padding:0 12px 48px!important;
+    overflow:hidden!important;
+  }
+  .orig-hero{
+    padding:28px 0 34px!important;
+    margin-bottom:18px!important;
+  }
+  .orig-hero-bg{
+    font-size:2.15rem!important;
+    line-height:.95!important;
+  }
+  .orig-hero h1{
+    font-size:2.25rem!important;
+    line-height:.95!important;
+    letter-spacing:-.035em!important;
+    padding:0 4px!important;
+  }
+  .orig-hero p{
+    max-width:320px!important;
+    margin:10px auto 0!important;
+    font-size:12px!important;
+    line-height:1.45!important;
+  }
+
+  .orig-period-control{
+    margin-bottom:24px!important;
+    gap:6px!important;
+  }
+  .orig-period-row{
+    width:100%!important;
+    display:grid!important;
+    grid-template-columns:74px minmax(0,1fr) 74px!important;
+    gap:6px!important;
+  }
+  .orig-period-row .ref-gold{
+    min-width:0!important;
+    width:74px!important;
+    min-height:40px!important;
+    padding:8px 6px!important;
+    font-size:10px!important;
+  }
+  .orig-select-wrap{
+    width:100%!important;
+  }
+  .orig-select-btn{
+    width:100%!important;
+    min-width:0!important;
+    min-height:40px!important;
+    padding:8px 10px!important;
+    font-size:13px!important;
+  }
+
+  .orig-top5{
+    margin:0 -12px 32px!important;
+  }
+  .orig-top5 h2{
+    padding:0 12px!important;
+    margin-bottom:12px!important;
+    font-size:18px!important;
+  }
+  .orig-top5-row{
+    width:100%!important;
+    justify-content:flex-start!important;
+    overflow-x:auto!important;
+    gap:10px!important;
+    padding:0 12px 10px!important;
+    scroll-padding-left:12px!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+  .orig-top5-row::-webkit-scrollbar{display:none!important}
+  .orig-top5-card{
+    width:116px!important;
+    flex:0 0 116px!important;
+  }
+  .orig-top5-card.lead{
+    width:172px!important;
+    flex:0 0 172px!important;
+  }
+  .orig-top5-art{
+    margin-bottom:6px!important;
+  }
+  .orig-top5-title{
+    font-size:12px!important;
+    line-height:1.2!important;
+  }
+  .orig-top5-artist{
+    font-size:10px!important;
+  }
+  .orig-rank{
+    width:28px!important;
+    height:28px!important;
+    font-size:12px!important;
+  }
+  .orig-view-wrap{
+    margin-top:12px!important;
+  }
+
+  .orig-chart-grid-section{
+    margin-bottom:32px!important;
+  }
+  .orig-chart-grid-section h2{
+    font-size:18px!important;
+    margin-bottom:12px!important;
+  }
+  .orig-chart-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    width:100%!important;
+  }
+  .orig-chart-link{
+    min-height:62px!important;
+    padding:12px 8px!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+  }
+
+  /* YEC detail */
+  .orig-period-layout{
+    display:block!important;
+    width:100%!important;
+    padding:0 8px 48px!important;
+  }
+  .orig-period-side{
+    position:static!important;
+    width:100%!important;
+    margin:0 0 18px!important;
+  }
+  .orig-period-side-links{
+    display:flex!important;
+    flex-direction:row!important;
+    gap:6px!important;
+    overflow-x:auto!important;
+    padding:0 0 6px!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+  .orig-period-side-links::-webkit-scrollbar{display:none!important}
+  .orig-period-side-links a{
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:132px!important;
+    min-height:40px!important;
+    padding:8px 10px!important;
+    font-size:10px!important;
+    line-height:1.2!important;
+  }
+  .orig-period-back{
+    display:none!important;
+  }
+  .orig-period-main{
+    width:100%!important;
+    min-width:0!important;
+  }
+  .orig-period-heading{
+    margin:4px 0 14px!important;
+    padding:0 6px!important;
+  }
+  .orig-period-heading h1{
+    font-size:24px!important;
+    line-height:1.05!important;
+    text-align:center!important;
+  }
+  .orig-period-list{
+    width:100%!important;
+    gap:8px!important;
+  }
+  .orig-period-card,
+  .orig-period-card.first{
+    width:100%!important;
+    min-height:84px!important;
+    display:grid!important;
+    grid-template-columns:30px 64px minmax(0,1fr) 34px!important;
+    gap:8px!important;
+    align-items:center!important;
+    padding:8px!important;
+  }
+  .orig-period-rank,
+  .orig-period-rank.first{
+    width:30px!important;
+    height:auto!important;
+    background:transparent!important;
+    color:var(--foreground)!important;
+    font-size:19px!important;
+    line-height:1!important;
+  }
+  .orig-period-art,
+  .orig-period-art.first{
+    width:64px!important;
+    height:64px!important;
+    border-left:0!important;
+  }
+  .orig-period-card.first .orig-period-art{
+    width:68px!important;
+    height:68px!important;
+    border-left:3px solid var(--accent)!important;
+  }
+  .orig-period-entry{
+    min-width:0!important;
+    overflow:hidden!important;
+  }
+  .orig-period-name,
+  .orig-period-card.first .orig-period-name{
+    font-size:13px!important;
+    line-height:1.2!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .orig-period-artist{
+    margin-top:2px!important;
+    font-size:10.5px!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .orig-period-more{
+    width:32px!important;
+    height:32px!important;
+    flex:0 0 32px!important;
+  }
+  .orig-period-details{
+    grid-column:1/-1!important;
+    margin-top:4px!important;
+    padding:10px 6px!important;
+    gap:6px!important;
+    border-radius:8px!important;
+  }
+  .orig-period-details span{
+    font-size:8px!important;
+  }
+  .orig-period-details strong{
+    font-size:12px!important;
+  }
+
+  /* GOAT detail */
+  .orig-goat-layout{
+    display:block!important;
+    width:100%!important;
+    padding:0 8px 48px!important;
+  }
+  .orig-goat-side{
+    position:static!important;
+    width:100%!important;
+    margin:0 0 14px!important;
+  }
+  .orig-goat-box{
+    padding:10px!important;
+    margin-bottom:8px!important;
+  }
+  .orig-goat-box:first-child{
+    display:block!important;
+  }
+  .orig-goat-box:first-child .orig-eyebrow{
+    margin-bottom:6px!important;
+  }
+  .orig-goat-box select{
+    width:100%!important;
+    min-height:40px!important;
+  }
+  .orig-goat-box:nth-child(2){
+    display:flex!important;
+    gap:6px!important;
+    overflow-x:auto!important;
+    padding:0 0 8px!important;
+    border:0!important;
+    background:transparent!important;
+    -webkit-overflow-scrolling:touch!important;
+    scrollbar-width:none!important;
+  }
+  .orig-goat-box:nth-child(2)::-webkit-scrollbar{display:none!important}
+  .orig-goat-box:nth-child(2) .orig-eyebrow{
+    display:none!important;
+  }
+  .orig-goat-box:nth-child(2) a{
+    flex:0 0 auto!important;
+    min-width:132px!important;
+    min-height:40px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:8px 10px!important;
+    border:1px solid var(--border)!important;
+    background:var(--muted)!important;
+    font-size:10px!important;
+    line-height:1.2!important;
+    text-align:center!important;
+  }
+  .orig-goat-box:nth-child(2) a.active{
+    background:var(--accent)!important;
+    color:#000!important;
+    border-color:var(--accent)!important;
+  }
+  .orig-goat-side .orig-period-back{
+    display:none!important;
+  }
+  .orig-goat-main{
+    width:100%!important;
+    min-width:0!important;
+  }
+  .orig-goat-hero{
+    padding:26px 0 30px!important;
+    margin-bottom:18px!important;
+  }
+  .orig-goat-hero>div{
+    font-size:2.7rem!important;
+    line-height:.9!important;
+  }
+  .orig-goat-hero h1{
+    font-size:27px!important;
+    line-height:1!important;
+    padding:0 8px!important;
+  }
+  .orig-goat-hero p{
+    font-size:12px!important;
+  }
+  .orig-goat-top3{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin-bottom:20px!important;
+  }
+  .orig-goat-top3>div{
+    min-width:0!important;
+    padding:12px 6px!important;
+  }
+  .orig-goat-top3 span{
+    width:42px!important;
+    height:42px!important;
+    margin-bottom:8px!important;
+    font-size:18px!important;
+  }
+  .orig-goat-top3 strong{
+    font-size:11px!important;
+    line-height:1.2!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .orig-goat-top3 small{
+    font-size:9px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .orig-goat-search{
+    margin-bottom:10px!important;
+  }
+  .orig-goat-search input{
+    min-height:42px!important;
+    font-size:13px!important;
+  }
+  .orig-goat-metric{
+    display:none!important;
+  }
+}
