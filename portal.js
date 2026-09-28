@@ -20,8 +20,7 @@ const officialYearEnd={
   yecArtist50Female:{kind:'artist',title:'Top Artists — Female',weeklyId:'artists'},
   yecArtist50Male:{kind:'artist',title:'Top Artists — Male',weeklyId:'artists'},
   yecArtist50DuoGroup:{kind:'artist',title:'Top Artists — Duo/Group',weeklyId:'artists'},
-  yecRadioSongsArtists:{kind:'artist',title:'Radio Songs — Artists',weeklyId:'radioSongs'},
-  yecTopLatinAlbums:{kind:'album',title:'Top Latin Albums',weeklyId:'albums'}
+  yecRadioSongsArtists:{kind:'artist',title:'Radio Songs — Artists',weeklyId:'radioSongs'}
 };
 const officialGoat={
   goatSongs:{kind:'song',title:'Greatest of All Time Songs',weeklyId:'songs'},
@@ -554,24 +553,6 @@ async function computeNewArtistsExact(){
   for(const [y,o] of Object.entries(years))entriesByYear[y]=Object.values(o).sort((a,b)=>b.totalUnits-a.totalUnits||a.peak-b.peak).slice(0,10).map((e,i)=>({...e,position:i+1}));
   return {years:Object.keys(entriesByYear).sort().reverse(),entriesByYear,kind:'artist',title:'Top New Artists'};
 }
-const LATIN_PATTERNS=['latin','reggaeton','urbano','latin urban','latin trap','salsa','bachata','merengue','cumbia','reggae en espanol','latin hip hop','latin rock','latin alternative','latin metal','bossa nova','mpb','forró','forro','sertanejo','pagode','funk','brega','axé','piseiro','pisadinha','spanish pop','spanish rock','spanish hip hop','brazilian pop','brazilian rock','brazilian hip hop','brazilian funk','portuguese pop','portuguese rock','tropical','tropipop','vallenato','grupero','norteño','banda','corrido','ranchera','mariachi','kizomba','kuduro'];
-async function computeLatinYecExact(){
-  const yec=await computeYearEndExact('albums');
-  try{
-    const rows=await fetchCsv(PORTAL_SHEET+'1618822736');
-    const h=rows[0]||[],ai=pFind(h,['artist']),bi=pFind(h,['album']),gi=pFind(h,['genre']),g2i=pFind(h,['genre 2']),latin=new Set();
-    for(const r of rows.slice(1)){
-      const a=String(r[ai]||'').trim(),al=String(r[bi]||'').trim(),g=(String(r[gi]||'')+' '+String(r[g2i]||'')).toLowerCase();
-      if(a&&al&&LATIN_PATTERNS.some(k=>g.includes(k)))latin.add((al+'||'+a).toLowerCase());
-    }
-    const entriesByYear={};
-    for(const y of yec.years)entriesByYear[y]=(yec.entriesByYear[y]||[]).filter(e=>latin.has((e.name+'||'+e.artist).toLowerCase())).slice(0,25).map((e,i)=>({...e,position:i+1}));
-    return {years:yec.years,entriesByYear,kind:'album',title:'Top Latin Albums'};
-  }catch(err){
-    console.warn('Latin genre lookup failed',err);
-    return {years:yec.years,entriesByYear:Object.fromEntries(yec.years.map(y=>[y,[]])),kind:'album',title:'Top Latin Albums'};
-  }
-}
 async function loadYecExact(chartId){
   if(chartId==='yecHot100Artists')return computeArtistAggregateExact('songs','Hot 100 — Artists','points');
   if(chartId==='yecTop100AlbumsArtists')return computeArtistAggregateExact('albums','Top 100 Albums — Artists','units');
@@ -580,7 +561,6 @@ async function loadYecExact(chartId){
   if(chartId==='yecArtist50Male')return computeGenderYecExact('MALE');
   if(chartId==='yecArtist50DuoGroup')return computeGenderYecExact('GROUP');
   if(chartId==='yearEndNewArtists')return computeNewArtistsExact();
-  if(chartId==='yecTopLatinAlbums')return computeLatinYecExact();
   const cfg=officialYearEnd[chartId];if(!cfg)throw new Error('Unknown Year-End chart');
   return computeYearEndExact(cfg.weeklyId);
 }
@@ -645,8 +625,6 @@ async function renderYearEndIndex(){
     loadYecExact('yearEndAlbums'),
     loadYecExact('yearEndArtists')
   ]);
-  let latin={years:[],entriesByYear:{},kind:'album',title:'Top Latin Albums'};
-  try{latin=await loadYecExact('yecTopLatinAlbums')}catch(err){console.warn('Top Latin Albums unavailable',err)}
   const allYears=songs.years||[];
   const years=allYears.filter(y=>y!=='2026');
   let selected=new URLSearchParams(location.search).get('year')||(years.includes('2025')?'2025':years[0]||'');
@@ -655,7 +633,7 @@ async function renderYearEndIndex(){
     {id:'yearEndSongs',title:'Hot 100'},{id:'yearEndRadio',title:'Radio Songs'},{id:'yearEndDigitalSongsSales',title:'Digital Songs Sales'},{id:'yearEndStreamingSongs',title:'Streaming Songs'}
   ];
   const ALBUM_CHARTS=[
-    {id:'yearEndAlbums',title:'Top 100 Albums'},{id:'yearEndTopAlbumSales',title:'Top Album Sales'},{id:'yearEndTopStreamingAlbums',title:'Top Streaming Albums'},{id:'yecTopLatinAlbums',title:'Top Latin Albums'}
+    {id:'yearEndAlbums',title:'Top 100 Albums'},{id:'yearEndTopAlbumSales',title:'Top Album Sales'},{id:'yearEndTopStreamingAlbums',title:'Top Streaming Albums'}
   ];
   const ARTIST_CHARTS=[
     {id:'yecHot100Artists',title:'Hot 100 — Artists'},{id:'yecArtist50Female',title:'Top Artists — Female'},{id:'yecArtist50Male',title:'Top Artists — Male'},{id:'yecArtist50DuoGroup',title:'Top Artists — Duo/Group'},{id:'yearEndNewArtists',title:'Top New Artists'},{id:'yecTop100AlbumsArtists',title:'Top 100 Albums — Artists'},{id:'yecRadioSongsArtists',title:'Radio Songs — Artists'}
@@ -666,7 +644,6 @@ async function renderYearEndIndex(){
       originalTop5('Hot 100',(songs.entriesByYear[selected]||[]).slice(0,5),'song','/year-end/yearEndSongs')+
       originalTop5('Top 100 Albums',(albums.entriesByYear[selected]||[]).slice(0,5),'album','/year-end/yearEndAlbums')+
       originalTop5('Artist 50',(artists.entriesByYear[selected]||[]).slice(0,5),'artist','/year-end/yearEndArtists')+
-      originalTop5('Top Latin Albums',(latin.entriesByYear[selected]||[]).slice(0,5),'album','/year-end/yecTopLatinAlbums')+
       originalChartGrid('Songs',SONG_CHARTS,'/year-end/')+
       originalChartGrid('Albums',ALBUM_CHARTS,'/year-end/')+
       originalChartGrid('Artists',ARTIST_CHARTS,'/year-end/')+
