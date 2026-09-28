@@ -308,6 +308,30 @@ function aggregatePeriod(data,chartId,predicate){
   }
   return [...m.values()].sort((a,b)=>b.score-a.score||b.weeks-a.weeks||a.peak-b.peak);
 }
+function aggregateDecadePeriod(data,chartId,predicate){
+  const kind=charts[chartId].kind;
+  const metricField=chartId==='songs'?'points':'units';
+  const m=new Map();
+  for(const d of data.dates){
+    if(!predicate(d))continue;
+    for(const e of data.entriesByDate[d]||[]){
+      const key=kind==='artist'?String(e.name).toLowerCase():itemKey(e);
+      let x=m.get(key);
+      if(!x){
+        x={name:e.name,artist:e.artist,score:0,totalMetric:0,weeks:0,peak:e.position,weeksAt1:0,lastEntry:e,metricField};
+        m.set(key,x);
+      }
+      const value=metricNumber(e[metricField]??0);
+      x.score+=value;
+      x.totalMetric+=value;
+      x.weeks++;
+      x.peak=Math.min(x.peak,e.position);
+      if(e.position===1)x.weeksAt1++;
+      x.lastEntry=e;
+    }
+  }
+  return [...m.values()].sort((a,b)=>b.totalMetric-a.totalMetric||b.weeks-a.weeks||a.peak-b.peak);
+}
 function latestEntry(data){const d=data.dates[data.dates.length-1]||'';return {date:d,entries:data.entriesByDate[d]||[]}}
 
 function editorialBlock(title,paragraphs,links=[]){
@@ -923,7 +947,7 @@ async function renderDecadeIndex(){
   const years=[...new Set(data.flatMap(d=>d.dates.map(x=>Number(x.slice(0,4)))))].sort((a,b)=>b-a);
   const decades=[...new Set(years.map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a).map(x=>String(x));
   let selected=new URLSearchParams(location.search).get('decade')||decades[0]||'2000';
-  const aggregate=(d,id)=>aggregatePeriod(d,id,x=>Number(x.slice(0,4))>=Number(selected)&&Number(x.slice(0,4))<Number(selected)+10).slice(0,5).map((x,i)=>({...x,position:i+1}));
+  const aggregate=(d,id)=>aggregateDecadePeriod(d,id,x=>Number(x.slice(0,4))>=Number(selected)&&Number(x.slice(0,4))<Number(selected)+10).slice(0,5).map((x,i)=>({...x,position:i+1}));
   const draw=()=>{
     const main='<div class="orig-page">'+originalHero('DECADE-END CHARTS','Decade-End Charts','The definitive decade-end rankings across every chart')+
       originalYearControls('Decade',decades.map(x=>x+'s'),selected+'s','decade')+
@@ -1142,7 +1166,7 @@ async function renderPeriod(type,chartSeg){
 async function renderDecadeDetailExact(chartSeg){
   const oldMap={songs:'songs',albums:'albums',artists:'artists'},weeklyId=oldMap[chartSeg]||'songs';
   const data=await loadWeekly(weeklyId),years=[...new Set(data.dates.map(d=>Number(d.slice(0,4))))].sort((a,b)=>b-a),decades=[...new Set(years.map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a);
-  const selected=String(new URLSearchParams(location.search).get('decade')||decades[0]||'2000'),pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10,arr=aggregatePeriod(data,weeklyId,pred).slice(0,100);
+  const selected=String(new URLSearchParams(location.search).get('decade')||decades[0]||'2000'),pred=d=>Number(d.slice(0,4))>=Number(selected)&&Number(d.slice(0,4))<Number(selected)+10,arr=aggregateDecadePeriod(data,weeklyId,pred).slice(0,100);
   const path='/decade-end/'+chartSeg,kind=charts[weeklyId].kind,title=charts[weeklyId].title;
   const main='<div class="orig-period-layout"><aside class="orig-period-side"><div class="orig-period-side-links">'+['songs','albums','artists'].map(id=>'<a href="'+appHref('/decade-end/'+id)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(charts[id].title)+'</a>').join('')+'</div><a class="orig-period-back" href="'+appHref('/decade-end')+'"><i class="fas fa-arrow-left"></i> All Decade-End</a></aside><main class="orig-period-main"><div class="orig-period-heading"><h1>'+esc(title)+'</h1></div><div class="orig-period-list">'+arr.map((e,i)=>'<div class="orig-period-card"><div class="orig-period-rank">'+(i+1)+'</div><div class="orig-period-art">'+refThumb(e,kind)+'</div><div class="orig-period-entry"><div class="orig-period-name">'+entityLink(e,kind)+'</div></div></div>').join('')+'</div></main></div>';
   setMode(true);portalEl.innerHTML=shellHtml(main);bindLinks();hydratePortalImages();
