@@ -164,6 +164,7 @@ function setMode(portal){
   document.body.classList.toggle('portal-mode',!!portal);
   document.body.classList.add('global-site-shell');
   document.body.classList.add('global-bars-weekly');
+  document.body.classList.add('global-header-canonical');
 
   // Keep Weekly branding untouched, but mirror the daegoncharts header on portal routes.
   const brand=document.querySelector('.brand');
