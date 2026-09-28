@@ -185,10 +185,11 @@ function setMode(portal){
     portalEl.setAttribute('hidden','');
   }
 }
-function portalSkeleton(title='Loading'){
+function portalSkeleton(title='Loading',kind=''){
+  const isArtist=kind==='artist'||/artist/i.test(title);
   const cards=Array.from({length:7},(_,i)=>'<div class="portal-sk-card">'+
     '<div class="portal-sk-rank sk"></div>'+
-    '<div class="portal-sk-art sk '+(/artist/i.test(title)?'circle':'')+'"></div>'+
+    '<div class="portal-sk-art sk '+(isArtist?'circle':'')+'"></div>'+
     '<div class="portal-sk-copy"><div class="portal-sk-title sk"></div><div class="portal-sk-sub sk"></div></div>'+
     '<div class="portal-sk-action sk"></div>'+
   '</div>').join('');
@@ -198,9 +199,46 @@ function portalSkeleton(title='Loading'){
     '<div class="portal-sk-list">'+cards+'</div>'+
   '</div>';
 }
-function loading(title='Loading'){
+function loading(title='Loading',kind=''){
   setMode(true);
-  portalEl.innerHTML=portalSkeleton(title);
+  portalEl.innerHTML=portalSkeleton(title,kind);
+}
+function routeSkeletonMeta(parts){
+  const p=parts||[];
+  const first=p[0]||'';
+  const second=p[1]||'';
+  let kind='';
+  if(first==='artist'||first==='artists')kind='artist';
+  else if(first==='album'||first==='albums')kind='album';
+  else if(first==='song'||first==='songs')kind='song';
+  else if(first==='decade-end'){
+    if(second==='artists')kind='artist';
+    else if(second==='albums')kind='album';
+    else if(second==='songs')kind='song';
+  }else if(first==='goat'){
+    if(/artist/i.test(second))kind='artist';
+    else if(/album/i.test(second))kind='album';
+    else if(second)kind='song';
+  }else if(first==='year-end'){
+    if(/artist/i.test(second))kind='artist';
+    else if(/album/i.test(second))kind='album';
+    else if(second)kind='song';
+  }
+  const title=
+    first==='decade-end'?'Decade-End Charts':
+    first==='year-end'?'Year-End Charts':
+    first==='goat'?'Greatest of All Time':
+    first==='artist'||first==='artists'?'Artists':
+    first==='album'||first==='albums'?'Albums':
+    first==='song'||first==='songs'?'Songs':
+    first==='number-ones'?'Number Ones':
+    first==='chart-beat'?'Chart Beat':
+    first==='stats'?'Stats':
+    first==='search'?'Search':
+    first==='chart-battle'?'Chart Battle':
+    first==='awards'?'Awards':
+    'Daegon Charts';
+  return {title,kind};
 }
 function setMeta(title,desc,path,exactTitle=false){
   document.title=exactTitle?title:title+' | Daegon Charts';
@@ -1555,6 +1593,8 @@ function bindLinks(){
 async function renderRoute(){
   ensureShell();
   const p=routeParts();
+  const skeleton=routeSkeletonMeta(p);
+  loading(skeleton.title,skeleton.kind);
   try{
     if(!p.length){await renderHome()}
     else if(p[0]==='songs')await renderCatalog('song');
