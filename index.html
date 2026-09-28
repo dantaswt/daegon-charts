@@ -1877,7 +1877,259 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-exact-mobile-yec-goat-16">
+  <link rel="stylesheet" href="/portal.css?v=20260927-critical-mobile-17">
+
+<!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
+<style id="yec-goat-mobile-critical">
+/* Critical responsive shell for nested YEC/GOAT routes.
+   Kept inline so these routes cannot render unstyled while portal.css is stale/missed. */
+.exact-mobile-only{display:none}
+.exact-desktop-only{display:block}
+.exact-chart-card{box-sizing:border-box;width:100%;border:1px solid var(--border);background:var(--card)}
+.exact-desktop-row{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px}
+.exact-mobile-row{display:none}
+.exact-details{display:none}
+.exact-details.open{display:grid}
+
+@media(max-width:767px){
+  html,body{max-width:100%;overflow-x:hidden}
+  #portalPage,.portal-page,.portal-main,.portal-shell{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow-x:hidden!important;
+  }
+
+  .exact-mobile-only{display:block!important}
+  .exact-desktop-only{display:none!important}
+
+  .exact-yec-layout,
+  .exact-goat-page,
+  .exact-goat-flex,
+  .exact-yec-main,
+  .exact-goat-content,
+  .exact-chart-list{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    transform:none!important;
+  }
+
+  .exact-yec-layout,
+  .exact-goat-page{padding:0 12px 48px!important}
+
+  .exact-yec-sidebar,
+  .exact-goat-sidebar{
+    position:static!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0 0 18px!important;
+  }
+
+  .exact-mobile-chart-nav,
+  .exact-goat-mobile-nav{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    width:100%!important;
+  }
+
+  .exact-mobile-active,
+  .exact-goat-mobile-active,
+  .exact-mobile-more,
+  .exact-mobile-more-list a{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:44px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    margin:0!important;
+    padding:8px 12px!important;
+    border:1px solid var(--border)!important;
+    background:var(--muted)!important;
+    color:var(--foreground)!important;
+    text-decoration:none!important;
+    text-align:center!important;
+    text-transform:uppercase!important;
+    letter-spacing:.04em!important;
+    font-size:12px!important;
+    line-height:1.2!important;
+    font-weight:800!important;
+  }
+
+  .exact-mobile-active,
+  .exact-goat-mobile-active{
+    background:var(--accent)!important;
+    color:#000!important;
+    border-color:var(--accent)!important;
+  }
+
+  .exact-mobile-more-list{
+    display:none!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    width:100%!important;
+  }
+  .exact-mobile-more-list.open{display:flex!important}
+
+  .exact-back-card{
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    width:100%!important;
+    min-height:52px!important;
+    margin:12px 0 0!important;
+    padding:14px 16px!important;
+    border:1px solid var(--border)!important;
+    background:var(--card)!important;
+    color:var(--muted-foreground)!important;
+    text-decoration:none!important;
+    font-size:11px!important;
+    font-weight:800!important;
+    text-transform:uppercase!important;
+    letter-spacing:.08em!important;
+  }
+
+  .exact-yec-heading{text-align:center!important;margin:0 0 8px!important}
+  .exact-yec-heading h1{margin:0!important;font-size:24px!important;line-height:1.05!important;font-weight:900!important}
+
+  .exact-chart-list{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:8px!important;
+    padding:0!important;
+  }
+
+  .exact-chart-card{
+    min-width:0!important;
+    margin:0!important;
+  }
+
+  .exact-desktop-row{display:none!important}
+  .exact-mobile-row{
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:8px!important;
+  }
+
+  .exact-mobile-rank{
+    width:30px!important;
+    flex:0 0 30px!important;
+    text-align:center!important;
+    font-size:19px!important;
+    line-height:1!important;
+    font-weight:900!important;
+  }
+
+  .exact-mobile-art{
+    width:64px!important;
+    height:64px!important;
+    flex:0 0 64px!important;
+    overflow:hidden!important;
+    background:var(--muted)!important;
+  }
+  .exact-mobile-art.first{
+    width:68px!important;
+    height:68px!important;
+    flex-basis:68px!important;
+    border-left:3px solid var(--accent)!important;
+  }
+  .exact-mobile-art .ref-thumb,
+  .exact-mobile-art .ref-thumb img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+  }
+
+  .exact-mobile-copy{
+    min-width:0!important;
+    flex:1 1 auto!important;
+    overflow:hidden!important;
+  }
+  .exact-mobile-title{
+    font-size:13px!important;
+    line-height:1.2!important;
+    font-weight:800!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .exact-mobile-title a{
+    color:inherit!important;
+    text-decoration:none!important;
+  }
+  .exact-mobile-artist{
+    margin-top:2px!important;
+    font-size:11px!important;
+    line-height:1.2!important;
+    color:var(--muted-foreground)!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .exact-plus{
+    width:32px!important;
+    height:32px!important;
+    flex:0 0 32px!important;
+    border:0!important;
+    border-radius:50%!important;
+    background:var(--muted)!important;
+    color:var(--foreground)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    font-size:13px!important;
+  }
+
+  .exact-details{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin:2px 8px 8px!important;
+    padding:10px 6px!important;
+    border:1px solid var(--border)!important;
+    border-radius:8px!important;
+    background:var(--muted)!important;
+  }
+  .exact-details.open{display:grid!important}
+  .exact-details div{text-align:center!important}
+  .exact-details span{display:block!important;color:var(--accent)!important;font-size:8px!important;font-weight:800!important;text-transform:uppercase!important}
+  .exact-details strong{display:block!important;margin-top:4px!important;font-size:12px!important}
+
+  .exact-goat-flex{display:block!important}
+  .exact-sidebar-section{box-sizing:border-box!important;width:100%!important;margin-bottom:10px!important;padding:12px!important}
+  .exact-sidebar-section select{box-sizing:border-box!important;width:100%!important;min-height:42px!important}
+  .exact-goat-heading{position:relative!important;text-align:center!important;padding:28px 0 32px!important;margin-bottom:18px!important;overflow:hidden!important}
+  .exact-goat-bg{position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:3.2rem!important;font-weight:900!important;opacity:.06!important;text-transform:uppercase!important;white-space:nowrap!important}
+  .exact-goat-heading h1{position:relative!important;z-index:1!important;margin:0!important;color:var(--accent)!important;font-size:30px!important;line-height:1!important;text-transform:uppercase!important}
+  .exact-goat-heading p{position:relative!important;z-index:1!important;margin:8px 0 0!important;color:var(--muted-foreground)!important;font-size:12px!important}
+
+  .exact-goat-podium{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin-bottom:20px!important}
+  .exact-podium-card{min-width:0!important;padding:14px 6px!important;text-align:center!important}
+  .exact-podium-rank{width:48px!important;height:48px!important;margin:0 auto 8px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:50%!important;font-size:18px!important;font-weight:900!important}
+  .exact-podium-title{font-size:11px!important;line-height:1.2!important;font-weight:800!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+  .exact-podium-artist{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .exact-podium-metric{font-size:9px!important}
+
+  .exact-goat-search-wrap{position:relative!important;width:100%!important;margin-bottom:10px!important}
+  .exact-goat-search-wrap input{box-sizing:border-box!important;width:100%!important;min-height:42px!important}
+  .exact-results-count{font-size:10px!important}
+  .exact-goat-desktop-metric{display:none!important}
+}
+</style>
+
 </head>
 <body>
 <div class="shell">
@@ -2854,6 +3106,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-exact-mobile-yec-goat-16"></script>
+<script src="/portal.js?v=20260927-critical-mobile-17"></script>
 </body>
 </html>
