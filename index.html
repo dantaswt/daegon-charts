@@ -1877,7 +1877,7 @@
       background:rgba(0,0,0,.22);
     }
 </style>
-  <link rel="stylesheet" href="/portal.css?v=20260927-artist-number1-clean-30">
+  <link rel="stylesheet" href="/portal.css?v=20260927-artist-parity-31">
 
 <!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
 <style id="yec-goat-mobile-critical">
@@ -2266,18 +2266,23 @@ html.dark .sk{
 
 
 
-<!-- WEEKLY_ARTIST_NUMBER1_CLEAN_V30 -->
-<style id="weekly-artist-number1-clean-v30">
-/* Artist #1: same image treatment as every other artist.
-   Keep only the orange outer ring and desktop size distinction. */
-.cover.one.weekly-artist-art::after,
-.m-cover.one.weekly-artist-art::after{
-  content:none!important;
-  display:none!important;
-}
 
-.cover.one.weekly-artist-art .artwork-slot,
-.m-cover.one.weekly-artist-art .artwork-slot{
+
+<!-- WEEKLY_ARTIST_FINAL_PARITY_V31 -->
+<style id="weekly-artist-final-parity-v31">
+.cover.weekly-artist-art,
+.m-cover.weekly-artist-art{
+  background:transparent!important;
+  border-left:0!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:relative!important;
+}
+.cover.weekly-artist-art .artwork-slot,
+.m-cover.weekly-artist-art .artwork-slot{
   position:absolute!important;
   inset:0!important;
   width:100%!important;
@@ -2286,9 +2291,8 @@ html.dark .sk{
   overflow:hidden!important;
   background:transparent!important;
 }
-
-.cover.one.weekly-artist-art .artwork-slot img,
-.m-cover.one.weekly-artist-art .artwork-slot img{
+.cover.weekly-artist-art .artwork-slot img,
+.m-cover.weekly-artist-art .artwork-slot img{
   position:absolute!important;
   left:50%!important;
   top:50%!important;
@@ -2300,6 +2304,37 @@ html.dark .sk{
   object-fit:cover!important;
   object-position:center center!important;
   border-radius:0!important;
+}
+.cover.weekly-artist-art::after,
+.m-cover.weekly-artist-art::after{
+  content:none!important;
+  display:none!important;
+}
+@media(min-width:768px){
+  .cover.weekly-artist-art{
+    width:88px!important;
+    height:88px!important;
+    flex:0 0 88px!important;
+  }
+  .cover.weekly-artist-art.artist-one{
+    width:104px!important;
+    height:104px!important;
+    flex:0 0 104px!important;
+    box-shadow:0 0 0 4px var(--accent)!important;
+  }
+}
+@media(max-width:767px){
+  .m-cover.weekly-artist-art{
+    width:72px!important;
+    height:72px!important;
+    flex:0 0 72px!important;
+  }
+  .m-cover.weekly-artist-art.artist-one{
+    width:72px!important;
+    height:72px!important;
+    flex:0 0 72px!important;
+    box-shadow:0 0 0 3px var(--accent)!important;
+  }
 }
 </style>
 
@@ -3027,7 +3062,10 @@ async function playEntry(e,btn){
 
 function coverHtml(e,one,mobile=false){
   const kind=charts[state.active].kind;
-  const cls=(mobile?(one?'m-cover one':'m-cover'):(one?'cover one':'cover'))+(kind==='artist'?' weekly-artist-art':'');
+  const isArtist=kind==='artist';
+  const cls=mobile
+    ? 'm-cover'+((!isArtist&&one)?' one':'')+(isArtist?' weekly-artist-art':'')+((isArtist&&one)?' artist-one':'')
+    : 'cover'+((!isArtist&&one)?' one':'')+(isArtist?' weekly-artist-art':'')+((isArtist&&one)?' artist-one':'');
   const icon=kind==='artist'?'fa-user':kind==='album'?'fa-compact-disc':'fa-music';
   const play=(!mobile&&kind==='song')
     ? '<button class="cover-play play" data-entry="'+esc(itemKey(e))+'" aria-label="Play preview"><i class="fas fa-play"></i></button>'
@@ -3303,6 +3341,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260927-artist-number1-clean-30"></script>
+<script src="/portal.js?v=20260927-artist-parity-31"></script>
 </body>
 </html>
