@@ -3589,3 +3589,27 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   object-position:center center!important;
   border-radius:0!important;
 }
+
+/* === PORTAL SKELETON v26 === */
+.portal-skeleton-wrap{max-width:960px;margin:0 auto;padding:24px 16px 56px}
+.portal-sk-heading{width:min(420px,72%);height:42px;margin:8px auto 24px}
+.portal-sk-control{width:min(520px,84%);height:52px;margin:0 auto 28px}
+.portal-sk-list{display:flex;flex-direction:column;gap:10px}
+.portal-sk-card{display:grid;grid-template-columns:44px 88px minmax(0,1fr) 36px;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);background:var(--card);min-height:112px}
+.portal-sk-rank{width:28px;height:28px;justify-self:center}
+.portal-sk-art{width:88px;height:88px}
+.portal-sk-art.circle{border-radius:50%}
+.portal-sk-copy{min-width:0}
+.portal-sk-title{width:68%;height:18px}
+.portal-sk-sub{width:44%;height:12px;margin-top:8px}
+.portal-sk-action{width:32px;height:32px;border-radius:50%}
+@media(max-width:767px){
+  .portal-skeleton-wrap{padding:16px 12px 48px}
+  .portal-sk-heading{height:30px;margin-bottom:18px}
+  .portal-sk-control{height:44px;margin-bottom:20px}
+  .portal-sk-card{grid-template-columns:30px 64px minmax(0,1fr) 32px;gap:8px;min-height:84px;padding:8px}
+  .portal-sk-art{width:64px;height:64px}
+  .portal-sk-art.circle{width:72px;height:72px}
+  .portal-sk-title{width:78%;height:14px}
+  .portal-sk-sub{width:52%;height:10px;margin-top:6px}
+}
