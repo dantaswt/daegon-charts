@@ -361,12 +361,17 @@ async function renderHome(){
   setMode(true);portalEl.innerHTML=shellHtml(main,true);setMeta('Daegon Charts','Weekly music charts, year-end rankings and greatest of all time lists.','/');
   bindLinks();hydratePortalImages();bindHomeSidebar();
 
-  let active='songs',timer=null;
+  let active='songs';
   const bindTabs=()=>{
-    portalEl.querySelectorAll('[data-home-tab]').forEach(btn=>btn.onclick=()=>{active=btn.dataset.homeTab;document.getElementById('refTopCharts').innerHTML=topSection(active);bindLinks();hydratePortalImages();bindTabs();if(timer)clearInterval(timer);timer=setInterval(rotate,10000)});
+    portalEl.querySelectorAll('[data-home-tab]').forEach(btn=>btn.onclick=()=>{
+      active=btn.dataset.homeTab;
+      document.getElementById('refTopCharts').innerHTML=topSection(active);
+      bindLinks();
+      hydratePortalImages();
+      bindTabs();
+    });
   };
-  const rotate=()=>{const order=['songs','albums','artists'];active=order[(order.indexOf(active)+1)%order.length];document.getElementById('refTopCharts').innerHTML=topSection(active);bindLinks();hydratePortalImages();bindTabs()};
-  bindTabs();timer=setInterval(rotate,4000);
+  bindTabs();
 
   const on=document.getElementById('refOnThisWeek');
   if(on){
