@@ -3689,3 +3689,50 @@ body.portal-mode .page > #weeklyView{
 body:not(.portal-mode) #portalPage{
   display:none!important;
 }
+
+
+/* === GLOBAL ARTIST PORTRAIT PARITY v44 ===
+   Match the proven Weekly Artists crop everywhere in the portal. */
+[data-portal-image][data-kind="artist"]{
+  position:relative!important;
+  overflow:hidden!important;
+  border-radius:50%!important;
+  background:transparent!important;
+  box-sizing:border-box!important;
+}
+[data-portal-image][data-kind="artist"] > img{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:134%!important;
+  height:134%!important;
+  min-width:0!important;
+  min-height:0!important;
+  max-width:none!important;
+  max-height:none!important;
+  transform:translate(-50%,-50%)!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  border-radius:0!important;
+}
+
+/* refThumb has a global 56px flex-basis; inside dedicated artist frames
+   it must fill the frame instead of becoming a narrow capsule. */
+.exact-art.exact-artist-art > [data-portal-image][data-kind="artist"],
+.exact-mobile-art.exact-artist-art > [data-portal-image][data-kind="artist"],
+.ref-first-art > [data-portal-image][data-kind="artist"],
+.ref-beat-art > [data-portal-image][data-kind="artist"]{
+  width:100%!important;
+  height:100%!important;
+  min-width:100%!important;
+  min-height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  flex:0 0 100%!important;
+}
+
+/* Every artist-specific avatar frame stays circular, regardless of section. */
+.ref-thumb.ref-thumb-round,
+.ref-battle-avatar[data-kind="artist"]{
+  border-radius:50%!important;
+}
