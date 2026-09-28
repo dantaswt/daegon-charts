@@ -3522,10 +3522,17 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
   position:relative!important;
   width:100%!important;
   height:100%!important;
+  min-width:100%!important;
+  min-height:100%!important;
+  max-width:100%!important;
+  max-height:100%!important;
+  flex:0 0 100%!important;
   aspect-ratio:1/1!important;
   overflow:hidden!important;
   border-radius:50%!important;
+  border:0!important;
   background:transparent!important;
+  box-sizing:border-box!important;
 }
 .exact-art.exact-artist-art .ref-thumb img,
 .exact-mobile-art.exact-artist-art .ref-thumb img{
