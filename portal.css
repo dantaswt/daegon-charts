@@ -2387,3 +2387,147 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
     display:none!important;
   }
 }
+
+/* === ORIGINAL DAEGONCHARTS ROUTE PORT v7 === */
+.orig-page{max-width:1024px;margin:0 auto;padding:0 24px 64px}
+.orig-hero{position:relative;text-align:center;padding:40px 0 56px;margin-bottom:32px;overflow:hidden}
+.orig-hero-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;user-select:none;font-size:5rem;font-weight:900;color:var(--foreground);opacity:.06;text-transform:uppercase;letter-spacing:-.05em;line-height:1;white-space:nowrap}
+.orig-hero h1{position:relative;z-index:1;margin:0;color:var(--accent);font-size:4.5rem;line-height:1;font-weight:900;text-transform:uppercase;letter-spacing:-.03em}
+.orig-hero p{position:relative;z-index:1;margin:12px 0 0;color:var(--muted-foreground);font-size:16px}
+.orig-period-control{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:32px}
+.orig-period-label,.orig-eyebrow{font-size:12px;color:var(--muted-foreground);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.orig-period-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px}
+.orig-select-wrap{position:relative}
+.orig-select-btn{min-width:160px;min-height:44px;padding:8px 16px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+.orig-select-menu{display:none;position:absolute;left:0;right:0;top:100%;z-index:100;background:var(--card);border:1px solid var(--border);max-height:300px;overflow-y:auto}
+.orig-select-menu.open{display:block}
+.orig-select-menu button{display:block;width:100%;padding:8px 16px;border:0;border-bottom:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:14px;font-weight:800;text-align:center}
+.orig-select-menu button.active{background:var(--accent);color:#000}
+.orig-select-menu button:hover{background:var(--muted)}
+.orig-top5{margin-bottom:40px}
+.orig-top5 h2,.orig-chart-grid-section h2{margin:0 0 16px;font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:-.02em;text-align:center}
+.orig-top5-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;justify-content:center;align-items:flex-start}
+.orig-top5-card{width:140px;flex:0 0 140px;min-width:0}
+.orig-top5-card.lead{width:220px;flex-basis:220px}
+.orig-top5-art{position:relative;width:100%;aspect-ratio:1/1;margin-bottom:8px;overflow:hidden;background:var(--muted)}
+.orig-top5-art .ref-thumb{width:100%!important;height:100%!important;border:0!important}
+.orig-top5-art .ref-thumb img{width:100%;height:100%;object-fit:cover}
+.orig-rank{position:absolute;left:0;bottom:0;width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--accent);color:#000;font-size:14px;font-weight:900}
+.orig-top5-title{font-size:14px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orig-top5-title a{color:inherit;text-decoration:none}
+.orig-top5-title a:hover{color:var(--accent);text-decoration:underline}
+.orig-top5-artist{margin-top:2px;font-size:12px;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orig-view-wrap{display:flex;justify-content:center;margin-top:16px}
+.orig-view{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:34px;padding:7px 12px;border:1px solid var(--border);background:transparent;color:var(--foreground);text-decoration:none;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.orig-view:hover{border-color:var(--accent);color:var(--accent)}
+.orig-chart-grid-section{margin-bottom:40px}
+.orig-chart-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;max-width:768px;margin:0 auto;justify-items:stretch}
+.orig-chart-link{display:flex;align-items:center;justify-content:center;min-height:72px;padding:16px;border:1px solid var(--border);background:var(--card);color:var(--foreground);text-align:center;text-decoration:none;font-size:14px;font-weight:800;text-transform:uppercase;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.orig-chart-link:hover{border-color:var(--accent);color:var(--accent)}
+
+.orig-stats-page{max-width:1152px;margin:0 auto;padding:0 24px 64px}
+.orig-stats-tools{position:sticky;top:68px;z-index:40;display:flex;gap:12px;align-items:center;margin:0 -24px 24px;padding:12px 24px;background:var(--background);border-bottom:1px solid var(--border)}
+.orig-stats-tools select{min-height:42px;padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--foreground);font-size:14px;font-weight:700}
+.orig-overview{margin-bottom:32px}
+.orig-eyebrow{margin-bottom:12px}
+.orig-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.orig-summary-card{padding:16px;border:1px solid var(--border);background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.orig-summary-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--muted-foreground)}
+.orig-summary-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--muted);color:var(--accent)}
+.orig-summary-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orig-summary-artist{font-size:12px;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orig-summary-value{margin-top:8px;font-size:18px;font-weight:900;color:var(--accent)}
+.orig-record-list{display:flex;flex-direction:column;gap:10px}
+.orig-record-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--border);background:var(--card);transition:.15s}
+.orig-record-row:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.orig-record-rank{width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex:0 0 36px;background:var(--muted);font-size:14px;font-weight:900}
+.orig-record-rank.top{background:var(--accent);color:#000}
+.orig-record-row .ref-thumb{width:56px;height:56px;flex:0 0 56px}
+.orig-record-main{min-width:0;flex:1}
+.orig-record-name{font-size:14px;font-weight:800}
+.orig-record-name a{color:inherit;text-decoration:none}
+.orig-record-name a:hover{color:var(--accent)}
+.orig-record-artist{font-size:12px;color:var(--muted-foreground);margin-top:2px}
+.orig-record-value{text-align:right;font-size:18px;font-weight:900;color:var(--accent);white-space:nowrap}
+.orig-record-value small{display:block;font-size:10px;font-weight:500;color:var(--muted-foreground)}
+
+.orig-beat-layout{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;width:100%;padding-bottom:64px}
+.orig-beat-side{position:sticky;top:92px;align-self:start}
+.orig-beat-side>h2{margin:0 0 12px;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-foreground)}
+.orig-beat-side>h3{margin:20px 0 8px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-foreground)}
+.orig-beat-charts{display:flex;flex-direction:column;gap:4px}
+.orig-beat-charts button{min-height:38px;padding:8px 12px;border:1px solid var(--border);background:var(--card);color:var(--foreground);text-align:left;font-size:12px;font-weight:700}
+.orig-beat-charts button i{width:20px;margin-right:8px;color:var(--accent)}
+.orig-beat-charts button.active{background:var(--accent);color:#000;border-color:var(--accent)}
+.orig-beat-charts button.active i{color:#000}
+.orig-beat-weeks{max-height:50vh;overflow-y:auto;display:flex;flex-direction:column;gap:2px;padding-right:4px}
+.orig-beat-weeks button{padding:6px 8px;border:0;background:transparent;color:var(--muted-foreground);font-size:12px;text-align:left}
+.orig-beat-weeks button:hover{color:var(--accent);background:rgba(255,255,255,.03)}
+.orig-beat-weeks button.active{background:var(--accent);color:#000;font-weight:800}
+.orig-beat-title{text-align:left;margin-bottom:16px}
+.orig-beat-title h1{margin:0;font-size:36px;font-weight:900;text-transform:uppercase}
+.orig-beat-title p{margin:4px 0 0;color:var(--muted-foreground);font-size:14px}
+.orig-beat-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.orig-beat-article{border-top:1px solid var(--border);padding-top:24px;max-width:780px}
+.orig-beat-article h2{font-size:26px;margin:0 0 12px}
+.orig-beat-article h3{font-size:17px;margin:28px 0 8px}
+.orig-beat-article p{font-size:15px;line-height:1.75;color:var(--muted-foreground);margin:0 0 12px}
+.orig-beat-article strong{color:var(--foreground)}
+
+.orig-awards{min-height:70vh}
+.orig-awards-bar{border-bottom:2px solid var(--accent);background:var(--card);max-width:100%;padding:16px max(16px,calc((100% - 1152px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.orig-awards-logo{display:flex;align-items:center;gap:12px;color:var(--foreground);text-decoration:none}
+.orig-awards-logo i{color:var(--accent);font-size:18px}
+.orig-awards-logo span{font-family:"Times New Roman",serif;font-size:20px;font-weight:700;letter-spacing:.08em}
+.orig-awards-bar nav{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.orig-awards-bar nav a{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--muted-foreground);text-decoration:none}
+.orig-awards-bar nav a.active,.orig-awards-bar nav a:hover{color:var(--accent)}
+.orig-awards-search{position:relative}
+.orig-awards-search input{width:192px;padding:8px 12px 8px 40px;border:1px solid var(--border);background:var(--background);color:var(--foreground);font-size:14px}
+.orig-awards-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted-foreground)}
+.orig-awards-body{max-width:1152px;margin:0 auto;padding:32px 16px}
+.orig-awards-intro{text-align:center;margin-bottom:40px}
+.orig-awards-intro h2{font-family:"Times New Roman",serif;font-size:30px;margin:0 0 12px}
+.orig-awards-intro p{max-width:576px;margin:0 auto;color:var(--muted-foreground);line-height:1.6}
+.orig-editions{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+.orig-editions button{padding:24px;border:2px solid var(--accent);background:var(--card);color:var(--foreground);text-align:center;transition:.2s}
+.orig-editions button:hover{background:var(--accent);color:#000}
+.orig-editions strong{display:block;font-family:"Times New Roman",serif;font-size:30px;color:var(--accent)}
+.orig-editions button:hover strong{color:#000}
+.orig-editions span{display:block;margin-top:4px;font-size:12px;font-weight:700;letter-spacing:.12em}
+.orig-award-winners{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.orig-award-winners section{border:1px solid var(--border);background:var(--card);padding:16px}
+.orig-award-winners h3{margin:0 0 12px;font-size:14px;text-transform:uppercase}
+
+@media(max-width:900px){
+  .orig-chart-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .orig-beat-layout{grid-template-columns:1fr}
+  .orig-beat-side{position:static}
+  .orig-beat-weeks{max-height:220px}
+  .orig-editions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .orig-award-winners{grid-template-columns:1fr}
+}
+@media(max-width:767px){
+  .orig-page,.orig-stats-page{padding:0 12px 48px}
+  .orig-hero{padding:40px 0 56px;margin-bottom:16px}
+  .orig-hero-bg{font-size:2.5rem}
+  .orig-hero h1{font-size:3rem}
+  .orig-hero p{font-size:14px}
+  .orig-top5 h2,.orig-chart-grid-section h2{font-size:20px}
+  .orig-top5-row{justify-content:flex-start}
+  .orig-chart-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .orig-summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .orig-stats-tools{top:62px;margin:0 -12px 20px;padding:12px;flex-direction:column;align-items:stretch}
+  .orig-stats-tools select{width:100%}
+  .orig-record-row{padding:10px 12px;gap:10px}
+  .orig-record-row .ref-thumb{width:48px;height:48px;flex-basis:48px}
+  .orig-record-value{font-size:15px}
+  .orig-beat-layout{padding:0 4px 48px}
+  .orig-beat-title{text-align:center}
+  .orig-beat-title h1{font-size:28px}
+  .orig-beat-actions{justify-content:center}
+  .orig-editions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .orig-awards-bar{padding:14px 16px}
+  .orig-awards-bar nav{order:3;width:100%;gap:14px}
+  .orig-awards-search{display:none}
+}
