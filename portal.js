@@ -181,9 +181,22 @@ function setMode(portal){
     portalEl.setAttribute('hidden','');
   }
 }
+function portalSkeleton(title='Loading'){
+  const cards=Array.from({length:7},(_,i)=>'<div class="portal-sk-card">'+
+    '<div class="portal-sk-rank sk"></div>'+
+    '<div class="portal-sk-art sk '+(/artist/i.test(title)?'circle':'')+'"></div>'+
+    '<div class="portal-sk-copy"><div class="portal-sk-title sk"></div><div class="portal-sk-sub sk"></div></div>'+
+    '<div class="portal-sk-action sk"></div>'+
+  '</div>').join('');
+  return '<div class="portal-skeleton-wrap" aria-hidden="true">'+
+    '<div class="portal-sk-heading sk"></div>'+
+    '<div class="portal-sk-control sk"></div>'+
+    '<div class="portal-sk-list">'+cards+'</div>'+
+  '</div>';
+}
 function loading(title='Loading'){
   setMode(true);
-  portalEl.innerHTML='<div class="portal-hero"><div class="portal-kicker">Daegon Charts</div><h1 class="portal-title">'+esc(title)+'</h1><p class="portal-subtitle">Loading chart archive…</p></div><div class="loader-wrap"><div class="loader"></div></div>';
+  portalEl.innerHTML=portalSkeleton(title);
 }
 function setMeta(title,desc,path){
   document.title=title+' | Daegon Charts';
