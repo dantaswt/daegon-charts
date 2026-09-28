@@ -6,10 +6,10 @@ const mainChartIds={song:'songs',album:'albums',artist:'artists'};
 const periodLimits={songs:100,albums:100,artists:50};
 const PORTAL_SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
 const officialYearEnd={
-  yearEndSongs:{gid:'530686468',kind:'song',title:'Hot 100',weeklyId:'songs'},
-  yearEndArtists:{gid:'1597569311',kind:'artist',title:'Artist 50',weeklyId:'artists'},
-  yearEndAlbums:{gid:'897935603',kind:'album',title:'Top 100 Albums',weeklyId:'albums'},
-  yearEndRadio:{gid:'982271206',kind:'song',title:'Radio Songs',weeklyId:'radioSongs'},
+  yearEndSongs:{kind:'song',title:'Hot 100',weeklyId:'songs'},
+  yearEndArtists:{kind:'artist',title:'Artist 50',weeklyId:'artists'},
+  yearEndAlbums:{kind:'album',title:'Top 100 Albums',weeklyId:'albums'},
+  yearEndRadio:{kind:'song',title:'Radio Songs',weeklyId:'radioSongs'},
   yearEndStreamingSongs:{kind:'song',title:'Streaming Songs',weeklyId:'streamingSongs'},
   yearEndTopStreamingAlbums:{kind:'album',title:'Top Streaming Albums',weeklyId:'topStreamingAlbums'},
   yearEndTopAlbumSales:{kind:'album',title:'Top Album Sales',weeklyId:'topAlbumSales'},
@@ -24,10 +24,10 @@ const officialYearEnd={
   yecTopLatinAlbums:{kind:'album',title:'Top Latin Albums',weeklyId:'albums'}
 };
 const officialGoat={
-  goatSongs:{gid:'1157278896',kind:'song',title:'Greatest of All Time Songs',weeklyId:'songs'},
-  goatArtists:{gid:'222299678',kind:'artist',title:'Greatest of All Time Artists',weeklyId:'artists'},
-  goatAlbums:{gid:'1548244755',kind:'album',title:'Greatest of All Time Albums',weeklyId:'albums'},
-  goatRadio:{gid:'1447340097',kind:'song',title:'Greatest of All Time Radio',weeklyId:'radioSongs'}
+  goatSongs:{kind:'song',title:'Greatest of All Time Songs',weeklyId:'songs'},
+  goatArtists:{kind:'artist',title:'Greatest of All Time Artists',weeklyId:'artists'},
+  goatAlbums:{kind:'album',title:'Greatest of All Time Albums',weeklyId:'albums'},
+  goatRadio:{kind:'song',title:'Greatest of All Time Radio',weeklyId:'radioSongs'}
 };
 const exactYearEndIds=['yearEndSongs','yearEndArtists','yearEndAlbums','yearEndRadio','yearEndDigitalSongsSales','yearEndStreamingSongs','yearEndTopAlbumSales','yearEndTopStreamingAlbums','yecHot100Artists','yecArtist50Female','yecArtist50Male','yecArtist50DuoGroup','yearEndNewArtists','yecTop100AlbumsArtists','yecRadioSongsArtists'];
 const exactGoatIds=['goatSongs','goatArtists','goatAlbums','goatRadio'];
@@ -102,44 +102,6 @@ async function fetchCsv(url){
   return text.trim().split(/\r?\n/).filter(Boolean).map(parseLine);
 }
 
-async function loadOfficialRanking(cfg,{yearly=false}={}){
-  const rows=await fetchCsv(PORTAL_SHEET+cfg.gid);
-  if(!rows?.length)return yearly?{years:[],entriesByYear:{}}:{entries:[]};
-  const header=rows[0];
-  const idx={
-    year:pFind(header,['year','ano']),
-    pos:pFind(header,['position','rank','pos']),
-    song:pFind(header,['song','title','track']),
-    album:pFind(header,['album']),
-    artist:pFind(header,['artist','artists']),
-    peak:pFind(header,['peak']),
-    weeks:pFind(header,['weeks','wks']),
-    units:pFind(header,['units','points','sales','streams','audience']),
-    total:pFind(header,['total units','total'])
-  };
-  const nameIdx=cfg.kind==='artist'?idx.artist:cfg.kind==='album'?idx.album:idx.song;
-  const parseRow=r=>({
-    position:pInt(r[idx.pos]),
-    name:String(r[nameIdx]??'').trim(),
-    artist:String(r[idx.artist]??'').trim(),
-    peak:pInt(r[idx.peak]),
-    weeks:pInt(r[idx.weeks]),
-    units:idx.units>=0?String(r[idx.units]??'').trim():'',
-    totalUnits:idx.total>=0?String(r[idx.total]??'').trim():''
-  });
-  if(yearly){
-    const entriesByYear={};
-    for(const r of rows.slice(1)){
-      const year=String(r[idx.year]??'').trim(),e=parseRow(r);
-      if(!year||!e.position||!e.name)continue;
-      (entriesByYear[year]??=[]).push(e);
-    }
-    for(const y of Object.keys(entriesByYear))entriesByYear[y].sort((a,b)=>a.position-b.position);
-    return {years:Object.keys(entriesByYear).sort((a,b)=>Number(b)-Number(a)),entriesByYear};
-  }
-  const entries=rows.slice(1).map(parseRow).filter(e=>e.position&&e.name).sort((a,b)=>a.position-b.position);
-  return {entries};
-}
 
 function ensureShell(){
   weeklyEl=document.querySelector('.layout');
@@ -505,29 +467,41 @@ async function renderDetail(kind,slug){
 
 
 
+const generatedYecCache=new Map();
+const generatedGoatCache=new Map();
 function metricNumber(v){return toInt(String(v??'0'))}
 async function computeYearEndExact(weeklyId){
-  const chartData=await loadWeekly(weeklyId);
-  const years={};
-  const metricKey=weeklyId==='songs'?'points':(weeklyId==='streamingSongs'||weeklyId==='topStreamingAlbums')?'streams':weeklyId==='radioSongs'?'audience':(weeklyId==='topAlbumSales'||weeklyId==='digitalSongsSales')?'sales':'units';
-  const seenGlobal=new Set();
-  for(const date of chartData.dates){
-    const year=date.slice(0,4); if(!years[year])years[year]={};
-    for(const e of chartData.entriesByDate[date]||[]){
-      const key=(e.name+'||'+e.artist).toLowerCase();
-      if(!years[year][key])years[year][key]={position:0,name:e.name,artist:e.artist,peak:e.peak||e.position,weeks:0,weeksAt1:0,totalUnits:0,kind:chartData.kind};
-      const x=years[year][key];
-      x.weeks++; x.peak=Math.min(x.peak||999,e.peak||e.position||999); x.weeksAt1+=(e.weeksAt1||0);
-      const first=!seenGlobal.has(key);seenGlobal.add(key);
-      if(first&&weeklyId==='topStreamingAlbums'&&e.totalStreams)x.totalUnits+=metricNumber(e.totalStreams);
-      else x.totalUnits+=metricNumber(e[metricKey]??e.units??0);
+  if(generatedYecCache.has(weeklyId))return generatedYecCache.get(weeklyId);
+  const job=(async()=>{
+    const chartData=await loadWeekly(weeklyId);
+    const years={};
+    const metricKey=weeklyId==='songs'?'points':(weeklyId==='streamingSongs'||weeklyId==='topStreamingAlbums')?'streams':weeklyId==='radioSongs'?'audience':(weeklyId==='topAlbumSales'||weeklyId==='digitalSongsSales')?'sales':'units';
+    const seenGlobal=new Set();
+    for(const date of chartData.dates){
+      const year=date.slice(0,4); if(!years[year])years[year]={};
+      for(const e of chartData.entriesByDate[date]||[]){
+        const key=(e.name+'||'+e.artist).toLowerCase();
+        if(!years[year][key])years[year][key]={position:0,name:e.name,artist:e.artist,peak:e.peak||e.position,weeks:0,weeksAt1:0,totalUnits:0,kind:chartData.kind};
+        const x=years[year][key];
+        x.weeks++;
+        x.peak=Math.min(x.peak||999,e.peak||e.position||999);
+        x.weeksAt1+=(e.weeksAt1||0);
+        const first=!seenGlobal.has(key);seenGlobal.add(key);
+        if(first&&weeklyId==='topStreamingAlbums'&&e.totalStreams)x.totalUnits+=metricNumber(e.totalStreams);
+        else x.totalUnits+=metricNumber(e[metricKey]??e.units??0);
+      }
     }
-  }
-  const entriesByYear={};
-  for(const [year,obj] of Object.entries(years)){
-    entriesByYear[year]=Object.values(obj).sort((a,b)=>b.totalUnits-a.totalUnits||a.peak-b.peak).slice(0,100).map((e,i)=>({...e,position:i+1}));
-  }
-  return {years:Object.keys(entriesByYear).sort().reverse(),entriesByYear,kind:chartData.kind,title:charts[weeklyId]?.title||weeklyId};
+    const entriesByYear={};
+    for(const [year,obj] of Object.entries(years)){
+      entriesByYear[year]=Object.values(obj)
+        .sort((a,b)=>b.totalUnits-a.totalUnits||a.peak-b.peak)
+        .slice(0,100)
+        .map((e,i)=>({...e,position:i+1}));
+    }
+    return {years:Object.keys(entriesByYear).sort().reverse(),entriesByYear,kind:chartData.kind,title:charts[weeklyId]?.title||weeklyId};
+  })();
+  generatedYecCache.set(weeklyId,job);
+  try{return await job}catch(err){generatedYecCache.delete(weeklyId);throw err}
 }
 async function computeArtistAggregateExact(weeklyId,title,metricField){
   const chartData=await loadWeekly(weeklyId),years={};
@@ -582,12 +556,21 @@ async function computeNewArtistsExact(){
 }
 const LATIN_PATTERNS=['latin','reggaeton','urbano','latin urban','latin trap','salsa','bachata','merengue','cumbia','reggae en espanol','latin hip hop','latin rock','latin alternative','latin metal','bossa nova','mpb','forró','forro','sertanejo','pagode','funk','brega','axé','piseiro','pisadinha','spanish pop','spanish rock','spanish hip hop','brazilian pop','brazilian rock','brazilian hip hop','brazilian funk','portuguese pop','portuguese rock','tropical','tropipop','vallenato','grupero','norteño','banda','corrido','ranchera','mariachi','kizomba','kuduro'];
 async function computeLatinYecExact(){
-  const [yec,rows]=await Promise.all([computeYearEndExact('albums'),fetchCsv(PORTAL_SHEET+'1618822736')]);
-  const h=rows[0]||[],ai=pFind(h,['artist']),bi=pFind(h,['album']),gi=pFind(h,['genre']),g2i=pFind(h,['genre 2']),latin=new Set();
-  for(const r of rows.slice(1)){const a=String(r[ai]||'').trim(),al=String(r[bi]||'').trim(),g=(String(r[gi]||'')+' '+String(r[g2i]||'')).toLowerCase();if(a&&al&&LATIN_PATTERNS.some(k=>g.includes(k)))latin.add((al+'||'+a).toLowerCase())}
-  const entriesByYear={};
-  for(const y of yec.years)entriesByYear[y]=(yec.entriesByYear[y]||[]).filter(e=>latin.has((e.name+'||'+e.artist).toLowerCase())).slice(0,25).map((e,i)=>({...e,position:i+1}));
-  return {years:yec.years,entriesByYear,kind:'album',title:'Top Latin Albums'};
+  const yec=await computeYearEndExact('albums');
+  try{
+    const rows=await fetchCsv(PORTAL_SHEET+'1618822736');
+    const h=rows[0]||[],ai=pFind(h,['artist']),bi=pFind(h,['album']),gi=pFind(h,['genre']),g2i=pFind(h,['genre 2']),latin=new Set();
+    for(const r of rows.slice(1)){
+      const a=String(r[ai]||'').trim(),al=String(r[bi]||'').trim(),g=(String(r[gi]||'')+' '+String(r[g2i]||'')).toLowerCase();
+      if(a&&al&&LATIN_PATTERNS.some(k=>g.includes(k)))latin.add((al+'||'+a).toLowerCase());
+    }
+    const entriesByYear={};
+    for(const y of yec.years)entriesByYear[y]=(yec.entriesByYear[y]||[]).filter(e=>latin.has((e.name+'||'+e.artist).toLowerCase())).slice(0,25).map((e,i)=>({...e,position:i+1}));
+    return {years:yec.years,entriesByYear,kind:'album',title:'Top Latin Albums'};
+  }catch(err){
+    console.warn('Latin genre lookup failed',err);
+    return {years:yec.years,entriesByYear:Object.fromEntries(yec.years.map(y=>[y,[]])),kind:'album',title:'Top Latin Albums'};
+  }
 }
 async function loadYecExact(chartId){
   if(chartId==='yecHot100Artists')return computeArtistAggregateExact('songs','Hot 100 — Artists','points');
@@ -602,19 +585,37 @@ async function loadYecExact(chartId){
   return computeYearEndExact(cfg.weeklyId);
 }
 async function computeGoatExact(chartId){
-  const cfg=officialGoat[chartId]||officialGoat.goatSongs;
-  const weeklyId=cfg.weeklyId;
-  const data=await loadWeekly(weeklyId);
-  const aggregated={};
-  for(const date of data.dates){
-    for(const e of data.entriesByDate[date]||[]){
-      const key=(e.name+'||'+e.artist).toLowerCase();
-      if(!aggregated[key])aggregated[key]={position:0,name:e.name,artist:e.artist,peak:e.peak||e.position,weeks:0,weeksAt1:0,totalUnits:0,totalStreams:0,totalSales:0,totalAudience:0,totalPoints:0,kind:cfg.kind};
-      const x=aggregated[key];x.weeks++;x.peak=Math.min(x.peak||999,e.peak||e.position||999);x.weeksAt1+=(e.weeksAt1||0);x.totalUnits+=metricNumber(e.units);x.totalStreams+=metricNumber(e.streams);x.totalSales+=metricNumber(e.sales);x.totalAudience+=metricNumber(e.audience);x.totalPoints+=metricNumber(e.points);
+  if(generatedGoatCache.has(chartId))return generatedGoatCache.get(chartId);
+  const job=(async()=>{
+    const cfg=officialGoat[chartId]||officialGoat.goatSongs;
+    const data=await loadWeekly(cfg.weeklyId);
+    const aggregated={};
+    for(const date of data.dates){
+      for(const e of data.entriesByDate[date]||[]){
+        const key=(e.name+'||'+e.artist).toLowerCase();
+        if(!aggregated[key])aggregated[key]={
+          position:0,name:e.name,artist:e.artist,peak:e.peak||e.position,weeks:0,weeksAt1:0,
+          totalUnits:0,totalStreams:0,totalSales:0,totalAudience:0,totalPoints:0,kind:cfg.kind
+        };
+        const x=aggregated[key];
+        x.weeks++;
+        x.peak=Math.min(x.peak||999,e.peak||e.position||999);
+        x.weeksAt1+=(e.weeksAt1||0);
+        x.totalUnits+=metricNumber(e.units);
+        x.totalStreams+=metricNumber(e.streams);
+        x.totalSales+=metricNumber(e.sales);
+        x.totalAudience+=metricNumber(e.audience);
+        x.totalPoints+=metricNumber(e.points);
+      }
     }
-  }
-  const entries=Object.values(aggregated).sort((a,b)=>b.weeks-a.weeks||a.peak-b.peak).slice(0,500).map((e,i)=>({...e,position:i+1}));
-  return {entries,kind:cfg.kind,title:cfg.title};
+    const entries=Object.values(aggregated)
+      .sort((a,b)=>b.weeks-a.weeks||a.peak-b.peak)
+      .slice(0,500)
+      .map((e,i)=>({...e,position:i+1}));
+    return {entries,kind:cfg.kind,title:cfg.title};
+  })();
+  generatedGoatCache.set(chartId,job);
+  try{return await job}catch(err){generatedGoatCache.delete(chartId);throw err}
 }
 
 function originalHero(bg,title,subtitle){
@@ -639,9 +640,13 @@ function originalYearControls(label,values,selected,onKey){
 }
 async function renderYearEndIndex(){
   loading('Year-End Charts');
-  const [songs,albums,artists,latin]=await Promise.all([
-    loadYecExact('yearEndSongs'),loadYecExact('yearEndAlbums'),loadYecExact('yearEndArtists'),loadYecExact('yecTopLatinAlbums')
+  const [songs,albums,artists]=await Promise.all([
+    loadYecExact('yearEndSongs'),
+    loadYecExact('yearEndAlbums'),
+    loadYecExact('yearEndArtists')
   ]);
+  let latin={years:[],entriesByYear:{},kind:'album',title:'Top Latin Albums'};
+  try{latin=await loadYecExact('yecTopLatinAlbums')}catch(err){console.warn('Top Latin Albums unavailable',err)}
   const allYears=songs.years||[];
   const years=allYears.filter(y=>y!=='2026');
   let selected=new URLSearchParams(location.search).get('year')||(years.includes('2025')?'2025':years[0]||'');
