@@ -4168,3 +4168,9 @@ body:not(.portal-mode) #portalPage{
     height:72px!important;
   }
 }
+
+/* === DECADE GRID LABEL CENTER v52 === */
+.orig-chart-grid a{
+  text-align:center!important;
+  justify-content:center!important;
+}
