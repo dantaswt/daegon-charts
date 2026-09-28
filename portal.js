@@ -767,27 +767,114 @@ async function renderStats(){
 
 async function renderPeriod(type,chartSeg){
   if(type!=='year')return renderDecadeDetailExact(chartSeg);
+
   const cfg=officialYearEnd[chartSeg]||officialYearEnd.yearEndSongs;
   loading('Year-End');
+
   const data=await loadYecExact(chartSeg);
   const years=(data.years||[]).filter(y=>y!=='2026');
   let selected=new URLSearchParams(location.search).get('year')||(years.includes('2025')?'2025':years[0]||'');
   if(!years.includes(selected))selected=years[0]||selected;
-  const arr=data.entriesByYear[selected]||[],kind=data.kind||cfg.kind,path='/year-end/'+chartSeg;
-  const sideIds=exactYearEndIds;
-  const listHtml=arr.map((e,i)=>{
-    const pos=e.position||i+1,isFirst=pos===1;
-    return '<div class="orig-period-card '+(isFirst?'first':'')+'"><div class="orig-period-rank '+(isFirst?'first':'')+'">'+pos+'</div><div class="orig-period-art '+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div><div class="orig-period-entry"><div class="orig-period-name">'+entityLink(e,kind)+'</div>'+(kind!=='artist'?'<div class="orig-period-artist">'+esc(e.artist||'')+'</div>':'')+'</div><button class="orig-period-more" data-period-detail="'+i+'" aria-label="Toggle details"><i class="fas fa-plus"></i></button><div class="orig-period-details" data-period-panel="'+i+'"><div><span>'+(kind==='artist'?'Entries':'Peak')+'</span><strong>'+(kind==='artist'?(e.entries||1):'#'+(e.peak||pos))+'</strong></div><div><span>Weeks</span><strong>'+(e.weeks||'—')+'</strong></div><div><span>Units</span><strong>'+fmtNum(e.totalUnits||0)+'</strong></div></div></div>';
-  }).join('');
-  const main='<div class="orig-period-layout"><aside class="orig-period-side"><div class="orig-period-side-links">'+sideIds.map(id=>'<a href="'+appHref('/year-end/'+id)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(officialYearEnd[id]?.title||id)+'</a>').join('')+'</div><a class="orig-period-back" href="'+appHref('/year-end')+'"><i class="fas fa-arrow-left"></i> All Year-End</a></aside><main class="orig-period-main"><div class="orig-period-heading"><h1>'+esc(cfg.title)+'</h1></div>'+originalYearControls('Year',years,selected,'detailperiod')+'<div class="orig-period-list">'+listHtml+'</div></main></div>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Year-End Charts - '+cfg.title,cfg.title,path);bindLinks();hydratePortalImages();
-  const change=v=>{history.replaceState({},'',appHref(path)+'?year='+encodeURIComponent(v));renderPeriod('year',chartSeg)};
-  const toggle=portalEl.querySelector('[data-detailperiod-toggle]'),menu=portalEl.querySelector('[data-detailperiod-menu]');if(toggle&&menu)toggle.onclick=()=>menu.classList.toggle('open');
-  portalEl.querySelectorAll('[data-detailperiod-value]').forEach(b=>b.onclick=()=>change(b.dataset.detailperiodValue));
-  const idx=years.indexOf(selected),prev=idx<years.length-1?years[idx+1]:null,next=idx>0?years[idx-1]:null;
-  const pb=portalEl.querySelector('[data-detailperiod-prev]'),nb=portalEl.querySelector('[data-detailperiod-next]');if(pb)pb.onclick=()=>prev&&change(prev);if(nb)nb.onclick=()=>next&&change(next);
-  portalEl.querySelectorAll('[data-period-detail]').forEach(b=>b.onclick=()=>{const p=portalEl.querySelector('[data-period-panel="'+b.dataset.periodDetail+'"]');if(p){p.classList.toggle('open');b.querySelector('i').className='fas '+(p.classList.contains('open')?'fa-minus':'fa-plus')}});
+
+  const kind=data.kind||cfg.kind;
+  const path='/year-end/'+chartSeg;
+  const pre2017=['yearEndSongs','yearEndArtists','yearEndAlbums','yecHot100Artists','yecArtist50Female','yecArtist50Male','yecArtist50DuoGroup','yearEndNewArtists','yecTop100AlbumsArtists'];
+  const visibleIds=(selected&&selected<'2017')?pre2017:exactYearEndIds;
+  let mobileExpanded=false;
+  const openDetails=new Set();
+
+  const metricLabel=kind==='artist'&&chartSeg.startsWith('yec')?'Entries':'Units';
+
+  const draw=()=>{
+    const arr=data.entriesByYear[selected]||[];
+
+    const desktopCards=arr.map((e,i)=>{
+      const pos=e.position||i+1,isFirst=pos===1,key='yec-'+selected+'-'+pos+'-'+slugify(e.name);
+      return '<div class="exact-chart-card '+(isFirst?'first':'')+'">'+
+        '<div class="exact-desktop-row">'+
+          '<div class="exact-rank '+(isFirst?'first':'')+'">'+pos+'</div>'+
+          '<div class="exact-art '+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div>'+
+          '<div class="exact-entry"><div class="exact-title">'+entityLink(e,kind)+'</div>'+(kind!=='artist'?'<div class="exact-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
+          '<button type="button" class="exact-plus" data-yec-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
+        '</div>'+
+        '<div class="exact-mobile-row">'+
+          '<div class="exact-mobile-rank">'+pos+'</div>'+
+          '<div class="exact-mobile-art '+(isFirst?'first':'')+'">'+refThumb(e,kind)+'</div>'+
+          '<div class="exact-mobile-copy"><div class="exact-mobile-title">'+entityLink(e,kind)+'</div>'+(kind!=='artist'?'<div class="exact-mobile-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
+          '<button type="button" class="exact-plus" data-yec-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
+        '</div>'+
+        '<div class="exact-details '+(openDetails.has(key)?'open':'')+'">'+
+          '<div><span>'+(kind==='artist'&&chartSeg.startsWith('yec')?'Entries':'Peak')+'</span><strong>'+(kind==='artist'&&chartSeg.startsWith('yec')?(e.entries||1):'#'+(e.peak||pos))+'</strong></div>'+
+          '<div><span>Weeks</span><strong>'+(e.weeks||'—')+'</strong></div>'+
+          '<div><span>'+metricLabel+'</span><strong>'+(metricLabel==='Entries'?(e.entries||1):fmtNum(e.totalUnits||0))+'</strong></div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    const mobileNav=
+      '<div class="exact-mobile-only exact-mobile-chart-nav">'+
+        '<a class="exact-mobile-active" href="'+appHref(path)+'">'+esc(cfg.title)+'</a>'+
+        '<button type="button" class="exact-mobile-more" data-yec-more>'+(mobileExpanded?'− Less':'+ More Charts')+'</button>'+
+        '<div class="exact-mobile-more-list '+(mobileExpanded?'open':'')+'">'+
+          visibleIds.filter(id=>id!==chartSeg).map(id=>'<a href="'+appHref('/year-end/'+id)+'">'+esc(officialYearEnd[id]?.title||id)+'</a>').join('')+
+        '</div>'+
+      '</div>';
+
+    const desktopNav=
+      '<div class="exact-desktop-only exact-desktop-chart-nav">'+
+        visibleIds.map(id=>'<a href="'+appHref('/year-end/'+id)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(officialYearEnd[id]?.title||id)+'</a>').join('')+
+      '</div>';
+
+    const main=
+      '<div class="exact-yec-layout">'+
+        '<aside class="exact-yec-sidebar">'+
+          mobileNav+desktopNav+
+          '<a class="exact-back-card" href="'+appHref('/year-end')+'"><i class="fas fa-arrow-left"></i> All Year-End</a>'+
+        '</aside>'+
+        '<main class="exact-yec-main">'+
+          '<div class="exact-yec-heading"><h1>'+esc(cfg.title)+'</h1></div>'+
+          originalYearControls('Year',years,selected,'detailperiod')+
+          '<div class="exact-chart-list">'+desktopCards+'</div>'+
+          (!arr.length?'<div class="exact-empty">'+(selected?'No data for this year.':'Select a year.')+'</div>':'')+
+        '</main>'+
+      '</div>';
+
+    setMode(true);
+    portalEl.innerHTML=shellHtml(main);
+    setMeta('Year-End Charts - '+cfg.title,cfg.title,path);
+    bindLinks();
+    hydratePortalImages();
+
+    const change=v=>{
+      selected=v;
+      history.replaceState({},'',appHref(path)+'?year='+encodeURIComponent(v));
+      mobileExpanded=false;
+      draw();
+    };
+
+    const toggle=portalEl.querySelector('[data-detailperiod-toggle]');
+    const menu=portalEl.querySelector('[data-detailperiod-menu]');
+    if(toggle&&menu)toggle.onclick=()=>menu.classList.toggle('open');
+    portalEl.querySelectorAll('[data-detailperiod-value]').forEach(b=>b.onclick=()=>change(b.dataset.detailperiodValue));
+
+    const idx=years.indexOf(selected),prev=idx<years.length-1?years[idx+1]:null,next=idx>0?years[idx-1]:null;
+    const pb=portalEl.querySelector('[data-detailperiod-prev]'),nb=portalEl.querySelector('[data-detailperiod-next]');
+    if(pb)pb.onclick=()=>prev&&change(prev);
+    if(nb)nb.onclick=()=>next&&change(next);
+
+    const more=portalEl.querySelector('[data-yec-more]');
+    if(more)more.onclick=()=>{mobileExpanded=!mobileExpanded;draw()};
+
+    portalEl.querySelectorAll('[data-yec-detail]').forEach(b=>b.onclick=()=>{
+      const key=b.dataset.yecDetail;
+      if(openDetails.has(key))openDetails.delete(key);else openDetails.add(key);
+      draw();
+    });
+  };
+
+  draw();
 }
+
 async function renderDecadeDetailExact(chartSeg){
   const oldMap={songs:'songs',albums:'albums',artists:'artists'},weeklyId=oldMap[chartSeg]||'songs';
   const data=await loadWeekly(weeklyId),years=[...new Set(data.dates.map(d=>Number(d.slice(0,4))))].sort((a,b)=>b-a),decades=[...new Set(years.map(y=>Math.floor(y/10)*10))].sort((a,b)=>b-a);
@@ -800,27 +887,155 @@ async function renderDecadeDetailExact(chartSeg){
 async function renderGoat(chartSeg){
   const cfg=officialGoat[chartSeg]||officialGoat.goatSongs;
   loading('Greatest of All Time');
+
   const data=await computeGoatExact(chartSeg);
-  let sort='weeks',search='';
-  const draw=()=>{
-    let arr=[...data.entries];
-    if(search){const q=search.toLowerCase();arr=arr.filter(e=>(e.name+' '+e.artist).toLowerCase().includes(q))}
-    const sorters={
-      weeks:(a,b)=>b.weeks-a.weeks||a.peak-b.peak,
-      no1:(a,b)=>b.weeksAt1-a.weeksAt1||b.weeks-a.weeks,
-      units:(a,b)=>b.totalUnits-a.totalUnits,
-      streams:(a,b)=>b.totalStreams-a.totalStreams,
-      sales:(a,b)=>b.totalSales-a.totalSales,
-      audience:(a,b)=>b.totalAudience-a.totalAudience,
-      points:(a,b)=>b.totalPoints-a.totalPoints
-    };
-    arr.sort(sorters[sort]||sorters.weeks);
-    const top=arr.slice(0,3);
-    const main='<div class="orig-goat-layout"><aside class="orig-goat-side"><div class="orig-goat-box"><div class="orig-eyebrow">Sort By</div><select id="origGoatSort"><option value="weeks" '+(sort==='weeks'?'selected':'')+'>Weeks on Chart</option><option value="no1" '+(sort==='no1'?'selected':'')+'>Weeks at #1</option><option value="units" '+(sort==='units'?'selected':'')+'>Units</option><option value="streams" '+(sort==='streams'?'selected':'')+'>Streams</option><option value="sales" '+(sort==='sales'?'selected':'')+'>Sales</option><option value="audience" '+(sort==='audience'?'selected':'')+'>Audience</option><option value="points" '+(sort==='points'?'selected':'')+'>Points</option></select></div><div class="orig-goat-box"><div class="orig-eyebrow">Charts</div>'+exactGoatIds.map(id=>'<a class="'+(id===chartSeg?'active':'')+'" href="'+appHref('/goat/'+id)+'">'+esc(officialGoat[id].title)+'</a>').join('')+'</div><a class="orig-period-back" href="'+appHref('/goat')+'"><i class="fas fa-arrow-left"></i> All Greatest of All Time</a></aside><main class="orig-goat-main"><div class="orig-goat-hero"><div>Greatest of All Time</div><h1>'+esc(cfg.title)+'</h1><p>The definitive all-time rankings</p></div><div class="orig-goat-top3">'+top.map((e,i)=>'<div class="'+(i===0?'first':'')+'"><span>'+(i+1)+'</span><strong>'+esc(e.name)+'</strong>'+(data.kind!=='artist'?'<small>'+esc(e.artist||'')+'</small>':'')+'</div>').join('')+'</div><div class="orig-goat-search"><input id="origGoatSearch" value="'+escAttr(search)+'" placeholder="Search..."></div><div class="orig-period-list">'+arr.slice(0,100).map((e,i)=>'<div class="orig-period-card"><div class="orig-period-rank">'+(i+1)+'</div><div class="orig-period-art">'+refThumb(e,data.kind)+'</div><div class="orig-period-entry"><div class="orig-period-name">'+entityLink(e,data.kind)+'</div>'+(data.kind!=='artist'?'<div class="orig-period-artist">'+esc(e.artist||'')+'</div>':'')+'</div><div class="orig-goat-metric">'+(sort==='weeks'?e.weeks+' weeks':sort==='no1'?e.weeksAt1+' weeks':fmtNum(e['total'+sort.charAt(0).toUpperCase()+sort.slice(1)]||0))+'</div></div>').join('')+'</div></main></div>';
-    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(cfg.title,cfg.title,'/goat/'+chartSeg);bindLinks();hydratePortalImages();
-    document.getElementById('origGoatSort').onchange=e=>{sort=e.target.value;draw()};
-    document.getElementById('origGoatSearch').oninput=e=>{search=e.target.value;clearTimeout(window.__goatSearchTimer);window.__goatSearchTimer=setTimeout(draw,150)};
+  const isRadio=chartSeg==='goatRadio';
+  let sort=chartSeg==='goatSongs'?'points':isRadio?'audience':'units';
+  let search='';
+  let page=1;
+  let mobileExpanded=false;
+  const openDetails=new Set();
+  const PAGE_SIZE=50;
+
+  const sortOptions=[
+    ...(chartSeg==='goatSongs'?[['points','Total Points']]:[]),
+    ...(isRadio?[['audience','Total Audience']]:[]),
+    ['units','Total Units'],
+    ...((chartSeg==='goatSongs'||chartSeg==='goatAlbums')?[['sales','Total Sales'],['streams','Total Streams']]:[]),
+    ['weeks','Weeks on Chart']
+  ];
+
+  const metricValue=e=>{
+    if(sort==='units')return fmtNum(e.totalUnits||0)+' units';
+    if(sort==='streams')return fmtNum(e.totalStreams||0)+' streams';
+    if(sort==='sales')return fmtNum(e.totalSales||0)+' sales';
+    if(sort==='audience')return fmtNum(e.totalAudience||0)+' audience';
+    if(sort==='points')return fmtNum(e.totalPoints||0)+' points';
+    return (e.weeks||0)+' weeks';
   };
+
+  const draw=()=>{
+    let sorted=[...data.entries];
+    const sorters={
+      units:(a,b)=>b.totalUnits-a.totalUnits||a.peak-b.peak,
+      streams:(a,b)=>b.totalStreams-a.totalStreams||a.peak-b.peak,
+      sales:(a,b)=>b.totalSales-a.totalSales||a.peak-b.peak,
+      audience:(a,b)=>b.totalAudience-a.totalAudience||a.peak-b.peak,
+      points:(a,b)=>b.totalPoints-a.totalPoints||a.peak-b.peak,
+      weeks:(a,b)=>b.weeks-a.weeks||a.peak-b.peak
+    };
+    sorted.sort(sorters[sort]||sorters.weeks);
+    sorted=sorted.map((e,i)=>({...e,position:i+1}));
+
+    let filtered=sorted;
+    if(search.trim()){
+      const q=search.toLowerCase();
+      filtered=sorted.filter(e=>(e.name||'').toLowerCase().includes(q)||(e.artist||'').toLowerCase().includes(q));
+    }
+
+    const totalPages=Math.max(1,Math.ceil(filtered.length/PAGE_SIZE));
+    page=Math.min(page,totalPages);
+    const displayed=filtered.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+    const top3=sorted.slice(0,3);
+    const podiumOrder=top3.length>=3?[top3[1],top3[0],top3[2]]:top3;
+
+    const desktopNav=
+      '<div class="exact-desktop-only exact-goat-chart-links">'+
+        exactGoatIds.map(id=>'<a class="'+(id===chartSeg?'active':'')+'" href="'+appHref('/goat/'+id)+'">'+esc(officialGoat[id].title)+'</a>').join('')+
+      '</div>';
+
+    const mobileNav=
+      '<div class="exact-mobile-only exact-goat-mobile-nav">'+
+        '<a class="exact-goat-mobile-active" href="'+appHref('/goat/'+chartSeg)+'">'+esc(cfg.title)+'</a>'+
+        '<button type="button" class="exact-mobile-more" data-goat-more>'+(mobileExpanded?'− Less':'+ More Charts')+'</button>'+
+        '<div class="exact-mobile-more-list '+(mobileExpanded?'open':'')+'">'+
+          exactGoatIds.filter(id=>id!==chartSeg).map(id=>'<a href="'+appHref('/goat/'+id)+'">'+esc(officialGoat[id].title)+'</a>').join('')+
+        '</div>'+
+      '</div>';
+
+    const cards=displayed.map((e,i)=>{
+      const key='goat-'+chartSeg+'-'+e.position+'-'+slugify(e.name);
+      const isFirst=e.position===1;
+      return '<div class="exact-chart-card '+(isFirst?'first':'')+'">'+
+        '<div class="exact-desktop-row">'+
+          '<div class="exact-rank '+(isFirst?'first':'')+'">'+e.position+'</div>'+
+          '<div class="exact-art '+(isFirst?'first':'')+'">'+refThumb(e,data.kind)+'</div>'+
+          '<div class="exact-entry"><div class="exact-title">'+entityLink(e,data.kind)+'</div>'+(data.kind!=='artist'?'<div class="exact-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
+          '<div class="exact-goat-desktop-metric">'+esc(metricValue(e))+'</div>'+
+          '<button type="button" class="exact-plus" data-goat-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
+        '</div>'+
+        '<div class="exact-mobile-row">'+
+          '<div class="exact-mobile-rank">'+e.position+'</div>'+
+          '<div class="exact-mobile-art '+(isFirst?'first':'')+'">'+refThumb(e,data.kind)+'</div>'+
+          '<div class="exact-mobile-copy"><div class="exact-mobile-title">'+entityLink(e,data.kind)+'</div>'+(data.kind!=='artist'?'<div class="exact-mobile-artist">'+esc(e.artist||'')+'</div>':'')+'</div>'+
+          '<button type="button" class="exact-plus" data-goat-detail="'+escAttr(key)+'">'+(openDetails.has(key)?'−':'+')+'</button>'+
+        '</div>'+
+        '<div class="exact-details '+(openDetails.has(key)?'open':'')+'">'+
+          '<div><span>Peak</span><strong>#'+(e.peak||e.position)+'</strong></div>'+
+          '<div><span>Weeks</span><strong>'+(e.weeks||0)+'</strong></div>'+
+          '<div><span>'+esc(sortOptions.find(x=>x[0]===sort)?.[1]||'Metric')+'</span><strong>'+esc(metricValue(e))+'</strong></div>'+
+        '</div>'+
+      '</div>';
+    }).join('');
+
+    const main=
+      '<div class="exact-goat-page">'+
+        '<div class="exact-goat-flex">'+
+          '<aside class="exact-goat-sidebar">'+
+            '<div class="exact-sidebar-section"><div class="exact-sidebar-label">Sort By</div><select id="exactGoatSort">'+
+              sortOptions.map(([k,l])=>'<option value="'+k+'" '+(sort===k?'selected':'')+'>'+esc(l)+'</option>').join('')+
+            '</select></div>'+
+            '<div class="exact-sidebar-section"><div class="exact-sidebar-label">Charts</div>'+mobileNav+desktopNav+'</div>'+
+            '<a class="exact-back-card" href="'+appHref('/goat')+'"><i class="fas fa-arrow-left"></i> All Greatest of All Time</a>'+
+          '</aside>'+
+          '<main class="exact-goat-content">'+
+            '<div class="exact-goat-heading"><div class="exact-goat-bg">Greatest of All Time</div><h1>'+esc(cfg.title)+'</h1><p>'+sorted.length+' greatest of all time</p></div>'+
+            (podiumOrder.length?'<div class="exact-goat-podium">'+podiumOrder.map((e,idx)=>{
+              const first=top3[0]&&e.position===top3[0].position;
+              return '<div class="exact-podium-card '+(first?'first':'')+'"><div class="exact-podium-rank">'+e.position+'</div><div class="exact-podium-title">'+esc(e.name)+'</div>'+(data.kind!=='artist'?'<div class="exact-podium-artist">'+esc(e.artist||'')+'</div>':'')+'<div class="exact-podium-metric">'+esc(metricValue(e))+'</div></div>';
+            }).join('')+'</div>':'')+
+            '<div class="exact-goat-search-wrap"><input id="exactGoatSearch" value="'+escAttr(search)+'" placeholder="Search...">'+(search?'<button id="exactGoatClear">×</button>':'')+'</div>'+
+            '<div class="exact-results-count">'+filtered.length+' item'+(filtered.length===1?'':'s')+' found'+(search?' matching “'+esc(search)+'”':'')+'</div>'+
+            '<div class="exact-chart-list">'+cards+'</div>'+
+            (totalPages>1?'<div class="exact-pagination"><button id="exactGoatPrev" '+(page<=1?'disabled':'')+'><i class="fas fa-chevron-left"></i></button><span>Page '+page+' of '+totalPages+'</span><button id="exactGoatNext" '+(page>=totalPages?'disabled':'')+'><i class="fas fa-chevron-right"></i></button></div>':'')+
+          '</main>'+
+        '</div>'+
+      '</div>';
+
+    setMode(true);
+    portalEl.innerHTML=shellHtml(main);
+    setMeta(cfg.title,cfg.title,'/goat/'+chartSeg);
+    bindLinks();
+    hydratePortalImages();
+
+    const sortEl=document.getElementById('exactGoatSort');
+    if(sortEl)sortEl.onchange=e=>{sort=e.target.value;page=1;draw()};
+
+    const searchEl=document.getElementById('exactGoatSearch');
+    if(searchEl)searchEl.oninput=e=>{
+      search=e.target.value;
+      page=1;
+      clearTimeout(window.__exactGoatSearchTimer);
+      window.__exactGoatSearchTimer=setTimeout(draw,120);
+    };
+
+    const clear=document.getElementById('exactGoatClear');
+    if(clear)clear.onclick=()=>{search='';page=1;draw()};
+
+    const more=portalEl.querySelector('[data-goat-more]');
+    if(more)more.onclick=()=>{mobileExpanded=!mobileExpanded;draw()};
+
+    portalEl.querySelectorAll('[data-goat-detail]').forEach(b=>b.onclick=()=>{
+      const key=b.dataset.goatDetail;
+      if(openDetails.has(key))openDetails.delete(key);else openDetails.add(key);
+      draw();
+    });
+
+    const prev=document.getElementById('exactGoatPrev'),next=document.getElementById('exactGoatNext');
+    if(prev)prev.onclick=()=>{if(page>1){page--;draw();window.scrollTo({top:0,behavior:'smooth'})}};
+    if(next)next.onclick=()=>{if(page<totalPages){page++;draw();window.scrollTo({top:0,behavior:'smooth'})}};
+  };
+
   draw();
 }
 
