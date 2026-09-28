@@ -3567,3 +3567,25 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
     box-shadow:0 0 0 3px var(--accent)!important;
   }
 }
+
+/* === ARTIST PORTRAIT FILL YEC GOAT v23 === */
+.exact-art.exact-artist-art .ref-thumb,
+.exact-mobile-art.exact-artist-art .ref-thumb{
+  position:relative!important;
+  overflow:hidden!important;
+  border-radius:50%!important;
+}
+.exact-art.exact-artist-art .ref-thumb img,
+.exact-mobile-art.exact-artist-art .ref-thumb img{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:118%!important;
+  height:118%!important;
+  max-width:none!important;
+  max-height:none!important;
+  transform:translate(-50%,-50%)!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  border-radius:0!important;
+}
