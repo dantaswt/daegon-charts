@@ -102,6 +102,30 @@ body{padding-top:68px!important}
   .global-static-header .mobile-drawer{top:62px!important;position:fixed!important}
 }
 
+
+/* original-about-port-v7 */
+.orig-about{max-width:768px;margin:0 auto;padding:48px 16px 64px}
+.orig-about-hero{text-align:center;margin-bottom:48px}
+.orig-about-hero h1{margin:0 0 12px;padding:0;font-size:48px;line-height:1.05;font-weight:900;letter-spacing:-.03em}
+.orig-about-hero h1::after{display:none!important}
+.orig-about-hero p{max-width:576px;margin:0 auto;color:var(--muted);font-size:15px;line-height:1.6}
+.orig-about-section{margin-bottom:48px}
+.orig-about-section>h2{display:flex;align-items:center;justify-content:space-between;margin:0 0 24px!important;padding:12px 20px!important;background:#FF6D00!important;color:#000!important;font-size:18px!important;font-weight:900!important;text-transform:uppercase!important;letter-spacing:.05em!important}
+.orig-about-section>h2::before{display:none!important}
+.orig-about-copy{color:var(--muted);font-size:14px;line-height:1.75}
+.orig-about-copy p{margin:0 0 12px;font-size:14px;line-height:1.75}
+.orig-about-card{margin-bottom:12px;padding:16px;border:1px solid var(--border);background:var(--card)}
+.orig-about-card strong{display:block;margin-bottom:6px;color:var(--fg);font-size:16px}
+.orig-about-card code{display:inline-block;margin-bottom:8px;padding:8px 12px;background:var(--bg);color:#FF6D00;font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.orig-about-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+@media(max-width:767px){
+  .orig-about{padding:32px 16px 48px}
+  .orig-about-hero{margin-bottom:40px}
+  .orig-about-hero h1{font-size:36px}
+  .orig-about-section{margin-bottom:40px}
+  .orig-about-section>h2{font-size:16px}
+}
+
 </style>
 </head>
 <body>
@@ -134,14 +158,63 @@ body{padding-top:68px!important}
   <a href="/about">ABOUT</a>
 </nav>
 </header>
-<main><div class="eyebrow">Independent music archive</div><h1>About Daegon Charts</h1>
-<p>Daegon Charts is an independent music-ranking project built to preserve weekly chart history in a consistent, searchable format. The site follows songs, albums and artists over time and records how each entry moves from week to week, including rank, last-week position, peak, total chart weeks and weeks spent at number one.</p>
-<p>The project exists because music history is more useful when it can be explored as a continuous timeline rather than as isolated lists. A single chart week can show what was popular at one moment; a long-running archive can show how quickly a song rose, how long an album remained relevant, when an artist returned to the chart and how musical eras overlap.</p>
-<div class="card"><h2>What you can explore</h2><ul><li>Weekly song, album and artist rankings.</li><li>Historical chart runs for individual entries.</li><li>New entries, re-entries, gains, declines and drop-outs.</li><li>Peak positions, weeks charted and weeks at number one.</li><li>Specialized views for streaming, sales and radio where available.</li></ul></div>
-<h2>An original editorial project</h2><p>Daegon Charts is not a mirror of one commercial chart. Its rankings, historical reconstruction, organization and presentation are part of an original editorial project. The archive is maintained with a consistent set of rules so that a week in one era can be meaningfully compared with another while still respecting the different ways people discovered and consumed music at the time.</p>
-<p>Historical work requires judgment as well as data. Release timing, market coverage, catalog behavior, re-entries, artist-credit normalization and continuity from one week to the next all matter. The methodology page explains these principles in more detail.</p>
-<h2>Independence and attribution</h2><p>Daegon Charts is an independent project and is not affiliated with Billboard, Spotify, Last.fm, record labels or other music companies. Artist names, song titles, album titles and artwork remain the property of their respective owners. Artwork and metadata may be retrieved from public music services or APIs for identification and informational presentation.</p>
-<h2>Ongoing archive</h2><p>The archive is continuously reviewed. Historical records may be corrected when better source information becomes available, when duplicate artist credits are identified or when continuity errors are found. The goal is to maintain a coherent record whose changes can be explained by the same methodology.</p></main><footer><div class="links"><a href="/about">About</a><a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/contact">Contact</a><a href="/terms">Terms</a></div><div>Daegon Charts — independent music charts and historical archive.</div></footer><script>
+<main class="orig-about">
+  <div class="orig-about-hero">
+    <h1>About Daegon Charts</h1>
+    <p>Independent weekly music charts powered by publicly available data. No label influence, no editorial bias — just numbers.</p>
+  </div>
+
+  <section class="orig-about-section">
+    <h2>How It Works</h2>
+    <div class="orig-about-copy">
+      <p>Every week, data is collected from public sources — primarily streaming platform counts, sales figures, and radio airplay metrics. This data is processed through weighted formulas to produce each chart ranking.</p>
+      <p>All weekly charts are generated by Google Apps Script codes running directly in Google Sheets. Each chart has its own spreadsheet that is updated automatically via these scripts. The site reads from public Google Sheets links, which allows the data to be displayed here in real time.</p>
+      <p>Charts are updated weekly and dated accordingly. Historical data is preserved so you can track how songs, albums, and artists perform over time.</p>
+    </div>
+  </section>
+
+  <section class="orig-about-section">
+    <h2>Auditing & Transparency</h2>
+    <div class="orig-about-copy">
+      <p>All chart data is sourced from publicly available APIs and published reports. Streaming data comes directly from streaming platform APIs. Sales data is compiled from public sales reports. Radio airplay data is sourced from monitored station logs.</p>
+      <p>Every chart entry is auditable by design. Historical records are reviewed and corrected when better source information, duplicate credits, or continuity issues are identified.</p>
+    </div>
+  </section>
+
+  <section class="orig-about-section">
+    <h2>Weekly Charts</h2>
+    <div class="orig-about-copy"><p>Each weekly chart uses a specific formula to rank entries. Here's how each one works:</p></div>
+    <div class="orig-about-card"><strong>Hot 100</strong><code>Sales (7d) × 3 + Streaming (28d) × 2 + Airplay × 1 = Points</code><p>The flagship chart combines sales, streaming and radio activity into one weekly ranking.</p></div>
+    <div class="orig-about-card"><strong>Artist 50</strong><code>Sales (7d) + Streaming (28d) ÷ 2 = Units</code><p>Ranks artists by total consumption units across their catalog.</p></div>
+    <div class="orig-about-card"><strong>Top 100 Albums</strong><code>Sales (7d) + Streaming (28d) ÷ 2 = Units</code><p>Albums are ranked by consumption units, with album editions normalized into a single entry.</p></div>
+    <div class="orig-about-card"><strong>Digital Songs Sales</strong><code>Sales (7d) × 1,000</code><p>Sales-focused ranking based on the current weekly window.</p></div>
+    <div class="orig-about-card"><strong>Streaming Songs</strong><code>Streaming (rolling 4 weeks) × 1,000</code><p>Streaming chart based on a rolling four-week window.</p></div>
+    <div class="orig-about-card"><strong>Top Albums Sales</strong><code>Sales (7d) × 1,000</code><p>Sales-only album ranking.</p></div>
+    <div class="orig-about-card"><strong>Top Streaming Albums</strong><code>Streaming (28d) × 1,000</code><p>Streaming-only album ranking over the last 28 days.</p></div>
+    <div class="orig-about-card"><strong>Radio Songs</strong><code>(Previous Audience × 0.90) + (Weekly Spins × 10) = Audience</code><p>Ranks songs by accumulated radio audience with weekly decay.</p></div>
+  </section>
+
+  <section class="orig-about-section">
+    <h2>Year-End Charts (YEC)</h2>
+    <div class="orig-about-copy"><p>Year-End charts are cumulative rankings that cover an entire calendar year. They aggregate weekly performance to determine the most successful songs, albums, and artists of each year.</p></div>
+  </section>
+
+  <section class="orig-about-section">
+    <h2>Greatest of All Time (GOAT)</h2>
+    <div class="orig-about-copy"><p>The GOAT charts rank the biggest hits across the complete chart history using cumulative performance data across all available weeks.</p></div>
+  </section>
+
+  <section class="orig-about-section">
+    <h2>Stats</h2>
+    <div class="orig-about-copy"><p>The Stats section provides deeper analytics, career records, weeks at No. 1, total chart weeks and historical milestones.</p></div>
+  </section>
+
+  <section class="orig-about-section">
+    <h2>Certifications</h2>
+    <div class="orig-about-card"><strong>Songs — UK Style</strong><p>Silver 200,000 · Gold 400,000 · Platinum 600,000 · Diamond 6,000,000 units.</p></div>
+    <div class="orig-about-card"><strong>Albums — USA Style</strong><p>Gold 500,000 · Platinum 1,000,000 · Diamond 10,000,000 units.</p></div>
+  </section>
+</main><footer><div class="links"><a href="/about">About</a><a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/contact">Contact</a><a href="/terms">Terms</a></div><div>Daegon Charts — independent music charts and historical archive.</div></footer><script>
 (function globalHeaderInit(){
   const menu=document.getElementById('globalMenuToggle');
   const drawer=document.getElementById('globalMobileDrawer');
