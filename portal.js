@@ -1241,7 +1241,7 @@ async function renderBattle(){
   const artistData=await loadWeekly('artists');
   const artists=aggregateCatalog(artistData,'artist').map(x=>x.name).sort((a,b)=>a.localeCompare(b));
   const allIds=['songs','albums','artists','radioSongs','topStreamingAlbums','topAlbumSales','streamingSongs','digitalSongsSales'];
-  const allData=await Promise.all(allIds.map(async id=>{try{return await loadWeekly(id)}catch{return null}}));
+  let allData=null;
 
   let a1=null,a2=null,started=false,selectedChart='All';
   const statsFor=name=>{
@@ -1284,7 +1284,13 @@ async function renderBattle(){
       bindSearch('a1',v=>a1=v);bindSearch('a2',v=>a2=v);
       portalEl.querySelectorAll('[data-clear]').forEach(b=>b.onclick=()=>{if(b.dataset.clear==='a1')a1=null;else a2=null;draw()});
       document.getElementById('refBattleChart').onchange=e=>selectedChart=e.target.value;
-      document.getElementById('refFight').onclick=()=>{if(a1&&a2){started=true;draw()}};
+      document.getElementById('refFight').onclick=async()=>{
+        if(!(a1&&a2))return;
+        const btn=document.getElementById('refFight');
+        btn.disabled=true;btn.textContent='Loading…';
+        allData=await Promise.all(allIds.map(async id=>{try{return await loadWeekly(id)}catch{return null}}));
+        started=true;draw();
+      };
       return;
     }
     const s1=statsFor(a1),s2=statsFor(a2);
@@ -1309,16 +1315,43 @@ async function renderBattle(){
 
 async function renderSearch(){
   loading('Search');
-  const [songs,albums,artists]=await Promise.all([loadWeekly('songs'),loadWeekly('albums'),loadWeekly('artists')]);
-  const all=[
-    ...aggregateCatalog(songs,'song').map(x=>({...x,kind:'song'})),
-    ...aggregateCatalog(albums,'album').map(x=>({...x,kind:'album'})),
-    ...aggregateCatalog(artists,'artist').map(x=>({...x,kind:'artist'}))
-  ];
   const main='<div class="portal-hero"><div class="portal-kicker">Archive search</div><h1 class="portal-title">Search</h1><p class="portal-subtitle">Search songs, albums and artists across the complete archive.</p></div><div class="portal-toolbar"><input id="globalSearch" class="portal-input" placeholder="Type a song, album or artist…" autofocus></div><div id="searchRows" class="portal-empty">Start typing to search.</div>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Search','Search the Daegon Charts archive.','/search');
+
   const inp=document.getElementById('globalSearch'),rows=document.getElementById('searchRows');
-  const draw=()=>{const q=inp.value.trim().toLowerCase();if(!q){rows.className='portal-empty';rows.innerHTML='Start typing to search.';return}const hits=all.filter(x=>(x.name+' '+(x.artist||'')).toLowerCase().includes(q)).slice(0,100);rows.className='portal-list';rows.innerHTML=hits.map((x,i)=>'<div class="portal-row"><div class="portal-row-rank"><i class="fas '+iconFor(x.kind)+'"></i></div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,x.kind)+'</div><div class="portal-row-sub">'+labelFor(x.kind)+(x.kind!=='artist'?' · '+esc(x.artist):'')+'</div></div><div class="portal-row-meta">Peak #'+x.peak+' · '+x.weeks+' weeks</div></div>').join('')||'<div class="portal-empty">No results.</div>';bindLinks()};inp.oninput=draw;
+  let all=null,loadingPromise=null,timer=null;
+
+  const ensureData=()=>{
+    if(all)return Promise.resolve(all);
+    if(loadingPromise)return loadingPromise;
+    loadingPromise=Promise.all([loadWeekly('songs'),loadWeekly('albums'),loadWeekly('artists')]).then(([songs,albums,artists])=>{
+      all=[
+        ...aggregateCatalog(songs,'song').map(x=>({...x,kind:'song'})),
+        ...aggregateCatalog(albums,'album').map(x=>({...x,kind:'album'})),
+        ...aggregateCatalog(artists,'artist').map(x=>({...x,kind:'artist'}))
+      ];
+      return all;
+    }).finally(()=>{loadingPromise=null});
+    return loadingPromise;
+  };
+
+  const draw=async()=>{
+    const q=inp.value.trim().toLowerCase();
+    if(!q){rows.className='portal-empty';rows.innerHTML='Start typing to search.';return}
+    rows.className='portal-empty';rows.innerHTML='Searching archive…';
+    const data=await ensureData();
+    if(inp.value.trim().toLowerCase()!==q)return;
+    const hits=data.filter(x=>(x.name+' '+(x.artist||'')).toLowerCase().includes(q)).slice(0,100);
+    rows.className='portal-list';
+    rows.innerHTML=hits.map(x=>'<div class="portal-row"><div class="portal-row-rank"><i class="fas '+iconFor(x.kind)+'"></i></div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,x.kind)+'</div><div class="portal-row-sub">'+labelFor(x.kind)+(x.kind!=='artist'?' · '+esc(x.artist):'')+'</div></div><div class="portal-row-meta">Peak #'+x.peak+' · '+x.weeks+' weeks</div></div>').join('')||'<div class="portal-empty">No results.</div>';
+    bindLinks();
+  };
+
+  inp.oninput=()=>{
+    clearTimeout(timer);
+    if(!inp.value.trim()){rows.className='portal-empty';rows.innerHTML='Start typing to search.';return}
+    timer=setTimeout(draw,180);
+  };
 }
 
 function renderNotFound(){
