@@ -3694,3 +3694,21 @@ body.global-header-canonical.global-bars-weekly.global-site-shell .header-inner{
     background:var(--muted);
   }
 }
+
+/* === PERFORMANCE CONTAINMENT v34 === */
+.ref-catalog-card,
+.portal-row,
+.orig-record-row,
+.ref-no1-card,
+.ref-first-card,
+.ref-beat-card,
+.exact-entry,
+.exact-mobile-row{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 92px;
+}
+.orig-beat-article,
+.editorial-block,
+.portal-section{
+  contain:layout paint;
+}
