@@ -251,45 +251,18 @@ function bindHomeSidebar(){
 
 async function hydratePortalImages(){
   const nodes=[...portalEl.querySelectorAll('[data-portal-image]')];
-  const done=new WeakSet();
-
-  async function loadNode(node,priority=false){
-    if(!node||done.has(node)||!node.isConnected)return;
-    done.add(node);
-    const kind=node.dataset.kind,name=node.dataset.name,artist=node.dataset.artist||name;
-    try{
-      const url=await resolveImage({name,artist},{kind});
-      if(url&&node.isConnected){
-        const attrs=priority?'loading="eager" fetchpriority="high"':'loading="lazy"';
-        node.innerHTML='<img src="'+escAttr(url)+'" alt="'+escAttr(name||artist||'')+'" '+attrs+' decoding="async" style="width:100%;height:100%;object-fit:cover">';
-      }
-    }catch{}
-  }
-
-  // Keep the first screen responsive; resolve only a small visible batch now.
-  const immediate=nodes.slice(0,8);
-  let i=0;
+  const limit=6;let i=0;
   async function worker(){
-    while(i<immediate.length){
-      const index=i++;
-      await loadNode(immediate[index],index===0);
+    while(i<nodes.length){
+      const node=nodes[i++],kind=node.dataset.kind,name=node.dataset.name,artist=node.dataset.artist||name;
+      const cfg={kind};
+      try{
+        const url=await resolveImage({name,artist},cfg);
+        if(url&&node.isConnected)node.innerHTML='<img src="'+escAttr(url)+'" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover">';
+      }catch{}
     }
   }
-  Promise.all(Array.from({length:Math.min(4,immediate.length)},()=>worker())).catch(()=>{});
-
-  if('IntersectionObserver' in window){
-    const observer=new IntersectionObserver(items=>{
-      for(const item of items){
-        if(!item.isIntersecting)continue;
-        observer.unobserve(item.target);
-        loadNode(item.target,false);
-      }
-    },{rootMargin:'700px 0px'});
-    nodes.slice(8).forEach(node=>observer.observe(node));
-  }else{
-    const rest=()=>nodes.slice(8).forEach(node=>loadNode(node,false));
-    if('requestIdleCallback' in window)requestIdleCallback(rest,{timeout:1800});else setTimeout(rest,250);
-  }
+  await Promise.all(Array.from({length:Math.min(limit,nodes.length)},()=>worker()));
 }
 function thumb(e,kind,size=54){
   return '<div data-portal-image data-kind="'+kind+'" data-name="'+escAttr(e.name)+'" data-artist="'+escAttr(e.artist||e.name)+'" style="width:'+size+'px;height:'+size+'px;background:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas '+iconFor(kind)+'" style="opacity:.28"></i></div>';
