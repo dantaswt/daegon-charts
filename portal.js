@@ -944,23 +944,23 @@ async function renderPeriod(type,chartSeg){
 
     const mobileNav=
       '<div class="exact-mobile-only exact-mobile-chart-nav">'+
-        '<a class="exact-mobile-active" href="'+appHref(path)+'">'+esc(cfg.title)+'</a>'+
+        '<a class="exact-mobile-active" href="'+appHref(path)+'?year='+encodeURIComponent(selected)+'">'+esc(cfg.title)+'</a>'+
         '<button type="button" class="exact-mobile-more" data-yec-more>'+(mobileExpanded?'− Less':'+ More Charts')+'</button>'+
         '<div class="exact-mobile-more-list '+(mobileExpanded?'open':'')+'">'+
-          visibleIds.filter(id=>id!==chartSeg).map(id=>'<a href="'+appHref('/year-end/'+id)+'">'+esc(officialYearEnd[id]?.title||id)+'</a>').join('')+
+          visibleIds.filter(id=>id!==chartSeg).map(id=>'<a href="'+appHref('/year-end/'+id)+'?year='+encodeURIComponent(selected)+'">'+esc(officialYearEnd[id]?.title||id)+'</a>').join('')+
         '</div>'+
       '</div>';
 
     const desktopNav=
       '<div class="exact-desktop-only exact-desktop-chart-nav">'+
-        visibleIds.map(id=>'<a href="'+appHref('/year-end/'+id)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(officialYearEnd[id]?.title||id)+'</a>').join('')+
+        visibleIds.map(id=>'<a href="'+appHref('/year-end/'+id)+'?year='+encodeURIComponent(selected)+'" class="'+(id===chartSeg?'active':'')+'">'+esc(officialYearEnd[id]?.title||id)+'</a>').join('')+
       '</div>';
 
     const main=
       '<div class="exact-yec-layout">'+
         '<aside class="exact-yec-sidebar">'+
           mobileNav+desktopNav+
-          '<a class="exact-back-card" href="'+appHref('/year-end')+'"><i class="fas fa-arrow-left"></i> All Year-End</a>'+
+          '<a class="exact-back-card" href="'+appHref('/year-end')+'?year='+encodeURIComponent(selected)+'"><i class="fas fa-arrow-left"></i> All Year-End</a>'+
         '</aside>'+
         '<main class="exact-yec-main">'+
           '<div class="exact-yec-heading"><h1>'+esc(cfg.title)+'</h1></div>'+
