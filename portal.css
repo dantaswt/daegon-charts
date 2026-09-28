@@ -4139,3 +4139,32 @@ body:not(.portal-mode) #portalPage{
   #origArtistChartSelect{width:100%;min-width:0}
   .orig-artist-table{min-width:720px}
 }
+
+
+/* === GLOBAL PORTAL SKELETON PARITY v49 === */
+.portal-skeleton-wrap{
+  width:100%;
+  max-width:960px;
+  margin:0 auto;
+}
+.portal-sk-card{
+  content-visibility:visible!important;
+}
+.portal-sk-art.circle{
+  border-radius:50%!important;
+}
+@media(max-width:767px){
+  .portal-skeleton-wrap{
+    padding:12px 12px 48px!important;
+  }
+  .portal-sk-card{
+    grid-template-columns:34px 72px minmax(0,1fr) 32px!important;
+    min-height:96px!important;
+    padding:10px!important;
+    gap:9px!important;
+  }
+  .portal-sk-art{
+    width:72px!important;
+    height:72px!important;
+  }
+}
