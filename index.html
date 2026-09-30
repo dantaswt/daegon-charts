@@ -2343,6 +2343,93 @@
   .m-actions .action{width:32px!important;height:32px!important;font-size:25px!important}
 }
 </style>
+<style id="weekly-mobile-alignment-v33">
+@media(max-width:767px){
+  /* Fixed vertical rhythm for every weekly mobile row */
+  .mobile-row{
+    align-items:start!important;
+  }
+  .m-rank,
+  .m-cover,
+  .m-cover.one,
+  .m-actions{
+    align-self:start!important;
+  }
+  .m-entry{
+    align-self:start!important;
+    height:104px!important;
+    padding:2px 0 0!important;
+    display:grid!important;
+    grid-template-rows:40px 20px 9px 16px 16px!important;
+    align-content:start!important;
+  }
+  .m-title{
+    grid-row:1!important;
+    margin:0!important;
+    min-height:40px!important;
+    max-height:40px!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+    align-self:start!important;
+  }
+  .m-artist{
+    grid-row:2!important;
+    margin:0!important;
+    min-height:20px!important;
+    max-height:20px!important;
+    line-height:20px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    align-self:start!important;
+  }
+  .m-metrics{
+    grid-row:4!important;
+    margin:0!important;
+    min-height:16px!important;
+    line-height:16px!important;
+    align-self:start!important;
+  }
+  .m-weeks-no1{
+    grid-row:5!important;
+    margin:0!important;
+    min-height:16px!important;
+    line-height:16px!important;
+    align-self:start!important;
+  }
+  /* Reserve the final metadata line even when the entry has never been #1,
+     so all rows keep identical title/artist/metrics positioning. */
+  .m-entry:not(:has(.m-weeks-no1))::after{
+    content:"";
+    grid-row:5;
+    display:block;
+    min-height:16px;
+  }
+}
+@media(max-width:430px){
+  .m-entry{
+    height:94px!important;
+    grid-template-rows:36px 18px 7px 15px 15px!important;
+    padding-top:1px!important;
+  }
+  .m-title{
+    min-height:36px!important;
+    max-height:36px!important;
+  }
+  .m-artist{
+    min-height:18px!important;
+    max-height:18px!important;
+    line-height:18px!important;
+  }
+  .m-metrics,
+  .m-weeks-no1{
+    min-height:15px!important;
+    line-height:15px!important;
+  }
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
