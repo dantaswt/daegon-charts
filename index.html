@@ -3152,7 +3152,21 @@ function renderRows(data,date){
       if(top){const old=top.textContent;top.textContent='Copied!';setTimeout(()=>top.textContent=old,1200)}
     }catch{}
   });
-  content.querySelectorAll('.details-btn').forEach(b=>b.onclick=()=>{const k=b.dataset.key;if(state.details.has(k))state.details.delete(k);else state.details.add(k);renderRows(data,date)});
+  content.querySelectorAll('.details-btn').forEach(b=>b.onclick=e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const k=b.dataset.key;
+    const card=b.closest('.chart-card');
+    const beforeTop=card?.getBoundingClientRect().top;
+    if(state.details.has(k))state.details.delete(k);else state.details.add(k);
+    renderRows(data,date);
+    if(Number.isFinite(beforeTop)){
+      requestAnimationFrame(()=>{
+        const nextCard=[...content.querySelectorAll('.chart-card')].find(x=>x.dataset.key===k);
+        if(nextCard)window.scrollBy(0,nextCard.getBoundingClientRect().top-beforeTop);
+      });
+    }
+  });
   content.querySelectorAll('.run-jump').forEach(b=>b.onclick=()=>setDate(b.dataset.date,data));
   content.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const e=all.find(x=>itemKey(x)===b.dataset.entry);if(e)playEntry(e,b)});
   hydrateImages(cfg,rows);
