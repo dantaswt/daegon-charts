@@ -2484,6 +2484,161 @@
   }
 }
 </style>
+<style id="weekly-mobile-layout-v36">
+@media(max-width:767px){
+  .mobile-row{
+    position:relative!important;
+    grid-template-columns:42px 96px minmax(0,1fr)!important;
+    gap:10px!important;
+    align-items:start!important;
+    min-height:103px!important;
+    padding-right:82px!important;
+  }
+  .m-entry{
+    height:96px!important;
+    min-height:96px!important;
+    max-height:96px!important;
+    padding:1px 0 0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-start!important;
+    overflow:hidden!important;
+  }
+  .m-title{
+    flex:0 0 auto!important;
+    min-height:0!important;
+    max-height:40px!important;
+    margin:0!important;
+    line-height:1.08!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .m-artist{
+    flex:0 0 auto!important;
+    min-height:0!important;
+    max-height:20px!important;
+    margin:4px 0 0!important;
+    line-height:1.08!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .m-metrics{
+    flex:0 0 auto!important;
+    margin-top:12px!important;
+    min-height:0!important;
+    line-height:1.15!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:9px!important;
+    white-space:nowrap!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .m-weeks-no1{
+    flex:0 0 auto!important;
+    margin-top:5px!important;
+    min-height:0!important;
+    line-height:1.15!important;
+    white-space:nowrap!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .m-entry:not(:has(.m-weeks-no1))::after{display:none!important}
+  .m-actions{
+    position:absolute!important;
+    right:0!important;
+    bottom:4px!important;
+    width:auto!important;
+    height:auto!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+  }
+  .m-actions-top{display:none!important}
+  .m-actions .action{
+    width:34px!important;
+    height:34px!important;
+    flex:0 0 34px!important;
+  }
+  .m-actions .award,
+  .m-actions .award-performance{
+    width:28px!important;
+    height:34px!important;
+    min-width:28px!important;
+    min-height:34px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    color:var(--foreground)!important;
+  }
+  .m-actions .award i,
+  .m-actions .award-performance i{
+    font-size:21px!important;
+    line-height:1!important;
+    color:var(--foreground)!important;
+  }
+  .m-actions .award-gainer{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    background:transparent!important;
+  }
+  .m-actions .award-gainer i{font-size:17px!important}
+}
+@media(max-width:430px){
+  .mobile-row{
+    grid-template-columns:36px 82px minmax(0,1fr)!important;
+    gap:8px!important;
+    min-height:94px!important;
+    padding-right:72px!important;
+  }
+  .m-entry{
+    height:82px!important;
+    min-height:82px!important;
+    max-height:82px!important;
+  }
+  .m-title{max-height:35px!important}
+  .m-artist{max-height:18px!important;margin-top:3px!important}
+  .m-metrics{
+    margin-top:8px!important;
+    gap:6px!important;
+    font-size:10px!important;
+  }
+  .m-weeks-no1{
+    margin-top:3px!important;
+    font-size:10px!important;
+  }
+  .m-actions{bottom:1px!important;gap:7px!important}
+  .m-actions .award,
+  .m-actions .award-performance{
+    width:25px!important;
+    height:32px!important;
+    min-width:25px!important;
+    min-height:32px!important;
+  }
+  .m-actions .award i,
+  .m-actions .award-performance i{font-size:19px!important}
+  .m-actions .award-gainer{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    min-height:32px!important;
+  }
+  .m-actions .award-gainer i{font-size:16px!important}
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -3506,7 +3661,7 @@ function renderRows(data,date){
         coverHtml(e,one,false)+
         '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
         '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+esc(displayArtist(e.artist))+'</div>':'')+'</div>'+
-        '<div class="right">'+(award.hasStar?'<span class="award" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><i class="fas fa-star" style="font-size:11px"></i></span>':'')+
+        '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><i class="fas fa-star" style="font-size:11px"></i></span>':'')+
           metricsHtml(e)+
           '<div class="actions">'+
           '<button class="action details-btn" aria-label="Toggle details" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
@@ -3516,7 +3671,7 @@ function renderRows(data,date){
         '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div></div>'+
         coverHtml(e,one,true)+
         '<div class="m-entry"><div class="m-title">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(displayArtist(e.artist))+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
-        '<div class="m-actions"><div class="m-actions-top">'+(award.hasStar?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':'')+'</div><button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+        '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><i class="fas fa-star"></i></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
       (open?detailHtml(e,cfg,data,date,copy):'')+
     '</article>';
