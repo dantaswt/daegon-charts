@@ -59,12 +59,22 @@ function isHandled(pathname=cleanPath()){
 function closePortalMenu(){
   const menu=document.getElementById('portalMobileMenu');
   const btn=document.getElementById('portalMenuToggle');
+  const globalDrawer=document.getElementById('globalMobileDrawer');
+  const globalBtn=document.getElementById('globalMenuToggle');
   if(menu){
     menu.classList.remove('open');
     menu.setAttribute('aria-hidden','true');
     menu.style.display='none';
   }
   if(btn)btn.setAttribute('aria-expanded','false');
+  if(globalDrawer){
+    globalDrawer.classList.remove('open');
+    globalDrawer.setAttribute('aria-hidden','true');
+  }
+  if(globalBtn)globalBtn.setAttribute('aria-expanded','false');
+  document.documentElement.classList.remove('menu-open');
+  document.body.classList.remove('menu-open');
+  if(document.body.style.overflow==='hidden')document.body.style.removeProperty('overflow');
 }
 function keepViewportPosition(y){
   const restore=()=>window.scrollTo(0,y);
@@ -1260,16 +1270,23 @@ async function renderPeriod(type,chartSeg){
     portalEl.querySelectorAll('[data-yec-detail]').forEach(b=>b.onclick=e=>{
       e.preventDefault();
       e.stopPropagation();
-      const y=window.scrollY;
       const key=b.dataset.yecDetail;
       const card=b.closest('.exact-chart-card');
+      const cardTop=card?.getBoundingClientRect().top;
       const details=card?.querySelector('.exact-details');
       const willOpen=!openDetails.has(key);
       if(willOpen)openDetails.add(key);else openDetails.delete(key);
       if(details)details.classList.toggle('open',willOpen);
       card?.querySelectorAll('[data-yec-detail]').forEach(btn=>{btn.textContent=willOpen?'−':'+'});
       b.blur();
-      keepViewportPosition(y);
+      if(card&&Number.isFinite(cardTop)){
+        const restore=()=>{
+          const delta=card.getBoundingClientRect().top-cardTop;
+          if(Math.abs(delta)>.5)window.scrollBy(0,delta);
+        };
+        restore();
+        requestAnimationFrame(()=>{restore();requestAnimationFrame(restore)});
+      }
     });
   };
 
@@ -1780,5 +1797,7 @@ try{
 }catch{}
 document.addEventListener('click',onDocumentClick);
 window.addEventListener('popstate',()=>{closePortalMenu();if(!activateWeeklyIfNeeded())renderRoute()});
+window.addEventListener('pageshow',closePortalMenu);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)closePortalMenu()});
 if(!activateWeeklyIfNeeded())renderRoute();
 })();
