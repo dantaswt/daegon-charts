@@ -157,6 +157,10 @@ function ensureShell(){
       const open=mobileMenu.classList.toggle('open');
       mobileBtn.setAttribute('aria-expanded',open?'true':'false');
     };
+    mobileMenu.addEventListener('click',e=>{
+      const link=e.target.closest('a');
+      if(link) closePortalMenu();
+    });
     head.insertBefore(mobileBtn,theme);
     const searchBtn=document.createElement('button');
     searchBtn.id='portalSearchBtn';
@@ -1226,10 +1230,16 @@ async function renderPeriod(type,chartSeg){
     const more=portalEl.querySelector('[data-yec-more]');
     if(more)more.onclick=()=>{mobileExpanded=!mobileExpanded;draw()};
 
-    portalEl.querySelectorAll('[data-yec-detail]').forEach(b=>b.onclick=()=>{
+    portalEl.querySelectorAll('[data-yec-detail]').forEach(b=>b.onclick=e=>{
+      e.preventDefault();
+      e.stopPropagation();
       const key=b.dataset.yecDetail;
-      if(openDetails.has(key))openDetails.delete(key);else openDetails.add(key);
-      draw();
+      const card=b.closest('.exact-chart-card');
+      const details=card?.querySelector('.exact-details');
+      const willOpen=!openDetails.has(key);
+      if(willOpen)openDetails.add(key);else openDetails.delete(key);
+      if(details)details.classList.toggle('open',willOpen);
+      card?.querySelectorAll('[data-yec-detail]').forEach(btn=>{btn.textContent=willOpen?'−':'+'});
     });
   };
 
