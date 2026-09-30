@@ -3617,6 +3617,31 @@ async function spotifyArtwork(name,artist,kind){
 
 async function resolveImage(e,cfg){
   const key=cfg.kind+'|'+artworkIdentityTitle(cfg.kind,e.name)+'|'+comparable(e.artist||e.name);
+
+  // Exact Apple Music override for releases where generic search can pick the wrong edition.
+  // The Life of a Showgirl must use the artwork from "The Encore" edition supplied by the user.
+  if(
+    cfg.kind==='album' &&
+    comparable(e.name)==='the life of a showgirl' &&
+    comparable(e.artist)==='taylor swift'
+  ){
+    try{
+      const d=await fetch('https://itunes.apple.com/lookup?id=6814997249&country=br')
+        .then(r=>r.ok?r.json():null);
+      const hit=(d?.results||[]).find(x=>String(x.collectionId||'')==='6814997249')||(d?.results||[])[0];
+      let art=hit?.artworkUrl100||hit?.artworkUrl60||'';
+      if(art){
+        art=art.replace(/\/\d+x\d+bb(?:-\d+)?\.(jpg|png)$/i,'/1200x1200bb.$1')
+               .replace(/\/100x100bb\.(jpg|png)$/i,'/1200x1200bb.$1');
+        if(/^https?:\/\//i.test(art)){
+          state.images.set(key,art);
+          try{localStorage.setItem('img:'+key,art)}catch{}
+          return art;
+        }
+      }
+    }catch{}
+  }
+
   if(state.images.has(key))return state.images.get(key);
 
   const persistedKey='img:'+key;
