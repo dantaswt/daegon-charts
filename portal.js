@@ -59,8 +59,22 @@ function isHandled(pathname=cleanPath()){
 function closePortalMenu(){
   const menu=document.getElementById('portalMobileMenu');
   const btn=document.getElementById('portalMenuToggle');
-  if(menu)menu.classList.remove('open');
+  if(menu){
+    menu.classList.remove('open');
+    menu.setAttribute('aria-hidden','true');
+    menu.style.display='none';
+  }
   if(btn)btn.setAttribute('aria-expanded','false');
+}
+function keepViewportPosition(y){
+  const restore=()=>window.scrollTo(0,y);
+  restore();
+  requestAnimationFrame(()=>{
+    restore();
+    requestAnimationFrame(restore);
+  });
+  setTimeout(restore,80);
+  setTimeout(restore,180);
 }
 function go(path,replace=false){
   closePortalMenu();
@@ -153,9 +167,18 @@ function ensureShell(){
       ['AWARDS','/awards'],["#1'S",'/number-ones'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     mobileBtn.setAttribute('aria-expanded','false');
+    mobileMenu.setAttribute('aria-hidden','true');
+    mobileMenu.style.display='none';
     mobileBtn.onclick=()=>{
-      const open=mobileMenu.classList.toggle('open');
-      mobileBtn.setAttribute('aria-expanded',open?'true':'false');
+      const willOpen=!mobileMenu.classList.contains('open');
+      if(willOpen){
+        mobileMenu.style.display='';
+        mobileMenu.setAttribute('aria-hidden','false');
+        mobileMenu.classList.add('open');
+      }else{
+        closePortalMenu();
+      }
+      mobileBtn.setAttribute('aria-expanded',willOpen?'true':'false');
     };
     mobileMenu.addEventListener('click',e=>{
       const link=e.target.closest('a[data-portal-link]');
@@ -1237,20 +1260,16 @@ async function renderPeriod(type,chartSeg){
     portalEl.querySelectorAll('[data-yec-detail]').forEach(b=>b.onclick=e=>{
       e.preventDefault();
       e.stopPropagation();
+      const y=window.scrollY;
       const key=b.dataset.yecDetail;
       const card=b.closest('.exact-chart-card');
-      const beforeTop=card?.getBoundingClientRect().top;
       const details=card?.querySelector('.exact-details');
       const willOpen=!openDetails.has(key);
       if(willOpen)openDetails.add(key);else openDetails.delete(key);
       if(details)details.classList.toggle('open',willOpen);
       card?.querySelectorAll('[data-yec-detail]').forEach(btn=>{btn.textContent=willOpen?'−':'+'});
-      if(card&&Number.isFinite(beforeTop)){
-        requestAnimationFrame(()=>{
-          const afterTop=card.getBoundingClientRect().top;
-          window.scrollBy(0,afterTop-beforeTop);
-        });
-      }
+      b.blur();
+      keepViewportPosition(y);
     });
   };
 
@@ -1514,18 +1533,11 @@ async function renderGoat(chartSeg){
     portalEl.querySelectorAll('[data-goat-detail]').forEach(b=>b.onclick=e=>{
       e.preventDefault();
       e.stopPropagation();
+      const y=window.scrollY;
       const key=b.dataset.goatDetail;
-      const card=b.closest('.exact-chart-card');
-      const beforeTop=card?.getBoundingClientRect().top;
       if(openDetails.has(key))openDetails.delete(key);else openDetails.add(key);
       draw();
-      if(Number.isFinite(beforeTop)){
-        requestAnimationFrame(()=>{
-          const nextButton=[...portalEl.querySelectorAll('[data-goat-detail]')].find(x=>x.dataset.goatDetail===key);
-          const nextCard=nextButton?.closest('.exact-chart-card');
-          if(nextCard)window.scrollBy(0,nextCard.getBoundingClientRect().top-beforeTop);
-        });
-      }
+      keepViewportPosition(y);
     });
 
     const prev=document.getElementById('exactGoatPrev'),next=document.getElementById('exactGoatNext');
