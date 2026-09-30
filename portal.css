@@ -4223,3 +4223,15 @@ body:not(.portal-mode) #portalPage{
 .ref-standalone{
   font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
 }
+
+/* ENTITY_LINKS_SITEWIDE_V43 */
+.portal-link,
+.portal-artist-link{
+  color:inherit!important;
+  text-decoration:none!important;
+}
+.portal-link:hover,
+.portal-artist-link:hover{
+  text-decoration:underline!important;
+  text-underline-offset:2px;
+}
