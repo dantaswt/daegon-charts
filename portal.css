@@ -4210,3 +4210,16 @@ body:not(.portal-mode) #portalPage{
     font-size:40px!important;
   }
 }
+
+/* DAEGON_GROTESK_SITEWIDE_V41 */
+.portal-mode .portal-page,
+.portal-mode .portal-page button,
+.portal-mode .portal-page input,
+.portal-mode .portal-page select,
+.portal-mode .portal-page textarea,
+.portal-mode .portal-mobile-drawer,
+.portal-mode .portal-topnav,
+.ref-home-shell,
+.ref-standalone{
+  font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+}
