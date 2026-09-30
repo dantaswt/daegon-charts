@@ -158,8 +158,12 @@ function ensureShell(){
       mobileBtn.setAttribute('aria-expanded',open?'true':'false');
     };
     mobileMenu.addEventListener('click',e=>{
-      const link=e.target.closest('a');
-      if(link) closePortalMenu();
+      const link=e.target.closest('a[data-portal-link]');
+      if(!link)return;
+      e.preventDefault();
+      e.stopPropagation();
+      closePortalMenu();
+      go(link.dataset.portalLink);
     });
     head.insertBefore(mobileBtn,theme);
     const searchBtn=document.createElement('button');
@@ -1235,11 +1239,18 @@ async function renderPeriod(type,chartSeg){
       e.stopPropagation();
       const key=b.dataset.yecDetail;
       const card=b.closest('.exact-chart-card');
+      const beforeTop=card?.getBoundingClientRect().top;
       const details=card?.querySelector('.exact-details');
       const willOpen=!openDetails.has(key);
       if(willOpen)openDetails.add(key);else openDetails.delete(key);
       if(details)details.classList.toggle('open',willOpen);
       card?.querySelectorAll('[data-yec-detail]').forEach(btn=>{btn.textContent=willOpen?'−':'+'});
+      if(card&&Number.isFinite(beforeTop)){
+        requestAnimationFrame(()=>{
+          const afterTop=card.getBoundingClientRect().top;
+          window.scrollBy(0,afterTop-beforeTop);
+        });
+      }
     });
   };
 
@@ -1500,10 +1511,21 @@ async function renderGoat(chartSeg){
     const more=portalEl.querySelector('[data-goat-more]');
     if(more)more.onclick=()=>{mobileExpanded=!mobileExpanded;draw()};
 
-    portalEl.querySelectorAll('[data-goat-detail]').forEach(b=>b.onclick=()=>{
+    portalEl.querySelectorAll('[data-goat-detail]').forEach(b=>b.onclick=e=>{
+      e.preventDefault();
+      e.stopPropagation();
       const key=b.dataset.goatDetail;
+      const card=b.closest('.exact-chart-card');
+      const beforeTop=card?.getBoundingClientRect().top;
       if(openDetails.has(key))openDetails.delete(key);else openDetails.add(key);
       draw();
+      if(Number.isFinite(beforeTop)){
+        requestAnimationFrame(()=>{
+          const nextButton=[...portalEl.querySelectorAll('[data-goat-detail]')].find(x=>x.dataset.goatDetail===key);
+          const nextCard=nextButton?.closest('.exact-chart-card');
+          if(nextCard)window.scrollBy(0,nextCard.getBoundingClientRect().top-beforeTop);
+        });
+      }
     });
 
     const prev=document.getElementById('exactGoatPrev'),next=document.getElementById('exactGoatNext');
@@ -1681,6 +1703,7 @@ function bindLinks(){
   portalEl.querySelectorAll('[data-go]').forEach(x=>x.onclick=()=>go(x.dataset.go));
 }
 async function renderRoute(){
+  closePortalMenu();
   ensureShell();
   const p=routeParts();
   const skeleton=routeSkeletonMeta(p);
