@@ -3628,6 +3628,41 @@ async function resolveImage(e,cfg){
 
   // Exact Apple Music override for releases where generic search can pick the wrong edition.
   // The Life of a Showgirl must use the artwork from "The Encore" edition supplied by the user.
+  // Exact Apple Music fallback for tracks from Rebeldes (2011).
+  // Only applies when the requested song is actually returned inside album 721250427,
+  // so other Rebeldes releases keep using the normal resolver.
+  if(
+    cfg.kind==='song' &&
+    comparable(e.artist)==='rebeldes'
+  ){
+    try{
+      const d=await fetch('https://itunes.apple.com/lookup?id=721250427&entity=song&country=br')
+        .then(r=>r.ok?r.json():null);
+      const results=d?.results||[];
+      const track=results.find(x=>
+        String(x.wrapperType||'').toLowerCase()==='track' &&
+        comparable(x.trackName||'')===comparable(e.name||'')
+      );
+      if(track){
+        const collection=results.find(x=>
+          String(x.wrapperType||'').toLowerCase()==='collection' ||
+          String(x.collectionType||'').toLowerCase()==='album'
+        );
+        let art=track.artworkUrl100||track.artworkUrl60||collection?.artworkUrl100||collection?.artworkUrl60||'';
+        if(art){
+          art=art
+            .replace(/\/\d+x\d+bb(?:-\d+)?\.(jpg|png)$/i,'/1200x1200bb.$1')
+            .replace(/\/100x100bb\.(jpg|png)$/i,'/1200x1200bb.$1');
+          if(/^https?:\/\//i.test(art)){
+            state.images.set(key,art);
+            try{localStorage.setItem('img:'+key,art)}catch{}
+            return art;
+          }
+        }
+      }
+    }catch{}
+  }
+
   if(
     cfg.kind==='album' &&
     comparable(e.name)==='the life of a showgirl' &&
