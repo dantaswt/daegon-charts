@@ -56,7 +56,14 @@ function isHandled(pathname=cleanPath()){
   if(!p.length)return true;
   return PORTAL_ROUTES.has(p[0]) && p[0]!=='chart';
 }
+function closePortalMenu(){
+  const menu=document.getElementById('portalMobileMenu');
+  const btn=document.getElementById('portalMenuToggle');
+  if(menu)menu.classList.remove('open');
+  if(btn)btn.setAttribute('aria-expanded','false');
+}
 function go(path,replace=false){
+  closePortalMenu();
   const target=appHref(path);
   history[replace?'replaceState':'pushState']({},'',target);
   renderRoute();
@@ -145,7 +152,11 @@ function ensureShell(){
       ['DECADE-END','/decade-end'],['GREATEST OF ALL TIME','/goat'],['STATS','/stats'],
       ['AWARDS','/awards'],["#1'S",'/number-ones'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
-    mobileBtn.onclick=()=>mobileMenu.classList.toggle('open');
+    mobileBtn.setAttribute('aria-expanded','false');
+    mobileBtn.onclick=()=>{
+      const open=mobileMenu.classList.toggle('open');
+      mobileBtn.setAttribute('aria-expanded',open?'true':'false');
+    };
     head.insertBefore(mobileBtn,theme);
     const searchBtn=document.createElement('button');
     searchBtn.id='portalSearchBtn';
@@ -1705,7 +1716,7 @@ function onDocumentClick(e){
   const raw=basePrefix()&&href.startsWith(basePrefix())?href.slice(basePrefix().length):href;
   if(raw.startsWith('/about')||raw.startsWith('/methodology')||raw.startsWith('/privacy')||raw.startsWith('/contact')||raw.startsWith('/terms'))return;
   if(raw.startsWith('/chart/')){
-    e.preventDefault();history.pushState({},'',appHref(raw));activateWeeklyIfNeeded();return;
+    e.preventDefault();closePortalMenu();history.pushState({},'',appHref(raw));activateWeeklyIfNeeded();return;
   }
   const first=raw.split('/').filter(Boolean)[0]||'';
   if(PORTAL_ROUTES.has(first)){e.preventDefault();go(raw)}
@@ -1723,6 +1734,6 @@ try{
   }
 }catch{}
 document.addEventListener('click',onDocumentClick);
-window.addEventListener('popstate',()=>{if(!activateWeeklyIfNeeded())renderRoute()});
+window.addEventListener('popstate',()=>{closePortalMenu();if(!activateWeeklyIfNeeded())renderRoute()});
 if(!activateWeeklyIfNeeded())renderRoute();
 })();
