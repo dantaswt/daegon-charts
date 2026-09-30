@@ -1770,15 +1770,23 @@ function activateWeeklyIfNeeded(){
   }
   return false;
 }
+function closeMenuOnNavigationIntent(e){
+  const a=e.target.closest('a[href]');
+  if(!a)return;
+  const href=a.getAttribute('href')||'';
+  if(!href||href.startsWith('#')||href.startsWith('javascript:'))return;
+  closePortalMenu();
+}
 function onDocumentClick(e){
   const a=e.target.closest('a');
   if(!a)return;
   const href=a.getAttribute('href')||'';
   if(!href.startsWith('/')&&!href.startsWith(basePrefix()+'/'))return;
   const raw=basePrefix()&&href.startsWith(basePrefix())?href.slice(basePrefix().length):href;
+  closePortalMenu();
   if(raw.startsWith('/about')||raw.startsWith('/methodology')||raw.startsWith('/privacy')||raw.startsWith('/contact')||raw.startsWith('/terms'))return;
   if(raw.startsWith('/chart/')){
-    e.preventDefault();closePortalMenu();history.pushState({},'',appHref(raw));activateWeeklyIfNeeded();return;
+    e.preventDefault();history.pushState({},'',appHref(raw));activateWeeklyIfNeeded();return;
   }
   const first=raw.split('/').filter(Boolean)[0]||'';
   if(PORTAL_ROUTES.has(first)){e.preventDefault();go(raw)}
@@ -1795,6 +1803,7 @@ try{
     history.replaceState({},'',appHref(normalized||'/'));
   }
 }catch{}
+document.addEventListener('click',closeMenuOnNavigationIntent,true);
 document.addEventListener('click',onDocumentClick);
 window.addEventListener('popstate',()=>{closePortalMenu();if(!activateWeeklyIfNeeded())renderRoute()});
 window.addEventListener('pageshow',closePortalMenu);
