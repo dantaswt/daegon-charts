@@ -332,7 +332,7 @@ function bindHomeSidebar(){
       const q=search.value.trim().toLowerCase();
       if(!q){results.innerHTML='';return}
       const data=await loadWeekly('artists'),items=aggregateCatalog(data,'artist').filter(x=>x.name.toLowerCase().includes(q)).slice(0,8);
-      results.innerHTML=items.map(x=>'<a href="'+appHref(entityPath(x,'artist'))+'" data-portal-link="'+entityPath(x,'artist')+'">'+esc(x.name)+'</a>').join('');
+      results.innerHTML=items.map(x=>'<a href="'+appHref(entityPath(x,'artist'))+'" data-portal-link="'+entityPath(x,'artist')+'">'+esc(portalText(x.name))+'</a>').join('');
       bindLinks();
     };
     search.oninput=draw;
@@ -361,9 +361,15 @@ async function hydratePortalImages(){
 function thumb(e,kind,size=54){
   return '<div data-portal-image data-kind="'+kind+'" data-name="'+escAttr(e.name)+'" data-artist="'+escAttr(e.artist||e.name)+'" style="width:'+size+'px;height:'+size+'px;background:var(--muted);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="fas '+iconFor(kind)+'" style="opacity:.28"></i></div>';
 }
+function portalText(value){return typeof smartDisplayCase==='function'?smartDisplayCase(value):String(value??'')}
+function portalArtist(value){return typeof displayArtist==='function'?displayArtist(value):portalText(value)}
+function portalEntityName(e,kind,text){
+  const value=text??e.name;
+  return kind==='artist'?portalArtist(value):(typeof displayTitle==='function'?displayTitle(value):portalText(value));
+}
 function entityLink(e,kind,text){
   const p=entityPath(e,kind);
-  return '<a class="portal-link" href="'+appHref(p)+'" data-portal-link="'+p+'">'+esc(text??e.name)+'</a>';
+  return '<a class="portal-link" href="'+appHref(p)+'" data-portal-link="'+p+'">'+esc(portalEntityName(e,kind,text))+'</a>';
 }
 function refThumb(e,kind){
   const round=kind==='artist'?' ref-thumb-round':'';
@@ -490,7 +496,7 @@ async function renderHome(){
   };
 
   const numberOnes='<section class="ref-home-section"><div class="ref-section-banner"><span>No. 1 This Week</span><a href="'+appHref('/number-ones')+'" data-portal-link="/number-ones">View All <i class="fas fa-arrow-right"></i></a></div><div class="ref-home-no1-grid">'+
-    no1s.filter(x=>x.e).map(x=>'<div class="ref-home-no1"><div class="ref-home-no1-body">'+refThumb(x.e,charts[x.id].kind)+'<div><div class="ref-no1-chart">'+esc(charts[x.id].title)+'</div><div class="ref-no1-title">'+entityLink(x.e,charts[x.id].kind)+'</div>'+(charts[x.id].kind!=='artist'?'<div class="ref-no1-artist">'+esc(x.e.artist)+'</div>':'')+'</div></div><a href="'+appHref(chartPath(x.id,x.date))+'" class="ref-no1-view">View Chart →</a></div>').join('')+
+    no1s.filter(x=>x.e).map(x=>'<div class="ref-home-no1"><div class="ref-home-no1-body">'+refThumb(x.e,charts[x.id].kind)+'<div><div class="ref-no1-chart">'+esc(charts[x.id].title)+'</div><div class="ref-no1-title">'+entityLink(x.e,charts[x.id].kind)+'</div>'+(charts[x.id].kind!=='artist'?'<div class="ref-no1-artist">'+esc(portalArtist(x.e.artist))+'</div>':'')+'</div></div><a href="'+appHref(chartPath(x.id,x.date))+'" class="ref-no1-view">View Chart →</a></div>').join('')+
     '</div></section>';
 
   const first='<section class="ref-home-section"><div class="ref-section-banner"><span>First-Timers</span><a href="'+appHref('/artists')+'" data-portal-link="/artists">View All <i class="fas fa-arrow-right"></i></a></div><div class="ref-first-grid">'+
@@ -539,7 +545,7 @@ async function renderHome(){
         for(const dt of d.dates){const dd=Math.abs(new Date(dt+'T00:00:00')-target);if(dd<diff){diff=dd;best=dt}}
         const e=(d.entriesByDate[best]||[])[0];return{id,date:best,e};
       });
-      on.innerHTML='<div class="ref-side-section ref-on-week"><div class="ref-side-title">On This Week</div><div class="ref-year-scroll">'+years.map(y=>'<button data-on-year="'+y+'" class="'+(y===selected?'active':'')+'">'+y+'</button>').join('')+'</div><div class="ref-on-list">'+items.filter(x=>x.e).map(x=>'<div class="ref-on-item">'+refThumb(x.e,charts[x.id].kind)+'<div><div class="ref-no1-chart">'+esc(charts[x.id].title)+'</div><div class="ref-on-title">'+entityLink(x.e,charts[x.id].kind)+'</div>'+(charts[x.id].kind!=='artist'?'<div class="ref-on-artist">'+esc(x.e.artist)+'</div>':'')+'</div></div>').join('')+'</div><a class="ref-on-view" href="'+appHref(chartPath('songs',items[0]?.date||latestDate))+'">View Full Chart <i class="fas fa-arrow-right"></i></a></div>';
+      on.innerHTML='<div class="ref-side-section ref-on-week"><div class="ref-side-title">On This Week</div><div class="ref-year-scroll">'+years.map(y=>'<button data-on-year="'+y+'" class="'+(y===selected?'active':'')+'">'+y+'</button>').join('')+'</div><div class="ref-on-list">'+items.filter(x=>x.e).map(x=>'<div class="ref-on-item">'+refThumb(x.e,charts[x.id].kind)+'<div><div class="ref-no1-chart">'+esc(charts[x.id].title)+'</div><div class="ref-on-title">'+entityLink(x.e,charts[x.id].kind)+'</div>'+(charts[x.id].kind!=='artist'?'<div class="ref-on-artist">'+esc(portalArtist(x.e.artist))+'</div>':'')+'</div></div>').join('')+'</div><a class="ref-on-view" href="'+appHref(chartPath('songs',items[0]?.date||latestDate))+'">View Full Chart <i class="fas fa-arrow-right"></i></a></div>';
       bindLinks();hydratePortalImages();on.querySelectorAll('[data-on-year]').forEach(b=>b.onclick=()=>{selected=Number(b.dataset.onYear);drawOn()});
     };
     drawOn();
@@ -567,8 +573,8 @@ async function renderCatalog(kind){
     const rows=Object.keys(groups).sort().map(l=>'<section class="ref-alpha-section"><h2>'+esc(l)+'</h2><div class="ref-catalog-grid">'+groups[l].map(x=>
       '<a href="'+appHref(entityPath(x,kind))+'" data-portal-link="'+entityPath(x,kind)+'" class="ref-catalog-card">'+
       refThumb(x,kind)+
-      '<div class="ref-catalog-copy"><div class="ref-catalog-title">'+esc(x.name)+'</div>'+
-      '<div class="ref-catalog-sub">'+(kind==='artist'?fmtNum(x.entries)+' entries':esc(x.artist)+' · '+fmtNum(x.entries)+' entries')+'</div></div></a>'
+      '<div class="ref-catalog-copy"><div class="ref-catalog-title">'+esc(portalText(x.name))+'</div>'+
+      '<div class="ref-catalog-sub">'+(kind==='artist'?fmtNum(x.entries)+' entries':esc(portalArtist(x.artist))+' · '+fmtNum(x.entries)+' entries')+'</div></div></a>'
     ).join('')+'</div></section>').join('');
 
     portalEl.innerHTML=shellHtml(
@@ -1119,7 +1125,7 @@ async function renderNumberOnes(){
     const cards=datasets.map((data,i)=>{
       const id=ids[i],cfg=charts[id],entry=(data.entriesByDate[selected]||[]).find(e=>e.position===1);
       if(!entry)return '<div class="ref-no1-card"><div class="ref-no1-empty">No data</div></div>';
-      return '<div class="ref-no1-card"><div class="ref-no1-body">'+refThumb(entry,cfg.kind)+'<div class="ref-no1-copy"><div class="ref-no1-chart">'+esc(cfg.title)+'</div><div class="ref-no1-title">'+entityLink(entry,cfg.kind)+'</div>'+(cfg.kind!=='artist'?'<div class="ref-no1-artist">'+esc(entry.artist)+'</div>':'')+'</div></div><a class="ref-no1-view" href="'+appHref(chartPath(id,selected))+'">View Chart →</a></div>';
+      return '<div class="ref-no1-card"><div class="ref-no1-body">'+refThumb(entry,cfg.kind)+'<div class="ref-no1-copy"><div class="ref-no1-chart">'+esc(cfg.title)+'</div><div class="ref-no1-title">'+entityLink(entry,cfg.kind)+'</div>'+(cfg.kind!=='artist'?'<div class="ref-no1-artist">'+esc(portalArtist(entry.artist))+'</div>':'')+'</div></div><a class="ref-no1-view" href="'+appHref(chartPath(id,selected))+'">View Chart →</a></div>';
     }).join('');
     portalEl.innerHTML=shellHtml(
       refHero("#1'S","#1's","The #1 hit on every chart this week")+
@@ -1153,8 +1159,8 @@ async function renderStats(){
   let active='songs',type=0;
   const draw=()=>{
     const cats=chartStats[active],cat=cats[type],kind=charts[active].kind;
-    const summary=cats.map(c=>{const x=c.records[0];return '<div class="orig-summary-card"><div class="orig-summary-head"><span class="orig-summary-icon"><i class="fas '+c.icon+'"></i></span><span>'+esc(c.title)+'</span></div>'+(x?'<div class="orig-summary-name">'+esc(x.name)+'</div>'+(kind!=='artist'?'<div class="orig-summary-artist">'+esc(x.artist||'')+'</div>':'')+'<div class="orig-summary-value">'+esc(c.value(x))+'</div>':'')+'</div>'}).join('');
-    const rows=cat.records.map((x,i)=>'<div class="orig-record-row"><div class="orig-record-rank '+(i<3?'top':'')+'">'+(i+1)+'</div>'+refThumb(x,kind)+'<div class="orig-record-main"><div class="orig-record-name">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="orig-record-artist">'+esc(x.artist||'')+'</div>':'')+'</div><div class="orig-record-value">'+esc(cat.value(x))+(x.peak?'<small>Peak #'+x.peak+'</small>':'')+'</div></div>').join('');
+    const summary=cats.map(c=>{const x=c.records[0];return '<div class="orig-summary-card"><div class="orig-summary-head"><span class="orig-summary-icon"><i class="fas '+c.icon+'"></i></span><span>'+esc(c.title)+'</span></div>'+(x?'<div class="orig-summary-name">'+esc(portalText(x.name))+'</div>'+(kind!=='artist'?'<div class="orig-summary-artist">'+esc(portalArtist(x.artist||''))+'</div>':'')+'<div class="orig-summary-value">'+esc(c.value(x))+'</div>':'')+'</div>'}).join('');
+    const rows=cat.records.map((x,i)=>'<div class="orig-record-row"><div class="orig-record-rank '+(i<3?'top':'')+'">'+(i+1)+'</div>'+refThumb(x,kind)+'<div class="orig-record-main"><div class="orig-record-name">'+entityLink(x,kind)+'</div>'+(kind!=='artist'?'<div class="orig-record-artist">'+esc(portalArtist(x.artist||''))+'</div>':'')+'</div><div class="orig-record-value">'+esc(cat.value(x))+(x.peak?'<small>Peak #'+x.peak+'</small>':'')+'</div></div>').join('');
     const main='<div class="orig-stats-page">'+originalHero('STATS','Stats','Records, milestones & chart history across every chart')+
       '<section class="orig-stats-tools"><select id="origStatsChart"><option value="songs" '+(active==='songs'?'selected':'')+'>Hot 100</option><option value="albums" '+(active==='albums'?'selected':'')+'>Top 100 Albums</option><option value="artists" '+(active==='artists'?'selected':'')+'>Artist 50</option></select><select id="origStatsType">'+cats.map((c,i)=>'<option value="'+i+'" '+(i===type?'selected':'')+'>'+esc(c.title)+'</option>').join('')+'</select></section>'+
       '<section class="orig-overview"><div class="orig-eyebrow">Overview</div><div class="orig-summary-grid">'+summary+'</div></section>'+
@@ -1577,11 +1583,11 @@ async function renderChartBeat(){
     const article='<article class="orig-beat-article">'+
       '<div class="editorial-kicker">Weekly analysis</div>'+
       (no1?'<h2>'+esc(no1.name)+' leads the '+esc(charts[active].title)+'</h2><p><strong>'+esc(no1.artist||no1.name)+'</strong> holds No. 1 for the chart week of '+fmtDate(date)+'. The chart below is read from the same weekly dataset used throughout the archive, so movement and historical runs remain directly traceable to the source week.</p>':'')+
-      (top10.length?'<h3>Inside the Top 10</h3><p>The week’s Top 10 contains '+top10.length+' entries. '+top10.slice(0,3).map((x,i)=>(i+1)+'. <strong>'+esc(x.name)+'</strong>').join(' · ')+' lead the upper tier.</p>':'')+
-      (debuts.length?'<h3>New entries</h3><p>'+debuts.map(x=>'<strong>'+esc(x.name)+'</strong>').join(', ')+' '+(debuts.length===1?'makes':'make')+' a first chart appearance this week.</p>':'')+
-      (returners.length?'<h3>Returns</h3><p>'+returners.map(x=>'<strong>'+esc(x.name)+'</strong>').join(', ')+' return to the ranking after appearing in an earlier week.</p>':'')+
-      (mover?'<h3>Biggest upward move</h3><p><strong>'+esc(mover.name)+'</strong> posts the strongest climb among the entries shown this week ('+esc(mover.diff)+').</p>':'')+
-      (steady.length?'<h3>Holding position</h3><p>'+steady.slice(0,3).map(x=>'<strong>'+esc(x.name)+'</strong>').join(', ')+' remain at the same rank as the previous chart week.</p>':'')+
+      (top10.length?'<h3>Inside the Top 10</h3><p>The week’s Top 10 contains '+top10.length+' entries. '+top10.slice(0,3).map((x,i)=>(i+1)+'. <strong>'+esc(portalText(x.name))+'</strong>').join(' · ')+' lead the upper tier.</p>':'')+
+      (debuts.length?'<h3>New entries</h3><p>'+debuts.map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+' '+(debuts.length===1?'makes':'make')+' a first chart appearance this week.</p>':'')+
+      (returners.length?'<h3>Returns</h3><p>'+returners.map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+' return to the ranking after appearing in an earlier week.</p>':'')+
+      (mover?'<h3>Biggest upward move</h3><p><strong>'+esc(portalText(mover.name))+'</strong> posts the strongest climb among the entries shown this week ('+esc(mover.diff)+').</p>':'')+
+      (steady.length?'<h3>Holding position</h3><p>'+steady.slice(0,3).map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+' remain at the same rank as the previous chart week.</p>':'')+
       '<div class="beat-method-note"><strong>About Chart Beat:</strong> this page summarizes movements already present in the Daegon weekly chart. It does not add a separate editorial score to the rankings. <a href="'+appHref('/methodology')+'">Read the methodology →</a></div>'+
     '</article>';
     const main='<div class="orig-beat-layout"><aside class="orig-beat-side"><h2>Chart Beat</h2><div class="orig-beat-charts">'+ids.map(id=>'<button data-beat-chart="'+id+'" class="'+(id===active?'active':'')+'"><i class="fas '+(charts[id].icon||'fa-chart-bar')+'"></i>'+esc(charts[id].title)+'</button>').join('')+'</div><h3>Weeks</h3><div class="orig-beat-weeks">'+dates.slice(0,80).map(x=>'<button data-beat-date="'+x+'" class="'+(x===date?'active':'')+'">'+fmtDate(x)+'</button>').join('')+'</div></aside><main class="orig-beat-main"><div class="orig-beat-title"><h1>Chart Beat</h1><p>'+esc(charts[active].title)+' · '+fmtDate(date)+'</p></div><div class="orig-beat-actions"><a href="'+appHref(chartPath(active,date))+'" class="orig-view"><i class="fas fa-chart-bar"></i> View Raw Chart</a></div>'+article+'</main></div>';
@@ -1602,7 +1608,7 @@ async function renderAwards(){
 async function renderAwardsYear(year){
   const datasets=await Promise.all(['songs','albums','artists'].map(loadWeekly));
   const winners=datasets.map((d,i)=>{const id=['songs','albums','artists'][i];return{id,kind:charts[id].kind,list:aggregatePeriod(d,id,x=>x.startsWith(year+'-')).slice(0,5)}});
-  const main='<div class="orig-awards"><div class="orig-awards-bar"><a href="'+appHref('/awards')+'" class="orig-awards-logo"><i class="fas fa-trophy"></i><span>DAEGON AWARDS</span></a></div><div class="orig-awards-body"><div class="orig-awards-intro"><h2>Daegon Music Awards '+esc(year)+'</h2></div><div class="orig-award-winners">'+winners.map(w=>'<section><h3>'+esc(charts[w.id].title)+'</h3>'+w.list.map((x,i)=>'<div class="orig-record-row"><div class="orig-record-rank '+(i===0?'top':'')+'">'+(i+1)+'</div><div class="orig-record-main"><div class="orig-record-name">'+entityLink(x,w.kind)+'</div>'+(w.kind!=='artist'?'<div class="orig-record-artist">'+esc(x.artist||'')+'</div>':'')+'</div></div>').join('')+'</section>').join('')+'</div></div></div>';
+  const main='<div class="orig-awards"><div class="orig-awards-bar"><a href="'+appHref('/awards')+'" class="orig-awards-logo"><i class="fas fa-trophy"></i><span>DAEGON AWARDS</span></a></div><div class="orig-awards-body"><div class="orig-awards-intro"><h2>Daegon Music Awards '+esc(year)+'</h2></div><div class="orig-award-winners">'+winners.map(w=>'<section><h3>'+esc(charts[w.id].title)+'</h3>'+w.list.map((x,i)=>'<div class="orig-record-row"><div class="orig-record-rank '+(i===0?'top':'')+'">'+(i+1)+'</div><div class="orig-record-main"><div class="orig-record-name">'+entityLink(x,w.kind)+'</div>'+(w.kind!=='artist'?'<div class="orig-record-artist">'+esc(portalArtist(x.artist||''))+'</div>':'')+'</div></div>').join('')+'</section>').join('')+'</div></div></div>';
   setMode(true);portalEl.innerHTML=shellHtml(main);bindLinks();
 }
 
@@ -1713,7 +1719,7 @@ async function renderSearch(){
     if(inp.value.trim().toLowerCase()!==q)return;
     const hits=data.filter(x=>(x.name+' '+(x.artist||'')).toLowerCase().includes(q)).slice(0,100);
     rows.className='portal-list';
-    rows.innerHTML=hits.map(x=>'<div class="portal-row"><div class="portal-row-rank"><i class="fas '+iconFor(x.kind)+'"></i></div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,x.kind)+'</div><div class="portal-row-sub">'+labelFor(x.kind)+(x.kind!=='artist'?' · '+esc(x.artist):'')+'</div></div><div class="portal-row-meta">Peak #'+x.peak+' · '+x.weeks+' weeks</div></div>').join('')||'<div class="portal-empty">No results.</div>';
+    rows.innerHTML=hits.map(x=>'<div class="portal-row"><div class="portal-row-rank"><i class="fas '+iconFor(x.kind)+'"></i></div><div class="portal-row-main"><div class="portal-row-title">'+entityLink(x,x.kind)+'</div><div class="portal-row-sub">'+labelFor(x.kind)+(x.kind!=='artist'?' · '+esc(portalArtist(x.artist)):'')+'</div></div><div class="portal-row-meta">Peak #'+x.peak+' · '+x.weeks+' weeks</div></div>').join('')||'<div class="portal-empty">No results.</div>';
     bindLinks();
   };
 
