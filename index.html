@@ -2462,6 +2462,28 @@
   .m-actions .award i{font-size:16px!important}
 }
 </style>
+<style id="weekly-mobile-reentry-v35">
+@media(max-width:767px){
+  .m-diff .diff-re{
+    min-width:42px!important;
+    min-height:38px!important;
+    padding:4px 5px!important;
+    font-size:11px!important;
+    line-height:.92!important;
+    font-weight:800!important;
+    text-align:center!important;
+    white-space:normal!important;
+  }
+}
+@media(max-width:430px){
+  .m-diff .diff-re{
+    min-width:38px!important;
+    min-height:34px!important;
+    padding:3px 4px!important;
+    font-size:10px!important;
+  }
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -3009,7 +3031,7 @@ function diffType(diff){const d=String(diff||'');if(d==='NEW')return'debut';if(d
 function diffHtml(diff){
   const d=String(diff||'');
   if(d==='NEW')return '<span class="diff-badge diff-new">NEW</span>';
-  if(d==='RE')return '<span class="diff-badge diff-new">RE-ENTRY</span>';
+  if(d==='RE')return '<span class="diff-badge diff-new diff-re">RE-<br>ENTRY</span>';
   if(d.startsWith('▲'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M4 7l4-4 4 4"/></svg>';
   if(d.startsWith('▼'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 13V3M4 9l4 4 4-4"/></svg>';
   return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
