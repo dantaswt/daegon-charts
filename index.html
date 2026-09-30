@@ -3087,6 +3087,45 @@ function detailHtml(e,cfg,data,date,copy){
       : '<div class="details-empty">No chart run available.</div>')+
   '</div>';
 }
+const DISPLAY_CASE_EXCEPTIONS=new Map([
+  ['P!NK','P!nk'],['AC/DC','AC/DC'],['T.A.T.U.','t.A.T.u.'],['WILL.I.AM','will.i.am'],
+  ['*NSYNC','*NSYNC'],['NSYNC','*NSYNC'],['OUTKAST','OutKast'],['JAY Z','JAY Z'],['JAY-Z','JAY Z'],
+  ['ABBA','ABBA'],['U2','U2'],['R.E.M.','R.E.M.'],['TLC','TLC'],['BTS','BTS'],['M.I.A.','M.I.A.'],
+  ['N.E.R.D.','N.E.R.D.'],['N.E.R.D','N.E.R.D.'],['INXS','INXS'],['UB40','UB40'],['D12','D12'],
+  ['RBD','RBD'],['CSS','CSS'],['S.H.E','S.H.E'],['T.I.','T.I.'],['DMX','DMX'],['LL COOL J','LL Cool J'],
+  ['3LW','3LW'],['2NE1','2NE1'],['4 NON BLONDES','4 Non Blondes']
+]);
+const DISPLAY_SMALL_WORDS=new Set(['a','an','and','as','at','but','by','for','from','in','into','nor','of','on','or','the','to','vs','with']);
+function smartDisplayCase(value,{artist=false}={}){
+  const raw=String(value??'').trim();
+  if(!raw)return raw;
+  const exception=DISPLAY_CASE_EXCEPTIONS.get(raw.toUpperCase());
+  if(exception)return exception;
+  const letters=raw.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/g)||[];
+  if(!letters.length)return raw;
+  const isAllCaps=letters.every(ch=>ch===ch.toUpperCase());
+  if(!isAllCaps)return raw;
+
+  const parts=raw.split(/(\s+)/);
+  let wordIndex=0;
+  const wordCount=parts.filter(p=>!/^\s+$/.test(p)).length;
+  return parts.map(part=>{
+    if(/^\s+$/.test(part))return part;
+    const tokenException=DISPLAY_CASE_EXCEPTIONS.get(part.toUpperCase());
+    if(tokenException){wordIndex++;return tokenException}
+    const idx=wordIndex++;
+    return part.split(/([\-\/])/).map(piece=>{
+      if(piece==='-'||piece==='/')return piece;
+      return piece.replace(/[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)*/g,word=>{
+        const lower=word.toLocaleLowerCase();
+        if(!artist&&idx>0&&idx<wordCount-1&&DISPLAY_SMALL_WORDS.has(lower))return lower;
+        return lower.replace(/(^|['’])[A-Za-zÀ-ÖØ-öø-ÿ]/g,m=>m.toLocaleUpperCase());
+      });
+    }).join('');
+  }).join('');
+}
+function displayTitle(name){return smartDisplayCase(visibleChartTitle(name))}
+function displayArtist(name){return smartDisplayCase(name,{artist:true})}
 function visibleChartTitle(name){
   return String(name||'').replace(/\s*[\(\[]?\s*(?:feat\.?|ft\.?|featuring)\s+[^\)\]]+[\)\]]?\s*$/i,'').trim()||String(name||'');
 }
@@ -3125,7 +3164,7 @@ function renderRows(data,date){
         '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div>'+(one&&w1>=2?'<div class="weeks1">'+w1+' '+(w1===1?'WEEK':'WEEKS')+'</div>':'')+'</div>'+
         coverHtml(e,one,false)+
         '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
-        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+esc(cfg.kind==='song'?visibleChartTitle(e.name):e.name)+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+esc(e.artist)+'</div>':'')+'</div>'+
+        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+esc(displayArtist(e.artist))+'</div>':'')+'</div>'+
         '<div class="right">'+(award.hasStar?'<span class="award" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><i class="fas fa-star" style="font-size:11px"></i></span>':'')+
           metricsHtml(e)+
           '<div class="actions">'+
@@ -3135,7 +3174,7 @@ function renderRows(data,date){
       '<div class="mobile-row">'+
         '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div>'+(one&&w1>=2?'<div class="weeks1" style="font-size:7px;padding:2px 4px">'+w1+'W AT #1</div>':'')+'</div>'+
         coverHtml(e,one,true)+
-        '<div class="m-entry"><div class="m-title">'+esc(e.name)+(!one&&w1>=2?'<span class="badge-inline" style="font-size:7px">'+w1+'W AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
+        '<div class="m-entry"><div class="m-title">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline" style="font-size:7px">'+w1+'W AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(displayArtist(e.artist))+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
         '<div class="m-actions"><div class="m-actions-top">'+(award.hasStar?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':'')+'</div><button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
       (open?detailHtml(e,cfg,data,date,copy):'')+
@@ -3353,6 +3392,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260930-menu-scroll-anchor-3"></script>
+<script src="/portal.js?v=20260930-menu-scroll-anchor-4"></script>
 </body>
 </html>
