@@ -2905,6 +2905,16 @@
   }
 }
 </style>
+<style id="entity-links-sitewide-v43">
+.weekly-entity-link{
+  color:inherit!important;
+  text-decoration:none!important;
+}
+.weekly-entity-link:hover{
+  text-decoration:underline!important;
+  text-underline-offset:2px;
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -3868,6 +3878,23 @@ function coverHtml(e,one,mobile=false){
     play+
   '</div>';
 }
+function weeklyEntitySlug(e,kind){
+  const slug=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+    .replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  if(kind==='artist')return slug(e.name||e.artist);
+  return slug(e.name)+'--'+slug(e.artist);
+}
+function weeklyEntityHref(e,kind){
+  return '/'+kind+'/'+weeklyEntitySlug(e,kind);
+}
+function weeklyEntityLink(e,kind,text){
+  return '<a class="weekly-entity-link" href="'+weeklyEntityHref(e,kind)+'">'+esc(text)+'</a>';
+}
+function weeklyArtistLink(artist){
+  const name=displayArtist(artist);
+  return '<a class="weekly-entity-link weekly-artist-link" href="/artist/'+weeklyEntitySlug({name:artist},'artist')+'">'+esc(name)+'</a>';
+}
+
 function metricsHtml(e){
   const lw=e.lastWeek!==undefined&&String(e.lastWeek).trim()!==''?(String(e.lastWeek)==='0'?'-':String(e.lastWeek)):'-';
   const peak=e.peak>0?String(e.peak):'-';
@@ -3986,7 +4013,7 @@ function renderRows(data,date){
         '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div>'+(one&&w1>=2?'<div class="weeks1">'+w1+' '+(w1===1?'WEEK':'WEEKS')+'</div>':'')+'</div>'+
         coverHtml(e,one,false)+
         '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
-        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+esc(displayArtist(e.artist))+'</div>':'')+'</div>'+
+        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+weeklyArtistLink(e.artist)+'</div>':'')+'</div>'+
         '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><i class="fas fa-star" style="font-size:11px"></i></span>':'')+
           metricsHtml(e)+
           '<div class="actions">'+
@@ -3996,7 +4023,7 @@ function renderRows(data,date){
       '<div class="mobile-row">'+
         '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div></div>'+
         coverHtml(e,one,true)+
-        '<div class="m-entry"><div class="m-title">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(displayArtist(e.artist))+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
+        '<div class="m-entry"><div class="m-title">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+weeklyArtistLink(e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
         '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><i class="fas fa-star"></i></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
       (open?detailHtml(e,cfg,data,date,copy):'')+
