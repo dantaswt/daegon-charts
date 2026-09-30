@@ -3158,21 +3158,42 @@ function renderRows(data,date){
     e.stopPropagation();
     const k=b.dataset.key;
     const card=b.closest('.chart-card');
-    const cardTop=card?.getBoundingClientRect().top;
-    if(state.details.has(k))state.details.delete(k);else state.details.add(k);
+    if(!card)return;
+    const entry=rows.find(x=>(date+'|'+x.position+'|'+x.name+'|'+x.artist)===k);
+    if(!entry)return;
+
+    const isOpen=state.details.has(k);
+    if(isOpen){
+      state.details.delete(k);
+      card.querySelector('.details-panel')?.remove();
+      card.querySelectorAll('.details-btn').forEach(btn=>btn.textContent='+');
+      b.blur();
+      return;
+    }
+
+    state.details.add(k);
+    const template=document.createElement('template');
+    template.innerHTML=detailHtml(entry,cfg,data,date,copyText(entry,cfg,date,data)).trim();
+    const panel=template.content.firstElementChild;
+    if(panel){
+      card.appendChild(panel);
+      card.querySelectorAll('.details-btn').forEach(btn=>btn.textContent='−');
+
+      const copyBtn=panel.querySelector('.copy-detail');
+      if(copyBtn)copyBtn.onclick=async()=>{
+        const text=copyBtn.dataset.copy||'';
+        try{
+          if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+          else{
+            const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+          }
+          const top=copyBtn.querySelector('.details-copy-top span');
+          if(top){const old=top.textContent;top.textContent='Copied!';setTimeout(()=>top.textContent=old,1200)}
+        }catch{}
+      };
+      panel.querySelectorAll('.run-jump').forEach(run=>run.onclick=()=>setDate(run.dataset.date,data));
+    }
     b.blur();
-    renderRows(data,date);
-    const restore=()=>{
-      if(!Number.isFinite(cardTop))return;
-      const nextCard=[...content.querySelectorAll('.chart-card')].find(el=>el.dataset.key===k);
-      if(!nextCard)return;
-      const delta=nextCard.getBoundingClientRect().top-cardTop;
-      if(Math.abs(delta)>.5)window.scrollBy(0,delta);
-    };
-    restore();
-    requestAnimationFrame(()=>{restore();requestAnimationFrame(restore)});
-    setTimeout(restore,80);
-    setTimeout(restore,180);
   });
   content.querySelectorAll('.run-jump').forEach(b=>b.onclick=()=>setDate(b.dataset.date,data));
   content.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const e=all.find(x=>itemKey(x)===b.dataset.entry);if(e)playEntry(e,b)});
@@ -3332,6 +3353,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260930-menu-scroll-anchor-2"></script>
+<script src="/portal.js?v=20260930-menu-scroll-anchor-3"></script>
 </body>
 </html>
