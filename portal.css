@@ -4174,3 +4174,39 @@ body:not(.portal-mode) #portalPage{
   text-align:center!important;
   justify-content:center!important;
 }
+
+/* BILLBOARD_MOBILE_GLOBAL_HEADING_SCALE_V39 */
+@media(max-width:767px){
+  .portal-title,
+  .portal-mode .portal-title,
+  .ref-hero h1{
+    font-size:38px!important;
+    line-height:.96!important;
+    letter-spacing:-.035em!important;
+  }
+  .ref-hero p,
+  .portal-subtitle{
+    font-size:13px!important;
+    line-height:1.35!important;
+  }
+  .portal-kicker{
+    font-size:12px!important;
+  }
+  .ref-home-hero h1{
+    font-size:42px!important;
+    line-height:.96!important;
+  }
+  .ref-home-hero p{
+    font-size:13px!important;
+  }
+}
+@media(max-width:430px){
+  .portal-title,
+  .portal-mode .portal-title,
+  .ref-hero h1{
+    font-size:36px!important;
+  }
+  .ref-home-hero h1{
+    font-size:40px!important;
+  }
+}
