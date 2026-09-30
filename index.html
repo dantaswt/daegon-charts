@@ -3156,17 +3156,21 @@ function renderRows(data,date){
   content.querySelectorAll('.details-btn').forEach(b=>b.onclick=e=>{
     e.preventDefault();
     e.stopPropagation();
-    const y=window.scrollY;
     const k=b.dataset.key;
+    const card=b.closest('.chart-card');
+    const cardTop=card?.getBoundingClientRect().top;
     if(state.details.has(k))state.details.delete(k);else state.details.add(k);
     b.blur();
     renderRows(data,date);
-    const restore=()=>window.scrollTo(0,y);
+    const restore=()=>{
+      if(!Number.isFinite(cardTop))return;
+      const nextCard=[...content.querySelectorAll('.chart-card')].find(el=>el.dataset.key===k);
+      if(!nextCard)return;
+      const delta=nextCard.getBoundingClientRect().top-cardTop;
+      if(Math.abs(delta)>.5)window.scrollBy(0,delta);
+    };
     restore();
-    requestAnimationFrame(()=>{
-      restore();
-      requestAnimationFrame(restore);
-    });
+    requestAnimationFrame(()=>{restore();requestAnimationFrame(restore)});
     setTimeout(restore,80);
     setTimeout(restore,180);
   });
@@ -3328,6 +3332,6 @@ if(/\/chart\//.test(location.pathname)){
   loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
 }
 </script>
-<script src="/portal.js?v=20260929-scroll-menu-fix-1"></script>
+<script src="/portal.js?v=20260930-menu-scroll-anchor-2"></script>
 </body>
 </html>
