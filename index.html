@@ -2915,6 +2915,38 @@
   text-underline-offset:2px;
 }
 </style>
+<style id="weekly-exact-star-v44">
+.award-star-img{
+  display:block!important;
+  width:15px!important;
+  height:15px!important;
+  object-fit:contain!important;
+  border:0!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+}
+@media(max-width:767px){
+  .m-actions .award-performance .award-star-img{
+    width:16px!important;
+    height:16px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:16px!important;
+    height:16px!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions .award-performance .award-star-img{
+    width:15px!important;
+    height:15px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:15px!important;
+    height:15px!important;
+  }
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -4014,7 +4046,7 @@ function renderRows(data,date){
         coverHtml(e,one,false)+
         '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
         '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+weeklyArtistLink(e.artist)+'</div>':'')+'</div>'+
-        '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><i class="fas fa-star" style="font-size:11px"></i></span>':'')+
+        '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><img class="award-star-img" src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-star-vector-icon-png-image_696411.jpg" alt="" aria-hidden="true"></span>':'')+
           metricsHtml(e)+
           '<div class="actions">'+
           '<button class="action details-btn" aria-label="Toggle details" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
@@ -4024,7 +4056,7 @@ function renderRows(data,date){
         '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div></div>'+
         coverHtml(e,one,true)+
         '<div class="m-entry"><div class="m-title">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+weeklyArtistLink(e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
-        '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><i class="fas fa-star"></i></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+        '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><img class="award-star-img" src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-star-vector-icon-png-image_696411.jpg" alt="" aria-hidden="true"></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
       (open?detailHtml(e,cfg,data,date,copy):'')+
     '</article>';
