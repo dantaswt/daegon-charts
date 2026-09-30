@@ -161,11 +161,30 @@ body{padding-top:68px!important}
   const menu=document.getElementById('globalMenuToggle');
   const drawer=document.getElementById('globalMobileDrawer');
   const theme=document.getElementById('globalThemeToggle');
+  const closeMenu=()=>{
+    if(drawer){
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden','true');
+    }
+    if(menu)menu.setAttribute('aria-expanded','false');
+    document.documentElement.classList.remove('menu-open');
+    document.body.classList.remove('menu-open');
+    if(document.body.style.overflow==='hidden')document.body.style.removeProperty('overflow');
+  };
   if(menu&&drawer){
+    drawer.setAttribute('aria-hidden','true');
     menu.addEventListener('click',function(){
-      const open=drawer.classList.toggle('open');
-      menu.setAttribute('aria-expanded',open?'true':'false');
+      const open=!drawer.classList.contains('open');
+      closeMenu();
+      if(open){
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden','false');
+        menu.setAttribute('aria-expanded','true');
+      }
     });
+    drawer.querySelectorAll('a').forEach(link=>link.addEventListener('click',closeMenu));
+    window.addEventListener('pageshow',closeMenu);
+    window.addEventListener('popstate',closeMenu);
   }
   if(theme){
     theme.addEventListener('click',function(){
