@@ -2141,6 +2141,208 @@
   .exact-goat-desktop-metric{display:none!important}
 }
 </style>
+<style id="weekly-billboard-mobile-v32">
+@media(max-width:767px){
+  /* Billboard-style weekly list. Mobile only. Desktop remains untouched. */
+  .chart-list{
+    gap:0!important;
+    margin-left:-8px!important;
+    margin-right:-8px!important;
+    max-width:none!important;
+    background:var(--background)!important;
+  }
+  .chart-card{
+    position:relative!important;
+    margin:0!important;
+    min-height:124px!important;
+    padding:12px 10px!important;
+    border:0!important;
+    border-bottom:9px solid var(--background)!important;
+    background:var(--card)!important;
+    box-shadow:none!important;
+  }
+  .chart-card:hover{transform:none!important;box-shadow:none!important}
+  .mobile-row{
+    display:grid!important;
+    grid-template-columns:42px 96px minmax(0,1fr) 42px!important;
+    gap:10px!important;
+    align-items:center!important;
+    min-height:103px!important;
+  }
+  .m-rank{
+    width:42px!important;
+    height:96px!important;
+    padding:0!important;
+    align-self:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+  }
+  .m-rank-num{
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:28px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:-.04em!important;
+    color:var(--foreground)!important;
+  }
+  .m-diff{
+    height:26px!important;
+    margin:0!important;
+    color:#929292!important;
+  }
+  .m-diff .diff-arrow{
+    width:24px!important;
+    height:24px!important;
+    stroke-width:2.4!important;
+  }
+  .m-diff .diff-badge{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:38px!important;
+    min-height:22px!important;
+    padding:3px 5px!important;
+    background:#00f5a4!important;
+    color:#000!important;
+    font-size:11px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+  }
+  .m-cover,
+  .m-cover.one{
+    width:96px!important;
+    height:96px!important;
+    margin:0!important;
+    border:0!important;
+    flex:0 0 96px!important;
+    align-self:center!important;
+  }
+  .m-cover img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .m-entry{
+    min-width:0!important;
+    align-self:center!important;
+    padding:1px 0!important;
+  }
+  .m-title{
+    display:block!important;
+    margin:0!important;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:18px!important;
+    line-height:1.08!important;
+    font-weight:800!important;
+    letter-spacing:-.02em!important;
+    color:var(--foreground)!important;
+    overflow-wrap:anywhere!important;
+  }
+  .m-artist{
+    margin-top:4px!important;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:17px!important;
+    line-height:1.08!important;
+    font-weight:400!important;
+    color:var(--foreground)!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+  .m-metrics{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:baseline!important;
+    column-gap:10px!important;
+    row-gap:2px!important;
+    margin-top:11px!important;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:13px!important;
+    line-height:1.15!important;
+    font-weight:400!important;
+    color:var(--foreground)!important;
+    white-space:normal!important;
+  }
+  .m-metrics span{white-space:nowrap!important}
+  .m-metrics b,
+  .m-weeks-no1 b{
+    color:#8e8e8e!important;
+    font-weight:400!important;
+  }
+  .m-weeks-no1{
+    margin-top:5px!important;
+    font-family:"Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:13px!important;
+    line-height:1.15!important;
+    font-weight:400!important;
+    color:var(--foreground)!important;
+    white-space:nowrap!important;
+  }
+  .m-actions{
+    width:42px!important;
+    height:96px!important;
+    align-self:center!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+  }
+  .m-actions-top{
+    min-height:28px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .m-actions .award{
+    width:auto!important;
+    height:auto!important;
+    border:0!important;
+    background:transparent!important;
+    color:var(--foreground)!important;
+  }
+  .m-actions .award i{font-size:22px!important}
+  .m-actions .action{
+    width:34px!important;
+    height:34px!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    background:transparent!important;
+    color:#8f8f8f!important;
+    font-size:27px!important;
+    line-height:28px!important;
+    font-weight:300!important;
+    padding:0 0 3px!important;
+  }
+  .cover.weekly-artist-art,
+  .m-cover.weekly-artist-art{
+    width:96px!important;
+    height:96px!important;
+    flex:0 0 96px!important;
+  }
+}
+@media(max-width:430px){
+  .mobile-row{
+    grid-template-columns:36px 82px minmax(0,1fr) 38px!important;
+    gap:8px!important;
+    min-height:94px!important;
+  }
+  .chart-card{min-height:112px!important;padding:9px 7px!important}
+  .m-rank{width:36px!important;height:82px!important;gap:8px!important}
+  .m-rank-num{font-size:25px!important}
+  .m-diff .diff-arrow{width:21px!important;height:21px!important}
+  .m-diff .diff-badge{min-width:34px!important;min-height:20px!important;font-size:10px!important;padding:3px 4px!important}
+  .m-cover,.m-cover.one,
+  .cover.weekly-artist-art,.m-cover.weekly-artist-art{
+    width:82px!important;height:82px!important;flex-basis:82px!important;
+  }
+  .m-title{font-size:16px!important}
+  .m-artist{font-size:15px!important;margin-top:3px!important}
+  .m-metrics{font-size:11px!important;column-gap:7px!important;margin-top:8px!important}
+  .m-weeks-no1{font-size:11px!important;margin-top:4px!important}
+  .m-actions{width:38px!important;height:82px!important;gap:8px!important}
+  .m-actions .award i{font-size:19px!important}
+  .m-actions .action{width:32px!important;height:32px!important;font-size:25px!important}
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -3056,7 +3258,7 @@ function metricsHtml(e){
     '<span>WEEKS <span class="metric-v">'+esc(weeks)+'</span></span>'+
   '</div>';
 }
-function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';return '<div class="m-metrics"><span>LW '+esc(lw)+'</span><span>·</span><span>PEAK '+esc(e.peak||'-')+'</span><span>·</span><span>WEEKS '+esc(e.weeks||'-')+'</span></div>'}
+function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';const w1=Number(e.weeksAt1||0);return '<div class="m-metrics"><span><b>LW</b> '+esc(lw)+'</span><span><b>PEAK</b> '+esc(e.peak||'-')+'</span><span><b>WEEKS ON CHART</b> '+esc(e.weeks||'-')+'</span></div>'+(w1>0?'<div class="m-weeks-no1"><b>WEEKS AT NO. 1</b> '+esc(w1)+'</div>':'')}
 function detailHtml(e,cfg,data,date,copy){
   const run=runEntries(e,data,date);
   const copyBlock=
@@ -3170,9 +3372,9 @@ function renderRows(data,date){
         '</div>'+
       '</div>'+
       '<div class="mobile-row">'+
-        '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div>'+(one&&w1>=2?'<div class="weeks1" style="font-size:7px;padding:2px 4px">'+w1+'W AT #1</div>':'')+'</div>'+
+        '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div></div>'+
         coverHtml(e,one,true)+
-        '<div class="m-entry"><div class="m-title">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline" style="font-size:7px">'+w1+'W AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(displayArtist(e.artist))+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
+        '<div class="m-entry"><div class="m-title">'+esc(cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+esc(displayArtist(e.artist))+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
         '<div class="m-actions"><div class="m-actions-top">'+(award.hasStar?'<span class="award"><i class="fas fa-star" style="font-size:10px"></i></span>':'')+'</div><button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
       (open?detailHtml(e,cfg,data,date,copy):'')+
