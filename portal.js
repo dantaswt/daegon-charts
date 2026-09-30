@@ -86,11 +86,23 @@ function keepViewportPosition(y){
   setTimeout(restore,80);
   setTimeout(restore,180);
 }
+function scrollPageTop(){
+  const top=()=>window.scrollTo({top:0,left:0,behavior:'auto'});
+  top();
+  requestAnimationFrame(()=>{
+    top();
+    requestAnimationFrame(top);
+  });
+  setTimeout(top,60);
+  setTimeout(top,180);
+}
 function go(path,replace=false){
   closePortalMenu();
   const target=appHref(path);
   history[replace?'replaceState':'pushState']({},'',target);
-  renderRoute();
+  scrollPageTop();
+  const job=renderRoute();
+  Promise.resolve(job).finally(scrollPageTop);
 }
 function rankPoints(pos,chartId){
   const n=periodLimits[chartId]||100;
@@ -1798,7 +1810,12 @@ function onDocumentClick(e){
   closePortalMenu();
   if(raw.startsWith('/about')||raw.startsWith('/methodology')||raw.startsWith('/privacy')||raw.startsWith('/contact')||raw.startsWith('/terms'))return;
   if(raw.startsWith('/chart/')){
-    e.preventDefault();history.pushState({},'',appHref(raw));activateWeeklyIfNeeded();return;
+    e.preventDefault();
+    history.pushState({},'',appHref(raw));
+    scrollPageTop();
+    activateWeeklyIfNeeded();
+    setTimeout(scrollPageTop,80);
+    return;
   }
   const first=raw.split('/').filter(Boolean)[0]||'';
   if(PORTAL_ROUTES.has(first)){e.preventDefault();go(raw)}
