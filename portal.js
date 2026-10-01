@@ -417,7 +417,8 @@ function appleCreditForEntry(entry,targetArtist,catalog){
     if(xt!==title)return false;
     const xp=creditNorm(x.primaryArtist||'');
     const collabs=(x.collaborators||[]).map(creditNorm);
-    if(!collabs.includes(target))return false;
+    const targetParticipates=xp===target||collabs.includes(target);
+    if(!targetParticipates)return false;
     return !xp||xp===primary;
   });
   return matches[0]||null;
@@ -791,8 +792,9 @@ async function renderArtistDetailExact(slug,found){
     const map=new Map();
     for(const date of data.dates)for(const e of data.entriesByDate[date]||[]){
       const primaryMatch=creditNorm(e.artist||'')===creditNorm(artistName);
-      const appleCredit=entryKind==='song'&&!primaryMatch?appleCreditForEntry(e,artistName,appleCreditCatalog):null;
-      if(!primaryMatch&&!appleCredit)continue;
+      const appleCredit=entryKind==='song'?appleCreditForEntry(e,artistName,appleCreditCatalog):null;
+      const targetIsCollaborator=!!appleCredit&&!primaryMatch&&(appleCredit.collaborators||[]).map(creditNorm).includes(creditNorm(artistName));
+      if(!primaryMatch&&!targetIsCollaborator)continue;
       const key=itemKey(e),x=map.get(key)||{
         item:typeof visibleChartTitle==='function'?visibleChartTitle(e.name):e.name,
         artist:e.artist,primaryArtist:e.artist,appleCredit,
