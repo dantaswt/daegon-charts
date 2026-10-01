@@ -4137,7 +4137,72 @@ body:not(.portal-mode) #portalPage{
   .orig-artist-summary>div{min-height:82px;padding:10px}
   .orig-artist-summary .chart-name{grid-column:span 2}
   #origArtistChartSelect{width:100%;min-width:0}
-  .orig-artist-table{min-width:720px}
+  .orig-artist-detail-page{max-width:100%;overflow-x:hidden}
+  .orig-artist-chart-area{min-width:0;max-width:100%}
+  .orig-artist-table-wrap{
+    overflow:visible;
+    border:0;
+    background:transparent;
+  }
+  .orig-artist-table{
+    min-width:0;
+    width:100%;
+    display:block;
+    table-layout:auto;
+  }
+  .orig-artist-table thead{display:none}
+  .orig-artist-table tbody{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+  }
+  .orig-artist-table tr{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:0;
+    width:100%;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:var(--card);
+    overflow:hidden;
+  }
+  .orig-artist-table td,
+  .orig-artist-table td:not(:first-child){
+    display:block;
+    width:auto;
+    min-width:0;
+    padding:10px 12px;
+    border:0;
+    border-top:1px solid var(--border);
+    text-align:left;
+    overflow-wrap:anywhere;
+  }
+  .orig-artist-table td:first-child{
+    grid-column:1/-1;
+    border-top:0;
+    padding:13px 12px 11px;
+  }
+  .orig-artist-table td::before{
+    content:attr(data-label);
+    display:block;
+    margin-bottom:4px;
+    color:var(--muted-foreground);
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .orig-artist-table td:first-child::before{display:none}
+  .orig-artist-table td strong{font-size:14px}
+  .orig-artist-table td b{font-size:18px}
+  .orig-artist-table td em{
+    margin:4px 0 0;
+  }
+  .orig-artist-profile-image{
+    width:min(240px,72vw);
+    height:min(240px,72vw);
+  }
 }
 
 
