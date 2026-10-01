@@ -409,12 +409,19 @@ async function loadAppleArtistCreditCatalog(artist){
   appleArtistCreditCatalogCache.set(key,job);
   return job;
 }
-function appleCreditForEntry(entry,targetArtist,catalog){
+function appleCreditDateOkay(releaseDate,chartDate){
+  if(!releaseDate||!chartDate)return true;
+  const r=new Date(releaseDate).getTime(),c=new Date(chartDate+'T00:00:00Z').getTime();
+  if(!Number.isFinite(r)||!Number.isFinite(c))return true;
+  return r<=c+370*86400000;
+}
+function appleCreditForEntry(entry,targetArtist,catalog,chartDate=''){
   const target=creditNorm(targetArtist),title=creditNorm(creditBaseTitle(entry?.name||'')),primary=creditNorm(entry?.artist||'');
   if(!title||!target)return null;
   const matches=(catalog||[]).filter(x=>{
     const xt=creditNorm(creditBaseTitle(x.title||x.appleTrackName||''));
     if(xt!==title)return false;
+    if(!appleCreditDateOkay(x.releaseDate,chartDate))return false;
     const xp=creditNorm(x.primaryArtist||'');
     const collabs=(x.collaborators||[]).map(creditNorm);
     const targetParticipates=xp===target||collabs.includes(target);
@@ -775,24 +782,28 @@ async function renderItemDetailExact(kind,slug,found){
 
 async function renderArtistDetailExact(slug,found){
   const artistName=found.name;
-  const appleCreditCatalog=await loadAppleArtistCreditCatalog(artistName);
   const chartDefs=[
     ['songs','Hot 100 Songs','song'],['digitalSongsSales','Digital Songs Sales','song'],['streamingSongs','Streaming Songs','song'],['radioSongs','Top 40 Radio','song'],
     ['albums','Top 100 Albums','album'],['topAlbumSales','Top Album Sales','album'],['topStreamingAlbums','Top Streaming Albums','album']
   ];
-  const artistData=await loadWeekly('artists');
+  const [appleCreditCatalog,artistData,...chartDataList]=await Promise.all([
+    loadAppleArtistCreditCatalog(artistName),
+    loadWeekly('artists'),
+    ...chartDefs.map(([id])=>loadWeekly(id).catch(()=>null))
+  ]);
   const artistRuns=[];
   for(const date of artistData.dates){
     const e=(artistData.entriesByDate[date]||[]).find(x=>slugify(x.name)===slugify(artistName));
     if(e)artistRuns.push({...e,date});
   }
   const collected=[];
-  for(const [id,title,entryKind] of chartDefs){
-    const data=await loadWeekly(id).catch(()=>null);if(!data)continue;
+  for(let chartIndex=0;chartIndex<chartDefs.length;chartIndex++){
+    const [id,title,entryKind]=chartDefs[chartIndex];
+    const data=chartDataList[chartIndex];if(!data)continue;
     const map=new Map();
     for(const date of data.dates)for(const e of data.entriesByDate[date]||[]){
       const primaryMatch=creditNorm(e.artist||'')===creditNorm(artistName);
-      const appleCredit=entryKind==='song'?appleCreditForEntry(e,artistName,appleCreditCatalog):null;
+      const appleCredit=entryKind==='song'?appleCreditForEntry(e,artistName,appleCreditCatalog,date):null;
       const targetIsCollaborator=!!appleCredit&&!primaryMatch&&(appleCredit.collaborators||[]).map(creditNorm).includes(creditNorm(artistName));
       if(!primaryMatch&&!targetIsCollaborator)continue;
       const key=itemKey(e),x=map.get(key)||{
@@ -817,7 +828,7 @@ async function renderArtistDetailExact(slug,found){
     const visible=expanded?entries:entries.slice(0,5);
     const no1s=entries.filter(e=>e.peak===1).length,top10=entries.filter(e=>e.peak<=10).length;
     const table=entries.length?'<div class="orig-artist-table-wrap"><table class="orig-artist-table"><thead><tr><th>'+(group?.entryKind==='album'?'Album':'Song')+'</th><th>Debut Date</th><th>Peak Pos.</th><th>Peak Date</th><th>Wks. on Chart</th></tr></thead><tbody>'+
-      visible.map(e=>'<tr><td><strong><a href="'+appHref(entityPath({name:e.item,artist:e.primaryArtist||artistName},group.entryKind))+'">'+esc(e.item)+'</a></strong><small>'+esc(group?.entryKind==='song'?appleCreditText(e.primaryArtist||artistName,e.appleCredit):portalArtist(e.primaryArtist||artistName))+'</small></td><td>'+fmtShort(e.firstEntry)+'</td><td><b>#'+e.peak+'</b>'+(e.weeksAt1?'<em>'+e.weeksAt1+' WKS</em>':'')+'</td><td>'+fmtShort(e.peakDate)+'</td><td><b>'+e.weeks+'</b></td></tr>').join('')+
+      visible.map(e=>'<tr><td data-label="'+(group?.entryKind==='album'?'Album':'Song')+'"><strong><a href="'+appHref(entityPath({name:e.item,artist:e.primaryArtist||artistName},group.entryKind))+'">'+esc(e.item)+'</a></strong><small>'+esc(group?.entryKind==='song'?appleCreditText(e.primaryArtist||artistName,e.appleCredit):portalArtist(e.primaryArtist||artistName))+'</small></td><td data-label="Debut">'+fmtShort(e.firstEntry)+'</td><td data-label="Peak"><b>#'+e.peak+'</b>'+(e.weeksAt1?'<em>'+e.weeksAt1+' WKS</em>':'')+'</td><td data-label="Peak date">'+fmtShort(e.peakDate)+'</td><td data-label="Weeks"><b>'+e.weeks+'</b></td></tr>').join('')+
       '</tbody></table>'+(entries.length>5?'<div class="orig-artist-expand"><button data-artist-expand>'+(expanded?'Show less':'Show all '+entries.length+' entries')+'</button></div>':'')+'</div>':
       '<div class="orig-detail-empty">No entries found for this chart.</div>';
 
