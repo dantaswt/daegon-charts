@@ -3024,6 +3024,100 @@
   }
 }
 </style>
+<style id="weekly-mobile-actions-proportion-v46">
+@media(max-width:767px){
+  .m-actions{
+    gap:8px!important;
+    bottom:6px!important;
+    align-items:center!important;
+  }
+
+  /* Plain star — compact, but not vertically squashed */
+  .m-actions .award-performance{
+    width:24px!important;
+    height:30px!important;
+    min-width:24px!important;
+    min-height:30px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .m-actions .award-performance .award-star-img{
+    width:18px!important;
+    height:18px!important;
+    object-fit:contain!important;
+  }
+
+  /* Circled star — taller and rounder, matching the reference proportions */
+  .m-actions .award-gainer{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:17px!important;
+    height:17px!important;
+    object-fit:contain!important;
+  }
+
+  /* Plus button — circular, not flattened */
+  .m-actions .action{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+    flex:0 0 34px!important;
+    aspect-ratio:1/1!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0!important;
+    font-size:24px!important;
+    line-height:1!important;
+    font-weight:300!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions{
+    gap:7px!important;
+    bottom:4px!important;
+  }
+  .m-actions .award-performance{
+    width:22px!important;
+    height:28px!important;
+    min-width:22px!important;
+    min-height:28px!important;
+  }
+  .m-actions .award-performance .award-star-img{
+    width:17px!important;
+    height:17px!important;
+  }
+  .m-actions .award-gainer,
+  .m-actions .action{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    min-height:32px!important;
+    flex-basis:32px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:16px!important;
+    height:16px!important;
+  }
+  .m-actions .action{
+    font-size:22px!important;
+  }
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
