@@ -3152,6 +3152,79 @@
   }
 }
 </style>
+<style id="chart-image-generator-v48">
+.chart-image-tools{position:relative;flex:0 0 auto}
+.chart-image-btn{
+  min-height:44px;
+  border:1px solid var(--border);
+  background:var(--muted);
+  color:var(--foreground);
+  padding:9px 13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  cursor:pointer;
+}
+.chart-image-btn:hover{border-color:var(--accent)}
+.chart-image-btn.generating{opacity:.65;pointer-events:none}
+.chart-image-btn .image-chevron{font-size:9px;transition:transform .15s}
+.chart-image-tools.open .image-chevron{transform:rotate(180deg)}
+.chart-image-menu{
+  display:none;
+  position:absolute;
+  right:0;
+  top:calc(100% + 6px);
+  z-index:95;
+  min-width:170px;
+  background:var(--card);
+  border:1px solid var(--border);
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+.chart-image-tools.open .chart-image-menu{display:block}
+.chart-image-menu button{
+  width:100%;
+  min-height:44px;
+  border:0;
+  border-bottom:1px solid var(--border);
+  background:var(--card);
+  color:var(--foreground);
+  padding:9px 12px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  text-align:left;
+  cursor:pointer;
+}
+.chart-image-menu button:last-child{border-bottom:0}
+.chart-image-menu button:hover{background:var(--muted);color:var(--accent)}
+@media(max-width:767px){
+  .title-row{
+    flex-direction:column!important;
+    align-items:center!important;
+  }
+  .chart-image-tools{margin-top:8px}
+  .chart-image-btn{
+    min-height:40px;
+    font-size:12px;
+    padding:8px 12px;
+  }
+  .chart-image-menu{
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+  }
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -3332,7 +3405,17 @@ html.dark .sk{
             <h1 id="chartTitle"></h1>
             <div id="dateLabel" class="date-label"></div>
           </div>
-
+          <div id="chartImageTools" class="chart-image-tools">
+            <button id="chartImageBtn" class="chart-image-btn" type="button" aria-expanded="false">
+              <i class="fas fa-image"></i>
+              <span>Generate Image</span>
+              <i class="fas fa-chevron-down image-chevron"></i>
+            </button>
+            <div id="chartImageMenu" class="chart-image-menu">
+              <button type="button" data-image-mode="top10"><i class="fas fa-list-ol"></i><span>Top 10</span></button>
+              <button type="button" data-image-mode="full"><i class="fas fa-table-list"></i><span>Full Chart</span></button>
+            </div>
+          </div>
         </div>
 
         <div class="week-nav">
@@ -4410,6 +4493,227 @@ function setDate(date,data,{routeMode='push',scroll=true}={}){
   renderDropouts(data,date);
   if(scroll)window.scrollTo({top:0,behavior:'smooth'});
 }
+
+function chartImageDateLabel(date){
+  try{
+    return new Date(date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+  }catch{return date}
+}
+function chartImageDisplayName(e,kind){
+  return kind==='artist'?displayArtist(e.name):displayTitle(e.name);
+}
+function chartImageLastWeek(e){
+  if(e.diff==='NEW')return'NEW';
+  if(e.diff==='RE')return'RE';
+  const v=String(e.lastWeek??'').trim();
+  return !v||v==='0'?'-':v;
+}
+function chartImageRoundRect(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+function chartImageTrunc(ctx,text,maxW){
+  text=String(text||'');
+  if(ctx.measureText(text).width<=maxW)return text;
+  let t=text;
+  while(t.length&&ctx.measureText(t+'…').width>maxW)t=t.slice(0,-1);
+  return t+'…';
+}
+function chartImageLoad(url){
+  return new Promise(resolve=>{
+    if(!url){resolve(null);return}
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>resolve(img);
+    img.onerror=()=>resolve(null);
+    img.src=url;
+  });
+}
+async function chartImageDownload(canvas,filename){
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png',1));
+  if(!blob)return;
+  try{
+    const file=new File([blob],filename,{type:'image/png'});
+    if(navigator.share&&navigator.canShare?.({files:[file]})){
+      try{await navigator.share({files:[file],title:filename});return}catch{}
+    }
+  }catch{}
+  const url=URL.createObjectURL(blob);
+  if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
+    window.open(url,'_blank');
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+    return;
+  }
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.rel='noopener';a.target='_blank';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+async function generateTop10ChartImage(entries,cfg,date){
+  const list=entries.slice(0,10);
+  const W=1080,H=1350,canvas=document.createElement('canvas');
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  const dark='#111111',accent='#ff6d00',muted='#a0a0a0',white='#ffffff';
+  const F='"Daegon Grotesk","Helvetica Neue",Arial,sans-serif';
+
+  ctx.fillStyle=dark;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle=accent;ctx.fillRect(0,0,W,245);
+
+  ctx.fillStyle='#000';ctx.textAlign='left';
+  ctx.font='800 30px '+F;ctx.fillText('daegon charts',58,48);
+  ctx.font='900 78px '+F;
+  ctx.fillText(chartImageTrunc(ctx,String(cfg.title||'').toUpperCase(),780),58,98);
+  ctx.textAlign='right';
+  ctx.font='700 16px '+F;ctx.fillText('CHART DATED',W-58,52);
+  ctx.font='900 25px '+F;ctx.fillText(chartImageDateLabel(date),W-58,80);
+
+  const startY=285,rowH=94;
+  for(let i=0;i<list.length;i++){
+    const e=list[i],y=startY+i*rowH;
+    if(i) {ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(58,y-8,W-116,1)}
+    ctx.textAlign='center';
+    ctx.fillStyle=i===0?accent:white;
+    ctx.font=(i===0?'900 54px ':'900 42px ')+F;
+    ctx.fillText(String(e.position),92,y+15);
+
+    ctx.textAlign='left';
+    ctx.fillStyle=white;
+    ctx.font=(i===0?'900 30px ':'800 25px ')+F;
+    const title=chartImageDisplayName(e,cfg.kind);
+    ctx.fillText(chartImageTrunc(ctx,title,590),150,y+4);
+
+    if(cfg.kind!=='artist'){
+      ctx.fillStyle='rgba(255,255,255,.55)';
+      ctx.font='400 20px '+F;
+      ctx.fillText(chartImageTrunc(ctx,displayArtist(e.artist),520),150,y+38);
+    }
+
+    ctx.textAlign='right';
+    ctx.fillStyle=muted;ctx.font='700 14px '+F;
+    ctx.fillText('LW',W-210,y+10);
+    ctx.fillStyle=white;ctx.font='800 20px '+F;
+    ctx.fillText(chartImageLastWeek(e),W-160,y+6);
+    ctx.fillStyle=muted;ctx.font='700 14px '+F;
+    ctx.fillText('PK',W-105,y+10);
+    ctx.fillStyle=i===0?accent:white;ctx.font='800 20px '+F;
+    ctx.fillText(String(e.peak||'-'),W-58,y+6);
+  }
+
+  ctx.textAlign='left';
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='600 15px '+F;
+  ctx.fillText('daegoncharts.com.br',58,H-38);
+  ctx.textAlign='right';ctx.fillText('TOP 10',W-58,H-38);
+  return canvas;
+}
+async function generateFullChartImage(entries,cfg,date){
+  const W=1800,PAD=56,gap=48,rowH=30;
+  const col1=entries.slice(0,Math.min(50,entries.length));
+  const col2=entries.slice(50,100);
+  const maxRows=Math.max(col1.length,col2.length);
+  const headerH=330,footerH=56,H=headerH+maxRows*rowH+90+footerH;
+  const canvas=document.createElement('canvas');
+  canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  const F='"Daegon Grotesk","Helvetica Neue",Arial,sans-serif';
+  const accent='#ff6d00';
+
+  ctx.fillStyle='#f5f5f1';ctx.fillRect(0,0,W,H);
+  ctx.textAlign='center';ctx.fillStyle='#111';ctx.font='900 64px '+F;
+  ctx.fillText(String(cfg.title||'').toUpperCase(),W/2,28);
+  ctx.fillStyle='#666';ctx.font='500 22px '+F;
+  ctx.fillText('CHART WEEK OF '+chartImageDateLabel(date),W/2,103);
+  ctx.fillStyle=accent;ctx.fillRect(W/2-100,143,200,4);
+
+  const top=entries[0];
+  if(top){
+    const artSize=140,artX=PAD,artY=172;
+    let url='';
+    try{url=await resolveImage(top,cfg)}catch{}
+    const art=await chartImageLoad(url);
+    if(art){
+      ctx.save();chartImageRoundRect(ctx,artX,artY,artSize,artSize,6);ctx.clip();
+      ctx.drawImage(art,artX,artY,artSize,artSize);ctx.restore();
+    }else{
+      ctx.fillStyle=accent;ctx.fillRect(artX,artY,artSize,artSize);
+      ctx.fillStyle='#000';ctx.textAlign='center';ctx.font='900 60px '+F;ctx.fillText('1',artX+70,artY+38);
+    }
+    ctx.textAlign='left';ctx.fillStyle='#111';ctx.font='900 40px '+F;
+    ctx.fillText(chartImageTrunc(ctx,chartImageDisplayName(top,cfg.kind),1100),artX+170,artY+2);
+    if(cfg.kind!=='artist'){
+      ctx.fillStyle='#555';ctx.font='400 24px '+F;
+      ctx.fillText(chartImageTrunc(ctx,displayArtist(top.artist),1100),artX+170,artY+52);
+    }
+    ctx.fillStyle='#888';ctx.font='700 11px '+F;
+    ctx.fillText('LAST WEEK',artX+170,artY+98);
+    ctx.fillText('PEAK',artX+300,artY+98);
+    ctx.fillText('WEEKS',artX+400,artY+98);
+    ctx.fillStyle='#111';ctx.font='900 23px '+F;
+    ctx.fillText(chartImageLastWeek(top),artX+170,artY+114);
+    ctx.fillText(String(top.peak||'-'),artX+300,artY+114);
+    ctx.fillText(String(top.weeks||'-'),artX+400,artY+114);
+  }
+
+  const totalW=W-PAD*2,colW=(totalW-gap)/2,LX=PAD,RX=PAD+colW+gap,startY=headerH+20;
+  function headers(x){
+    ctx.fillStyle='#777';ctx.font='800 11px '+F;
+    ctx.fillText('#',x,startY);ctx.fillText('LW',x+38,startY);ctx.fillText('TITLE',x+86,startY);
+    ctx.fillText(cfg.kind==='artist'?'':'ARTIST',x+420,startY);ctx.fillText('PK',x+680,startY);ctx.fillText('WK',x+725,startY);
+    ctx.fillStyle='#ccc';ctx.fillRect(x,startY+17,colW,1);
+  }
+  headers(LX);if(col2.length)headers(RX);
+
+  function drawRows(list,x){
+    for(let i=0;i<list.length;i++){
+      const e=list[i],y=startY+29+i*rowH;
+      ctx.textAlign='center';ctx.fillStyle=e.position<=3?accent:'#111';ctx.font='900 15px '+F;ctx.fillText(String(e.position),x+14,y+2);
+      ctx.fillStyle=(e.diff==='NEW'||e.diff==='RE')?'#16a34a':'#777';ctx.font='700 13px '+F;ctx.fillText(chartImageLastWeek(e),x+54,y+3);
+      ctx.textAlign='left';ctx.fillStyle='#111';ctx.font='700 14px '+F;ctx.fillText(chartImageTrunc(ctx,chartImageDisplayName(e,cfg.kind),320),x+86,y+2);
+      if(cfg.kind!=='artist'){ctx.fillStyle='#777';ctx.font='400 13px '+F;ctx.fillText(chartImageTrunc(ctx,displayArtist(e.artist),245),x+420,y+3)}
+      ctx.textAlign='center';ctx.fillStyle=e.peak===1?accent:'#555';ctx.font='700 13px '+F;ctx.fillText(String(e.peak||'-'),x+692,y+3);
+      ctx.fillStyle='#777';ctx.fillText(String(e.weeks||'-'),x+742,y+3);
+      ctx.fillStyle='#ddd';ctx.fillRect(x,y+26,colW,1);
+    }
+  }
+  drawRows(col1,LX);if(col2.length)drawRows(col2,RX);
+
+  ctx.textAlign='left';ctx.fillStyle='#999';ctx.font='600 12px '+F;
+  ctx.fillText('daegoncharts.com.br',PAD,H-32);
+  ctx.textAlign='right';ctx.fillText(entries.length+' ENTRIES',W-PAD,H-32);
+  return canvas;
+}
+async function runChartImage(mode){
+  const tools=document.getElementById('chartImageTools');
+  const btn=document.getElementById('chartImageBtn');
+  const data=state.cache.get(state.active);
+  if(!data||!state.date)return;
+  const entries=data.entriesByDate[state.date]||[];
+  if(!entries.length)return;
+  const cfg=charts[state.active];
+  tools.classList.remove('open');
+  btn.classList.add('generating');
+  const old=btn.innerHTML;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i><span>Generating...</span>';
+  try{
+    await document.fonts?.ready;
+    const canvas=mode==='full'
+      ? await generateFullChartImage(entries,cfg,state.date)
+      : await generateTop10ChartImage(entries,cfg,state.date);
+    await chartImageDownload(canvas,'daegon-'+state.active+'-'+state.date+'-'+mode+'.png');
+  }catch(err){
+    console.error('Failed to generate chart image',err);
+    alert('Could not generate this chart image.');
+  }finally{
+    btn.innerHTML=old;
+    btn.classList.remove('generating');
+  }
+}
 async function loadChart(id,requestedDate=null,{routeMode='push',scroll=true}={}){
   state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML=weeklySkeleton(charts[id].kind);dropoutsEl.innerHTML='';
   try{
@@ -4420,6 +4724,26 @@ async function loadChart(id,requestedDate=null,{routeMode='push',scroll=true}={}
     dateLabel.textContent='Chart week of '+fmtDate(date);renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);
   }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" id="retryChart">Try again</button></div>';document.getElementById('retryChart').onclick=()=>{state.cache.delete(state.active);loadChart(state.active,state.date,{routeMode:'replace'})}}
 }
+
+
+const chartImageTools=document.getElementById('chartImageTools');
+const chartImageBtn=document.getElementById('chartImageBtn');
+const chartImageMenu=document.getElementById('chartImageMenu');
+chartImageBtn.onclick=e=>{
+  e.preventDefault();e.stopPropagation();
+  const open=chartImageTools.classList.toggle('open');
+  chartImageBtn.setAttribute('aria-expanded',open?'true':'false');
+};
+chartImageMenu.querySelectorAll('[data-image-mode]').forEach(b=>b.onclick=e=>{
+  e.preventDefault();e.stopPropagation();
+  runChartImage(b.dataset.imageMode);
+});
+document.addEventListener('click',e=>{
+  if(!chartImageTools.contains(e.target)){
+    chartImageTools.classList.remove('open');
+    chartImageBtn.setAttribute('aria-expanded','false');
+  }
+});
 
 document.getElementById('filters').querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
   const k=b.dataset.filter;if(k==='all')state.filters=new Set(['all']);else{state.filters.delete('all');if(state.filters.has(k))state.filters.delete(k);else state.filters.add(k);if(!state.filters.size)state.filters.add('all')}
