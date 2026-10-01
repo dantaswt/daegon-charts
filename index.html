@@ -3118,6 +3118,40 @@
   }
 }
 </style>
+<style id="weekly-transparent-star-v47">
+.award-star-svg{
+  display:block!important;
+  width:15px!important;
+  height:15px!important;
+  flex:0 0 auto!important;
+  overflow:visible!important;
+  background:transparent!important;
+}
+.award-star-svg path{
+  fill:currentColor!important;
+  stroke:none!important;
+}
+@media(max-width:767px){
+  .m-actions .award-performance .award-star-svg{
+    width:18px!important;
+    height:18px!important;
+  }
+  .m-actions .award-gainer .award-star-svg{
+    width:17px!important;
+    height:17px!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions .award-performance .award-star-svg{
+    width:17px!important;
+    height:17px!important;
+  }
+  .m-actions .award-gainer .award-star-svg{
+    width:16px!important;
+    height:16px!important;
+  }
+}
+</style>
 <!-- WEEKLY_SKELETON_V26 -->
 <style id="weekly-skeleton-v26">
 @keyframes daegonSkeletonShimmer{
@@ -4217,7 +4251,7 @@ function renderRows(data,date){
         coverHtml(e,one,false)+
         '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
         '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'">'+weeklyArtistLink(e.artist)+'</div>':'')+'</div>'+
-        '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><img class="award-star-img" src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-star-vector-icon-png-image_696411.jpg" alt="" aria-hidden="true"></span>':'')+
+        '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><svg class="award-star-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.8l3.02 6.12 6.76.98-4.89 4.77 1.15 6.73L12 17.22 5.96 20.4l1.15-6.73L2.22 8.9l6.76-.98L12 1.8z"/></svg></span>':'')+
           metricsHtml(e)+
           '<div class="actions">'+
           '<button class="action details-btn" aria-label="Toggle details" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
@@ -4227,7 +4261,7 @@ function renderRows(data,date){
         '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div></div>'+
         coverHtml(e,one,true)+
         '<div class="m-entry"><div class="m-title">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist">'+weeklyArtistLink(e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
-        '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><img class="award-star-img" src="https://png.pngtree.com/png-vector/20190223/ourmid/pngtree-star-vector-icon-png-image_696411.jpg" alt="" aria-hidden="true"></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+        '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><svg class="award-star-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.8l3.02 6.12 6.76.98-4.89 4.77 1.15 6.73L12 17.22 5.96 20.4l1.15-6.73L2.22 8.9l6.76-.98L12 1.8z"/></svg></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
       (open?detailHtml(e,cfg,data,date,copy):'')+
     '</article>';
