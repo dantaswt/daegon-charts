@@ -786,24 +786,19 @@ async function renderArtistDetailExact(slug,found){
     ['songs','Hot 100 Songs','song'],['digitalSongsSales','Digital Songs Sales','song'],['streamingSongs','Streaming Songs','song'],['radioSongs','Top 40 Radio','song'],
     ['albums','Top 100 Albums','album'],['topAlbumSales','Top Album Sales','album'],['topStreamingAlbums','Top Streaming Albums','album']
   ];
-  const [appleCreditCatalog,artistData,...chartDataList]=await Promise.all([
-    loadAppleArtistCreditCatalog(artistName),
-    loadWeekly('artists'),
-    ...chartDefs.map(([id])=>loadWeekly(id).catch(()=>null))
-  ]);
-  const artistRuns=[];
-  for(const date of artistData.dates){
-    const e=(artistData.entriesByDate[date]||[]).find(x=>slugify(x.name)===slugify(artistName));
-    if(e)artistRuns.push({...e,date});
-  }
-  const collected=[];
-  for(let chartIndex=0;chartIndex<chartDefs.length;chartIndex++){
-    const [id,title,entryKind]=chartDefs[chartIndex];
-    const data=chartDataList[chartIndex];if(!data)continue;
+  const chartDefById=new Map(chartDefs.map(x=>[x[0],x]));
+  const groups=new Map();
+  const pendingGroups=new Map();
+  let selected='songs',expanded=false,creditsReady=false,appleCreditCatalog=[];
+  let artistRuns=[],peak=null,weeks=0;
+
+  function buildGroup(data,def,creditCatalog=null){
+    if(!data||!def)return null;
+    const [id,title,entryKind]=def;
     const map=new Map();
-    for(const date of data.dates)for(const e of data.entriesByDate[date]||[]){
+    for(const date of data.dates||[])for(const e of data.entriesByDate?.[date]||[]){
       const primaryMatch=creditNorm(e.artist||'')===creditNorm(artistName);
-      const appleCredit=entryKind==='song'?appleCreditForEntry(e,artistName,appleCreditCatalog,date):null;
+      const appleCredit=entryKind==='song'&&creditCatalog?appleCreditForEntry(e,artistName,creditCatalog,date):null;
       const targetIsCollaborator=!!appleCredit&&!primaryMatch&&(appleCredit.collaborators||[]).map(creditNorm).includes(creditNorm(artistName));
       if(!primaryMatch&&!targetIsCollaborator)continue;
       const key=itemKey(e),x=map.get(key)||{
@@ -812,26 +807,63 @@ async function renderArtistDetailExact(slug,found){
         peak:999,weeks:0,weeksAt1:0,firstEntry:date,peakDate:date,kind:entryKind
       };
       if(!x.appleCredit&&appleCredit)x.appleCredit=appleCredit;
-      const p=Number(e.position)||999;x.weeks++;if(p<x.peak){x.peak=p;x.peakDate=date}if(p===1)x.weeksAt1++;map.set(key,x);
+      const p=Number(e.position)||999;
+      x.weeks++;
+      if(p<x.peak){x.peak=p;x.peakDate=date}
+      if(p===1)x.weeksAt1++;
+      map.set(key,x);
     }
     const entries=[...map.values()].sort((a,b)=>a.peak-b.peak||b.weeks-a.weeks);
-    if(entries.length)collected.push({id,title,entryKind,entries});
+    return {id,title,entryKind,entries};
   }
-  let selected=collected[0]?.id||'';
-  let expanded=false;
-  const peak=artistRuns.length?Math.min(...artistRuns.map(x=>Number(x.position)||999)):null;
-  const weeks=artistRuns.length;
 
-  const draw=()=>{
-    const group=collected.find(x=>x.id===selected)||collected[0];
+  async function ensureGroup(id,{waitForCredits=true}={}){
+    if(groups.has(id)&&(!waitForCredits||chartDefById.get(id)?.[2]!=='song'||creditsReady))return groups.get(id);
+    const pendingKey=id+'|'+(waitForCredits?'credits':'fast');
+    if(pendingGroups.has(pendingKey))return pendingGroups.get(pendingKey);
+    const job=(async()=>{
+      const def=chartDefById.get(id);
+      if(!def)return null;
+      const data=await loadWeekly(id).catch(()=>null);
+      if(!data)return null;
+      let catalog=null;
+      if(def[2]==='song'&&waitForCredits){
+        if(!creditsReady){
+          appleCreditCatalog=await loadAppleArtistCreditCatalog(artistName);
+          creditsReady=true;
+        }
+        catalog=appleCreditCatalog;
+      }else if(def[2]==='song'&&creditsReady){
+        catalog=appleCreditCatalog;
+      }
+      const group=buildGroup(data,def,catalog);
+      if(group)groups.set(id,group);
+      return group;
+    })().finally(()=>pendingGroups.delete(pendingKey));
+    pendingGroups.set(pendingKey,job);
+    return job;
+  }
+
+  function totalLoadedEntries(){
+    let n=0;
+    for(const g of groups.values())n+=g.entries.length;
+    return n;
+  }
+
+  function draw({loadingChart=false}={}){
+    const group=groups.get(selected)||null;
     const entries=group?.entries||[];
     const visible=expanded?entries:entries.slice(0,5);
     const no1s=entries.filter(e=>e.peak===1).length,top10=entries.filter(e=>e.peak<=10).length;
-    const table=entries.length?'<div class="orig-artist-table-wrap"><table class="orig-artist-table"><thead><tr><th>'+(group?.entryKind==='album'?'Album':'Song')+'</th><th>Debut Date</th><th>Peak Pos.</th><th>Peak Date</th><th>Wks. on Chart</th></tr></thead><tbody>'+
-      visible.map(e=>'<tr><td data-label="'+(group?.entryKind==='album'?'Album':'Song')+'"><strong><a href="'+appHref(entityPath({name:e.item,artist:e.primaryArtist||artistName},group.entryKind))+'">'+esc(e.item)+'</a></strong><small>'+esc(group?.entryKind==='song'?appleCreditText(e.primaryArtist||artistName,e.appleCredit):portalArtist(e.primaryArtist||artistName))+'</small></td><td data-label="Debut">'+fmtShort(e.firstEntry)+'</td><td data-label="Peak"><b>#'+e.peak+'</b>'+(e.weeksAt1?'<em>'+e.weeksAt1+' WKS</em>':'')+'</td><td data-label="Peak date">'+fmtShort(e.peakDate)+'</td><td data-label="Weeks"><b>'+e.weeks+'</b></td></tr>').join('')+
-      '</tbody></table>'+(entries.length>5?'<div class="orig-artist-expand"><button data-artist-expand>'+(expanded?'Show less':'Show all '+entries.length+' entries')+'</button></div>':'')+'</div>':
-      '<div class="orig-detail-empty">No entries found for this chart.</div>';
+    const table=loadingChart
+      ? '<div class="orig-detail-empty"><i class="fas fa-circle-notch fa-spin"></i> Loading chart history…</div>'
+      : entries.length?'<div class="orig-artist-table-wrap"><table class="orig-artist-table"><thead><tr><th>'+(group?.entryKind==='album'?'Album':'Song')+'</th><th>Debut Date</th><th>Peak Pos.</th><th>Peak Date</th><th>Wks. on Chart</th></tr></thead><tbody>'+
+        visible.map(e=>'<tr><td data-label="'+(group?.entryKind==='album'?'Album':'Song')+'"><strong><a href="'+appHref(entityPath({name:e.item,artist:e.primaryArtist||artistName},group.entryKind))+'">'+esc(e.item)+'</a></strong><small>'+esc(group?.entryKind==='song'?appleCreditText(e.primaryArtist||artistName,e.appleCredit):portalArtist(e.primaryArtist||artistName))+'</small></td><td data-label="Debut">'+fmtShort(e.firstEntry)+'</td><td data-label="Peak"><b>#'+e.peak+'</b>'+(e.weeksAt1?'<em>'+e.weeksAt1+' WKS</em>':'')+'</td><td data-label="Peak date">'+fmtShort(e.peakDate)+'</td><td data-label="Weeks"><b>'+e.weeks+'</b></td></tr>').join('')+
+        '</tbody></table>'+(entries.length>5?'<div class="orig-artist-expand"><button data-artist-expand>'+(expanded?'Show less':'Show all '+entries.length+' entries')+'</button></div>':'')+'</div>'
+      : '<div class="orig-detail-empty">No entries found for this chart.</div>';
 
+    const def=chartDefById.get(selected)||chartDefs[0];
+    const activeTitle=group?.title||def[1];
     const main='<div class="orig-artist-detail-page">'+
       '<a class="orig-detail-back" href="'+appHref('/artists')+'"><i class="fas fa-arrow-left"></i> All artists</a>'+
       '<section class="orig-artist-name-hero"><h1>'+esc(artistName)+'</h1>'+detailActions(artistName,'artist')+'</section>'+
@@ -841,28 +873,73 @@ async function renderArtistDetailExact(slug,found){
       '</div>'+
       '<section class="orig-artist-profile">'+
         '<div class="orig-artist-profile-image" data-portal-image data-kind="artist" data-name="'+escAttr(artistName)+'" data-artist="'+escAttr(artistName)+'"><i class="fas fa-user"></i></div>'+
-        '<p>'+esc(artistName)+' has '+collected.reduce((s,g)=>s+g.entries.length,0)+' chart entries across all charts.</p>'+
+        '<p>'+esc(artistName)+(totalLoadedEntries()?' currently has '+totalLoadedEntries()+' loaded chart entries.':' chart history across Daegon Charts.')+'</p>'+
       '</section>'+
       '<div class="orig-artist-tabs"><button class="active"><i class="fas fa-chart-line"></i> Charts</button><button><i class="fas fa-trophy"></i> Awards</button></div>'+
-      (group?'<section class="orig-artist-chart-area">'+
+      '<section class="orig-artist-chart-area">'+
         '<div class="orig-artist-summary">'+
-          '<div class="chart-name">'+esc(group.title)+'</div>'+
+          '<div class="chart-name">'+esc(activeTitle)+'</div>'+
           '<div><strong>'+no1s+'</strong><span>NO. 1 HITS</span></div>'+
           '<div><strong>'+entries.length+'</strong><span>TITLES</span></div>'+
           '<div><strong>'+top10+'</strong><span>TOP 10 HITS</span></div>'+
         '</div>'+
-        '<select id="origArtistChartSelect">'+collected.map(g=>'<option value="'+escAttr(g.id)+'" '+(g.id===group.id?'selected':'')+'>'+esc(g.title)+'</option>').join('')+'</select>'+
+        '<select id="origArtistChartSelect">'+chartDefs.map(([id,title])=>'<option value="'+escAttr(id)+'" '+(id===selected?'selected':'')+'>'+esc(title)+'</option>').join('')+'</select>'+
         table+
-      '</section>':'')+
+      '</section>'+
       '<div class="orig-detail-bottom-back"><a href="'+appHref('/artists')+'"><i class="fas fa-arrow-left"></i> Browse all artists</a></div>'+
     '</div>';
 
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(artistName+' — chart history',artistName+' chart history and entries.',entityPath(found,'artist'));
     bindLinks();hydratePortalImages();bindDetailActions(artistName);
-    const sel=document.getElementById('origArtistChartSelect');if(sel)sel.onchange=e=>{selected=e.target.value;expanded=false;draw()};
-    const ex=portalEl.querySelector('[data-artist-expand]');if(ex)ex.onclick=()=>{expanded=!expanded;draw()};
-  };
+
+    const sel=document.getElementById('origArtistChartSelect');
+    if(sel)sel.onchange=async e=>{
+      selected=e.target.value;expanded=false;
+      if(groups.has(selected)){
+        draw();
+        if(chartDefById.get(selected)?.[2]==='song'&&!creditsReady){
+          ensureGroup(selected,{waitForCredits:true}).then(()=>{if(document.getElementById('origArtistChartSelect')?.value===selected)draw()});
+        }
+        return;
+      }
+      draw({loadingChart:true});
+      await ensureGroup(selected,{waitForCredits:chartDefById.get(selected)?.[2]==='song'});
+      if(document.getElementById('origArtistChartSelect')?.value===selected)draw();
+    };
+    const ex=portalEl.querySelector('[data-artist-expand]');
+    if(ex)ex.onclick=()=>{expanded=!expanded;draw()};
+  }
+
+  // Fast first paint: only the artist summary + Hot 100 are required.
+  const [artistData,songsData]=await Promise.all([
+    loadWeekly('artists').catch(()=>null),
+    loadWeekly('songs').catch(()=>null)
+  ]);
+
+  if(artistData){
+    for(const date of artistData.dates||[]){
+      const e=(artistData.entriesByDate?.[date]||[]).find(x=>slugify(x.name)===slugify(artistName));
+      if(e)artistRuns.push({...e,date});
+    }
+    peak=artistRuns.length?Math.min(...artistRuns.map(x=>Number(x.position)||999)):null;
+    weeks=artistRuns.length;
+  }
+  if(songsData){
+    const fastSongs=buildGroup(songsData,chartDefById.get('songs'),null);
+    if(fastSongs)groups.set('songs',fastSongs);
+  }
   draw();
+
+  // Enrich Hot 100 with Apple feat/duet credits after the page is already visible.
+  loadAppleArtistCreditCatalog(artistName).then(catalog=>{
+    appleCreditCatalog=catalog||[];
+    creditsReady=true;
+    if(songsData){
+      const enriched=buildGroup(songsData,chartDefById.get('songs'),appleCreditCatalog);
+      if(enriched)groups.set('songs',enriched);
+    }
+    if(selected==='songs')draw();
+  }).catch(()=>{creditsReady=true});
 }
 
 async function renderDetail(kind,slug){
