@@ -375,6 +375,58 @@ function thumb(e,kind,size=54){
 }
 function portalText(value){return typeof smartDisplayCase==='function'?smartDisplayCase(value):String(value??'')}
 function portalArtist(value){return typeof displayArtist==='function'?displayArtist(value):portalText(value)}
+const appleArtistCreditCatalogCache=new Map();
+function creditNorm(v){
+  return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+function creditBaseTitle(v){
+  return typeof artworkSearchTitle==='function'?artworkSearchTitle('song',v):String(v||'')
+    .replace(/\s*[\(\[]\s*(?:with|feat\.?|ft\.?|featuring)\b[^\)\]]*[\)\]]/gi,'')
+    .replace(/\s+/g,' ').trim();
+}
+async function loadAppleArtistCreditCatalog(artist){
+  const key=creditNorm(artist);
+  if(appleArtistCreditCatalogCache.has(key))return appleArtistCreditCatalogCache.get(key);
+  const job=(async()=>{
+    try{
+      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),16000);
+      const r=await fetch(SUPABASE_URL+'/functions/v1/apple-song-credits',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':SUPABASE_ANON_JWT,
+          'Authorization':'Bearer '+SUPABASE_ANON_JWT
+        },
+        body:JSON.stringify({mode:'artist',artist}),
+        signal:ctrl.signal
+      });
+      clearTimeout(timer);
+      if(!r.ok)return [];
+      const d=await r.json();
+      return Array.isArray(d?.items)?d.items:[];
+    }catch{return []}
+  })();
+  appleArtistCreditCatalogCache.set(key,job);
+  return job;
+}
+function appleCreditForEntry(entry,targetArtist,catalog){
+  const target=creditNorm(targetArtist),title=creditNorm(creditBaseTitle(entry?.name||'')),primary=creditNorm(entry?.artist||'');
+  if(!title||!target)return null;
+  const matches=(catalog||[]).filter(x=>{
+    const xt=creditNorm(creditBaseTitle(x.title||x.appleTrackName||''));
+    if(xt!==title)return false;
+    const xp=creditNorm(x.primaryArtist||'');
+    const collabs=(x.collaborators||[]).map(creditNorm);
+    if(!collabs.includes(target))return false;
+    return !xp||xp===primary;
+  });
+  return matches[0]||null;
+}
+function appleCreditText(primary,credit){
+  const collabs=Array.isArray(credit?.collaborators)?credit.collaborators.filter(Boolean):[];
+  if(!collabs.length)return portalArtist(primary);
+  return portalArtist(primary)+(String(credit?.joiner||' feat. ').trim()==='&'?' & ':' feat. ')+collabs.map(portalArtist).join(String(credit?.joiner||'').trim()==='&'?' & ':', ');
+}
 function portalEntityName(e,kind,text){
   const value=text??e.name;
   return kind==='artist'?portalArtist(value):(typeof displayTitle==='function'?displayTitle(value):portalText(value));
@@ -722,6 +774,7 @@ async function renderItemDetailExact(kind,slug,found){
 
 async function renderArtistDetailExact(slug,found){
   const artistName=found.name;
+  const appleCreditCatalog=await loadAppleArtistCreditCatalog(artistName);
   const chartDefs=[
     ['songs','Hot 100 Songs','song'],['digitalSongsSales','Digital Songs Sales','song'],['streamingSongs','Streaming Songs','song'],['radioSongs','Top 40 Radio','song'],
     ['albums','Top 100 Albums','album'],['topAlbumSales','Top Album Sales','album'],['topStreamingAlbums','Top Streaming Albums','album']
@@ -737,8 +790,15 @@ async function renderArtistDetailExact(slug,found){
     const data=await loadWeekly(id).catch(()=>null);if(!data)continue;
     const map=new Map();
     for(const date of data.dates)for(const e of data.entriesByDate[date]||[]){
-      if(String(e.artist||'').trim().toLowerCase()!==artistName.trim().toLowerCase())continue;
-      const key=itemKey(e),x=map.get(key)||{item:e.name,artist:e.artist,peak:999,weeks:0,weeksAt1:0,firstEntry:date,peakDate:date,kind:entryKind};
+      const primaryMatch=creditNorm(e.artist||'')===creditNorm(artistName);
+      const appleCredit=entryKind==='song'&&!primaryMatch?appleCreditForEntry(e,artistName,appleCreditCatalog):null;
+      if(!primaryMatch&&!appleCredit)continue;
+      const key=itemKey(e),x=map.get(key)||{
+        item:typeof visibleChartTitle==='function'?visibleChartTitle(e.name):e.name,
+        artist:e.artist,primaryArtist:e.artist,appleCredit,
+        peak:999,weeks:0,weeksAt1:0,firstEntry:date,peakDate:date,kind:entryKind
+      };
+      if(!x.appleCredit&&appleCredit)x.appleCredit=appleCredit;
       const p=Number(e.position)||999;x.weeks++;if(p<x.peak){x.peak=p;x.peakDate=date}if(p===1)x.weeksAt1++;map.set(key,x);
     }
     const entries=[...map.values()].sort((a,b)=>a.peak-b.peak||b.weeks-a.weeks);
@@ -755,7 +815,7 @@ async function renderArtistDetailExact(slug,found){
     const visible=expanded?entries:entries.slice(0,5);
     const no1s=entries.filter(e=>e.peak===1).length,top10=entries.filter(e=>e.peak<=10).length;
     const table=entries.length?'<div class="orig-artist-table-wrap"><table class="orig-artist-table"><thead><tr><th>'+(group?.entryKind==='album'?'Album':'Song')+'</th><th>Debut Date</th><th>Peak Pos.</th><th>Peak Date</th><th>Wks. on Chart</th></tr></thead><tbody>'+
-      visible.map(e=>'<tr><td><strong><a href="'+appHref(entityPath({name:e.item,artist:artistName},group.entryKind))+'">'+esc(e.item)+'</a></strong><small>'+esc(artistName)+'</small></td><td>'+fmtShort(e.firstEntry)+'</td><td><b>#'+e.peak+'</b>'+(e.weeksAt1?'<em>'+e.weeksAt1+' WKS</em>':'')+'</td><td>'+fmtShort(e.peakDate)+'</td><td><b>'+e.weeks+'</b></td></tr>').join('')+
+      visible.map(e=>'<tr><td><strong><a href="'+appHref(entityPath({name:e.item,artist:e.primaryArtist||artistName},group.entryKind))+'">'+esc(e.item)+'</a></strong><small>'+esc(group?.entryKind==='song'?appleCreditText(e.primaryArtist||artistName,e.appleCredit):portalArtist(e.primaryArtist||artistName))+'</small></td><td>'+fmtShort(e.firstEntry)+'</td><td><b>#'+e.peak+'</b>'+(e.weeksAt1?'<em>'+e.weeksAt1+' WKS</em>':'')+'</td><td>'+fmtShort(e.peakDate)+'</td><td><b>'+e.weeks+'</b></td></tr>').join('')+
       '</tbody></table>'+(entries.length>5?'<div class="orig-artist-expand"><button data-artist-expand>'+(expanded?'Show less':'Show all '+entries.length+' entries')+'</button></div>':'')+'</div>':
       '<div class="orig-detail-empty">No entries found for this chart.</div>';
 
