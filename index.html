@@ -4128,7 +4128,16 @@ async function resolveImage(e,cfg){
   const isReal=usableImage(url)&&/^https?:\/\//i.test(url);
   if(!isReal)url='';
 
-  if(isReal){
+  // Final visual fallback: if a song/album cover cannot be found, use the
+  // artist's square image instead of leaving the artwork slot empty.
+  if(!url&&cfg.kind!=='artist'&&artist){
+    try{
+      const artistUrl=await resolveImage({name:artist,artist},{kind:'artist'});
+      if(usableImage(artistUrl)&&/^https?:\/\//i.test(artistUrl))url=artistUrl;
+    }catch{}
+  }
+
+  if(url){
     state.images.set(key,url);
     try{localStorage.setItem(persistedKey,url)}catch{}
   }else{
