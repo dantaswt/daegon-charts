@@ -3378,6 +3378,10 @@ html.dark .sk{
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js"></script>
 </head>
 <body>
 <div class="shell">
@@ -4591,124 +4595,148 @@ function chartImageMetalGradient(ctx,W,H){
   r2.addColorStop(0,'rgba(255,255,255,.04)');r2.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle=r2;ctx.fillRect(0,0,W,H);
 }
+
 async function generateTop10ChartImage(entries,cfg,date){
   const list=entries.slice(0,10);
   const theme=chartImageTheme(state.active);
   const accent=theme.accent;
-  const F='"Daegon Grotesk","Helvetica Neue",Arial,sans-serif';
-  const W=1080;
-  const headerH=245;
-  const contentTop=32;
-  const contentBottom=36;
-  const colHeaderH=18;
-  const rowHeights=list.map((e,i)=>{
-    const no1=Number(e.position)===1;
-    const badge=no1&&chartImageWeeksAt1(e)>0?38:0;
-    return badge+(no1?104:72);
-  });
-  const contentH=contentTop+colHeaderH+4+rowHeights.reduce((a,b)=>a+b,0)+contentBottom;
-  const footerH=62;
-  const H=headerH+contentH+footerH;
+  const weeksAt1=chartImageWeeksAt1(list[0]);
+  const isArtist=cfg.kind==='artist';
+  const dateLabel=chartImageDateLabel(date);
+  const titleText=String(cfg.title||'').toUpperCase();
 
-  const canvas=document.createElement('canvas');
-  canvas.width=W;canvas.height=H;
-  const ctx=canvas.getContext('2d');
-  ctx.textBaseline='top';
+  const host=document.createElement('div');
+  host.style.cssText='position:fixed;top:0;left:0;width:1080px;opacity:0;pointer-events:none;z-index:-99999;overflow:hidden;';
+  const root=document.createElement('div');
+  root.style.cssText=[
+    'width:1080px',
+    'background:linear-gradient(135deg,#0d0d0d 0%,#1a1a1a 25%,#2a2a2a 50%,#1a1a1a 75%,#0d0d0d 100%)',
+    'font-family:Inter,"Helvetica Neue",Arial,sans-serif',
+    'display:flex',
+    'flex-direction:column',
+    'position:relative'
+  ].join(';');
 
-  chartImageMetalGradient(ctx,W,H);
+  root.innerHTML=
+    '<div style="position:absolute;inset:0;background:linear-gradient(45deg,transparent 0%,rgba(255,255,255,.02) 25%,transparent 50%,rgba(255,255,255,.03) 75%,transparent 100%);pointer-events:none;z-index:0"></div>'+
+    '<div style="background:'+accent+';padding:50px 60px 42px;display:flex;flex-direction:column;gap:6px;position:relative;z-index:1">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start">'+
+        '<div style="font-size:30px;font-weight:900;color:#000;letter-spacing:-.02em;text-transform:lowercase;opacity:.5">daegon charts</div>'+
+        '<div style="text-align:right">'+
+          '<div style="font-size:18px;font-weight:700;color:#000;opacity:.6;line-height:1.3">CHART DATED</div>'+
+          '<div style="font-size:30px;font-weight:900;color:#000">'+esc(dateLabel)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="font-size:100px;font-weight:900;color:#000;letter-spacing:-.04em;line-height:.95;margin-top:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(titleText)+'</div>'+
+    '</div>'+
+    '<div class="dc-img-content" style="padding:32px 60px 36px;display:flex;flex-direction:column;gap:0;position:relative;z-index:1">'+
+      '<div style="display:flex;align-items:center;padding:0 0 12px;border-bottom:2px solid '+accent+';margin-bottom:4px">'+
+        '<div style="width:70px;flex-shrink:0"></div><div style="flex:1"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="padding:18px 60px 28px;border-top:1px solid rgba(255,255,255,.06);display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1">'+
+      '<div style="font-size:14px;color:rgba(255,255,255,.2);font-weight:600">daegoncharts.com</div>'+
+      '<div style="font-size:14px;color:rgba(255,255,255,.2);font-weight:600">'+list.length+' / '+entries.length+' ENTRIES SHOWN</div>'+
+    '</div>';
 
-  // Header — same proportions as original ChartImage.
-  ctx.fillStyle=accent;ctx.fillRect(0,0,W,headerH);
-  ctx.fillStyle='rgba(0,0,0,.5)';
-  ctx.textAlign='left';ctx.font='900 30px '+F;
-  ctx.fillText('daegon charts',60,50);
+  const contentEl=root.querySelector('.dc-img-content');
 
-  ctx.textAlign='right';
-  ctx.fillStyle='rgba(0,0,0,.6)';
-  ctx.font='700 18px '+F;ctx.fillText('CHART DATED',W-60,50);
-  ctx.fillStyle='#000';ctx.font='900 30px '+F;
-  ctx.fillText(chartImageDateLabel(date),W-60,77);
+  for(const entry of list){
+    const no1=Number(entry.position)===1;
+    const wrapper=document.createElement('div');
 
-  ctx.textAlign='left';ctx.fillStyle='#000';ctx.font='900 100px '+F;
-  ctx.fillText(chartImageTrunc(ctx,String(cfg.title||'').toUpperCase(),W-120),60,112);
+    if(no1){
+      const pre=document.createElement('div');
+      pre.style.cssText='display:flex;align-items:center;margin-bottom:8px';
+      const badge=document.createElement('div');
 
-  // Content header.
-  let y=headerH+contentTop;
-  ctx.fillStyle=accent;ctx.fillRect(60,y+14,W-120,2);
-  y+=colHeaderH+4;
-
-  for(const e of list){
-    const isNo1=Number(e.position)===1;
-    const weeks1=chartImageWeeksAt1(e);
-
-    if(isNo1){
-      const badgeY=y;
-      if(weeks1){
-        const txt=weeks1+' '+(weeks1===1?'WEEK':'WEEKS')+' AT NO. 1';
-        ctx.font='800 15px '+F;
-        const bw=Math.ceil(ctx.measureText(txt).width)+36;
-        ctx.fillStyle=accent;
-        chartImageRoundRect(ctx,130,badgeY+4,bw,30,4);ctx.fill();
-        ctx.fillStyle='#000';ctx.textAlign='left';ctx.fillText(txt,148,badgeY+11);
+      if(weeksAt1){
+        badge.style.cssText='background:'+accent+';color:#000;font-size:15px;font-weight:800;padding:6px 18px;border-radius:4px;letter-spacing:.08em;text-transform:uppercase;width:fit-content;margin-left:70px';
+        badge.textContent=weeksAt1+' '+(weeksAt1===1?'WEEK':'WEEKS')+' AT NO. 1';
+      }else{
+        badge.style.marginLeft='70px';
       }
-      ctx.fillStyle=accent;
-      ctx.font='800 13px '+F;ctx.textAlign='center';
-      ctx.fillText('LAST',W-95,badgeY+4);
-      ctx.fillText('WEEK',W-95,badgeY+19);
-      y+=38;
+      pre.appendChild(badge);
+
+      const spacer=document.createElement('div');spacer.style.flex='1';pre.appendChild(spacer);
+      const lw=document.createElement('div');
+      lw.style.cssText='width:70px;font-size:13px;font-weight:800;color:'+accent+';text-transform:uppercase;letter-spacing:.05em;text-align:center;flex-shrink:0;line-height:1.2';
+      lw.innerHTML='LAST<br>WEEK';
+      pre.appendChild(lw);
+      wrapper.appendChild(pre);
     }
 
-    const rowH=isNo1?104:72;
-    const rowTop=y;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;padding:'+(no1?'20px 0':'14px 0')+';border-bottom:1px solid '+accent+';position:relative;overflow:hidden';
 
-    if(isNo1){
-      ctx.fillStyle='rgba(0,230,118,.12)';
-      // ghosted "1" uses theme accent, not hardcoded green
-      ctx.save();
-      ctx.globalAlpha=.12;ctx.fillStyle=accent;ctx.font='900 160px '+F;
-      ctx.textAlign='left';ctx.fillText('1',50,rowTop-30);ctx.restore();
+    if(no1){
+      const ghost=document.createElement('div');
+      ghost.style.cssText='position:absolute;left:-10px;top:50%;transform:translateY(-50%);font-size:160px;font-weight:900;color:'+accent+';opacity:.12;line-height:1;pointer-events:none;z-index:0';
+      ghost.textContent='1';row.appendChild(ghost);
     }
 
-    // Position
-    ctx.textAlign='center';
-    ctx.fillStyle=isNo1?accent:'#fff';
-    ctx.font=(isNo1?'900 64px ':'900 44px ')+F;
-    ctx.fillText(String(e.position),isNo1?105:95,rowTop+(isNo1?18:14));
+    const pos=document.createElement('div');
+    pos.style.cssText='width:'+(no1?'90px':'70px')+';font-size:'+(no1?'64px':'44px')+';font-weight:900;color:'+(no1?accent:'#fff')+';line-height:1;text-align:center;flex-shrink:0;position:relative;z-index:1';
+    pos.textContent=String(entry.position);row.appendChild(pos);
 
-    // Title
-    ctx.textAlign='left';ctx.fillStyle='#fff';
-    ctx.font=(isNo1?'900 34px ':'900 26px ')+F;
-    const titleX=isNo1?150:130;
-    const titleMax=cfg.kind==='artist'?700:520;
-    ctx.fillText(chartImageTrunc(ctx,chartImageDisplayName(e,cfg.kind).toUpperCase(),titleMax),titleX,rowTop+(isNo1?18:13));
+    const titleWrap=document.createElement('div');
+    titleWrap.style.cssText='flex:1;min-width:0;text-align:left;position:relative;z-index:1';
+    const title=document.createElement('div');
+    title.style.cssText='font-size:'+(no1?'34px':'26px')+';font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:-.01em;line-height:1.2;text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical';
+    title.textContent=chartImageDisplayName(entry,cfg.kind);
+    titleWrap.appendChild(title);row.appendChild(titleWrap);
 
-    // Artist
-    if(cfg.kind!=='artist'){
-      const artist=displayArtist(e.artist);
-      ctx.textAlign='right';ctx.fillStyle='rgba(255,255,255,.45)';
-      ctx.font=(isNo1?'400 28px ':'400 26px ')+F;
-      ctx.fillText(chartImageTrunc(ctx,artist,330),W-155,rowTop+(isNo1?18:13));
-      const feat=chartImageFeatText(e);
-      if(feat)ctx.fillText(chartImageTrunc(ctx,feat,330),W-155,rowTop+(isNo1?51:44));
+    if(!isArtist){
+      const artistWrap=document.createElement('div');
+      artistWrap.style.cssText='flex-shrink:0;text-align:right;margin-left:16px;margin-right:24px;max-width:340px;position:relative;z-index:1';
+      const artist=document.createElement('div');
+      artist.style.cssText='font-size:'+(no1?'28px':'26px')+';color:rgba(255,255,255,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+      artist.textContent=displayArtist(entry.artist);
+      artistWrap.appendChild(artist);
+
+      const feat=chartImageFeatText(entry);
+      if(feat){
+        const f=document.createElement('div');
+        f.style.cssText=artist.style.cssText;
+        f.textContent=feat;
+        artistWrap.appendChild(f);
+      }
+      row.appendChild(artistWrap);
+    }else{
+      const spacer=document.createElement('div');spacer.style.flex='1';row.appendChild(spacer);
     }
 
-    // LW
-    ctx.textAlign='center';ctx.fillStyle=accent;
-    ctx.font=(isNo1?'800 26px ':'800 22px ')+F;
-    ctx.fillText(chartImageLastWeek(e),W-95,rowTop+(isNo1?18:14));
+    const lw=document.createElement('div');
+    lw.style.cssText='width:70px;font-size:'+(no1?'26px':'22px')+';font-weight:800;color:'+accent+';text-align:center;flex-shrink:0;position:relative;z-index:1';
+    lw.textContent=chartImageLastWeek(entry);
+    row.appendChild(lw);
 
-    // separator
-    ctx.fillStyle=accent;ctx.fillRect(60,rowTop+rowH-1,W-120,1);
-    y+=rowH;
+    wrapper.appendChild(row);
+    contentEl.appendChild(wrapper);
   }
 
-  const footerY=H-footerH;
-  ctx.fillStyle='rgba(255,255,255,.06)';ctx.fillRect(0,footerY,W,1);
-  ctx.fillStyle='rgba(255,255,255,.2)';ctx.font='600 14px '+F;
-  ctx.textAlign='left';ctx.fillText('daegoncharts.com.br',60,footerY+20);
-  ctx.textAlign='right';ctx.fillText(list.length+' / '+entries.length+' ENTRIES SHOWN',W-60,footerY+20);
+  host.appendChild(root);
+  document.body.appendChild(host);
 
-  return canvas;
+  try{
+    await document.fonts.ready;
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    if(!window.htmlToImage?.toPng) throw new Error('html-to-image did not load');
+    const dataUrl=await window.htmlToImage.toPng(root,{
+      width:1080,
+      pixelRatio:2,
+      backgroundColor:'#1a1a1a',
+      cacheBust:true
+    });
+    const img=new Image();
+    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=dataUrl});
+    const canvas=document.createElement('canvas');
+    canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+    canvas.getContext('2d').drawImage(img,0,0);
+    return canvas;
+  }finally{
+    host.remove();
+  }
 }
 async function generateFullChartImage(entries,cfg,date){
   const titleText=String(cfg.title||'').toUpperCase();
