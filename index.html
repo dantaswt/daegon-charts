@@ -4313,10 +4313,10 @@ function visibleChartTitle(name){
 }
 
 const appleSongCreditCache=new Map();
-async function resolveAppleSongCredit(e){
+async function resolveAppleSongCredit(e,chartDate=''){
   const title=String(e?.name||'').trim(),artist=String(e?.artist||'').trim();
   if(!title||!artist)return null;
-  const key=comparable(artist)+'|'+comparable(artworkSearchTitle('song',title));
+  const key=comparable(artist)+'|'+comparable(artworkSearchTitle('song',title))+'|'+String(chartDate||'').slice(0,4);
   if(appleSongCreditCache.has(key))return appleSongCreditCache.get(key);
   const job=(async()=>{
     try{
@@ -4328,7 +4328,7 @@ async function resolveAppleSongCredit(e){
           'apikey':SUPABASE_ANON_JWT,
           'Authorization':'Bearer '+SUPABASE_ANON_JWT
         },
-        body:JSON.stringify({mode:'track',name:title,artist}),
+        body:JSON.stringify({mode:'track',name:title,artist,chartDate}),
         signal:ctrl.signal
       });
       clearTimeout(timer);
@@ -4352,7 +4352,7 @@ function songCreditHtml(primary,credit){
   }
   return base+' feat. '+collaborators.map(x=>weeklyArtistLink(x)).join(', ');
 }
-async function hydrateSongCredits(rows){
+async function hydrateSongCredits(rows,chartDate){
   const nodes=[...content.querySelectorAll('[data-song-credit]')];
   if(!nodes.length)return;
   const byKey=new Map();
@@ -4366,7 +4366,7 @@ async function hydrateSongCredits(rows){
   async function worker(){
     while(cursor<entries.length){
       const e=entries[cursor++];
-      const credit=await resolveAppleSongCredit(e);
+      const credit=await resolveAppleSongCredit(e,chartDate);
       if(!credit)continue;
       const html=songCreditHtml(e.artist,credit);
       for(const node of byKey.get(itemKey(e))||[])if(node.isConnected)node.innerHTML=html;
@@ -4484,7 +4484,7 @@ function renderRows(data,date){
   content.querySelectorAll('.run-jump').forEach(b=>b.onclick=()=>setDate(b.dataset.date,data));
   content.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const e=all.find(x=>itemKey(x)===b.dataset.entry);if(e)playEntry(e,b)});
   hydrateImages(cfg,rows);
-  if(cfg.kind==='song')hydrateSongCredits(rows);
+  if(cfg.kind==='song')hydrateSongCredits(rows,date);
 }
 async function hydrateDropoutImages(cfg,outs){
   const nodes=[...dropoutsEl.querySelectorAll('[data-dropout-image-key]')];
