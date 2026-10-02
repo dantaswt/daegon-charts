@@ -4319,3 +4319,11 @@ body:not(.portal-mode) #portalPage{
     letter-spacing:.045em!important;
   }
 }
+
+/* WEEKLY_DESKTOP_FIXED_HEADER_OFFSET_V3
+   The canonical header is fixed on weekly routes; keep the chart heading fully below it. */
+@media (min-width:768px){
+  body:not(.portal-mode).global-header-canonical.global-bars-weekly.global-site-shell .page{
+    padding-top:96px!important;
+  }
+}
