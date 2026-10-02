@@ -1210,9 +1210,10 @@
       }
       .metrics > span:not(.sep){
         display:grid !important;
-        grid-template-columns:54px 24px !important;
+        grid-template-columns:max-content 24px !important;
         column-gap:8px !important;
         align-items:center !important;
+        justify-content:end !important;
         text-align:right !important;
       }
       .metrics .metric-v{
@@ -3809,7 +3810,7 @@ function diffType(diff){const d=String(diff||'');if(d==='NEW')return'debut';if(d
 function diffHtml(diff){
   const d=String(diff||'');
   if(d==='NEW')return '<span class="diff-badge diff-new">NEW</span>';
-  if(d==='RE')return '<span class="diff-badge diff-new diff-re">RE-<br>ENTRY</span>';
+  if(d==='RE')return '<span class="diff-badge diff-new diff-re">RE-ENTRY</span>';
   if(d.startsWith('▲'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M4 7l4-4 4 4"/></svg>';
   if(d.startsWith('▼'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 13V3M4 9l4 4 4-4"/></svg>';
   return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
@@ -4257,10 +4258,10 @@ function metricsHtml(e){
   const weeks=e.weeks>0?String(e.weeks):'-';
   const w1=Number(e.weeksAt1||0);
   return '<div class="metrics">'+
-    '<span class="metric-label">LW</span><span class="metric-v">'+esc(lw)+'</span>'+
-    '<span class="metric-label">PEAK</span><span class="metric-v">'+esc(peak)+'</span>'+
-    (w1>0?'<span class="metric-label">WEEKS AT NO. 1</span><span class="metric-v">'+esc(w1)+'</span>':'')+
-    '<span class="metric-label">WEEKS ON CHART</span><span class="metric-v">'+esc(weeks)+'</span>'+
+    '<span class="metric-row"><span class="metric-label">LW</span><span class="metric-v">'+esc(lw)+'</span></span>'+
+    '<span class="metric-row"><span class="metric-label">PEAK</span><span class="metric-v">'+esc(peak)+'</span></span>'+
+    (w1>0?'<span class="metric-row"><span class="metric-label">WEEKS AT NO. 1</span><span class="metric-v">'+esc(w1)+'</span></span>':'')+
+    '<span class="metric-row"><span class="metric-label">WEEKS ON CHART</span><span class="metric-v">'+esc(weeks)+'</span></span>'+
   '</div>';
 }
 function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';const w1=Number(e.weeksAt1||0);return '<div class="m-metrics"><span><b>LW</b> '+esc(lw)+'</span><span><b>PEAK</b> '+esc(e.peak||'-')+'</span><span><b>WEEKS ON CHART</b> '+esc(e.weeks||'-')+'</span></div>'+(w1>0?'<div class="m-weeks-no1"><b>WEEKS AT NO. 1</b> '+esc(w1)+'</div>':'')}
