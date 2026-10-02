@@ -154,8 +154,31 @@
     .badge-inline{display:inline-flex;margin-left:6px;padding:2px 5px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
     .right{display:flex;align-items:center;gap:16px}
     .award{width:24px;height:24px;border:2px solid currentColor;border-radius:9999px!important;display:flex;align-items:center;justify-content:center}
-    .metrics{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted-foreground);white-space:nowrap}
-    .metrics .sep{color:var(--border)}
+    .metrics{
+      display:grid;
+      grid-template-columns:auto minmax(28px,auto);
+      column-gap:14px;
+      row-gap:5px;
+      align-items:center;
+      min-width:176px;
+      font-size:11px;
+      color:var(--muted-foreground);
+      white-space:nowrap;
+    }
+    .metrics .metric-label{
+      text-align:right;
+      text-transform:uppercase;
+      letter-spacing:.02em;
+      color:var(--muted-foreground);
+      font-weight:500;
+    }
+    .metrics .metric-v{
+      text-align:left;
+      color:var(--foreground);
+      font-weight:900;
+      font-size:13px;
+      line-height:1;
+    }
     .actions{display:flex;flex-direction:column;gap:8px}
     .action{
       width:32px;height:32px;border:0;background:var(--muted);color:var(--foreground);
@@ -4232,12 +4255,12 @@ function metricsHtml(e){
   const lw=e.lastWeek!==undefined&&String(e.lastWeek).trim()!==''?(String(e.lastWeek)==='0'?'-':String(e.lastWeek)):'-';
   const peak=e.peak>0?String(e.peak):'-';
   const weeks=e.weeks>0?String(e.weeks):'-';
+  const w1=Number(e.weeksAt1||0);
   return '<div class="metrics">'+
-    '<span>LW <span class="metric-v">'+esc(lw)+'</span></span>'+
-    '<span class="sep">·</span>'+
-    '<span>PEAK <span class="metric-v">'+esc(peak)+'</span></span>'+
-    '<span class="sep">·</span>'+
-    '<span>WEEKS <span class="metric-v">'+esc(weeks)+'</span></span>'+
+    '<span class="metric-label">LW</span><span class="metric-v">'+esc(lw)+'</span>'+
+    '<span class="metric-label">PEAK</span><span class="metric-v">'+esc(peak)+'</span>'+
+    (w1>0?'<span class="metric-label">WEEKS AT NO. 1</span><span class="metric-v">'+esc(w1)+'</span>':'')+
+    '<span class="metric-label">WEEKS ON CHART</span><span class="metric-v">'+esc(weeks)+'</span>'+
   '</div>';
 }
 function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';const w1=Number(e.weeksAt1||0);return '<div class="m-metrics"><span><b>LW</b> '+esc(lw)+'</span><span><b>PEAK</b> '+esc(e.peak||'-')+'</span><span><b>WEEKS ON CHART</b> '+esc(e.weeks||'-')+'</span></div>'+(w1>0?'<div class="m-weeks-no1"><b>WEEKS AT NO. 1</b> '+esc(w1)+'</div>':'')}
@@ -4408,10 +4431,10 @@ function renderRows(data,date){
     const movementClass=colorClass(e.diff);
     return '<article class="chart-card '+movementClass+(state.diffColors&&movementClass?' diff-colors-active':'')+'" data-key="'+esc(key)+'">'+
       '<div class="desktop-row">'+
-        '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div>'+(one&&w1>=2?'<div class="weeks1">'+w1+' '+(w1===1?'WEEK':'WEEKS')+'</div>':'')+'</div>'+
+        '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div></div>'+
         coverHtml(e,one,false)+
         '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
-        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+(!one&&w1>=2?'<span class="badge-inline">'+w1+' '+(w1===1?'WEEK':'WEEKS')+' AT #1</span>':'')+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+'</div>'+
+        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+'</div>'+
         '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><svg class="award-star-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.8l3.02 6.12 6.76.98-4.89 4.77 1.15 6.73L12 17.22 5.96 20.4l1.15-6.73L2.22 8.9l6.76-.98L12 1.8z"/></svg></span>':'')+
           metricsHtml(e)+
           '<div class="actions">'+
