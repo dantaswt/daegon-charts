@@ -4300,3 +4300,22 @@ body:not(.portal-mode) #portalPage{
   text-decoration:underline!important;
   text-underline-offset:2px;
 }
+
+/* GLOBAL_DESKTOP_NAV_TYPE_V2 — restore the larger desktop navigation scale */
+@media (min-width:768px){
+  .portal-topnav,
+  .portal-mode .portal-topnav,
+  body.global-bars-weekly .portal-topnav,
+  body.global-site-shell .portal-topnav{
+    gap:20px!important;
+  }
+  .portal-topnav a,
+  .portal-mode .portal-topnav a,
+  body.global-bars-weekly .portal-topnav a,
+  body.global-site-shell .portal-topnav a{
+    font-size:13px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:.045em!important;
+  }
+}
