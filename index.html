@@ -4566,6 +4566,12 @@ function renderDropouts(data,date){
 
   hydrateDropoutImages(cfg,outs);
 }
+function centerSelectedWeekOption(){
+  const selected=weekPickerMenu.querySelector('.selected');
+  if(!selected)return;
+  const target=selected.offsetTop-(weekPickerMenu.clientHeight-selected.offsetHeight)/2;
+  weekPickerMenu.scrollTop=Math.max(0,target);
+}
 function renderWeekPicker(data){
   weekPickerLabel.textContent=fmtShort(state.date);
   weekPickerMenu.innerHTML=data.dates.map(d=>'<button class="week-picker-option '+(d===state.date?'selected':'')+'" data-date="'+d+'">'+fmtShort(d)+'</button>').join('');
@@ -4575,10 +4581,9 @@ function renderWeekPicker(data){
       if(btn.dataset.date!==state.date)setDate(btn.dataset.date,data);
     };
   });
-  requestAnimationFrame(()=>{
-    const selected=weekPickerMenu.querySelector('.selected');
-    if(selected) selected.scrollIntoView({block:'center'});
-  });
+  if(weekPicker.classList.contains('open')){
+    requestAnimationFrame(centerSelectedWeekOption);
+  }
 }
 function syncWeekButtons(data){
   const idx=data.dates.indexOf(state.date),prev=idx>0?data.dates[idx-1]:null,next=idx>=0&&idx<data.dates.length-1?data.dates[idx+1]:null;
@@ -5069,10 +5074,7 @@ weekPickerButton.addEventListener('click',function(e){
   e.stopPropagation();
   const open=weekPicker.classList.toggle('open');
   if(open){
-    requestAnimationFrame(()=>{
-      const selected=weekPickerMenu.querySelector('.selected');
-      if(selected) selected.scrollIntoView({block:'center'});
-    });
+    requestAnimationFrame(centerSelectedWeekOption);
   }
 });
 
@@ -5082,10 +5084,7 @@ weekPickerButton.addEventListener('touchend',function(e){
   e.stopPropagation();
   const open=weekPicker.classList.toggle('open');
   if(open){
-    requestAnimationFrame(()=>{
-      const selected=weekPickerMenu.querySelector('.selected');
-      if(selected) selected.scrollIntoView({block:'center'});
-    });
+    requestAnimationFrame(centerSelectedWeekOption);
   }
 },{passive:false});
 
