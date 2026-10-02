@@ -151,6 +151,8 @@
     .entry-title.one{font-size:20px}
     .artist{margin-top:3px;color:var(--muted-foreground);font-size:14px;line-height:1.25}
     .artist.one{font-size:16px}
+    .album-ref{margin-top:2px;color:var(--muted-foreground);font-size:12px;line-height:1.2;font-style:italic}
+    .album-ref.one{font-size:14px}
     .badge-inline{display:inline-flex;margin-left:6px;padding:2px 5px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
     .right{display:flex;align-items:center;gap:16px}
     .award{width:24px;height:24px;border:2px solid currentColor;border-radius:9999px!important;display:flex;align-items:center;justify-content:center}
@@ -241,6 +243,7 @@
       .m-entry{min-width:0;flex:1}
       .m-title{font-size:13px;font-weight:800;line-height:1.15;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
       .m-artist{font-size:11px;color:var(--muted-foreground);line-height:1.15;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .m-album-ref{font-size:10px;color:var(--muted-foreground);line-height:1.15;margin-top:2px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .m-metrics{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted-foreground);white-space:nowrap;margin-top:4px}
       .m-actions{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
       .m-actions-top{display:flex;align-items:center;gap:6px}
@@ -2389,10 +2392,10 @@
   }
   .m-entry{
     align-self:start!important;
-    height:104px!important;
+    height:122px!important;
     padding:2px 0 0!important;
     display:grid!important;
-    grid-template-rows:40px 20px 9px 16px 16px!important;
+    grid-template-rows:40px 20px 18px 16px 16px!important;
     align-content:start!important;
   }
   .m-title{
@@ -2412,6 +2415,17 @@
     min-height:20px!important;
     max-height:20px!important;
     line-height:20px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    align-self:start!important;
+  }
+  .m-album-ref{
+    grid-row:3!important;
+    margin:0!important;
+    min-height:18px!important;
+    max-height:18px!important;
+    line-height:18px!important;
     white-space:nowrap!important;
     overflow:hidden!important;
     text-overflow:ellipsis!important;
@@ -4476,7 +4490,7 @@ function renderRows(data,date){
         '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div></div>'+
         coverHtml(e,one,false)+
         '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
-        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+'</div>'+
+        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+(cfg.kind==='song'&&e.album?'<div class="album-ref '+(one?'one':'')+'">'+esc(e.album)+'</div>':'')+'</div>'+
         '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><svg class="award-star-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.8l3.02 6.12 6.76.98-4.89 4.77 1.15 6.73L12 17.22 5.96 20.4l1.15-6.73L2.22 8.9l6.76-.98L12 1.8z"/></svg></span>':'')+
           metricsHtml(e)+
           '<div class="actions">'+
@@ -4486,7 +4500,7 @@ function renderRows(data,date){
       '<div class="mobile-row">'+
         '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div></div>'+
         coverHtml(e,one,true)+
-        '<div class="m-entry"><div class="m-title">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
+        '<div class="m-entry"><div class="m-title">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+(cfg.kind==='song'&&e.album?'<div class="m-album-ref">'+esc(e.album)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
         '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><svg class="award-star-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.8l3.02 6.12 6.76.98-4.89 4.77 1.15 6.73L12 17.22 5.96 20.4l1.15-6.73L2.22 8.9l6.76-.98L12 1.8z"/></svg></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
       '</div>'+
       (open?detailHtml(e,cfg,data,date,copy):'')+
