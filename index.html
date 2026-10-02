@@ -4370,7 +4370,11 @@ function smartDisplayCase(value,{artist=false}={}){
 function displayTitle(name){return smartDisplayCase(visibleChartTitle(name))}
 function displayArtist(name){return smartDisplayCase(name,{artist:true})}
 function visibleChartTitle(name){
-  return String(name||'').replace(/\s*[\(\[]?\s*(?:with|feat\.?|ft\.?|featuring)\s+[^\)\]]+[\)\]]?\s*$/i,'').trim()||String(name||'');
+  const raw=String(name||'');
+  return raw
+    .replace(/\s*[\(\[]\s*(?:with|feat\.?|ft\.?|featuring)\s+[^\)\]]+[\)\]]?\s*$/i,'')
+    .replace(/\s+(?:with|feat\.?|ft\.?|featuring)\s+.+$/i,'')
+    .trim()||raw;
 }
 
 const appleSongCreditCache=new Map();
