@@ -4049,7 +4049,7 @@ async function spotifyArtwork(name,artist,kind){
 }
 
 async function resolveImage(e,cfg){
-  const key=cfg.kind+'|'+artworkIdentityTitle(cfg.kind,e.name)+'|'+comparable(e.artist||e.name);
+  const key=(cfg.kind==='song'?'apple-song-v2|':'')+cfg.kind+'|'+artworkIdentityTitle(cfg.kind,e.name)+'|'+comparable(e.artist||e.name);
 
   // Exact Apple Music override for releases where generic search can pick the wrong edition.
   // The Life of a Showgirl must use the artwork from "The Encore" edition supplied by the user.
