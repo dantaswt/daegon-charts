@@ -4121,9 +4121,46 @@ async function resolveImage(e,cfg){
     }
   }catch{}
 
-  const name=String(e.name||'').trim();
-  const artist=String(e.artist||e.name||'').trim();
-  const searchName=artworkSearchTitle(cfg.kind,name);
+  let name=String(e.name||'').trim();
+  let artist=String(e.artist||e.name||'').trim();
+  let searchName=artworkSearchTitle(cfg.kind,name);
+
+  // Songs are canonicalized against Apple's catalog before artwork lookup.
+  // Keep Daegon's visible primary-artist credit untouched; Apple metadata is
+  // used only as the authoritative identity for cover/preview resolution.
+  if(cfg.kind==='song'&&name&&artist){
+    try{
+      const apple=await resolveAppleSongCredit(e);
+      if(apple?.found){
+        const appleName=String(apple.apple_track_name||apple.display_title||name).trim();
+        const appleArtist=String(apple.apple_artist_name||artist).trim();
+        const appleId=apple.apple_track_id;
+        const country=String(apple.source_country||'br').toLowerCase();
+
+        if(appleId){
+          const d=await fetch('https://itunes.apple.com/lookup?id='+encodeURIComponent(appleId)+'&entity=song&country='+encodeURIComponent(country))
+            .then(r=>r.ok?r.json():null);
+          const hit=(d?.results||[]).find(x=>String(x.trackId||'')===String(appleId))||(d?.results||[])[0];
+          let art=hit?.artworkUrl100||hit?.artworkUrl60||'';
+          if(art){
+            art=art
+              .replace(/\/\d+x\d+bb(?:-\d+)?\.(jpg|png)$/i,'/1200x1200bb.$1')
+              .replace(/\/100x100bb\.(jpg|png)$/i,'/1200x1200bb.$1');
+            if(/^https?:\/\//i.test(art)){
+              state.images.set(key,art);
+              try{localStorage.setItem(persistedKey,art)}catch{}
+              return art;
+            }
+          }
+        }
+
+        // If direct lookup fails, resolve again using Apple's exact spelling.
+        name=appleName||name;
+        artist=appleArtist||artist;
+        searchName=artworkSearchTitle(cfg.kind,name);
+      }
+    }catch{}
+  }
 
   async function requestArtwork(queryName){
     try{
