@@ -3719,7 +3719,7 @@ function computeDiffs(dates,entriesByDate){
   }
 }
 async function loadSecondaryFromSupabase(chartId){
-  const cacheKey='supabase-album-v12:'+chartId;
+  const cacheKey='supabase-album-v13:'+chartId;
   try{
     const cached=sessionStorage.getItem(cacheKey);
     const ts=Number(sessionStorage.getItem(cacheKey+':ts')||0);
