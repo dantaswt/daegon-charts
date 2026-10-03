@@ -3719,7 +3719,7 @@ function computeDiffs(dates,entriesByDate){
   }
 }
 async function loadSecondaryFromSupabase(chartId){
-  const cacheKey='supabase:'+chartId;
+  const cacheKey='supabase-album-v2:'+chartId;
   try{
     const cached=sessionStorage.getItem(cacheKey);
     const ts=Number(sessionStorage.getItem(cacheKey+':ts')||0);
@@ -3779,7 +3779,20 @@ async function loadWeekly(chartId){
     for(const e of entriesByDate[d]){
       const k=itemKey(e),existing=byKey.get(k);
       if(!existing){byKey.set(k,e);dedup.push(e)}
-      else if(e.position<existing.position){const ix=dedup.indexOf(existing);if(ix>=0)dedup[ix]=e;byKey.set(k,e)}
+      else{
+        // Historical Supabase rows can carry enrichment fields (notably album)
+        // that are absent from the primary sheet row. Preserve them while
+        // keeping the strongest chart position as the authoritative row.
+        const winner=e.position<existing.position?e:existing;
+        const donor=e.position<existing.position?existing:e;
+        for(const field of ['album','certification','totalUnits','totalStreams','totalSales']){
+          if(!winner[field]&&donor[field])winner[field]=donor[field];
+        }
+        if(winner!==existing){
+          const ix=dedup.indexOf(existing);if(ix>=0)dedup[ix]=winner;
+          byKey.set(k,winner);
+        }
+      }
     }
     entriesByDate[d]=dedup.sort((a,b)=>a.position-b.position);
   }
