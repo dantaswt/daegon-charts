@@ -3539,8 +3539,8 @@ const SUPABASE_ANON_JWT='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 const charts={
   songs:{id:'songs',title:'Daegon 100',kind:'song',url:SHEET+'904867620',secondaryUrl:HIST_SONGS+'1011796371'},
-  artists:{id:'artists',title:'Daegon Artists 50',kind:'artist',url:SHEET+'1568177610',secondaryUrl:HIST+'1959135946'},
-  albums:{id:'albums',title:'Daegon Albums 100',kind:'album',url:SHEET+'1940039611',secondaryUrl:HIST+'765580865'},
+  artists:{id:'artists',title:'Artist 50',kind:'artist',url:SHEET+'1568177610',secondaryUrl:HIST+'1959135946'},
+  albums:{id:'albums',title:'Top 100 Albums',kind:'album',url:SHEET+'1940039611',secondaryUrl:HIST+'765580865'},
   radioSongs:{id:'radioSongs',title:'Radio Songs',kind:'song',url:SHEET+'1681272096'},
   topStreamingAlbums:{id:'topStreamingAlbums',title:'Top Streaming Albums',kind:'album',url:SHEET+'1028545573'},
   topAlbumSales:{id:'topAlbumSales',title:'Top Album Sales',kind:'album',url:SHEET+'1111633725'},
@@ -3920,7 +3920,9 @@ function copyText(e,cfg,date,data){
   else if(e.peak>0&&weeksAtPeak>1)annotation='*peak: #'+e.peak+' for '+weeksAtPeak+' weeks*';
   else annotation='*peak: #'+e.peak+'*';
   const weeksPart=isNew?'':'['+e.weeks+' weeks].';
-  return ['Daegon\'s '+cfg.title+':',pos,e.name+',',e.artist,detail,weeksPart,isNew?'':annotation].filter(Boolean).join(' ')+'\n\nChart dated '+fmtDate(date)+'.';
+  const copyTitle=cfg.id==='songs'?'100 Songs':cfg.title;
+  const artistPart=e.artist+(isNew?'.':'');
+  return ['Daegon\'s '+copyTitle+':',pos,e.name+',',artistPart,detail,weeksPart,isNew?'':annotation].filter(Boolean).join(' ')+'\n\nChart dated '+fmtDate(date)+'.';
 }
 
 function comparable(value){
