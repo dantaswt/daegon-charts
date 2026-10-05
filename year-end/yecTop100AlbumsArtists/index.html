@@ -1,0 +1,5183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daegon Charts — Weekly Music Charts & Historical Archive</title>
+  <meta name="description" content="Daegon Charts is an independent weekly music chart and historical archive covering songs, albums and artists with original rankings, chart runs and movement data.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <meta name="author" content="Daegon Charts">
+  <meta property="og:title" content="Daegon Charts — Weekly Music Charts & Historical Archive">
+  <meta property="og:description" content="Independent weekly rankings, chart runs and historical music chart data for songs, albums and artists.">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Daegon Charts">
+  <meta property="og:image" content="https://i.imgur.com/jaBZ19n.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#0f0f0f">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5838624736955714" crossorigin="anonymous"></script>
+  <meta property="og:url" content="https://daegoncharts.com.br/year-end/yecTop100AlbumsArtists">
+  <link rel="canonical" href="https://daegoncharts.com.br/year-end/yecTop100AlbumsArtists">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://docs.google.com" crossorigin>
+  <link rel="preconnect" href="https://kvnzhuwmgadqicixbzvb.supabase.co" crossorigin>
+  <link rel="dns-prefetch" href="//itunes.apple.com">
+  <link rel="dns-prefetch" href="//raw.githubusercontent.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  </noscript>
+  <script>
+    (function(){
+      try{
+        var t=localStorage.getItem('theme');
+        if(t!=='light') document.documentElement.classList.add('dark');
+      }catch(e){}
+    })();
+  </script>
+  <style>
+    @font-face{
+  font-family:"Daegon Grotesk";
+  src:url("https://raw.githubusercontent.com/RandomMaerks/Overused-Grotesk/master/fonts/variable/OverusedGrotesk-VF.woff2") format("woff2-variations");
+  font-style:normal;
+  font-weight:300 900;
+  font-display:swap;
+}
+
+    :root{
+      --background:#e8e8e8;
+      --foreground:#1a1a1a;
+      --card:#ffffff;
+      --card-foreground:#1a1a1a;
+      --muted:#f0f0f0;
+      --muted-foreground:#6b7280;
+      --accent:#FF6D00;
+      --border:#d4d4d4;
+      --border-dark:#c0c0c0;
+    }
+    html.dark{
+      --background:#1a1a1a;
+      --foreground:#f5f5f5;
+      --card:#0f0f0f;
+      --card-foreground:#f5f5f5;
+      --muted:#171717;
+      --muted-foreground:#9CA3AF;
+      --border:#2a2a2a;
+      --border-dark:#333333;
+    }
+    *{box-sizing:border-box;border-radius:0!important}
+    html,body{margin:0;background:var(--background);color:var(--foreground);font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif}
+    body{min-height:100vh}
+    button,select{font:inherit}
+    button{cursor:pointer}
+    .shell{min-height:100vh;display:flex;flex-direction:column}
+    .site-header{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      background:linear-gradient(to bottom,#0f0f0f,#161616);
+      border-bottom:1px solid #2a2a2a;
+    }
+    .header-inner{
+      max-width:1280px;margin:0 auto;padding:12px 16px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+    }
+    .brand{font-size:20px;font-weight:800;color:#f5f5f5;letter-spacing:.02em;text-transform:lowercase}
+    .weekly-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:#9ca3af}
+    .theme-btn{
+      width:44px;height:44px;border:1px solid var(--border);background:var(--card);color:var(--foreground);
+      display:flex;align-items:center;justify-content:center;transition:.15s;
+    }
+    .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .page{
+      flex:1;max-width:1280px;width:100%;margin:0 auto;padding:88px 12px 36px;
+    }
+    .layout{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px}
+    .sidebar{position:sticky;top:96px;align-self:start}
+    .chart-nav{display:flex;flex-direction:column;gap:8px}
+    .chart-nav button{
+      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
+      font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:9px 14px;
+      transition:.15s;
+    }
+    .chart-nav button:hover,.chart-nav button.active{background:var(--accent);color:#000;border-color:var(--accent)}
+    .main{min-width:0}
+    .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px}
+    h1{margin:0;font-size:36px;line-height:1;font-weight:800;text-transform:uppercase;letter-spacing:-.02em}
+    .date-label{margin-top:6px;font-size:13px;color:var(--muted-foreground)}
+    .week-nav{display:flex;flex-direction:column;align-items:center;gap:8px;margin:8px 0 16px}
+    .week-label{font-size:12px;color:var(--muted-foreground);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+    .week-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+    .gold-btn{
+      min-height:44px;border:0;background:var(--accent);color:#000;font-weight:700;padding:9px 14px;
+      display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    }
+    .gold-btn:disabled{opacity:.4;cursor:not-allowed}
+    .date-select{
+      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
+      font-size:14px;font-weight:800;padding:9px 14px;min-width:175px;text-align:center;
+    }
+    .filters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:16px}
+    .filter{
+      min-height:44px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);
+      padding:9px 12px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;
+    }
+    .filter.active{background:var(--accent);color:#000;border-color:var(--accent)}
+    .chart-list{display:flex;flex-direction:column;gap:12px;max-width:896px;margin:0 auto}
+    .chart-card{
+      overflow-anchor:none;
+      background:var(--card);color:var(--card-foreground);border:1px solid var(--border);
+      padding:14px 16px;box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06);
+      transition:transform .18s ease,box-shadow .18s ease;
+    }
+    .chart-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+    .desktop-row{
+      display:grid;grid-template-columns:auto auto auto minmax(0,1fr) auto;gap:12px;align-items:center;
+    }
+    .rank-wrap{width:64px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+    .rank-num{font-size:30px;font-weight:900;min-width:64px;display:flex;align-items:center;justify-content:center}
+    .rank-num.one{font-size:36px;width:64px;height:64px;background:var(--accent);color:#000}
+    .weeks1{margin-top:3px;padding:2px 6px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
+    .cover{
+      width:96px;height:96px;background:var(--muted);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--muted-foreground)
+    }
+    .cover.one{width:180px;height:180px;border-left:4px solid var(--accent);margin-left:-12px}
+    .cover img{width:100%;height:100%;object-fit:cover;display:block}
+    .diff-wrap{width:32px;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground)}
+    .diff-arrow{width:19px;height:19px}
+    .diff-badge{font-size:10px;font-weight:800;line-height:1;letter-spacing:.05em}
+    .diff-new{background:#00E676;color:#000;padding:3px 5px;writing-mode:horizontal-tb;transform:none}
+    .entry{min-width:0}
+    .entry-title{font-weight:800;font-size:16px;line-height:1.2;overflow-wrap:anywhere}
+    .entry-title.one{font-size:20px}
+    .artist{margin-top:3px;color:var(--muted-foreground);font-size:14px;line-height:1.25}
+    .artist.one{font-size:16px}
+    .album-ref{margin-top:2px;color:var(--muted-foreground);font-size:12px;line-height:1.2;font-style:italic}
+    .album-ref.one{font-size:14px}
+    .badge-inline{display:inline-flex;margin-left:6px;padding:2px 5px;background:#FFD600;color:#000;font-size:9px;font-weight:800;text-transform:uppercase;white-space:nowrap}
+    .right{display:flex;align-items:center;gap:16px}
+    .award{width:24px;height:24px;border:2px solid currentColor;border-radius:9999px!important;display:flex;align-items:center;justify-content:center}
+    .metrics{
+      display:grid;
+      grid-template-columns:auto minmax(28px,auto);
+      column-gap:14px;
+      row-gap:5px;
+      align-items:center;
+      min-width:176px;
+      font-size:11px;
+      color:var(--muted-foreground);
+      white-space:nowrap;
+    }
+    .metrics .metric-label{
+      text-align:right;
+      text-transform:uppercase;
+      letter-spacing:.02em;
+      color:var(--muted-foreground);
+      font-weight:500;
+    }
+    .metrics .metric-v{
+      text-align:left;
+      color:var(--foreground);
+      font-weight:900;
+      font-size:13px;
+      line-height:1;
+    }
+    .actions{display:flex;flex-direction:column;gap:8px}
+    .action{
+      width:32px;height:32px;border:0;background:var(--muted);color:var(--foreground);
+      display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:9999px!important;transition:.15s
+    }
+    .action:hover{background:var(--border)}
+    .details{
+      margin-top:12px;border:1px solid var(--border);background:var(--muted);padding:12px;
+      font-size:13px;color:var(--foreground)
+    }
+    .details-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+    .detail-box{background:var(--card);border:1px solid var(--border);padding:9px}
+    .detail-k{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted-foreground)}
+    .detail-v{font-size:13px;font-weight:700;margin-top:3px}
+    .dropouts{max-width:896px;margin:28px auto 0;border:1px solid var(--border);background:var(--muted);padding:16px}
+    .dropouts-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.2em;color:var(--muted-foreground);margin-bottom:10px}
+    .dropout{display:flex;gap:10px;align-items:center;border:1px solid var(--border-dark);background:var(--card);padding:10px;margin-top:8px}
+    .dropout-rank{font-weight:800}
+    .dropout-info{min-width:0}
+    .dropout-name{font-size:13px;font-weight:700}
+    .dropout-meta{font-size:10px;color:var(--muted-foreground);margin-top:2px}
+    .mobile-row{display:none}
+    .back-top{
+      position:fixed;right:18px;bottom:20px;z-index:120;width:48px;height:48px;border:0;background:var(--accent);color:#000;
+      border-radius:9999px!important;display:none;align-items:center;justify-content:center;box-shadow:0 5px 14px rgba(0,0,0,.2)
+    }
+    .loader-wrap{display:flex;justify-content:center;padding:60px 0}
+    .loader{width:42px;height:42px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:9999px!important;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error{text-align:center;padding:48px 10px;color:var(--muted-foreground)}
+    .color-new{background:#bae6fd!important;color:#1a1a1a!important}
+    .color-re{background:#93c5fd!important;color:#1a1a1a!important}
+    .color-up1{background:#d1fae5!important;color:#1a1a1a!important}
+    .color-up10{background:#6ee7b7!important;color:#1a1a1a!important}
+    .color-down1{background:#fee2e2!important;color:#1a1a1a!important}
+    .color-down10{background:#fca5a5!important;color:#1a1a1a!important}
+    .site-footer{margin-top:auto;background:#0f0f0f;border-top:1px solid #2a2a2a;padding:28px 16px;text-align:center;color:#9ca3af;font-size:12px}
+    @media(max-width:900px){
+      .layout{grid-template-columns:1fr}
+      .sidebar{position:static}
+      .chart-nav{display:flex;flex-direction:row;overflow-x:auto;gap:0;margin-bottom:6px}
+      .chart-nav button{flex:0 0 auto;white-space:nowrap}
+    }
+    @media(max-width:767px){
+      .page{padding-top:80px}
+      .header-inner{padding:9px 14px}
+      .brand{position:absolute;left:64px;right:64px;text-align:center;font-size:18px}
+      .weekly-label{visibility:hidden}
+      .title-row{justify-content:center;text-align:center}
+      h1{font-size:28px}
+      .desktop-row{display:none}
+      .mobile-row{display:flex;align-items:flex-start;gap:8px}
+      .chart-card{padding:13px 14px}
+      .m-rank{width:32px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:2px}
+      .m-rank-num{font-size:20px;font-weight:900;line-height:1}
+      .m-diff{height:20px;margin-top:3px;display:flex;align-items:center;justify-content:center}
+      .m-cover{width:64px;height:64px;background:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;color:var(--muted-foreground)}
+      .m-cover.one{width:68px;height:68px;border-left:3px solid var(--accent)}
+      .m-cover img{width:100%;height:100%;object-fit:cover}
+      .m-entry{min-width:0;flex:1}
+      .m-title{font-size:13px;font-weight:800;line-height:1.15;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+      .m-artist{font-size:11px;color:var(--muted-foreground);line-height:1.15;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .m-album-ref{font-size:10px;color:var(--muted-foreground);line-height:1.15;margin-top:2px;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .m-metrics{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted-foreground);white-space:nowrap;margin-top:4px}
+      .m-actions{display:flex;flex-direction:column;align-items:center;gap:6px;flex-shrink:0}
+      .m-actions-top{display:flex;align-items:center;gap:6px}
+      .week-nav{margin-top:4px}
+      .filters{gap:6px}
+      .filter{padding:8px 10px}
+    }
+  
+    .mobile-chart-nav{display:none}
+    .mobile-active-chart,.mobile-more-charts,.mobile-chart-menu button{
+      width:100%;min-height:44px;border:1px solid var(--border);font-size:14px;font-weight:800;
+      text-transform:uppercase;letter-spacing:.04em;padding:9px 14px;
+    }
+    .mobile-active-chart{background:var(--accent);color:#000;border-color:var(--accent)}
+    .mobile-more-charts,.mobile-chart-menu button{background:var(--muted);color:var(--foreground)}
+    .mobile-chart-menu{display:none}
+    .mobile-chart-menu.open{display:block}
+    .mobile-chart-menu button{display:block;border-top:0}
+    @media(min-width:768px){
+      .desktop-row{display:grid!important}
+      .mobile-row{display:none!important}
+      .desktop-chart-nav{display:flex!important}
+      .mobile-chart-nav{display:none!important}
+    }
+    @media(max-width:767px){
+      .desktop-chart-nav{display:none!important}
+      .mobile-chart-nav{display:block!important}
+      .desktop-row{display:none!important}
+      .mobile-row{display:flex!important}
+      .layout{display:block}
+      .sidebar{position:static;margin-bottom:12px}
+      .page{padding-left:8px;padding-right:8px;padding-top:74px}
+      .chart-list{gap:8px}
+      .chart-card{padding:10px 9px}
+      .title-row{margin-bottom:6px}
+      h1{font-size:22px}
+      .date-label{font-size:11px}
+      .week-nav{margin:6px 0 10px}
+      .week-label{font-size:10px}
+      .week-controls{gap:6px}
+      .gold-btn{min-height:40px;padding:7px 10px;font-size:12px}
+      .date-select{min-height:40px;min-width:145px;padding:7px 9px;font-size:12px}
+      .filters{margin-bottom:10px}
+      .filter{min-height:38px;padding:7px 9px;font-size:10px}
+    }
+
+    .week-picker{position:relative;min-width:175px}
+    .week-picker-button{
+      width:100%;min-width:175px;min-height:44px;
+      background:var(--muted);color:var(--foreground);
+      border:1px solid var(--border);
+      font-size:14px;font-weight:800;
+      padding:9px 14px;
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      cursor:pointer;
+    }
+    .week-picker-button:hover{border-color:var(--accent)}
+    .week-picker-button i{font-size:11px;transition:transform .15s}
+    .week-picker.open .week-picker-button i{transform:rotate(180deg)}
+    .week-picker-menu{
+      position:absolute;top:100%;left:0;right:0;z-index:80;
+      background:var(--card);border:1px solid var(--border);
+      max-height:300px;overflow-y:auto;
+      display:none;
+      box-shadow:0 8px 24px rgba(0,0,0,.18);
+    }
+    .week-picker.open .week-picker-menu{display:block}
+    .week-picker-option{
+      width:100%;min-height:44px;border:0;border-bottom:1px solid var(--border);
+      background:var(--card);color:var(--foreground);
+      padding:9px 14px;text-align:center;
+      font-size:14px;font-weight:800;cursor:pointer;
+    }
+    .week-picker-option:hover{background:var(--muted)}
+    .week-picker-option.selected{background:var(--accent);color:#000}
+    @media(max-width:767px){
+      .week-picker{min-width:145px}
+      .week-picker-button{min-width:145px;min-height:40px;padding:7px 9px;font-size:12px}
+      .week-picker-option{min-height:40px;padding:7px 9px;font-size:12px}
+      .week-picker-menu{max-height:260px}
+    }
+
+    /* Responsive week selector */
+    .week-controls{width:100%}
+    .week-picker{min-width:0;max-width:220px;flex:1 1 175px}
+    .week-picker-button{min-width:0;width:100%}
+    @media(max-width:767px){
+      .week-controls{
+        display:grid;
+        grid-template-columns:auto minmax(0,1fr) auto;
+        gap:6px;
+        width:100%;
+        max-width:100%;
+        align-items:center;
+      }
+      .week-picker{
+        width:100%;
+        min-width:0;
+        max-width:none;
+        flex:none;
+      }
+      .week-picker-button{
+        width:100%;
+        min-width:0;
+        max-width:100%;
+        min-height:40px;
+        padding:7px 8px;
+        font-size:12px;
+        gap:6px;
+      }
+      #weekPickerLabel{
+        display:block;
+        min-width:0;
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+      }
+      .week-picker-menu{
+        left:0;
+        right:0;
+        width:100%;
+        min-width:100%;
+        max-width:100%;
+        max-height:52vh;
+      }
+      .week-picker-option{
+        width:100%;
+        min-height:40px;
+        padding:8px 6px;
+        font-size:12px;
+      }
+      .week-controls .gold-btn{
+        min-width:0;
+        min-height:40px;
+        padding:7px 9px;
+        gap:5px;
+        font-size:11px;
+        white-space:nowrap;
+      }
+    }
+    @media(max-width:390px){
+      .week-controls{gap:4px}
+      .week-controls .gold-btn{
+        padding:7px 7px;
+        font-size:10px;
+      }
+      .week-picker-button{
+        padding:7px 6px;
+        font-size:11px;
+      }
+      .week-picker-button i{font-size:9px}
+    }
+
+    @media(min-width:901px){
+      .page{
+        max-width:1580px;
+        padding:96px 28px 48px;
+      }
+      .layout{
+        grid-template-columns:350px minmax(0,1fr);
+        gap:48px;
+        align-items:start;
+      }
+      .sidebar{
+        position:sticky;
+        top:96px;
+      }
+      .chart-nav{gap:10px}
+      .chart-nav button{
+        min-height:54px;
+        font-size:16px;
+        letter-spacing:.025em;
+        background:#ececec;
+        border-color:#d0d0d0;
+      }
+      .chart-nav button.active{
+        background:var(--accent);
+        border-color:var(--accent);
+      }
+      .main{min-width:0}
+      .title-row{
+        min-height:72px;
+        margin:0 0 10px;
+        align-items:flex-start;
+      }
+      h1{
+        font-size:44px;
+        line-height:.96;
+        letter-spacing:-.035em;
+      }
+      .date-label{
+        margin-top:8px;
+        font-size:16px;
+      }
+      .week-nav{
+        margin:8px 0 18px;
+        gap:10px;
+      }
+      .week-label{font-size:12px}
+      .week-controls{gap:14px}
+      .gold-btn{
+        min-height:54px;
+        padding:0 20px;
+        font-size:16px;
+      }
+      .week-picker{
+        flex:0 0 190px;
+        max-width:190px;
+      }
+      .week-picker-button{
+        min-height:54px;
+        font-size:15px;
+        background:#eee;
+      }
+      .filters{
+        gap:8px;
+        margin-bottom:18px;
+      }
+      .filter{
+        min-height:54px;
+        min-width:50px;
+        padding:0 14px;
+        font-size:11px;
+      }
+      .chart-list{
+        max-width:none;
+        width:100%;
+        gap:14px;
+      }
+      .chart-card{
+        padding:0 18px;
+        min-height:154px;
+        display:flex;
+        flex-direction:column;
+        justify-content:center;
+      }
+      .desktop-row{
+        grid-template-columns:74px 118px 44px minmax(0,1fr) auto;
+        gap:14px;
+        min-height:152px;
+      }
+      .rank-wrap{
+        width:74px;
+        height:100%;
+      }
+      .rank-num{
+        min-width:74px;
+        font-size:35px;
+      }
+      .cover{
+        width:118px;
+        height:118px;
+      }
+      .diff-wrap{
+        width:44px;
+        font-size:20px;
+      }
+      .diff-arrow{
+        width:22px;
+        height:22px;
+      }
+      .entry-title{
+        font-size:19px;
+        line-height:1.15;
+      }
+      .artist{
+        font-size:17px;
+        margin-top:4px;
+      }
+      .badge-inline{
+        font-size:8px;
+        vertical-align:middle;
+      }
+      .right{
+        gap:18px;
+      }
+      .award{
+        width:24px;
+        height:24px;
+        border:0;
+        font-size:18px;
+      }
+      .award i{font-size:18px!important}
+      .metrics{
+        min-width:112px;
+        display:grid;
+        grid-template-columns:auto auto;
+        column-gap:14px;
+        row-gap:2px;
+        font-size:12px;
+        text-align:right;
+      }
+      .metrics .sep{display:none}
+      .actions{
+        gap:8px;
+      }
+      .action{
+        width:40px;
+        height:40px;
+        font-size:14px;
+      }
+
+      /* Number one follows the larger reference card. */
+      .chart-card:has(.rank-num.one){
+        min-height:250px;
+        padding-left:18px;
+      }
+      .chart-card:has(.rank-num.one) .desktop-row{
+        min-height:248px;
+        grid-template-columns:74px 214px 44px minmax(0,1fr) auto;
+      }
+      .chart-card:has(.rank-num.one) .rank-wrap{
+        align-self:stretch;
+        justify-content:center;
+      }
+      .rank-num.one{
+        width:74px;
+        height:78px;
+        min-width:74px;
+        font-size:42px;
+      }
+      .chart-card:has(.rank-num.one) .cover.one{
+        width:214px;
+        height:214px;
+        margin-left:-14px;
+        border-left:5px solid var(--accent);
+      }
+      .chart-card:has(.rank-num.one) .entry-title.one{
+        font-size:24px;
+      }
+      .chart-card:has(.rank-num.one) .artist.one{
+        font-size:18px;
+      }
+      .weeks1{
+        font-size:9px;
+        padding:3px 8px;
+      }
+      .dropouts{max-width:none}
+      .site-footer{display:none}
+    }
+
+    @media(min-width:901px) and (max-width:1250px){
+      .page{padding-left:20px;padding-right:20px}
+      .layout{grid-template-columns:270px minmax(0,1fr);gap:28px}
+      .chart-nav button{font-size:14px}
+      .chart-card{padding-left:12px;padding-right:12px}
+      .desktop-row{grid-template-columns:62px 104px 36px minmax(0,1fr) auto;gap:10px}
+      .rank-wrap,.rank-num{width:62px;min-width:62px}
+      .cover{width:104px;height:104px}
+      .chart-card:has(.rank-num.one) .desktop-row{grid-template-columns:62px 180px 36px minmax(0,1fr) auto}
+      .chart-card:has(.rank-num.one) .cover.one{width:180px;height:180px}
+    }
+
+    @media(min-width:901px){
+      .chart-card{
+        min-height:192px;
+        padding:0 20px;
+      }
+      .desktop-row{
+        grid-template-columns:86px 148px 62px minmax(0,1fr) auto;
+        gap:14px;
+        min-height:190px;
+        align-items:center;
+      }
+      .rank-wrap{
+        width:86px;
+        align-items:center;
+      }
+      .rank-num{
+        min-width:86px;
+        width:86px;
+        font-size:35px;
+      }
+      .cover{
+        width:148px;
+        height:148px;
+      }
+      .diff-wrap{
+        width:62px;
+        justify-content:center;
+      }
+      .diff-badge{
+        writing-mode:horizontal-tb !important;
+        transform:none !important;
+        white-space:nowrap;
+        font-size:10px;
+        padding:4px 7px;
+      }
+      .entry-title{
+        font-size:20px;
+        line-height:1.1;
+      }
+      .artist{
+        font-size:18px;
+        line-height:1.15;
+        margin-top:6px;
+      }
+      .right{
+        min-width:300px;
+        margin-left:auto;
+        justify-content:flex-end;
+        gap:22px;
+      }
+      .award{
+        width:auto;
+        height:auto;
+        border:0 !important;
+        border-radius:0 !important;
+        font-size:20px;
+      }
+      .award i{
+        font-size:20px !important;
+      }
+      .metrics{
+        min-width:132px;
+        display:grid;
+        grid-template-columns:auto auto;
+        column-gap:12px;
+        row-gap:3px;
+        justify-content:end;
+        font-size:12px;
+        line-height:1.1;
+      }
+      .metrics .sep{display:none}
+      .actions{
+        width:42px;
+        gap:8px;
+        align-items:center;
+      }
+      .action{
+        width:42px;
+        height:42px;
+        font-size:14px;
+      }
+
+      .chart-card:has(.rank-num.one){
+        min-height:252px;
+        padding:0 20px;
+      }
+      .chart-card:has(.rank-num.one) .desktop-row{
+        grid-template-columns:86px 216px 62px minmax(0,1fr) auto;
+        min-height:250px;
+      }
+      .chart-card:has(.rank-num.one) .cover.one{
+        width:216px;
+        height:216px;
+        margin-left:0;
+        border-left:5px solid var(--accent);
+      }
+      .rank-num.one{
+        width:86px;
+        min-width:86px;
+        height:82px;
+        font-size:42px;
+      }
+      .chart-card:has(.rank-num.one) .entry-title.one{
+        font-size:24px;
+      }
+      .chart-card:has(.rank-num.one) .artist.one{
+        font-size:19px;
+      }
+    }
+
+    /* Desktop reference sizing — keep the page at the same visual scale as the original app */
+    @media(min-width:901px){
+      .page{
+        max-width:1460px;
+        width:100%;
+        margin:0 auto;
+        padding:104px 0 48px;
+      }
+      .layout{
+        grid-template-columns:330px minmax(0,1fr);
+        gap:48px;
+      }
+      .sidebar{
+        top:104px;
+      }
+      .chart-nav button{
+        min-height:52px;
+        font-size:15px;
+      }
+
+      .title-row{
+        min-height:66px;
+        margin-bottom:4px;
+      }
+      h1{
+        font-size:42px;
+      }
+      .date-label{
+        font-size:15px;
+        margin-top:6px;
+      }
+
+      .week-nav{
+        margin:4px 0 14px;
+        gap:8px;
+      }
+      .week-controls{
+        gap:12px;
+      }
+      .gold-btn{
+        min-height:52px;
+        padding:0 18px;
+        font-size:15px;
+      }
+      .week-picker{
+        flex-basis:188px;
+        max-width:188px;
+      }
+      .week-picker-button{
+        min-height:52px;
+        font-size:14px;
+      }
+      .filters{
+        margin-bottom:18px;
+      }
+      .filter{
+        min-height:52px;
+        padding:0 13px;
+      }
+
+      .chart-card{
+        min-height:154px;
+        padding:0 18px;
+      }
+      .desktop-row{
+        grid-template-columns:72px 116px 48px minmax(0,1fr) auto;
+        min-height:152px;
+        gap:12px;
+      }
+      .rank-wrap{
+        width:72px;
+      }
+      .rank-num{
+        width:72px;
+        min-width:72px;
+        font-size:32px;
+      }
+      .cover{
+        width:116px;
+        height:116px;
+      }
+      .diff-wrap{
+        width:48px;
+      }
+      .entry-title{
+        font-size:18px;
+      }
+      .artist{
+        font-size:16px;
+        margin-top:4px;
+      }
+      .right{
+        min-width:250px;
+        gap:16px;
+      }
+      .metrics{
+        min-width:110px;
+        font-size:11px;
+      }
+      .action{
+        width:38px;
+        height:38px;
+      }
+
+      .chart-card:has(.rank-num.one){
+        min-height:246px;
+        padding:0 18px;
+      }
+      .chart-card:has(.rank-num.one) .desktop-row{
+        min-height:244px;
+        grid-template-columns:72px 210px 48px minmax(0,1fr) auto;
+      }
+      .rank-num.one{
+        width:72px;
+        min-width:72px;
+        height:76px;
+        font-size:39px;
+      }
+      .chart-card:has(.rank-num.one) .cover.one{
+        width:210px;
+        height:210px;
+        margin-left:0;
+      }
+      .chart-card:has(.rank-num.one) .entry-title.one{
+        font-size:22px;
+      }
+      .chart-card:has(.rank-num.one) .artist.one{
+        font-size:17px;
+      }
+    }
+
+    @media(min-width:901px) and (max-width:1500px){
+      .page{
+        max-width:calc(100% - 40px);
+      }
+      .layout{
+        grid-template-columns:300px minmax(0,1fr);
+        gap:36px;
+      }
+    }
+
+    /* === Desktop Weekly Charts: direct port of dantaswt/daegoncharts === */
+    @media(min-width:901px){
+      .page{
+        max-width:1280px !important;
+        width:100% !important;
+        margin:0 auto !important;
+        padding:96px 24px 36px !important;
+      }
+      .layout{
+        display:grid !important;
+        grid-template-columns:280px minmax(0,1fr) !important;
+        gap:24px !important;
+        align-items:start !important;
+      }
+      .sidebar{
+        position:sticky !important;
+        top:96px !important;
+        align-self:start !important;
+      }
+      .chart-nav{
+        display:flex !important;
+        flex-direction:column !important;
+        gap:8px !important;
+        margin-bottom:24px !important;
+      }
+      .chart-nav button{
+        width:100% !important;
+        min-height:44px !important;
+        padding:8px 16px !important;
+        font-size:14px !important;
+        font-weight:700 !important;
+        letter-spacing:.025em !important;
+        background:var(--muted) !important;
+        color:var(--foreground) !important;
+        border:1px solid var(--border) !important;
+      }
+      .chart-nav button.active{
+        background:var(--accent) !important;
+        color:#000 !important;
+        border-color:var(--accent) !important;
+      }
+
+      .main{min-width:0 !important}
+      .title-row{
+        display:flex !important;
+        align-items:flex-start !important;
+        justify-content:space-between !important;
+        gap:12px !important;
+        min-height:0 !important;
+        margin:0 0 8px !important;
+        text-align:left !important;
+      }
+      h1{
+        margin:0 !important;
+        font-size:36px !important;
+        line-height:40px !important;
+        font-weight:800 !important;
+        letter-spacing:-.01em !important;
+      }
+      .date-label{
+        margin-top:4px !important;
+        font-size:14px !important;
+        line-height:20px !important;
+        color:var(--muted-foreground) !important;
+      }
+
+      .week-nav{
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:center !important;
+        gap:12px !important;
+        margin:0 0 16px !important;
+      }
+      .week-label{
+        font-size:12px !important;
+        line-height:16px !important;
+        font-weight:600 !important;
+        text-transform:uppercase !important;
+        letter-spacing:.025em !important;
+      }
+      .week-controls{
+        width:auto !important;
+        display:flex !important;
+        flex-wrap:wrap !important;
+        align-items:center !important;
+        justify-content:center !important;
+        gap:12px !important;
+      }
+      .gold-btn{
+        min-height:44px !important;
+        padding:8px 16px !important;
+        font-size:14px !important;
+        font-weight:700 !important;
+        gap:6px !important;
+      }
+      .week-picker{
+        flex:none !important;
+        width:auto !important;
+        min-width:160px !important;
+        max-width:none !important;
+      }
+      .week-picker-button{
+        width:auto !important;
+        min-width:160px !important;
+        min-height:44px !important;
+        padding:8px 16px !important;
+        font-size:14px !important;
+        font-weight:700 !important;
+        gap:8px !important;
+      }
+      .week-picker-menu{
+        max-height:300px !important;
+      }
+      .week-picker-option{
+        min-height:44px !important;
+        padding:8px 16px !important;
+        font-size:14px !important;
+        font-weight:700 !important;
+      }
+
+      .filters{
+        max-width:896px !important;
+        margin:0 auto 16px !important;
+        display:flex !important;
+        flex-wrap:wrap !important;
+        justify-content:center !important;
+        gap:8px !important;
+      }
+      .filter{
+        min-width:0 !important;
+        min-height:44px !important;
+        padding:10px 12px !important;
+        font-size:11px !important;
+        font-weight:700 !important;
+        letter-spacing:.05em !important;
+      }
+
+      .chart-list{
+        width:100% !important;
+        max-width:896px !important;
+        margin:0 auto !important;
+        gap:12px !important;
+      }
+      .chart-card{
+        width:100% !important;
+        min-height:0 !important;
+        padding:14.4px 16px !important;
+        display:block !important;
+        background:var(--card) !important;
+        color:var(--card-foreground) !important;
+        border:1px solid var(--border) !important;
+        box-shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06) !important;
+      }
+      .desktop-row{
+        display:grid !important;
+        grid-template-columns:auto auto auto minmax(0,1fr) auto !important;
+        gap:12px !important;
+        align-items:center !important;
+        min-height:0 !important;
+      }
+      .rank-wrap{
+        width:64px !important;
+        min-width:64px !important;
+        height:auto !important;
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:center !important;
+        justify-content:center !important;
+      }
+      .rank-num{
+        width:64px !important;
+        min-width:64px !important;
+        height:auto !important;
+        font-size:30px !important;
+        line-height:36px !important;
+        font-weight:900 !important;
+      }
+      .rank-num.one{
+        width:64px !important;
+        min-width:64px !important;
+        height:64px !important;
+        font-size:36px !important;
+        line-height:40px !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        background:var(--accent) !important;
+        color:#000 !important;
+      }
+      .weeks1{
+        margin-top:2px !important;
+        padding:2px 6px !important;
+        font-size:9px !important;
+        line-height:12px !important;
+      }
+      .cover{
+        width:96px !important;
+        height:96px !important;
+        margin:0 !important;
+        border-left:0 !important;
+      }
+      .cover.one{
+        width:180px !important;
+        height:180px !important;
+        margin-left:-12px !important;
+        border-left:4px solid var(--accent) !important;
+      }
+      .diff-wrap{
+        width:32px !important;
+        min-width:32px !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+      }
+      .diff-arrow{
+        width:19.2px !important;
+        height:19.2px !important;
+      }
+      .diff-badge{
+        display:inline-flex !important;
+        align-items:center !important;
+        flex-direction:column !important;
+        writing-mode:vertical-lr !important;
+        text-orientation:mixed !important;
+        transform:rotate(180deg) !important;
+        font-size:10.4px !important;
+        line-height:1 !important;
+        letter-spacing:.05em !important;
+        font-weight:800 !important;
+      }
+      .diff-new{
+        padding:2px 4px !important;
+        writing-mode:vertical-lr !important;
+        transform:rotate(180deg) !important;
+      }
+
+      .entry{
+        min-width:0 !important;
+        display:flex !important;
+        flex-direction:column !important;
+        flex:1 1 auto !important;
+      }
+      .entry-title{
+        font-size:16px !important;
+        line-height:24px !important;
+        font-weight:700 !important;
+        display:flex !important;
+        flex-wrap:wrap !important;
+        align-items:center !important;
+        gap:6px !important;
+      }
+      .entry-title.one{
+        font-size:20px !important;
+        line-height:28px !important;
+      }
+      .artist{
+        margin-top:0 !important;
+        font-size:14px !important;
+        line-height:20px !important;
+        color:var(--muted-foreground) !important;
+      }
+      .artist.one{
+        font-size:16px !important;
+        line-height:24px !important;
+      }
+      .badge-inline{
+        margin-left:0 !important;
+        padding:2px 6px !important;
+        font-size:9px !important;
+        line-height:12px !important;
+      }
+
+      .right{
+        min-width:0 !important;
+        margin:0 !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:flex-start !important;
+        gap:16px !important;
+        flex-shrink:0 !important;
+      }
+      .award{
+        width:24px !important;
+        height:24px !important;
+        border:2px solid currentColor !important;
+        border-radius:9999px !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+        font-size:inherit !important;
+      }
+      .award i{font-size:11px !important}
+      .metrics{
+        min-width:0 !important;
+        display:flex !important;
+        align-items:center !important;
+        gap:8px !important;
+        font-size:12px !important;
+        line-height:16px !important;
+        white-space:nowrap !important;
+        color:var(--muted-foreground) !important;
+        text-align:left !important;
+      }
+      .metrics .sep{display:inline !important}
+      .actions{
+        width:auto !important;
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+        gap:8px !important;
+      }
+      .action{
+        width:32px !important;
+        height:32px !important;
+        font-size:13px !important;
+      }
+
+      .chart-card:has(.rank-num.one){
+        min-height:0 !important;
+        padding:14.4px 16px !important;
+      }
+      .chart-card:has(.rank-num.one) .desktop-row{
+        min-height:0 !important;
+        grid-template-columns:auto auto auto minmax(0,1fr) auto !important;
+      }
+      .chart-card:has(.rank-num.one) .rank-wrap{
+        width:64px !important;
+        min-width:64px !important;
+        height:auto !important;
+      }
+      .chart-card:has(.rank-num.one) .cover.one{
+        width:180px !important;
+        height:180px !important;
+        margin-left:-12px !important;
+      }
+      .chart-card:has(.rank-num.one) .entry-title.one{
+        font-size:20px !important;
+        line-height:28px !important;
+      }
+      .chart-card:has(.rank-num.one) .artist.one{
+        font-size:16px !important;
+        line-height:24px !important;
+      }
+
+      .dropouts{
+        max-width:896px !important;
+        margin:32px auto 0 !important;
+      }
+      .site-footer{margin-top:40px !important}
+    }
+
+    @media(min-width:901px){
+      .metrics{
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+        gap:2px !important;
+        min-width:92px !important;
+        font-size:11px !important;
+        line-height:14px !important;
+        color:var(--muted-foreground) !important;
+        white-space:nowrap !important;
+      }
+      .metrics > span:not(.sep){
+        display:grid !important;
+        grid-template-columns:max-content 24px !important;
+        column-gap:8px !important;
+        align-items:center !important;
+        justify-content:end !important;
+        text-align:right !important;
+      }
+      .metrics .metric-v{
+        color:var(--foreground) !important;
+        font-weight:700 !important;
+        text-align:right !important;
+      }
+      .metrics .sep{
+        display:none !important;
+      }
+      .right{
+        align-items:center !important;
+      }
+    }
+
+    /* Details panel — ported from daegoncharts ChartRow */
+    .details-panel{
+      margin-top:12px;
+      width:100%;
+      background:var(--muted);
+      border:1px solid var(--border);
+      padding:12px;
+      font-size:14px;
+      color:var(--foreground);
+    }
+    .details-title{
+      font-weight:600;
+      margin-bottom:8px;
+      color:var(--foreground);
+    }
+    .details-run-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .details-run-card{
+      display:block;
+      width:100%;
+      border:1px solid var(--border);
+      background:var(--card);
+      padding:12px;
+      color:var(--foreground);
+      text-align:left;
+      cursor:pointer;
+      transition:border-color .15s,background .15s;
+    }
+    .details-run-card:hover{
+      border-color:var(--accent);
+      background:var(--muted);
+    }
+    .details-run-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      font-size:14px;
+      color:var(--foreground);
+    }
+    .details-run-pos{
+      font-weight:600;
+      color:var(--accent);
+    }
+    .details-run-meta{
+      margin-top:8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      font-size:12px;
+      color:var(--muted-foreground);
+    }
+    .details-empty{
+      font-size:14px;
+      color:var(--muted-foreground);
+    }
+
+    @media(max-width:767px){
+      .details-panel{
+        margin-top:10px;
+        padding:12px;
+        font-size:13px;
+      }
+      .details-title{margin-bottom:8px}
+      .details-run-card{padding:12px}
+      .details-run-head{font-size:13px}
+      .details-run-meta{
+        margin-top:7px;
+        font-size:11px;
+        gap:7px;
+      }
+    }
+
+    @media(min-width:901px){
+      .weeks1{
+        margin-top:2px !important;
+        padding:2px 6px !important;
+        background:#FFD600 !important;
+        color:#000 !important;
+        font-size:9px !important;
+        line-height:12px !important;
+        font-weight:700 !important;
+        text-transform:uppercase !important;
+        white-space:nowrap !important;
+      }
+      .badge-inline{
+        display:inline-flex !important;
+        align-items:center !important;
+        margin-left:0 !important;
+        padding:2px 6px !important;
+        background:#FFD600 !important;
+        color:#000 !important;
+        font-size:9px !important;
+        line-height:12px !important;
+        font-weight:700 !important;
+        text-transform:uppercase !important;
+        white-space:nowrap !important;
+      }
+    }
+
+    .dropouts{
+      max-width:896px;
+      margin:32px auto 0;
+      border:1px solid var(--border);
+      background:var(--muted);
+      padding:16px;
+    }
+    .dropouts-title{
+      font-size:12px;
+      font-weight:600;
+      text-transform:uppercase;
+      letter-spacing:.2em;
+      color:var(--muted-foreground);
+      margin-bottom:12px;
+    }
+    .dropouts-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .dropout{
+      display:flex;
+      align-items:flex-start;
+      gap:12px;
+      width:100%;
+      border:1px solid var(--border-dark);
+      background:var(--muted);
+      padding:12px;
+      color:var(--muted-foreground);
+      font-size:12px;
+      transition:border-color .15s;
+    }
+    .dropout:hover{
+      border-color:var(--accent);
+    }
+    .dropout-cover{
+      width:56px;
+      height:56px;
+      flex:0 0 56px;
+      overflow:hidden;
+      background:var(--muted);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:var(--muted-foreground);
+      font-size:20px;
+    }
+    .dropout-cover img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .dropout-info{
+      min-width:0;
+      flex:1;
+    }
+    .dropout-name{
+      font-size:12px;
+      font-weight:600;
+      color:var(--foreground);
+      overflow-wrap:anywhere;
+    }
+    .dropout-artist{
+      margin-top:1px;
+      font-size:11px;
+      color:var(--muted-foreground);
+      overflow-wrap:anywhere;
+    }
+    .dropout-meta{
+      margin-top:4px;
+      display:flex;
+      flex-wrap:wrap;
+      column-gap:8px;
+      row-gap:2px;
+      font-size:10px;
+      color:var(--muted-foreground);
+    }
+    .dropout-meta strong{
+      color:inherit;
+      font-weight:600;
+    }
+    @media(max-width:767px){
+      .dropouts{
+        margin-top:24px;
+        padding:12px;
+      }
+      .dropout{
+        padding:10px;
+        gap:10px;
+      }
+      .dropout-cover{
+        width:56px;
+        height:56px;
+        flex-basis:56px;
+      }
+    }
+
+    /* Artwork play: desktop hover-only overlay */
+    .artwork-cover{
+      position:relative;
+    }
+    .artwork-slot{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+    .artwork-slot img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+    .cover-play{
+      display:none;
+    }
+    @media(min-width:901px){
+      .cover-play{
+        position:absolute;
+        inset:0;
+        z-index:3;
+        width:100%;
+        height:100%;
+        border:0;
+        background:rgba(0,0,0,.42);
+        color:#fff;
+        align-items:center;
+        justify-content:center;
+        font-size:24px;
+        cursor:pointer;
+        opacity:0;
+        transition:opacity .15s ease;
+      }
+      .artwork-cover:hover .cover-play,
+      .cover-play:focus-visible{
+        display:flex;
+        opacity:1;
+      }
+      .cover-play:hover{
+        background:rgba(0,0,0,.48);
+      }
+      .cover-play i{
+        filter:drop-shadow(0 1px 2px rgba(0,0,0,.45));
+      }
+    }
+
+    /* Copy text lives inside Details, above Chart run */
+    .details-copy{
+      width:100%;
+      display:block;
+      margin:0 0 12px;
+      padding:12px;
+      border:1px solid var(--border);
+      background:var(--card);
+      color:var(--foreground);
+      text-align:left;
+      cursor:pointer;
+      transition:border-color .15s,background .15s;
+    }
+    .details-copy:hover{
+      border-color:var(--accent);
+      background:var(--muted);
+    }
+    .details-copy-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:7px;
+      font-size:11px;
+      line-height:14px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted-foreground);
+    }
+    .details-copy-text{
+      font-size:12px;
+      line-height:1.45;
+      color:var(--foreground);
+      white-space:pre-wrap;
+      overflow-wrap:anywhere;
+    }
+    @media(max-width:767px){
+      .details-copy{
+        padding:10px;
+        margin-bottom:10px;
+      }
+      .details-copy-top{
+        font-size:10px;
+        margin-bottom:6px;
+      }
+      .details-copy-text{
+        font-size:11px;
+        line-height:1.4;
+      }
+    }
+
+    .bottom-week-nav{
+      margin-top:28px !important;
+    }
+    .bottom-week-nav .week-controls{
+      display:flex !important;
+      justify-content:center !important;
+      gap:10px !important;
+      width:auto !important;
+    }
+    .bottom-nav-btn{
+      width:104px !important;
+      min-width:104px !important;
+      min-height:38px !important;
+      padding:7px 12px !important;
+      background:var(--muted) !important;
+      color:var(--foreground) !important;
+      border:1px solid var(--border) !important;
+      font-size:12px !important;
+      font-weight:700 !important;
+    }
+    .bottom-nav-btn:hover:not(:disabled){
+      border-color:var(--accent) !important;
+      color:var(--accent) !important;
+      background:var(--card) !important;
+    }
+    .bottom-nav-btn:disabled{
+      opacity:.4 !important;
+    }
+    @media(max-width:767px){
+      .bottom-week-nav{
+        margin-top:20px !important;
+      }
+      .bottom-week-nav .week-controls{
+        display:flex !important;
+        grid-template-columns:none !important;
+        gap:8px !important;
+      }
+      .bottom-nav-btn{
+        width:92px !important;
+        min-width:92px !important;
+        min-height:36px !important;
+        padding:6px 10px !important;
+        font-size:11px !important;
+      }
+    }
+
+    /* === Color Movements: ported from daegoncharts === */
+    .color-new{
+      background:#bae6fd !important; /* sky-200 */
+      color:#1a1a1a !important;
+    }
+    .color-re{
+      background:#bfdbfe !important; /* blue-200 */
+      color:#1a1a1a !important;
+    }
+    .color-up1{
+      background:#d1fae5 !important; /* emerald-100 */
+      color:#1a1a1a !important;
+    }
+    .color-up10{
+      background:#6ee7b7 !important; /* emerald-300 */
+      color:#1a1a1a !important;
+    }
+    .color-down1{
+      background:#fee2e2 !important; /* red-100 */
+      color:#1a1a1a !important;
+    }
+    .color-down10{
+      background:#fca5a5 !important; /* red-300 */
+      color:#1a1a1a !important;
+    }
+
+    .color-control{
+      position:relative;
+      display:inline-flex;
+    }
+    .color-legend{
+      position:absolute;
+      left:50%;
+      top:100%;
+      z-index:90;
+      width:208px;
+      margin-top:8px;
+      padding:12px;
+      transform:translateX(-50%);
+      display:none;
+      background:var(--card);
+      color:var(--foreground);
+      border:1px solid var(--border);
+      box-shadow:0 8px 24px rgba(0,0,0,.16);
+    }
+    .color-control:hover .color-legend,
+    .color-control:focus-within .color-legend{
+      display:block;
+    }
+    .color-legend-title{
+      margin-bottom:8px;
+      font-size:10px;
+      line-height:14px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:var(--muted-foreground);
+    }
+    .color-legend-row{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-top:6px;
+      font-size:12px;
+      line-height:16px;
+      color:var(--foreground);
+      white-space:nowrap;
+    }
+    .color-swatch{
+      width:16px;
+      height:16px;
+      flex:0 0 16px;
+      display:inline-block;
+    }
+    .legend-new{background:#7dd3fc}          /* sky-300, as original legend */
+    .legend-re{background:#93c5fd}           /* blue-300 */
+    .legend-up-small{
+      background:#d1fae5;
+      border:1px solid #6ee7b7;
+    }
+    .legend-up-big{background:#6ee7b7}
+    .legend-down-small{
+      background:#fee2e2;
+      border:1px solid #fca5a5;
+    }
+    .legend-down-big{background:#fca5a5}
+
+    /* Original daegoncharts dark-mode treatment for colored rows */
+    .dark .diff-colors-active,
+    .dark .diff-colors-active *{
+      color:#1a1a1a !important;
+    }
+    .dark .diff-colors-active .artist,
+    .dark .diff-colors-active .m-artist,
+    .dark .diff-colors-active .metrics,
+    .dark .diff-colors-active .metrics *,
+    .dark .diff-colors-active .m-metrics,
+    .dark .diff-colors-active .m-metrics *{
+      color:#555 !important;
+    }
+    .dark .diff-colors-active .award,
+    .dark .diff-colors-active .award i{
+      border-color:#1a1a1a !important;
+      color:#1a1a1a !important;
+    }
+    .dark .diff-colors-active .details-btn,
+    .dark .diff-colors-active .action{
+      color:#f5f5f5 !important;
+      background:var(--muted) !important;
+    }
+    .dark .diff-colors-active .details-btn *,
+    .dark .diff-colors-active .action *{
+      color:inherit !important;
+    }
+
+    /* Open details must retain the normal theme even when its parent row is colorized */
+    .dark .diff-colors-active .details-panel,
+    .dark .diff-colors-active .details-panel *{
+      color:var(--foreground) !important;
+    }
+    .dark .diff-colors-active .details-panel{
+      background:var(--card) !important;
+      border-color:var(--border) !important;
+    }
+    .dark .diff-colors-active .details-panel .details-copy,
+    .dark .diff-colors-active .details-panel .details-run-card{
+      background:var(--muted) !important;
+      border-color:var(--border) !important;
+    }
+    .dark .diff-colors-active .details-panel .details-copy-top,
+    .dark .diff-colors-active .details-panel .details-run-meta{
+      color:var(--muted-foreground) !important;
+    }
+    .dark .diff-colors-active .details-panel .details-run-pos{
+      color:var(--accent) !important;
+    }
+
+    @media(max-width:767px){
+      .color-legend{
+        position:fixed;
+        left:50%;
+        top:auto;
+        bottom:16px;
+        width:min(208px,calc(100vw - 24px));
+        transform:translateX(-50%);
+      }
+    }
+
+    .site-about-note{
+      max-width:896px;
+      margin:30px auto 0;
+      padding:18px 20px;
+      border-top:1px solid var(--border);
+      color:var(--muted-foreground);
+      font-size:12px;
+      line-height:1.65;
+    }
+    .site-about-note h2{
+      margin:0 0 8px;
+      color:var(--foreground);
+      font-size:14px;
+      line-height:1.3;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+    .site-about-note p{margin:6px 0}
+    .site-about-note a,.site-footer a{color:var(--accent);text-decoration:none}
+    .site-about-note a:hover,.site-footer a:hover{text-decoration:underline}
+    .site-footer{display:flex;flex-direction:column;align-items:center;gap:10px}
+    .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+    .footer-copy{font-size:11px;color:#9ca3af}
+    @media(max-width:767px){
+      .site-about-note{margin-top:22px;padding:14px 8px;font-size:11px}
+      .footer-links{gap:10px;font-size:10px}
+    }
+
+    /* === Daegon visual identity layer === */
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:9px;
+      text-transform:none !important;
+      letter-spacing:0 !important;
+    }
+    .brand-mark{
+      width:26px;
+      height:26px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--accent);
+      color:#090909;
+      font-size:15px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:-.05em;
+      transform:skewX(-7deg);
+      box-shadow:3px 3px 0 #ffd54a;
+    }
+    .brand-word{
+      font-size:20px;
+      font-weight:900;
+      letter-spacing:-.035em;
+      text-transform:lowercase;
+    }
+
+    /* Cards keep the familiar chart structure, but gain a Daegon signature edge. */
+    .chart-card{
+      position:relative;
+      overflow:visible;
+      border-left:3px solid transparent !important;
+      box-shadow:0 1px 0 rgba(255,109,0,.14),0 2px 8px rgba(0,0,0,.06) !important;
+    }
+    .chart-card::before{
+      content:"";
+      position:absolute;
+      left:-3px;
+      top:-1px;
+      bottom:-1px;
+      width:3px;
+      background:linear-gradient(180deg,var(--accent) 0%,#ffd54a 100%);
+      opacity:.42;
+      pointer-events:none;
+    }
+    .chart-card:hover::before{opacity:1}
+    .chart-card:hover{
+      transform:translateX(2px) !important;
+      box-shadow:0 1px 0 rgba(255,109,0,.22),0 6px 18px rgba(0,0,0,.10) !important;
+    }
+
+    /* The weekly #1 gets a distinctly Daegon treatment instead of a generic block. */
+    .rank-num.one{
+      position:relative;
+      background:linear-gradient(135deg,var(--accent) 0%,#ff8f00 72%,#ffd54a 100%) !important;
+      color:#090909 !important;
+      box-shadow:5px 5px 0 rgba(255,213,74,.42);
+      border:1px solid rgba(0,0,0,.12) !important;
+    }
+    .rank-num.one::after{
+      content:"#1";
+      position:absolute;
+      right:4px;
+      bottom:3px;
+      font-size:7px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:.08em;
+      opacity:.55;
+    }
+    .cover.one::after{
+      content:"DAEGON · #1";
+      position:absolute;
+      left:8px;
+      bottom:8px;
+      z-index:2;
+      padding:4px 6px;
+      background:rgba(8,8,8,.78);
+      color:#fff;
+      font-size:8px;
+      line-height:1;
+      font-weight:900;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      pointer-events:none;
+    }
+    .cover.one:hover::after{opacity:.25}
+
+    /* Weeks-at-#1 becomes a project badge rather than a generic yellow label. */
+    .weeks1,
+    .badge-inline{
+      background:#111 !important;
+      color:#ffd54a !important;
+      border:1px solid rgba(255,213,74,.7) !important;
+      letter-spacing:.06em !important;
+    }
+    html.dark .weeks1,
+    html.dark .badge-inline{
+      background:#090909 !important;
+      color:#ffd54a !important;
+    }
+
+    /* Active navigation uses an identifying side marker as well as the accent fill. */
+    .chart-nav button{
+      position:relative;
+    }
+    .chart-nav button.active::before{
+      content:"";
+      position:absolute;
+      left:-1px;
+      top:-1px;
+      bottom:-1px;
+      width:4px;
+      background:#ffd54a;
+    }
+
+    /* Section title gets a restrained Daegon underline, not a copied masthead treatment. */
+    .title-row h1{
+      position:relative;
+      padding-bottom:8px;
+    }
+    .title-row h1::after{
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:54px;
+      height:3px;
+      background:linear-gradient(90deg,var(--accent),#ffd54a);
+    }
+
+    /* Details/dropouts share the same small signature without changing their information architecture. */
+    .details-panel,
+    .dropouts{
+      border-top:2px solid rgba(255,109,0,.7) !important;
+    }
+
+    @media(max-width:767px){
+      .brand{position:absolute;left:50%;right:auto;transform:translateX(-50%);gap:7px}
+      .brand-mark{width:23px;height:23px;font-size:13px;box-shadow:2px 2px 0 #ffd54a}
+      .brand-word{font-size:17px}
+      .chart-card{border-left-width:2px !important}
+      .chart-card::before{left:-2px;width:2px}
+      .chart-card:hover{transform:none !important}
+      .title-row h1::after{left:50%;transform:translateX(-50%);width:42px}
+      .m-rank-num{
+        position:relative;
+        font-variant-numeric:tabular-nums;
+      }
+      .m-cover.one::after{
+        content:"D · #1";
+        left:4px;
+        bottom:4px;
+        padding:3px 4px;
+        font-size:6px;
+      }
+    }
+
+    /* Movement colors remain authoritative when enabled. */
+    .chart-card.diff-colors-active::before{
+      background:rgba(0,0,0,.22);
+    }
+</style>
+  <link rel="stylesheet" href="/portal.css?v=20261002-weekly-header-offset-3">
+
+<!-- YEC_GOAT_MOBILE_CRITICAL_V17 -->
+<style id="yec-goat-mobile-critical">
+/* Critical responsive shell for nested YEC/GOAT routes.
+   Kept inline so these routes cannot render unstyled while portal.css is stale/missed. */
+.exact-mobile-only{display:none}
+.exact-desktop-only{display:block}
+.exact-chart-card{box-sizing:border-box;width:100%;border:1px solid var(--border);background:var(--card)}
+.exact-desktop-row{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px 16px}
+.exact-mobile-row{display:none}
+.exact-details{display:none}
+.exact-details.open{display:grid}
+
+@media(max-width:767px){
+  html,body{max-width:100%;overflow-x:hidden}
+  #portalPage,.portal-page,.portal-main,.portal-shell{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    overflow-x:hidden!important;
+  }
+
+  .exact-mobile-only{display:block!important}
+  .exact-desktop-only{display:none!important}
+
+  .exact-yec-layout,
+  .exact-goat-page,
+  .exact-goat-flex,
+  .exact-yec-main,
+  .exact-goat-content,
+  .exact-chart-list{
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    transform:none!important;
+  }
+
+  .exact-yec-layout,
+  .exact-goat-page{padding:0 12px 48px!important}
+
+  .exact-yec-sidebar,
+  .exact-goat-sidebar{
+    position:static!important;
+    box-sizing:border-box!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    margin:0 0 18px!important;
+  }
+
+  .exact-mobile-chart-nav,
+  .exact-goat-mobile-nav{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    width:100%!important;
+  }
+
+  .exact-mobile-active,
+  .exact-goat-mobile-active,
+  .exact-mobile-more,
+  .exact-mobile-more-list a{
+    box-sizing:border-box!important;
+    width:100%!important;
+    min-height:44px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    margin:0!important;
+    padding:8px 12px!important;
+    border:1px solid var(--border)!important;
+    background:var(--muted)!important;
+    color:var(--foreground)!important;
+    text-decoration:none!important;
+    text-align:center!important;
+    text-transform:uppercase!important;
+    letter-spacing:.04em!important;
+    font-size:12px!important;
+    line-height:1.2!important;
+    font-weight:800!important;
+  }
+
+  .exact-mobile-active,
+  .exact-goat-mobile-active{
+    background:var(--accent)!important;
+    color:#000!important;
+    border-color:var(--accent)!important;
+  }
+
+  .exact-mobile-more-list{
+    display:none!important;
+    flex-direction:column!important;
+    gap:4px!important;
+    width:100%!important;
+  }
+  .exact-mobile-more-list.open{display:flex!important}
+
+  .exact-back-card{
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    width:100%!important;
+    min-height:52px!important;
+    margin:12px 0 0!important;
+    padding:14px 16px!important;
+    border:1px solid var(--border)!important;
+    background:var(--card)!important;
+    color:var(--muted-foreground)!important;
+    text-decoration:none!important;
+    font-size:11px!important;
+    font-weight:800!important;
+    text-transform:uppercase!important;
+    letter-spacing:.08em!important;
+  }
+
+  .exact-yec-heading{text-align:center!important;margin:0 0 8px!important}
+  .exact-yec-heading h1{margin:0!important;font-size:24px!important;line-height:1.05!important;font-weight:900!important}
+
+  .exact-chart-list{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:8px!important;
+    padding:0!important;
+  }
+
+  .exact-chart-card{
+    min-width:0!important;
+    margin:0!important;
+  }
+
+  .exact-desktop-row{display:none!important}
+  .exact-mobile-row{
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    width:100%!important;
+    min-width:0!important;
+    padding:8px!important;
+  }
+
+  .exact-mobile-rank{
+    width:30px!important;
+    flex:0 0 30px!important;
+    text-align:center!important;
+    font-size:19px!important;
+    line-height:1!important;
+    font-weight:900!important;
+  }
+
+  .exact-mobile-art{
+    width:64px!important;
+    height:64px!important;
+    flex:0 0 64px!important;
+    overflow:hidden!important;
+    background:var(--muted)!important;
+  }
+  .exact-mobile-art.first{
+    width:68px!important;
+    height:68px!important;
+    flex-basis:68px!important;
+    border-left:3px solid var(--accent)!important;
+  }
+  .exact-mobile-art .ref-thumb,
+  .exact-mobile-art .ref-thumb img{
+    width:100%!important;
+    height:100%!important;
+    object-fit:cover!important;
+  }
+
+  .exact-mobile-copy{
+    min-width:0!important;
+    flex:1 1 auto!important;
+    overflow:hidden!important;
+  }
+  .exact-mobile-title{
+    font-size:13px!important;
+    line-height:1.2!important;
+    font-weight:800!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .exact-mobile-title a{
+    color:inherit!important;
+    text-decoration:none!important;
+  }
+  .exact-mobile-artist{
+    margin-top:2px!important;
+    font-size:11px!important;
+    line-height:1.2!important;
+    color:var(--muted-foreground)!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  .exact-plus{
+    width:32px!important;
+    height:32px!important;
+    flex:0 0 32px!important;
+    border:0!important;
+    border-radius:50%!important;
+    background:var(--muted)!important;
+    color:var(--foreground)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    font-size:13px!important;
+  }
+
+  .exact-details{
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:6px!important;
+    margin:2px 8px 8px!important;
+    padding:10px 6px!important;
+    border:1px solid var(--border)!important;
+    border-radius:8px!important;
+    background:var(--muted)!important;
+  }
+  .exact-details.open{display:grid!important}
+  .exact-details div{text-align:center!important}
+  .exact-details span{display:block!important;color:var(--accent)!important;font-size:8px!important;font-weight:800!important;text-transform:uppercase!important}
+  .exact-details strong{display:block!important;margin-top:4px!important;font-size:12px!important}
+
+  .exact-goat-flex{display:block!important}
+  .exact-sidebar-section{box-sizing:border-box!important;width:100%!important;margin-bottom:10px!important;padding:12px!important}
+  .exact-sidebar-section select{box-sizing:border-box!important;width:100%!important;min-height:42px!important}
+  .exact-goat-heading{position:relative!important;text-align:center!important;padding:28px 0 32px!important;margin-bottom:18px!important;overflow:hidden!important}
+  .exact-goat-bg{position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;font-size:3.2rem!important;font-weight:900!important;opacity:.06!important;text-transform:uppercase!important;white-space:nowrap!important}
+  .exact-goat-heading h1{position:relative!important;z-index:1!important;margin:0!important;color:var(--accent)!important;font-size:30px!important;line-height:1!important;text-transform:uppercase!important}
+  .exact-goat-heading p{position:relative!important;z-index:1!important;margin:8px 0 0!important;color:var(--muted-foreground)!important;font-size:12px!important}
+
+  .exact-goat-podium{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important;margin-bottom:20px!important}
+  .exact-podium-card{min-width:0!important;padding:14px 6px!important;text-align:center!important}
+  .exact-podium-rank{width:48px!important;height:48px!important;margin:0 auto 8px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:50%!important;font-size:18px!important;font-weight:900!important}
+  .exact-podium-title{font-size:11px!important;line-height:1.2!important;font-weight:800!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+  .exact-podium-artist{font-size:9px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .exact-podium-metric{font-size:9px!important}
+
+  .exact-goat-search-wrap{position:relative!important;width:100%!important;margin-bottom:10px!important}
+  .exact-goat-search-wrap input{box-sizing:border-box!important;width:100%!important;min-height:42px!important}
+  .exact-results-count{font-size:10px!important}
+  .exact-goat-desktop-metric{display:none!important}
+}
+</style>
+<style id="weekly-billboard-mobile-v32">
+@media(max-width:767px){
+  /* Billboard-style weekly list. Mobile only. Desktop remains untouched. */
+  .chart-list{
+    gap:0!important;
+    margin-left:-8px!important;
+    margin-right:-8px!important;
+    max-width:none!important;
+    background:var(--background)!important;
+  }
+  .chart-card{
+    position:relative!important;
+    margin:0!important;
+    min-height:124px!important;
+    padding:12px 10px!important;
+    border:0!important;
+    border-bottom:9px solid var(--background)!important;
+    background:var(--card)!important;
+    box-shadow:none!important;
+  }
+  .chart-card:hover{transform:none!important;box-shadow:none!important}
+  .mobile-row{
+    display:grid!important;
+    grid-template-columns:42px 96px minmax(0,1fr) 42px!important;
+    gap:10px!important;
+    align-items:center!important;
+    min-height:103px!important;
+  }
+  .m-rank{
+    width:42px!important;
+    height:96px!important;
+    padding:0!important;
+    align-self:center!important;
+    justify-content:center!important;
+    gap:10px!important;
+  }
+  .m-rank-num{
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:28px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:-.04em!important;
+    color:var(--foreground)!important;
+  }
+  .m-diff{
+    height:26px!important;
+    margin:0!important;
+    color:#929292!important;
+  }
+  .m-diff .diff-arrow{
+    width:24px!important;
+    height:24px!important;
+    stroke-width:2.4!important;
+  }
+  .m-diff .diff-badge{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:38px!important;
+    min-height:22px!important;
+    padding:3px 5px!important;
+    background:#00f5a4!important;
+    color:#000!important;
+    font-size:11px!important;
+    line-height:1!important;
+    font-weight:800!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+  }
+  .m-cover,
+  .m-cover.one{
+    width:96px!important;
+    height:96px!important;
+    margin:0!important;
+    border:0!important;
+    flex:0 0 96px!important;
+    align-self:center!important;
+  }
+  .m-cover img{width:100%!important;height:100%!important;object-fit:cover!important}
+  .m-entry{
+    min-width:0!important;
+    align-self:center!important;
+    padding:1px 0!important;
+  }
+  .m-title{
+    display:block!important;
+    margin:0!important;
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:18px!important;
+    line-height:1.08!important;
+    font-weight:800!important;
+    letter-spacing:-.02em!important;
+    color:var(--foreground)!important;
+    overflow-wrap:anywhere!important;
+  }
+  .m-artist{
+    margin-top:4px!important;
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:17px!important;
+    line-height:1.08!important;
+    font-weight:400!important;
+    color:var(--foreground)!important;
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+  }
+  .m-metrics{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:baseline!important;
+    column-gap:10px!important;
+    row-gap:2px!important;
+    margin-top:11px!important;
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:13px!important;
+    line-height:1.15!important;
+    font-weight:400!important;
+    color:var(--foreground)!important;
+    white-space:normal!important;
+  }
+  .m-metrics span{white-space:nowrap!important}
+  .m-metrics b,
+  .m-weeks-no1 b{
+    color:#8e8e8e!important;
+    font-weight:400!important;
+  }
+  .m-weeks-no1{
+    margin-top:5px!important;
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:13px!important;
+    line-height:1.15!important;
+    font-weight:400!important;
+    color:var(--foreground)!important;
+    white-space:nowrap!important;
+  }
+  .m-actions{
+    width:42px!important;
+    height:96px!important;
+    align-self:center!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+  }
+  .m-actions-top{
+    min-height:28px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .m-actions .award{
+    width:auto!important;
+    height:auto!important;
+    border:0!important;
+    background:transparent!important;
+    color:var(--foreground)!important;
+  }
+  .m-actions .award i{font-size:22px!important}
+  .m-actions .action{
+    width:34px!important;
+    height:34px!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    background:transparent!important;
+    color:#8f8f8f!important;
+    font-size:27px!important;
+    line-height:28px!important;
+    font-weight:300!important;
+    padding:0 0 3px!important;
+  }
+  .cover.weekly-artist-art,
+  .m-cover.weekly-artist-art{
+    width:96px!important;
+    height:96px!important;
+    flex:0 0 96px!important;
+  }
+}
+@media(max-width:430px){
+  .mobile-row{
+    grid-template-columns:36px 82px minmax(0,1fr) 38px!important;
+    gap:8px!important;
+    min-height:94px!important;
+  }
+  .chart-card{min-height:112px!important;padding:9px 7px!important}
+  .m-rank{width:36px!important;height:82px!important;gap:8px!important}
+  .m-rank-num{font-size:25px!important}
+  .m-diff .diff-arrow{width:21px!important;height:21px!important}
+  .m-diff .diff-badge{min-width:34px!important;min-height:20px!important;font-size:10px!important;padding:3px 4px!important}
+  .m-cover,.m-cover.one,
+  .cover.weekly-artist-art,.m-cover.weekly-artist-art{
+    width:82px!important;height:82px!important;flex-basis:82px!important;
+  }
+  .m-title{font-size:16px!important}
+  .m-artist{font-size:15px!important;margin-top:3px!important}
+  .m-metrics{font-size:11px!important;column-gap:7px!important;margin-top:8px!important}
+  .m-weeks-no1{font-size:11px!important;margin-top:4px!important}
+  .m-actions{width:38px!important;height:82px!important;gap:8px!important}
+  .m-actions .award i{font-size:19px!important}
+  .m-actions .action{width:32px!important;height:32px!important;font-size:25px!important}
+}
+</style>
+<style id="weekly-mobile-alignment-v33">
+@media(max-width:767px){
+  /* Fixed vertical rhythm for every weekly mobile row */
+  .mobile-row{
+    align-items:start!important;
+  }
+  .m-rank,
+  .m-cover,
+  .m-cover.one,
+  .m-actions{
+    align-self:start!important;
+  }
+  .m-entry{
+    align-self:start!important;
+    height:122px!important;
+    padding:2px 0 0!important;
+    display:grid!important;
+    grid-template-rows:40px 20px 18px 16px 16px!important;
+    align-content:start!important;
+  }
+  .m-title{
+    grid-row:1!important;
+    margin:0!important;
+    min-height:40px!important;
+    max-height:40px!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+    align-self:start!important;
+  }
+  .m-artist{
+    grid-row:2!important;
+    margin:0!important;
+    min-height:20px!important;
+    max-height:20px!important;
+    line-height:20px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    align-self:start!important;
+  }
+  .m-album-ref{
+    grid-row:3!important;
+    margin:0!important;
+    min-height:18px!important;
+    max-height:18px!important;
+    line-height:18px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    align-self:start!important;
+  }
+  .m-metrics{
+    grid-row:4!important;
+    margin:0!important;
+    min-height:16px!important;
+    line-height:16px!important;
+    align-self:start!important;
+  }
+  .m-weeks-no1{
+    grid-row:5!important;
+    margin:0!important;
+    min-height:16px!important;
+    line-height:16px!important;
+    align-self:start!important;
+  }
+  /* Reserve the final metadata line even when the entry has never been #1,
+     so all rows keep identical title/artist/metrics positioning. */
+  .m-entry:not(:has(.m-weeks-no1))::after{
+    content:"";
+    grid-row:5;
+    display:block;
+    min-height:16px;
+  }
+}
+@media(max-width:430px){
+  .m-entry{
+    height:94px!important;
+    grid-template-rows:36px 18px 7px 15px 15px!important;
+    padding-top:1px!important;
+  }
+  .m-title{
+    min-height:36px!important;
+    max-height:36px!important;
+  }
+  .m-artist{
+    min-height:18px!important;
+    max-height:18px!important;
+    line-height:18px!important;
+  }
+  .m-metrics,
+  .m-weeks-no1{
+    min-height:15px!important;
+    line-height:15px!important;
+  }
+}
+</style>
+<style id="weekly-mobile-award-v34">
+@media(max-width:767px){
+  .m-actions .award{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    background:transparent!important;
+    color:var(--foreground)!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    box-sizing:border-box!important;
+  }
+  .m-actions .award i{
+    font-size:17px!important;
+    line-height:1!important;
+    color:var(--foreground)!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions .award{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    min-height:32px!important;
+  }
+  .m-actions .award i{font-size:16px!important}
+}
+</style>
+<style id="weekly-mobile-reentry-v35">
+@media(max-width:767px){
+  .m-diff .diff-re{
+    min-width:42px!important;
+    min-height:38px!important;
+    padding:4px 5px!important;
+    font-size:11px!important;
+    line-height:.92!important;
+    font-weight:800!important;
+    text-align:center!important;
+    white-space:normal!important;
+  }
+}
+@media(max-width:430px){
+  .m-diff .diff-re{
+    min-width:38px!important;
+    min-height:34px!important;
+    padding:3px 4px!important;
+    font-size:10px!important;
+  }
+}
+</style>
+<style id="weekly-mobile-layout-v36">
+@media(max-width:767px){
+  .mobile-row{
+    position:relative!important;
+    grid-template-columns:42px 96px minmax(0,1fr)!important;
+    gap:10px!important;
+    align-items:start!important;
+    min-height:103px!important;
+    padding-right:82px!important;
+  }
+  .m-entry{
+    height:96px!important;
+    min-height:96px!important;
+    max-height:96px!important;
+    padding:1px 0 0!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    justify-content:flex-start!important;
+    overflow:hidden!important;
+  }
+  .m-title{
+    flex:0 0 auto!important;
+    min-height:0!important;
+    max-height:40px!important;
+    margin:0!important;
+    line-height:1.08!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .m-artist{
+    flex:0 0 auto!important;
+    min-height:0!important;
+    max-height:20px!important;
+    margin:4px 0 0!important;
+    line-height:1.08!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .m-metrics{
+    flex:0 0 auto!important;
+    margin-top:12px!important;
+    min-height:0!important;
+    line-height:1.15!important;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:9px!important;
+    white-space:nowrap!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .m-weeks-no1{
+    flex:0 0 auto!important;
+    margin-top:5px!important;
+    min-height:0!important;
+    line-height:1.15!important;
+    white-space:nowrap!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+  .m-entry:not(:has(.m-weeks-no1))::after{display:none!important}
+  .m-actions{
+    position:absolute!important;
+    right:0!important;
+    bottom:4px!important;
+    width:auto!important;
+    height:auto!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+  }
+  .m-actions-top{display:none!important}
+  .m-actions .action{
+    width:34px!important;
+    height:34px!important;
+    flex:0 0 34px!important;
+  }
+  .m-actions .award,
+  .m-actions .award-performance{
+    width:28px!important;
+    height:34px!important;
+    min-width:28px!important;
+    min-height:34px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    color:var(--foreground)!important;
+  }
+  .m-actions .award i,
+  .m-actions .award-performance i{
+    font-size:21px!important;
+    line-height:1!important;
+    color:var(--foreground)!important;
+  }
+  .m-actions .award-gainer{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    background:transparent!important;
+  }
+  .m-actions .award-gainer i{font-size:17px!important}
+}
+@media(max-width:430px){
+  .mobile-row{
+    grid-template-columns:36px 82px minmax(0,1fr)!important;
+    gap:8px!important;
+    min-height:94px!important;
+    padding-right:72px!important;
+  }
+  .m-entry{
+    height:82px!important;
+    min-height:82px!important;
+    max-height:82px!important;
+  }
+  .m-title{max-height:35px!important}
+  .m-artist{max-height:18px!important;margin-top:3px!important}
+  .m-metrics{
+    margin-top:8px!important;
+    gap:6px!important;
+    font-size:10px!important;
+  }
+  .m-weeks-no1{
+    margin-top:3px!important;
+    font-size:10px!important;
+  }
+  .m-actions{bottom:1px!important;gap:7px!important}
+  .m-actions .award,
+  .m-actions .award-performance{
+    width:25px!important;
+    height:32px!important;
+    min-width:25px!important;
+    min-height:32px!important;
+  }
+  .m-actions .award i,
+  .m-actions .award-performance i{font-size:19px!important}
+  .m-actions .award-gainer{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    min-height:32px!important;
+  }
+  .m-actions .award-gainer i{font-size:16px!important}
+}
+</style>
+<style id="weekly-mobile-type-v37">
+@media(max-width:767px){
+  /* Let title/artist use the full text area. Actions only occupy the lower-right. */
+  .mobile-row{
+    padding-right:0!important;
+  }
+  .m-entry{
+    width:100%!important;
+    max-width:none!important;
+    overflow:visible!important;
+  }
+  .m-title{
+    width:100%!important;
+    max-width:100%!important;
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:20px!important;
+    line-height:1.08!important;
+    font-weight:700!important;
+    letter-spacing:-.025em!important;
+    white-space:normal!important;
+    overflow-wrap:normal!important;
+    word-break:normal!important;
+    hyphens:none!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    overflow:hidden!important;
+  }
+  .m-artist{
+    width:100%!important;
+    max-width:100%!important;
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:18px!important;
+    line-height:1.1!important;
+    font-weight:400!important;
+    letter-spacing:-.015em!important;
+  }
+  .m-metrics,
+  .m-weeks-no1{
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-size:14px!important;
+    line-height:1.12!important;
+    font-weight:400!important;
+    letter-spacing:-.015em!important;
+  }
+  .m-metrics{
+    /* Only the metadata line needs to stop before the action buttons. */
+    width:calc(100% - 76px)!important;
+    max-width:calc(100% - 76px)!important;
+    gap:10px!important;
+    overflow:visible!important;
+  }
+  .m-weeks-no1{
+    width:calc(100% - 76px)!important;
+    max-width:calc(100% - 76px)!important;
+    overflow:visible!important;
+  }
+  .m-metrics b,.m-weeks-no1 b{
+    font-weight:400!important;
+    color:#8e8e8e!important;
+  }
+  .m-rank-num{
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-weight:700!important;
+  }
+}
+@media(max-width:430px){
+  .mobile-row{padding-right:0!important}
+  .m-title{
+    font-size:17px!important;
+    line-height:1.08!important;
+    font-weight:700!important;
+    max-height:37px!important;
+  }
+  .m-artist{
+    font-size:16px!important;
+    line-height:1.08!important;
+  }
+  .m-metrics,
+  .m-weeks-no1{
+    font-size:12.5px!important;
+    line-height:1.12!important;
+  }
+  .m-metrics{
+    width:calc(100% - 66px)!important;
+    max-width:calc(100% - 66px)!important;
+    gap:7px!important;
+    margin-top:9px!important;
+  }
+  .m-weeks-no1{
+    width:calc(100% - 66px)!important;
+    max-width:calc(100% - 66px)!important;
+    margin-top:4px!important;
+  }
+}
+</style>
+<style id="weekly-mobile-font-parity-v38">
+@media(max-width:767px){
+  .m-title{
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-weight:700!important;
+    letter-spacing:-.018em!important;
+  }
+  .m-artist{
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-weight:400!important;
+    letter-spacing:-.01em!important;
+  }
+  .m-metrics,
+  .m-weeks-no1{
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+    font-weight:400!important;
+    letter-spacing:-.005em!important;
+  }
+  .m-metrics b,
+  .m-weeks-no1 b{
+    font-family:inherit!important;
+    font-weight:400!important;
+  }
+  .m-rank-num,
+  .m-diff{
+    font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif!important;
+  }
+}
+</style>
+<style id="billboard-mobile-heading-scale-v39">
+@media(max-width:767px){
+  .title-row h1,
+  .main > .title-row h1{
+    font-size:38px!important;
+    line-height:.96!important;
+    font-weight:800!important;
+    letter-spacing:-.035em!important;
+  }
+  .date-label{
+    margin-top:13px!important;
+    font-size:13px!important;
+    line-height:1.15!important;
+  }
+  .week-label{
+    font-size:13px!important;
+    line-height:1.1!important;
+    letter-spacing:.09em!important;
+  }
+}
+@media(max-width:430px){
+  .title-row h1,
+  .main > .title-row h1{
+    font-size:36px!important;
+  }
+}
+</style>
+<style id="weekly-mobile-controls-type-v40">
+@media(max-width:767px){
+  .gold-btn,
+  .week-picker-button,
+  .date-select{
+    font-size:15px!important;
+    font-weight:700!important;
+    line-height:1!important;
+  }
+  .filter{
+    font-size:14px!important;
+    font-weight:700!important;
+    line-height:1!important;
+    letter-spacing:.05em!important;
+  }
+  .week-picker-option{
+    font-size:14px!important;
+    font-weight:600!important;
+  }
+  .gold-btn i,
+  .week-picker-button i,
+  .filter i{
+    font-size:15px!important;
+  }
+}
+@media(max-width:430px){
+  .gold-btn,
+  .week-picker-button,
+  .date-select{
+    font-size:14px!important;
+  }
+  .filter{
+    font-size:13px!important;
+  }
+  .week-picker-option{
+    font-size:13px!important;
+  }
+}
+</style>
+<style id="weekly-mobile-star-scale-v42">
+@media(max-width:767px){
+  .m-actions{
+    align-items:center!important;
+    gap:10px!important;
+  }
+  .m-actions .award-performance{
+    width:22px!important;
+    height:22px!important;
+    min-width:22px!important;
+    min-height:22px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    line-height:1!important;
+    padding:0!important;
+    margin:0!important;
+  }
+  .m-actions .award-performance i{
+    font-size:16px!important;
+    line-height:1!important;
+    display:block!important;
+  }
+  .m-actions .award-gainer{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+  }
+  .m-actions .award-gainer i{
+    font-size:17px!important;
+  }
+  .m-actions .action{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions{
+    gap:8px!important;
+  }
+  .m-actions .award-performance{
+    width:20px!important;
+    height:20px!important;
+    min-width:20px!important;
+    min-height:20px!important;
+  }
+  .m-actions .award-performance i{
+    font-size:15px!important;
+  }
+  .m-actions .award-gainer,
+  .m-actions .action{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    min-height:32px!important;
+  }
+  .m-actions .award-gainer i{
+    font-size:16px!important;
+  }
+}
+</style>
+<style id="entity-links-sitewide-v43">
+.weekly-entity-link{
+  color:inherit!important;
+  text-decoration:none!important;
+}
+.weekly-entity-link:hover{
+  text-decoration:underline!important;
+  text-underline-offset:2px;
+}
+</style>
+<style id="weekly-exact-star-v44">
+.award-star-img{
+  display:block!important;
+  width:15px!important;
+  height:15px!important;
+  object-fit:contain!important;
+  border:0!important;
+  margin:0!important;
+  padding:0!important;
+  background:transparent!important;
+}
+@media(max-width:767px){
+  .m-actions .award-performance .award-star-img{
+    width:16px!important;
+    height:16px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:16px!important;
+    height:16px!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions .award-performance .award-star-img{
+    width:15px!important;
+    height:15px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:15px!important;
+    height:15px!important;
+  }
+}
+</style>
+<style id="weekly-mobile-actions-scale-v45">
+@media(max-width:767px){
+  .m-actions{
+    gap:10px!important;
+    bottom:7px!important;
+  }
+
+  /* Plain star: small, like Billboard reference */
+  .m-actions .award-performance{
+    width:20px!important;
+    height:20px!important;
+    min-width:20px!important;
+    min-height:20px!important;
+  }
+  .m-actions .award-performance .award-star-img{
+    width:16px!important;
+    height:16px!important;
+  }
+
+  /* Circled star: same overall scale as the + button */
+  .m-actions .award-gainer{
+    width:30px!important;
+    height:30px!important;
+    min-width:30px!important;
+    min-height:30px!important;
+    border-width:1px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:15px!important;
+    height:15px!important;
+  }
+
+  /* Details + button */
+  .m-actions .action{
+    width:30px!important;
+    height:30px!important;
+    min-width:30px!important;
+    min-height:30px!important;
+    border-width:1px!important;
+    font-size:23px!important;
+    line-height:26px!important;
+    padding:0 0 2px!important;
+  }
+}
+
+@media(max-width:430px){
+  .m-actions{
+    gap:8px!important;
+    bottom:5px!important;
+  }
+  .m-actions .award-performance{
+    width:18px!important;
+    height:18px!important;
+    min-width:18px!important;
+    min-height:18px!important;
+  }
+  .m-actions .award-performance .award-star-img{
+    width:15px!important;
+    height:15px!important;
+  }
+  .m-actions .award-gainer,
+  .m-actions .action{
+    width:28px!important;
+    height:28px!important;
+    min-width:28px!important;
+    min-height:28px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:14px!important;
+    height:14px!important;
+  }
+  .m-actions .action{
+    font-size:21px!important;
+    line-height:24px!important;
+  }
+}
+</style>
+<style id="weekly-mobile-actions-proportion-v46">
+@media(max-width:767px){
+  .m-actions{
+    gap:8px!important;
+    bottom:6px!important;
+    align-items:center!important;
+  }
+
+  /* Plain star — compact, but not vertically squashed */
+  .m-actions .award-performance{
+    width:24px!important;
+    height:30px!important;
+    min-width:24px!important;
+    min-height:30px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .m-actions .award-performance .award-star-img{
+    width:18px!important;
+    height:18px!important;
+    object-fit:contain!important;
+  }
+
+  /* Circled star — taller and rounder, matching the reference proportions */
+  .m-actions .award-gainer{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:17px!important;
+    height:17px!important;
+    object-fit:contain!important;
+  }
+
+  /* Plus button — circular, not flattened */
+  .m-actions .action{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    min-height:34px!important;
+    flex:0 0 34px!important;
+    aspect-ratio:1/1!important;
+    border:1px solid #8f8f8f!important;
+    border-radius:50%!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    padding:0!important;
+    font-size:24px!important;
+    line-height:1!important;
+    font-weight:300!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions{
+    gap:7px!important;
+    bottom:4px!important;
+  }
+  .m-actions .award-performance{
+    width:22px!important;
+    height:28px!important;
+    min-width:22px!important;
+    min-height:28px!important;
+  }
+  .m-actions .award-performance .award-star-img{
+    width:17px!important;
+    height:17px!important;
+  }
+  .m-actions .award-gainer,
+  .m-actions .action{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    min-height:32px!important;
+    flex-basis:32px!important;
+  }
+  .m-actions .award-gainer .award-star-img{
+    width:16px!important;
+    height:16px!important;
+  }
+  .m-actions .action{
+    font-size:22px!important;
+  }
+}
+</style>
+<style id="weekly-transparent-star-v47">
+.award-star-svg{
+  display:block!important;
+  width:15px!important;
+  height:15px!important;
+  flex:0 0 auto!important;
+  overflow:visible!important;
+  background:transparent!important;
+}
+.award-star-svg path{
+  fill:currentColor!important;
+  stroke:none!important;
+}
+@media(max-width:767px){
+  .m-actions .award-performance .award-star-svg{
+    width:18px!important;
+    height:18px!important;
+  }
+  .m-actions .award-gainer .award-star-svg{
+    width:17px!important;
+    height:17px!important;
+  }
+}
+@media(max-width:430px){
+  .m-actions .award-performance .award-star-svg{
+    width:17px!important;
+    height:17px!important;
+  }
+  .m-actions .award-gainer .award-star-svg{
+    width:16px!important;
+    height:16px!important;
+  }
+}
+</style>
+<style id="chart-image-generator-v48">
+.chart-image-tools{position:relative;flex:0 0 auto}
+.chart-image-btn{
+  min-height:44px;
+  border:1px solid var(--border);
+  background:var(--muted);
+  color:var(--foreground);
+  padding:9px 13px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  cursor:pointer;
+}
+.chart-image-btn:hover{border-color:var(--accent)}
+.chart-image-btn.generating{opacity:.65;pointer-events:none}
+.chart-image-btn .image-chevron{font-size:9px;transition:transform .15s}
+.chart-image-tools.open .image-chevron{transform:rotate(180deg)}
+.chart-image-menu{
+  display:none;
+  position:absolute;
+  right:0;
+  top:calc(100% + 6px);
+  z-index:95;
+  min-width:170px;
+  background:var(--card);
+  border:1px solid var(--border);
+  box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+.chart-image-tools.open .chart-image-menu{display:block}
+.chart-image-menu button{
+  width:100%;
+  min-height:44px;
+  border:0;
+  border-bottom:1px solid var(--border);
+  background:var(--card);
+  color:var(--foreground);
+  padding:9px 12px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  text-align:left;
+  cursor:pointer;
+}
+.chart-image-menu button:last-child{border-bottom:0}
+.chart-image-menu button:hover{background:var(--muted);color:var(--accent)}
+@media(max-width:767px){
+  .title-row{
+    flex-direction:column!important;
+    align-items:center!important;
+  }
+  .chart-image-tools{margin-top:8px}
+  .chart-image-btn{
+    min-height:40px;
+    font-size:12px;
+    padding:8px 12px;
+  }
+  .chart-image-menu{
+    left:50%;
+    right:auto;
+    transform:translateX(-50%);
+  }
+}
+</style>
+<!-- WEEKLY_SKELETON_V26 -->
+<style id="weekly-skeleton-v26">
+@keyframes daegonSkeletonShimmer{
+  0%{background-position:200% 0}
+  100%{background-position:-200% 0}
+}
+.sk{
+  display:block;
+  border-radius:4px;
+  background:linear-gradient(90deg,var(--muted) 25%,rgba(255,255,255,.55) 50%,var(--muted) 75%);
+  background-size:200% 100%;
+  animation:daegonSkeletonShimmer 1.25s linear infinite;
+}
+html.dark .sk{
+  background:linear-gradient(90deg,#232323 25%,#343434 50%,#232323 75%);
+  background-size:200% 100%;
+}
+.skeleton-card{pointer-events:none}
+.sk-rank{width:34px;height:30px;margin:0 auto}
+.sk-cover{width:96px;height:96px}
+.sk-cover-one{width:180px;height:180px}
+.sk-circle{border-radius:50%!important}
+.sk-diff{width:26px;height:22px}
+.sk-title{width:min(330px,75%);height:20px}
+.sk-sub{width:min(220px,55%);height:14px;margin-top:8px}
+.sk-metric{width:120px;height:14px}
+.sk-action{width:32px;height:32px;border-radius:50%}
+.sk-rank-mobile{width:24px;height:24px}
+.sk-diff-mobile{width:20px;height:16px;margin-top:6px}
+.sk-cover-mobile{width:64px;height:64px}
+.sk-cover-mobile-one{width:68px;height:68px}
+.sk-title-mobile{width:72%;height:16px}
+.sk-sub-mobile{width:48%;height:12px;margin-top:6px}
+.sk-meta-mobile{width:78%;height:10px;margin-top:8px}
+.sk-action-mobile{width:32px;height:32px;border-radius:50%}
+@media(max-width:767px){
+  .skeleton-card{min-height:84px}
+  .sk-cover-mobile.sk-circle{width:72px;height:72px;flex:0 0 72px}
+  .sk-cover-mobile-one.sk-circle{width:72px;height:72px;flex:0 0 72px}
+}
+</style>
+
+<!-- WEEKLY_ARTIST_FINAL_PARITY_V31 -->
+<style id="weekly-artist-final-parity-v31">
+.cover.weekly-artist-art,
+.m-cover.weekly-artist-art{
+  background:transparent!important;
+  border-left:0!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:relative!important;
+}
+.cover.weekly-artist-art .artwork-slot,
+.m-cover.weekly-artist-art .artwork-slot{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  border-radius:50%!important;
+  overflow:hidden!important;
+  background:transparent!important;
+}
+.cover.weekly-artist-art .artwork-slot img,
+.m-cover.weekly-artist-art .artwork-slot img{
+  position:absolute!important;
+  left:50%!important;
+  top:50%!important;
+  width:134%!important;
+  height:134%!important;
+  max-width:none!important;
+  max-height:none!important;
+  transform:translate(-50%,-50%)!important;
+  object-fit:cover!important;
+  object-position:center center!important;
+  border-radius:0!important;
+}
+.cover.weekly-artist-art::after,
+.m-cover.weekly-artist-art::after{
+  content:none!important;
+  display:none!important;
+}
+@media(min-width:768px){
+  .cover.weekly-artist-art{
+    width:88px!important;
+    height:88px!important;
+    flex:0 0 88px!important;
+  }
+  .cover.weekly-artist-art.artist-one{
+    width:104px!important;
+    height:104px!important;
+    flex:0 0 104px!important;
+    box-shadow:0 0 0 4px var(--accent)!important;
+  }
+}
+@media(max-width:767px){
+  .m-cover.weekly-artist-art{
+    width:72px!important;
+    height:72px!important;
+    flex:0 0 72px!important;
+  }
+  .m-cover.weekly-artist-art.artist-one{
+    width:72px!important;
+    height:72px!important;
+    flex:0 0 72px!important;
+    box-shadow:0 0 0 3px var(--accent)!important;
+  }
+}
+</style>
+
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@graph":[
+      {
+        "@type":"WebSite",
+        "@id":"https://daegoncharts.com.br/#website",
+        "url":"https://daegoncharts.com.br/",
+        "name":"Daegon Charts",
+        "description":"Independent weekly music charts and historical chart archive.",
+        "inLanguage":"en"
+      },
+      {
+        "@type":"Organization",
+        "@id":"https://daegoncharts.com.br/#publisher",
+        "name":"Daegon Charts",
+        "url":"https://daegoncharts.com.br/",
+        "logo":{"@type":"ImageObject","url":"https://i.imgur.com/jaBZ19n.png"}
+      }
+    ]
+  }
+  </script>
+<!-- PERFORMANCE_RENDERING_V34 -->
+<style id="weekly-route-isolation-v38">
+#weeklyView[hidden],
+.layout[hidden]{
+  display:none!important;
+}
+</style>
+<style id="performance-rendering-v34">
+.chart-card,.dropout{
+  content-visibility:auto;
+  contain-intrinsic-size:auto 112px;
+}
+@media(max-width:767px){
+  .chart-card{contain-intrinsic-size:auto 98px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js"></script>
+</head>
+<body>
+<div class="shell">
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="weekly-label">WEEKLY CHARTS</div>
+      <div class="brand"><span class="brand-mark" aria-hidden="true">D</span><span class="brand-word">aegon charts</span></div>
+      <button id="themeToggle" class="theme-btn" aria-label="Toggle theme"><i class="fas fa-sun"></i></button>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="layout" id="weeklyView" hidden>
+      <aside class="sidebar">
+    <div id="desktopChartNav" class="chart-nav desktop-chart-nav"></div>
+    <div class="mobile-chart-nav">
+      <button id="mobileActiveChart" class="mobile-active-chart"></button>
+      <button id="mobileMoreCharts" class="mobile-more-charts">+ More Charts</button>
+      <div id="mobileChartMenu" class="mobile-chart-menu"></div>
+    </div>
+  </aside>
+      <main class="main">
+        <div class="title-row">
+          <div>
+            <h1 id="chartTitle"></h1>
+            <div id="dateLabel" class="date-label"></div>
+          </div>
+          <div id="chartImageTools" class="chart-image-tools">
+            <button id="chartImageBtn" class="chart-image-btn" type="button" aria-expanded="false">
+              <i class="fas fa-image"></i>
+              <span>Generate Image</span>
+              <i class="fas fa-chevron-down image-chevron"></i>
+            </button>
+            <div id="chartImageMenu" class="chart-image-menu">
+              <button type="button" data-image-mode="top10"><i class="fas fa-list-ol"></i><span>Top 10</span></button>
+              <button type="button" data-image-mode="full"><i class="fas fa-table-list"></i><span>Full Chart</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="week-nav">
+          <div class="week-label">Chart Week</div>
+          <div class="week-controls">
+            <button id="prevBtn" class="gold-btn"><i class="fas fa-chevron-left"></i> Prev</button>
+            <div id="weekPicker" class="week-picker">
+              <button id="weekPickerButton" class="week-picker-button" type="button">
+                <span id="weekPickerLabel">Select week</span>
+                <i id="weekPickerChevron" class="fas fa-chevron-down"></i>
+              </button>
+              <div id="weekPickerMenu" class="week-picker-menu"></div>
+            </div>
+            <button id="nextBtn" class="gold-btn">Next <i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+
+        <div id="filters" class="filters">
+          <button class="filter active" data-filter="all">ALL</button>
+          <button class="filter" data-filter="debut">NEW</button>
+          <button class="filter" data-filter="re">RE</button>
+          <button class="filter" data-filter="rising"><i class="fas fa-arrow-up"></i></button>
+          <button class="filter" data-filter="falling"><i class="fas fa-arrow-down"></i></button>
+          <button class="filter" data-filter="static"><i class="fas fa-arrow-right"></i></button>
+          <div class="color-control">
+            <button id="colorToggle" class="filter" title="Color movements" aria-label="Color movements"><i class="fas fa-palette"></i></button>
+            <div class="color-legend" role="tooltip">
+              <div class="color-legend-title">Color Legend</div>
+              <div class="color-legend-row"><span class="color-swatch legend-new"></span><span>New entry</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-re"></span><span>Re-entry</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-up-small"></span><span>Up (small)</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-up-big"></span><span>Up (+10 or more)</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-down-small"></span><span>Down (small)</span></div>
+              <div class="color-legend-row"><span class="color-swatch legend-down-big"></span><span>Down (-10 or more)</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="content" class="chart-list"><div class="loader-wrap"><div class="loader"></div></div></div>
+        <div id="dropouts"></div>
+
+        <div class="week-nav bottom-week-nav">
+          <div class="week-controls">
+            <button id="prevBtnBottom" class="gold-btn bottom-nav-btn"><i class="fas fa-chevron-left"></i> Prev</button>
+            <button id="nextBtnBottom" class="gold-btn bottom-nav-btn">Next <i class="fas fa-chevron-right"></i></button>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <section class="site-about-note global-site-about" aria-labelledby="global-about-chart-heading">
+    <h2 id="global-about-chart-heading">About Daegon Charts</h2>
+    <p>Daegon Charts is an independent music-ranking project and historical archive. The weekly pages organize songs, albums and artists into original rankings and preserve chart movement, peak, weeks charted, weeks at number one and historical chart runs.</p>
+    <p>The project combines structured music-performance data with a consistent chart methodology designed for continuity across weeks and years. It is not affiliated with Billboard, Spotify, Last.fm or any record label. Learn more about how the rankings are built in the <a href="/methodology">methodology</a>.</p>
+  </section>
+
+  <footer class="site-footer">
+    <nav class="footer-links" aria-label="Site information">
+      <a href="/about">About</a>
+      <a href="/methodology">Methodology</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/contact">Contact</a>
+      <a href="/terms">Terms</a>
+    </nav>
+    <div class="footer-copy">Daegon Charts — independent weekly music charts and historical archive.</div>
+  </footer>
+  <button id="backTop" class="back-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
+</div>
+
+<script>
+const SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/export?format=csv&gid=';
+const HIST='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOUyuJJRPQbmPbCZH4/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
+const HIST_SONGS='https://docs.google.com/spreadsheets/d/1BUo5KNCtoWAMpezDYwv80MY9njOUyuJJRPQbmPbCZH4/gviz/tq?tq=select%20A,B,C,D,E,F,G,H,I,J&tqx=out:csv&gid=';
+const SUPABASE_URL='https://kvnzhuwmgadqicixbzvb.supabase.co';
+const SUPABASE_KEY='sb_publishable_h5gDNPl6krj8av3fJnVMbw_QiHf1P01';
+const SUPABASE_ANON_JWT='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt2bnpodXdtZ2FkcWljaXhienZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkzMDYxNTYsImV4cCI6MjEwNDg4MjE1Nn0.7e6Fa7sCTUI9mqjNXhY7fXlp1EdATk2qSbSEVb9a4ss';
+
+const charts={
+  songs:{id:'songs',title:'Daegon 100',kind:'song',url:SHEET+'904867620',secondaryUrl:HIST_SONGS+'1011796371'},
+  artists:{id:'artists',title:'Artist 50',kind:'artist',url:SHEET+'1568177610',secondaryUrl:HIST+'1959135946'},
+  albums:{id:'albums',title:'Top 100 Albums',kind:'album',url:SHEET+'1940039611',secondaryUrl:HIST+'765580865'},
+  radioSongs:{id:'radioSongs',title:'Radio Songs',kind:'song',url:SHEET+'1681272096'},
+  topStreamingAlbums:{id:'topStreamingAlbums',title:'Top Streaming Albums',kind:'album',url:SHEET+'1028545573'},
+  topAlbumSales:{id:'topAlbumSales',title:'Top Album Sales',kind:'album',url:SHEET+'1111633725'},
+  streamingSongs:{id:'streamingSongs',title:'Streaming Songs',kind:'song',url:SHEET+'626144821'},
+  digitalSongsSales:{id:'digitalSongsSales',title:'Digital Songs Sales',kind:'song',url:SHEET+'302176914'}
+};
+const SITE_ORIGIN='https://daegoncharts.com.br';
+const chartSlugs={
+  songs:'daegon-100',
+  albums:'daegon-albums-100',
+  artists:'daegon-artists-50',
+  radioSongs:'radio-songs',
+  streamingSongs:'streaming-songs',
+  digitalSongsSales:'digital-songs-sales',
+  topStreamingAlbums:'top-streaming-albums',
+  topAlbumSales:'top-album-sales'
+};
+const slugToChart=Object.fromEntries(Object.entries(chartSlugs).map(([id,slug])=>[slug,id]));
+function sitePath(path){
+  const base=location.hostname.endsWith('github.io')?'/daegon-charts':'';
+  return base+(path.startsWith('/')?path:'/'+path);
+}
+function chartPath(id,date){
+  const slug=chartSlugs[id]||id;
+  return '/chart/'+slug+(date?'/'+date:'');
+}
+function parseRoute(){
+  const parts=location.pathname.split('/').filter(Boolean);
+  const ci=parts.indexOf('chart');
+  if(ci>=0){
+    const slug=parts[ci+1]||'';
+    const id=slugToChart[slug];
+    const date=parts[ci+2]||null;
+    if(id)return{id,date};
+  }
+  return{id:'songs',date:null};
+}
+function syncDocumentMeta(id,date){
+  const cfg=charts[id];
+  const path=chartPath(id,date);
+  const canonical=SITE_ORIGIN+path;
+  const title=(cfg?.title||'Daegon Charts')+(date?' — '+fmtDate(date):'')+' | Daegon Charts';
+  const description=(cfg?.title||'Daegon Charts')+(date?' for '+fmtDate(date):'')+'. Explore rank, movement, peak, weeks charted and historical chart runs on Daegon Charts.';
+  document.title=title;
+  let d=document.querySelector('meta[name="description"]');if(d)d.setAttribute('content',description);
+  let c=document.querySelector('link[rel="canonical"]');if(c)c.setAttribute('href',canonical);
+  let ogu=document.querySelector('meta[property="og:url"]');if(ogu)ogu.setAttribute('content',canonical);
+  let ogt=document.querySelector('meta[property="og:title"]');if(ogt)ogt.setAttribute('content',title);
+  let ogd=document.querySelector('meta[property="og:description"]');if(ogd)ogd.setAttribute('content',description);
+}
+function updateBrowserRoute(id,date,replace=false){
+  const target=sitePath(chartPath(id,date));
+  if(location.pathname!==target){
+    history[replace?'replaceState':'pushState']({chartId:id,date},'',target);
+  }
+  syncDocumentMeta(id,date);
+}
+
+const weeklyIds=Object.keys(charts);
+const state={active:'songs',cache:new Map(),filters:new Set(['all']),diffColors:false,date:null,details:new Set(),images:new Map(),previews:new Map(),audio:null,playingBtn:null};
+try{
+  const imageCacheVersion='artist-priority-v9-soundtrack-album-fallback';
+  if(localStorage.getItem('imageCacheVersion')!==imageCacheVersion){
+    for(let i=localStorage.length-1;i>=0;i--){
+      const k=localStorage.key(i);
+      if(k&&k.startsWith('img:'))localStorage.removeItem(k);
+    }
+    localStorage.setItem('imageCacheVersion',imageCacheVersion);
+  }
+}catch{}
+
+const desktopChartNav=document.getElementById('desktopChartNav'), mobileActiveChart=document.getElementById('mobileActiveChart'), mobileMoreCharts=document.getElementById('mobileMoreCharts'), mobileChartMenu=document.getElementById('mobileChartMenu'), content=document.getElementById('content'), dropoutsEl=document.getElementById('dropouts');
+const chartTitle=document.getElementById('chartTitle'), dateLabel=document.getElementById('dateLabel');
+const weekPicker=document.getElementById('weekPicker'), weekPickerButton=document.getElementById('weekPickerButton'), weekPickerLabel=document.getElementById('weekPickerLabel'), weekPickerMenu=document.getElementById('weekPickerMenu');
+
+function parseCsvRow(line){
+  const out=[];let cur='',quoted=false;
+  for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'){if(quoted&&line[i+1]==='"'){cur+='"';i++}else quoted=!quoted}else if(ch===','&&!quoted){out.push(cur);cur=''}else cur+=ch}
+  out.push(cur);return out;
+}
+function normalizeDate(v){
+  if(!v)return'';v=String(v).trim();
+  if(v.includes('/')){const p=v.split('/');if(p.length===3)return p[2]+'-'+p[1].padStart(2,'0')+'-'+p[0].padStart(2,'0')}
+  return v;
+}
+function findIdx(h,names){const lower=h.map(x=>String(x).toLowerCase().trim());for(const n of names){const i=lower.indexOf(n.toLowerCase());if(i!==-1)return i}return -1}
+function toInt(v){
+  let x=String(v??'').trim();if(!x||x==='-')return 0;
+  x=x.replace(/[^0-9.,\-]/g,'');if(!x)return 0;
+  if(x.includes('.')&&((x.match(/\./g)||[]).length>1||/^\d+\.\d{3}$/.test(x)))x=x.replace(/\./g,'');
+  x=x.replace(/,/g,'');const n=parseInt(x,10);return Number.isFinite(n)?n:0;
+}
+function val(r,i){return i>=0?(r[i]||'').trim():''}
+function esc(s){return String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'","&#039;")}
+function fmtDate(d){try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}catch{return d}}
+function fmtShort(d){try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})}catch{return d}}
+function itemKey(e){return (e.name||'').toLowerCase()+'|'+(e.artist||'').toLowerCase()}
+function computeChartPoints(position,chartId){const n=['songs','streamingSongs','radioSongs','digitalSongsSales'].includes(chartId)?100:50;return Math.round(1000*Math.pow(Math.max(0,(n-position+1))/n,1.5))}
+function formatValue(v,chartId,isStream=false){
+  const num=toInt(v);if(!num)return String(v??'-')||'-';
+  if((isStream||['radioSongs','topStreamingAlbums','streamingSongs'].includes(chartId))){
+    if(num>=1000000)return (num/1000000).toFixed(1).replace(/\.0$/,'')+'B';
+    if(num>=1000)return Math.round(num/1000)+'M';
+  }
+  return num.toLocaleString('en-US');
+}
+function certification(units,type){
+  if(type==='song'){if(units>=12000000)return'2x Diamond';if(units>=6000000)return'Diamond';if(units>=600000){const x=Math.floor(units/600000);return x>=2?x+'x Platinum':'Platinum'}if(units>=400000)return'Gold';if(units>=200000)return'Silver'}
+  else{if(units>=20000000)return'2x Diamond';if(units>=10000000)return'Diamond';if(units>=1000000){const x=Math.floor(units/1000000);return x>=2?x+'x Platinum':'Platinum'}if(units>=500000)return'Gold'}
+  return'';
+}
+async function fetchText(url,retries=3){
+  const cached=sessionStorage.getItem('csv:'+url);
+  const ts=Number(sessionStorage.getItem('csvts:'+url)||0);
+  if(cached&&Date.now()-ts<10*60*1000)return cached;
+  let last;
+  for(let attempt=0;attempt<=retries;attempt++){
+    try{
+      const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),30000);
+      const res=await fetch(url,{cache:'default',signal:ctrl.signal});clearTimeout(timer);
+      if(res.status===429&&attempt<retries){await new Promise(r=>setTimeout(r,1000*(attempt+1)));continue}
+      if(!res.ok)throw new Error('CSV '+res.status);
+      let text=await res.text();if(text.charCodeAt(0)===0xFEFF)text=text.slice(1);
+      try{sessionStorage.setItem('csv:'+url,text);sessionStorage.setItem('csvts:'+url,String(Date.now()))}catch{}
+      return text;
+    }catch(e){last=e;if(attempt<retries)await new Promise(r=>setTimeout(r,1000*(attempt+1)))}
+  }
+  throw last||new Error('CSV failed');
+}
+async function fetchRows(url){const text=await fetchText(url);return text.trim().split(/\r?\n/).filter(Boolean).map(parseCsvRow)}
+
+const ALBUM_OVERRIDES={anitta:{'versions of me':'Girl from Rio'},waneesa:{'w (2005)':'W','w':'W'}};
+function parseSheet(rows,cfg){
+  if(!rows.length)return{};
+  const h=rows[0].map(x=>String(x).toLowerCase().trim());
+  const idx={
+    date:findIdx(h,['date','chart date']),position:findIdx(h,['position','rank','pos']),diff:findIdx(h,['dif','diff','▲▼']),
+    song:findIdx(h,['song','title','track']),album:findIdx(h,['album']),artist:findIdx(h,['artist','artists']),
+    lastWeek:findIdx(h,['last week','lw','last wk','prev week','previous week']),peak:findIdx(h,['peak']),weeks:findIdx(h,['weeks','wks']),
+    weeksAt1:findIdx(h,['weeks at 1','wks at 1','week at #1','week at 1','weeks at #1']),points:findIdx(h,['points']),
+    sales:findIdx(h,['sales','sales/streams','sales/streaming','pure sales']),streams:findIdx(h,['streams','sea','streaming']),
+    airplay:findIdx(h,['airplay']),audience:findIdx(h,['audience']),certification:findIdx(h,['certification']),
+    units:findIdx(h,['units','spins','sales','streams','audience']),totalUnits:findIdx(h,['total units','total']),
+    totalStreams:findIdx(h,['total streams','total streaming']),totalSales:findIdx(h,['total sales'])
+  };
+  if(cfg.id==='radioSongs'){const a=h.indexOf('audience');if(a!==-1)idx.units=a}
+  const nameIdx=cfg.kind==='artist'?idx.artist:cfg.kind==='album'?idx.album:idx.song;
+  const out={};
+  for(const r of rows.slice(1)){
+    const date=normalizeDate(r[idx.date]);if(!date)continue;
+    const rawName=val(r,nameIdx),rawArtist=val(r,idx.artist);
+    const finalName=(ALBUM_OVERRIDES[rawArtist.toLowerCase()]||{})[rawName.toLowerCase()]||rawName;
+    const e={
+      position:toInt(r[idx.position]),diff:idx.diff>=0?val(r,idx.diff):'',name:finalName,artist:rawArtist,
+      album:idx.album>=0?val(r,idx.album):'',peak:toInt(r[idx.peak]),weeks:toInt(r[idx.weeks]),weeksAt1:idx.weeksAt1>=0?toInt(r[idx.weeksAt1]):0,
+      lastWeek:idx.lastWeek>=0?val(r,idx.lastWeek):'',points:idx.points>=0?val(r,idx.points):'',sales:idx.sales>=0?val(r,idx.sales):'',
+      streams:idx.streams>=0?val(r,idx.streams):'',airplay:idx.airplay>=0?val(r,idx.airplay):'',audience:idx.audience>=0?val(r,idx.audience):'',
+      certification:idx.certification>=0?val(r,idx.certification):'',units:idx.units>=0?val(r,idx.units):'',totalUnits:idx.totalUnits>=0?val(r,idx.totalUnits):'',
+      totalStreams:idx.totalStreams>=0?val(r,idx.totalStreams):'',totalSales:idx.totalSales>=0?val(r,idx.totalSales):''
+    };
+    if(!e.name||!e.position)continue;(out[date]??=[]).push(e);
+  }
+  return out;
+}
+function computeDiffs(dates,entriesByDate){
+  const seen=new Map();
+  for(let di=0;di<dates.length;di++){
+    const d=dates[di],prev=dates[di-1],prevMap=new Map();
+    if(prev)for(const e of entriesByDate[prev]||[])prevMap.set(itemKey(e),e.position);
+    for(const e of entriesByDate[d]||[]){
+      const key=itemKey(e),p=prevMap.get(key);
+      if(p==null)e.diff=seen.has(key)?'RE':'NEW';
+      else{const move=p-e.position;e.diff=move>0?'▲'+move:move<0?'▼'+Math.abs(move):'='}
+      if(!seen.has(key))seen.set(key,d);
+    }
+  }
+}
+async function loadSecondaryFromSupabase(chartId){
+  const cacheKey='supabase-album-v15:'+chartId;
+  try{
+    const cached=sessionStorage.getItem(cacheKey);
+    const ts=Number(sessionStorage.getItem(cacheKey+':ts')||0);
+    if(cached&&Date.now()-ts<10*60*1000)return JSON.parse(cached);
+  }catch{}
+
+  const url=SUPABASE_URL+'/rest/v1/chart_data?select=chart_id,data&chart_type=eq.secondary&chart_id=like.'+encodeURIComponent(chartId+'_*')+'&order=chart_id.asc';
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),30000);
+  try{
+    const res=await fetch(url,{
+      headers:{apikey:SUPABASE_KEY,Accept:'application/json'},
+      signal:ctrl.signal
+    });
+    if(!res.ok)throw new Error('Supabase '+res.status);
+    const rows=await res.json();
+    const merged={};
+    for(const row of rows||[]){
+      const byDate=row?.data?.entriesByDate||{};
+      for(const [d,list] of Object.entries(byDate)){
+        if(!Array.isArray(list))continue;
+        (merged[d]??=[]).push(...list.map(e=>({...e})));
+      }
+    }
+    try{
+      sessionStorage.setItem(cacheKey,JSON.stringify(merged));
+      sessionStorage.setItem(cacheKey+':ts',String(Date.now()));
+    }catch{}
+    return merged;
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+async function loadWeekly(chartId){
+  if(state.cache.has(chartId))return state.cache.get(chartId);
+  const cfg=charts[chartId];
+  const primaryPromise=fetchRows(cfg.url);
+  const secondaryPromise=cfg.secondaryUrl
+    ? loadSecondaryFromSupabase(chartId).catch(async()=>{
+        const rows=await fetchRows(cfg.secondaryUrl).catch(()=>null);
+        return rows?parseSheet(rows,cfg):null;
+      })
+    : Promise.resolve(null);
+  const [primaryRows,secondaryEntries]=await Promise.all([primaryPromise,secondaryPromise]);
+  const entriesByDate=parseSheet(primaryRows,cfg);
+  if(secondaryEntries){
+    for(const [d,list] of Object.entries(secondaryEntries)){
+      if(!Array.isArray(list))continue;
+      (entriesByDate[d]??=[]).push(...list.map(e=>({...e})));
+    }
+  }
+  const dates=Object.keys(entriesByDate).sort();
+  for(const d of dates){
+    entriesByDate[d].sort((a,b)=>a.position-b.position);
+    const byKey=new Map(),dedup=[];
+    for(const e of entriesByDate[d]){
+      const k=itemKey(e),existing=byKey.get(k);
+      if(!existing){byKey.set(k,e);dedup.push(e)}
+      else{
+        // Historical Supabase rows can carry enrichment fields (notably album)
+        // that are absent from the primary sheet row. Preserve them while
+        // keeping the strongest chart position as the authoritative row.
+        const winner=e.position<existing.position?e:existing;
+        const donor=e.position<existing.position?existing:e;
+        for(const field of ['album','certification','totalUnits','totalStreams','totalSales']){
+          if(!winner[field]&&donor[field])winner[field]=donor[field];
+        }
+        if(winner!==existing){
+          const ix=dedup.indexOf(existing);if(ix>=0)dedup[ix]=winner;
+          byKey.set(k,winner);
+        }
+      }
+    }
+    entriesByDate[d]=dedup.sort((a,b)=>a.position-b.position);
+  }
+  if(cfg.secondaryUrl){
+    const running=new Map(),prevPos=new Map();
+    for(const d of dates){
+      for(const e of entriesByDate[d]){
+        e.position=toInt(e.position);e.peak=toInt(e.peak);e.weeks=toInt(e.weeks);e.weeksAt1=toInt(e.weeksAt1);
+        e.name=String(e.name||'').trim();e.artist=String(e.artist||'').trim();
+        const k=itemKey(e),st=running.get(k)||{weeks:0,peak:Infinity,weeksAt1:0};
+        st.weeks++;st.peak=Math.min(st.peak,e.position);if(e.position===1)st.weeksAt1++;
+        e.lastWeek=prevPos.has(k)?String(prevPos.get(k)):'';
+        e.weeks=st.weeks;e.peak=st.peak;e.weeksAt1=st.weeksAt1||0;
+        if(chartId==='songs'&&!e.points)e.points=String(computeChartPoints(e.position,'songs'));
+        else if(chartId!=='songs'&&!e.units)e.units=String(computeChartPoints(e.position,chartId));
+        running.set(k,st);
+      }
+      prevPos.clear();for(const e of entriesByDate[d])prevPos.set(itemKey(e),e.position);
+    }
+  }
+  computeDiffs(dates,entriesByDate);
+  const data={chartId,title:cfg.title,kind:cfg.kind,dates,entriesByDate};
+  state.cache.set(chartId,data);return data;
+}
+
+function visibleCharts(date){return date&&date<'2017-01-01'?['songs','artists','albums']:weeklyIds}
+function renderNav(){
+  const ids=visibleCharts(state.date);
+
+  desktopChartNav.innerHTML=ids.map(id=>'<button data-id="'+id+'" class="'+(id===state.active?'active':'')+'">'+charts[id].title+'</button>').join('');
+  desktopChartNav.querySelectorAll('button').forEach(b=>b.onclick=()=>loadChart(b.dataset.id,state.date,{routeMode:'push'}));
+
+  mobileActiveChart.textContent=charts[state.active].title;
+  mobileChartMenu.innerHTML=ids.filter(id=>id!==state.active).map(id=>'<button data-id="'+id+'">'+charts[id].title+'</button>').join('');
+  mobileChartMenu.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    mobileChartMenu.classList.remove('open');
+    mobileMoreCharts.textContent='+ More Charts';
+    loadChart(b.dataset.id,state.date,{routeMode:'push'});
+  });
+}
+function diffType(diff){const d=String(diff||'');if(d==='NEW')return'debut';if(d==='RE')return're';if(d.startsWith('▲'))return'rising';if(d.startsWith('▼'))return'falling';return'static'}
+function diffHtml(diff){
+  const d=String(diff||'');
+  if(d==='NEW')return '<span class="diff-badge diff-new">NEW</span>';
+  if(d==='RE')return '<span class="diff-badge diff-new diff-re">RE-ENTRY</span>';
+  if(d.startsWith('▲'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M4 7l4-4 4 4"/></svg>';
+  if(d.startsWith('▼'))return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 13V3M4 9l4 4 4-4"/></svg>';
+  return '<svg class="diff-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>';
+}
+function colorClass(diff){
+  if(!state.diffColors)return'';const d=String(diff||'');
+  if(d==='NEW')return'color-new';if(d==='RE')return'color-re';
+  if(d.startsWith('▲'))return toInt(d.slice(1))>=10?'color-up10':'color-up1';
+  if(d.startsWith('▼'))return toInt(d.slice(1))>=10?'color-down10':'color-down1';
+  return'';
+}
+function rowName(e,cfg){return e.name||'Unknown'}
+
+function awardsFor(e,entries,chartId){
+  const eligible=(chartId==='songs'||chartId==='albums')&&(e.diff==='NEW'||e.diff==='RE'||String(e.diff).startsWith('▲'));
+  if(!eligible)return{hasStar:false,gainer:false};
+  let maxStreams=0,streamKey='',maxSales=0,salesKey='';
+  for(const x of entries){
+    const st=toInt(x.streams);if(st>maxStreams){maxStreams=st;streamKey=itemKey(x)}
+    const sa=toInt(x.sales);if(sa>maxSales){maxSales=sa;salesKey=itemKey(x)}
+  }
+  const k=itemKey(e),g=(maxStreams>0&&streamKey===k)||(maxSales>0&&salesKey===k);
+  return{hasStar:true,gainer:g};
+}
+function detailFields(e,cfg){
+  const out=[];
+  if(cfg.id==='artists'){
+    out.push(['Units',formatValue(e.units,cfg.id)],['Total Units',formatValue(e.totalUnits,cfg.id)],['Sales',formatValue(e.sales,cfg.id)],['Total Sales',formatValue(e.totalSales,cfg.id)],['Streams',formatValue(e.streams,cfg.id,true)],['Total Streams',formatValue(e.totalStreams,cfg.id,true)]);
+  }else if(cfg.id==='songs'){
+    if(e.points)out.push(['Points',formatValue(e.points,cfg.id)]);
+    out.push(['Streams',formatValue(e.streams,cfg.id,true)]);
+    if(e.airplay)out.push(['Airplay',formatValue(e.airplay,cfg.id,true)]);
+    out.push(['Sales',formatValue(e.sales,cfg.id)],['Units',formatValue(e.units,cfg.id)]);
+    if(e.totalUnits)out.push(['Total Units',formatValue(e.totalUnits,cfg.id)]);
+  }else if(cfg.id==='albums'){
+    out.push(['Units',formatValue(e.units,cfg.id)]);
+    if(e.totalUnits)out.push(['Total Units',formatValue(e.totalUnits,cfg.id)]);
+    out.push(['Pure Sales',formatValue(e.sales,cfg.id)],['SEA',formatValue(e.streams,cfg.id,true)]);
+  }else if(cfg.id==='radioSongs'){
+    out.push(['Audience',formatValue(e.audience||e.units,cfg.id,true)]);
+  }else if(cfg.id==='topStreamingAlbums'||cfg.id==='streamingSongs'){
+    out.push(['Streams',formatValue(e.streams||e.units,cfg.id,true)]);
+    if(e.totalStreams)out.push(['Total Streams',formatValue(e.totalStreams,cfg.id,true)]);
+  }else if(cfg.id==='topAlbumSales'||cfg.id==='digitalSongsSales'){
+    out.push(['Sales',formatValue(e.sales||e.units,cfg.id)]);
+    if(e.totalSales)out.push(['Total Sales',formatValue(e.totalSales,cfg.id)]);
+  }
+  const cert=e.certification||((cfg.id==='songs'||cfg.id==='albums')?certification(toInt(e.totalUnits),cfg.kind):'');
+  if(cert)out.push(['Certification',cert]);
+  return out.filter(x=>x[1]&&x[1]!=='-'&&x[1]!=='0');
+}
+function runEntries(e,data,date){
+  const k=itemKey(e),arr=[];
+  for(const d of data.dates){if(d>date)break;for(const x of data.entriesByDate[d]||[])if(itemKey(x)===k)arr.push({date:d,...x})}
+  return arr;
+}
+function wordOrdinal(n){
+  const w=['zeroth','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth','eleventh','twelfth','thirteenth','fourteenth','fifteenth','sixteenth','seventeenth','eighteenth','nineteenth','twentieth'];
+  return n>=0&&n<=20?w[n]:n+'th';
+}
+function copyText(e,cfg,date,data){
+  let copyDiff=e.diff;if(copyDiff==='NEW')copyDiff='new';else if(copyDiff==='RE')copyDiff='re';else if(String(copyDiff).startsWith('▲'))copyDiff='+'+copyDiff.slice(1);else if(String(copyDiff).startsWith('▼'))copyDiff='-'+copyDiff.slice(1);
+  const isNew=e.diff==='NEW',isUp=String(e.diff).startsWith('▲'),isRe=e.diff==='RE',atPeak=e.position===e.peak,w1=e.weeksAt1||0;
+  const pos=isNew?'#'+e.position+'(new)':'#'+e.position+'('+copyDiff+')';
+  let detail='';
+  if(cfg.kind==='album'&&isNew){
+    const units=toInt(e.units),streams=toInt(e.streams),sales=toInt(e.sales),parts=[];
+    if(streams)parts.push((streams/1000).toLocaleString('en-US')+' million on-demand streams');
+    if(sales)parts.push(sales.toLocaleString('en-US')+' pure sales');
+    detail=(units?units.toLocaleString('en-US'):'')+(parts.length?' ['+parts.join(' | ')+'].':'.');
+  }else if(cfg.kind==='album'&&e.units){
+    detail=formatValue(e.units,cfg.id)+(e.totalUnits?' ('+formatValue(e.totalUnits,cfg.id)+' units since release)':'');
+  }
+  const run=runEntries(e,data,date),weeksAtPeak=run.filter(x=>x.position===e.peak).length;
+  let annotation='';
+  if(atPeak&&isUp&&!isNew&&e.position===1&&w1>1)annotation='*re-peak; '+wordOrdinal(w1)+' week at #1*';
+  else if(e.position===1&&w1>1)annotation='*'+wordOrdinal(w1)+' week at #1*';
+  else if(atPeak&&(isUp||isRe)&&!isNew)annotation='*new peak*';
+  else if(e.peak===1&&w1>=1)annotation=w1>1?'*peak: #1 for '+w1+' weeks*':'*peak: #1*';
+  else if(e.peak>0&&weeksAtPeak>1)annotation='*peak: #'+e.peak+' for '+weeksAtPeak+' weeks*';
+  else annotation='*peak: #'+e.peak+'*';
+  const weeksPart=isNew?'':'['+e.weeks+' weeks].';
+  const copyTitle=cfg.id==='songs'?'100 Songs':cfg.title;
+  const artistPart=e.artist+(isNew?'.':'');
+  return ['Daegon\'s '+copyTitle+':',pos,e.name+',',artistPart,detail,weeksPart,isNew?'':annotation].filter(Boolean).join(' ')+'\n\nChart dated '+fmtDate(date)+'.';
+}
+
+function comparable(value){
+  return String(value||'')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .replace(/&/g,'and')
+    .replace(/[’‘]/g,"'")
+    .replace(/[^a-z0-9' ]/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function exactish(a,b){
+  const x=comparable(a),y=comparable(b);
+  return !!x&&!!y&&x===y;
+}
+function exactArtist(a,b){
+  return exactish(a,b);
+}
+function exactTitle(a,b){
+  return exactish(a,b);
+}
+function artworkIdentityTitle(kind,value){
+  let x=comparable(value);
+  if(kind==='song'){
+    x=x
+      .replace(/\bpt\s*(\d+)\b/g,'part $1')
+      .replace(/\bpart\s*(\d+)\b/g,'part $1')
+      .replace(/\b(?:radio edit|single version|album version|edit|remaster(?:ed)?(?: \d{4})?|mono|stereo|explicit|clean)\b/g,'')
+      .replace(/\b(?:with|feat|ft|featuring)\b.*$/g,'')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+  return x;
+}
+function artworkSearchTitle(kind,value){
+  let x=String(value||'').trim();
+  if(kind!=='song')return x;
+  return x
+    .replace(/\s*[\(\[]\s*(?:with|feat\.?|ft\.?|featuring)\b[^\)\]]*[\)\]]/gi,'')
+    .replace(/\s+(?:with|feat\.?|ft\.?|featuring)\s+.+$/gi,'')
+    .replace(/\s*[\(\[]\s*(?:radio edit|single version|album version|edit|remaster(?:ed)?(?:\s+\d{4})?|mono|stereo|explicit|clean)\s*[\)\]]\s*$/gi,'')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+function usableImage(url){
+  if(!url)return false;
+  const u=String(url).toLowerCase();
+  return !u.includes('2a96cbd8b46e442fc41c2b86b821562f')&&!u.includes('default_album')&&!u.includes('noimage')&&!u.includes('no-image');
+}
+async function jsonFetch(url,timeout=5000){
+  try{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),timeout);
+    const r=await fetch(url,{signal:ctrl.signal});
+    clearTimeout(timer);
+    if(!r.ok)return null;
+    return await r.json();
+  }catch{return null}
+}
+function pickLastfmImage(images){
+  for(const img of [...(images||[])].reverse()){
+    const u=img&&img['#text'];
+    if(usableImage(u))return u;
+  }
+  return '';
+}
+function generatedFallbackImage(e,cfg){
+  const title=String(e.name||'Unknown').trim();
+  const artist=String(e.artist||'').trim();
+  const initials=(title.split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]).join('')||'♪').toUpperCase();
+  const label=cfg.kind==='artist'?'ARTIST':cfg.kind==='album'?'ALBUM':'SONG';
+  const safe=(v)=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">'+
+    '<rect width="600" height="600" fill="#111"/>'+
+    '<rect x="24" y="24" width="552" height="552" fill="none" stroke="#FF6D00" stroke-width="6"/>'+
+    '<text x="50%" y="42%" text-anchor="middle" dominant-baseline="middle" fill="#FF6D00" font-family="Arial,Helvetica,sans-serif" font-size="150" font-weight="900">'+safe(initials)+'</text>'+
+    '<text x="50%" y="61%" text-anchor="middle" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="34" font-weight="800">'+safe(title.slice(0,28))+'</text>'+
+    (artist?'<text x="50%" y="68%" text-anchor="middle" fill="#aaa" font-family="Arial,Helvetica,sans-serif" font-size="24">'+safe(artist.slice(0,34))+'</text>':'')+
+    '<text x="50%" y="88%" text-anchor="middle" fill="#FF6D00" font-family="Arial,Helvetica,sans-serif" font-size="18" font-weight="700" letter-spacing="3">'+label+'</text>'+
+    '</svg>';
+  return 'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(svg);
+}
+
+const HARDCODED_ALBUM_IMAGES={
+  checkmate:'https://image-cdn-ak.spotifycdn.com/image/ab67706c0000da841ebe14cc216c7be9269638d7',
+  solo:'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02c0f23c0d2af5ec63daef87f0',
+  ritalee1979:'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02471646faaecf4b53e95b5c1c',
+  rebeldes:'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e025637ea9091a58684212c8fea',
+  equals:'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02dc806722f6802a8ea9953c89',
+  brasileirinha:'https://static.wikia.nocookie.net/anitta/images/0/0c/BRASILEIRINHA.png/revision/latest?cb=20210622000705&path-prefix=pt-br',
+  girlfromrio:'https://i.pinimg.com/736x/9d/1a/66/9d1a663dae6e7251e69c75e8605b9ce9.jpg',
+  acontece:'https://i.pinimg.com/736x/72/c5/fd/72c5fdbdcb418854b7aee2c12720007b.jpg',
+  wanessacamargo:'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e02b3053279804f33dd993d032c',
+  wanessacamargo2002:'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02a492ad852a3ff45542494af6',
+  w:'https://image-cdn-fa.spotifycdn.com/image/ab67616d00001e022cd46c56308c5aba148c03dc',
+  deadline:'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e028db56c674b13b3a4c6a4dbb8'
+};
+const HARDCODED_TRACK_IMAGES={
+  saveyourtearsremix:'https://image-cdn-ak.spotifycdn.com/image/ab67616d00001e02c6af5ffa661a365b77df6ef6'
+};
+function compactKey(v){return comparable(v).replace(/[^a-z0-9]/g,'')}
+function extractYear(name){
+  const m=String(name||'').match(/\b(19|20)\d{2}\b/);
+  return {year:m?m[0]:null,stripped:m?String(name).replace(m[0],'').trim():String(name||'')};
+}
+function albumVariants(name){
+  const {year,stripped}=extractYear(name);
+  const out=[String(name||'')];
+  if(year&&stripped&&stripped!==name)out.push(stripped);
+  return [...new Set(out)];
+}
+async function searchTheAudioDB(name,kind,artistName=''){
+  if(kind==='artist'){
+    const d=await jsonFetch('https://www.theaudiodb.com/api/v1/json/123/search.php?s='+encodeURIComponent(name),7000);
+    const hit=(d?.artists||[]).find(a=>exactArtist(a?.strArtist,name));
+    return hit?.strArtistThumb||'';
+  }
+  const d=await jsonFetch('https://www.theaudiodb.com/api/v1/json/123/searchalbum.php?s='+encodeURIComponent(artistName)+'&a='+encodeURIComponent(name),7000);
+  const hit=(d?.album||[]).find(a=>exactTitle(a?.strAlbum,name)&&exactArtist(a?.strArtist,artistName));
+  return hit?.strAlbumThumb||'';
+}
+async function searchWikidataArtist(name){
+  const s=await jsonFetch('https://www.wikidata.org/w/api.php?action=wbsearchentities&search='+encodeURIComponent(name)+'&language=en&limit=5&format=json&origin=*',7000);
+  for(const item of s?.search||[]){
+    if(!exactArtist(item?.label,name))continue;
+    const d=await jsonFetch('https://www.wikidata.org/w/api.php?action=wbgetclaims&entity='+encodeURIComponent(item.id)+'&property=P18&format=json&origin=*',7000);
+    const fn=d?.claims?.P18?.[0]?.mainsnak?.datavalue?.value;
+    if(fn)return 'https://commons.wikimedia.org/wiki/Special:FilePath/'+encodeURIComponent(String(fn).replace(/ /g,'_'))+'?width=600';
+  }
+  return '';
+}
+async function spotifyArtwork(name,artist,kind){
+  try{
+    const ctrl=new AbortController();
+    const timer=setTimeout(()=>ctrl.abort(),10000);
+    const r=await fetch(SUPABASE_URL+'/functions/v1/spotify-artwork',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_ANON_JWT,
+        'Authorization':'Bearer '+SUPABASE_ANON_JWT
+      },
+      body:JSON.stringify({name,artist,kind}),
+      signal:ctrl.signal
+    });
+    clearTimeout(timer);
+    if(!r.ok)return '';
+    const d=await r.json();
+    return usableImage(d?.imageUrl)?d.imageUrl:'';
+  }catch{return ''}
+}
+
+async function resolveImage(e,cfg){
+  const key=(cfg.kind==='song'?'apple-song-v2|':'')+cfg.kind+'|'+artworkIdentityTitle(cfg.kind,e.name)+'|'+comparable(e.artist||e.name);
+
+  // Exact Apple Music override for releases where generic search can pick the wrong edition.
+  // The Life of a Showgirl must use the artwork from "The Encore" edition supplied by the user.
+  // Exact Apple Music fallback for tracks from Rebeldes (2011).
+  // Only applies when the requested song is actually returned inside album 721250427,
+  // so other Rebeldes releases keep using the normal resolver.
+  if(
+    cfg.kind==='song' &&
+    comparable(e.artist)==='rebeldes'
+  ){
+    try{
+      const d=await fetch('https://itunes.apple.com/lookup?id=721250427&entity=song&country=br')
+        .then(r=>r.ok?r.json():null);
+      const results=d?.results||[];
+      const track=results.find(x=>
+        String(x.wrapperType||'').toLowerCase()==='track' &&
+        comparable(x.trackName||'')===comparable(e.name||'')
+      );
+      if(track){
+        const collection=results.find(x=>
+          String(x.wrapperType||'').toLowerCase()==='collection' ||
+          String(x.collectionType||'').toLowerCase()==='album'
+        );
+        let art=track.artworkUrl100||track.artworkUrl60||collection?.artworkUrl100||collection?.artworkUrl60||'';
+        if(art){
+          art=art
+            .replace(/\/\d+x\d+bb(?:-\d+)?\.(jpg|png)$/i,'/1200x1200bb.$1')
+            .replace(/\/100x100bb\.(jpg|png)$/i,'/1200x1200bb.$1');
+          if(/^https?:\/\//i.test(art)){
+            state.images.set(key,art);
+            try{localStorage.setItem('img:'+key,art)}catch{}
+            return art;
+          }
+        }
+      }
+    }catch{}
+  }
+
+  if(
+    cfg.kind==='album' &&
+    comparable(e.name)==='the life of a showgirl' &&
+    comparable(e.artist)==='taylor swift'
+  ){
+    try{
+      const d=await fetch('https://itunes.apple.com/lookup?id=6814997249&country=br')
+        .then(r=>r.ok?r.json():null);
+      const hit=(d?.results||[]).find(x=>String(x.collectionId||'')==='6814997249')||(d?.results||[])[0];
+      let art=hit?.artworkUrl100||hit?.artworkUrl60||'';
+      if(art){
+        art=art.replace(/\/\d+x\d+bb(?:-\d+)?\.(jpg|png)$/i,'/1200x1200bb.$1')
+               .replace(/\/100x100bb\.(jpg|png)$/i,'/1200x1200bb.$1');
+        if(/^https?:\/\//i.test(art)){
+          state.images.set(key,art);
+          try{localStorage.setItem('img:'+key,art)}catch{}
+          return art;
+        }
+      }
+    }catch{}
+  }
+
+  if(state.images.has(key))return state.images.get(key);
+
+  const persistedKey='img:'+key;
+  try{
+    const persisted=localStorage.getItem(persistedKey);
+    if(persisted&&/^https?:\/\//i.test(persisted)){
+      state.images.set(key,persisted);
+      return persisted;
+    }
+  }catch{}
+
+  let name=String(e.name||'').trim();
+  let artist=String(e.artist||e.name||'').trim();
+  let searchName=artworkSearchTitle(cfg.kind,name);
+
+  // Songs are canonicalized against Apple's catalog before artwork lookup.
+  // Keep Daegon's visible primary-artist credit untouched; Apple metadata is
+  // used only as the authoritative identity for cover/preview resolution.
+  if(cfg.kind==='song'&&name&&artist){
+    try{
+      const apple=await resolveAppleSongCredit(e);
+      if(apple?.found){
+        const appleName=String(apple.apple_track_name||apple.display_title||name).trim();
+        const appleArtist=String(apple.apple_artist_name||artist).trim();
+        const appleId=apple.apple_track_id;
+        const country=String(apple.source_country||'br').toLowerCase();
+
+        if(appleId){
+          const d=await fetch('https://itunes.apple.com/lookup?id='+encodeURIComponent(appleId)+'&entity=song&country='+encodeURIComponent(country))
+            .then(r=>r.ok?r.json():null);
+          const hit=(d?.results||[]).find(x=>String(x.trackId||'')===String(appleId))||(d?.results||[])[0];
+          let art=hit?.artworkUrl100||hit?.artworkUrl60||'';
+          if(art){
+            art=art
+              .replace(/\/\d+x\d+bb(?:-\d+)?\.(jpg|png)$/i,'/1200x1200bb.$1')
+              .replace(/\/100x100bb\.(jpg|png)$/i,'/1200x1200bb.$1');
+            if(/^https?:\/\//i.test(art)){
+              state.images.set(key,art);
+              try{localStorage.setItem(persistedKey,art)}catch{}
+              return art;
+            }
+          }
+        }
+
+        // If direct lookup fails, resolve again using Apple's exact spelling.
+        name=appleName||name;
+        artist=appleArtist||artist;
+        searchName=artworkSearchTitle(cfg.kind,name);
+      }
+    }catch{}
+  }
+
+  async function requestArtwork(queryName){
+    try{
+      const ctrl=new AbortController();
+      const timer=setTimeout(()=>ctrl.abort(),20000);
+      const r=await fetch(SUPABASE_URL+'/functions/v1/artwork-resolver',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':SUPABASE_ANON_JWT,
+          'Authorization':'Bearer '+SUPABASE_ANON_JWT
+        },
+        body:JSON.stringify({kind:cfg.kind,name:queryName,artist}),
+        signal:ctrl.signal
+      });
+      clearTimeout(timer);
+      if(!r.ok)return '';
+      const d=await r.json();
+      return usableImage(d?.imageUrl)?d.imageUrl:'';
+    }catch{return ''}
+  }
+
+  let url=await requestArtwork(searchName||name);
+  if(!url&&searchName&&searchName!==name)url=await requestArtwork(name);
+
+  const isReal=usableImage(url)&&/^https?:\/\//i.test(url);
+  if(!isReal)url='';
+
+  // Final visual fallback: if a song/album cover cannot be found, use the
+  // artist's square image instead of leaving the artwork slot empty.
+  if(!url&&cfg.kind!=='artist'&&artist){
+    try{
+      const artistUrl=await resolveImage({name:artist,artist},{kind:'artist'});
+      if(usableImage(artistUrl)&&/^https?:\/\//i.test(artistUrl))url=artistUrl;
+    }catch{}
+  }
+
+  if(url){
+    state.images.set(key,url);
+    try{localStorage.setItem(persistedKey,url)}catch{}
+  }else{
+    state.images.delete(key);
+    try{localStorage.removeItem(persistedKey)}catch{}
+  }
+  return url;
+}
+async function resolvePreview(e){
+  const key=e.name+'|'+e.artist;if(state.previews.has(key))return state.previews.get(key);
+  let p='';try{const d=await fetch('https://itunes.apple.com/search?term='+encodeURIComponent(e.name+' '+e.artist)+'&entity=song&limit=5').then(r=>r.ok?r.json():null);const hit=(d?.results||[]).find(x=>String(x.trackName||'').toLowerCase()===e.name.toLowerCase())||(d?.results||[])[0];p=hit?.previewUrl||''}catch{}
+  state.previews.set(key,p);return p;
+}
+async function hydrateImages(cfg,rows){
+  const nodes=[...content.querySelectorAll('[data-image-key]')];
+  const byKey=new Map();
+
+  for(const node of nodes){
+    const key=node.dataset.imageKey;
+    if(!key)continue;
+    if(!byKey.has(key))byKey.set(key,[]);
+    byKey.get(key).push(node);
+  }
+
+  const entries=[...byKey.keys()]
+    .map(key=>rows.find(x=>itemKey(x)===key))
+    .filter(Boolean);
+
+  const concurrency=6;
+  let cursor=0;
+
+  async function worker(){
+    while(cursor<entries.length){
+      const e=entries[cursor++];
+      const key=itemKey(e);
+      const url=await resolveImage(e,cfg);
+      if(!url)continue;
+
+      for(const node of byKey.get(key)||[]){
+        if(node.isConnected){
+          const slot=node.querySelector('.artwork-slot');
+          if(slot) slot.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
+          else node.innerHTML='<img src="'+esc(url)+'" loading="lazy" decoding="async" onerror="this.onerror=null;this.remove();">';
+        }
+      }
+    }
+  }
+
+  await Promise.all(Array.from({length:Math.min(concurrency,entries.length)},()=>worker()));
+}
+async function playEntry(e,btn){
+  if(state.audio){state.audio.pause();state.audio=null;if(state.playingBtn)state.playingBtn.innerHTML='<i class="fas fa-play"></i>'}
+  if(state.playingBtn===btn){state.playingBtn=null;return}
+  const p=await resolvePreview(e);if(!p)return;
+  const a=new Audio(p);state.audio=a;state.playingBtn=btn;btn.innerHTML='<i class="fas fa-pause"></i>';a.play().catch(()=>{});
+  a.onended=()=>{btn.innerHTML='<i class="fas fa-play"></i>';state.audio=null;state.playingBtn=null};
+}
+
+function coverHtml(e,one,mobile=false){
+  const kind=charts[state.active].kind;
+  const isArtist=kind==='artist';
+  const cls=mobile
+    ? 'm-cover'+((!isArtist&&one)?' one':'')+(isArtist?' weekly-artist-art':'')+((isArtist&&one)?' artist-one':'')
+    : 'cover'+((!isArtist&&one)?' one':'')+(isArtist?' weekly-artist-art':'')+((isArtist&&one)?' artist-one':'');
+  const icon=kind==='artist'?'fa-user':kind==='album'?'fa-compact-disc':'fa-music';
+  const play=(!mobile&&kind==='song')
+    ? '<button class="cover-play play" data-entry="'+esc(itemKey(e))+'" aria-label="Play preview"><i class="fas fa-play"></i></button>'
+    : '';
+  return '<div class="'+cls+' artwork-cover" data-image-key="'+esc(itemKey(e))+'">'+
+    '<div class="artwork-slot"><i class="fas '+icon+'" style="opacity:.3;font-size:24px"></i></div>'+
+    play+
+  '</div>';
+}
+function weeklyEntitySlug(e,kind){
+  const slug=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()
+    .replace(/&/g,' and ').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  if(kind==='artist')return slug(e.name||e.artist);
+  return slug(e.name)+'--'+slug(e.artist);
+}
+function weeklyEntityHref(e,kind){
+  return '/'+kind+'/'+weeklyEntitySlug(e,kind);
+}
+function weeklyEntityLink(e,kind,text){
+  return '<a class="weekly-entity-link" href="'+weeklyEntityHref(e,kind)+'">'+esc(text)+'</a>';
+}
+function weeklyAlbumLink(album,artist){
+  const name=String(album||'').trim();
+  if(!name)return '';
+  return weeklyEntityLink({name,artist:artist||''},'album',name);
+}
+function weeklyArtistLink(artist){
+  const name=displayArtist(artist);
+  return '<a class="weekly-entity-link weekly-artist-link" href="/artist/'+weeklyEntitySlug({name:artist},'artist')+'">'+esc(name)+'</a>';
+}
+
+function metricsHtml(e){
+  const lw=e.lastWeek!==undefined&&String(e.lastWeek).trim()!==''?(String(e.lastWeek)==='0'?'-':String(e.lastWeek)):'-';
+  const peak=e.peak>0?String(e.peak):'-';
+  const weeks=e.weeks>0?String(e.weeks):'-';
+  const w1=Number(e.weeksAt1||0);
+  return '<div class="metrics">'+
+    '<span class="metric-row"><span class="metric-label">LW</span><span class="metric-v">'+esc(lw)+'</span></span>'+
+    '<span class="metric-row"><span class="metric-label">PEAK</span><span class="metric-v">'+esc(peak)+'</span></span>'+
+    (w1>0?'<span class="metric-row"><span class="metric-label">WEEKS AT NO. 1</span><span class="metric-v">'+esc(w1)+'</span></span>':'')+
+    '<span class="metric-row"><span class="metric-label">WEEKS ON CHART</span><span class="metric-v">'+esc(weeks)+'</span></span>'+
+  '</div>';
+}
+function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';const w1=Number(e.weeksAt1||0);return '<div class="m-metrics"><span><b>LW</b> '+esc(lw)+'</span><span><b>PEAK</b> '+esc(e.peak||'-')+'</span><span><b>WEEKS ON CHART</b> '+esc(e.weeks||'-')+'</span></div>'+(w1>0?'<div class="m-weeks-no1"><b>WEEKS AT NO. 1</b> '+esc(w1)+'</div>':'')}
+function detailHtml(e,cfg,data,date,copy){
+  const run=runEntries(e,data,date);
+  const copyBlock=
+    '<button class="details-copy copy-detail" type="button" data-copy="'+esc(copy)+'">'+
+      '<div class="details-copy-top"><span>Copy chart text</span><i class="fas fa-copy"></i></div>'+
+      '<div class="details-copy-text">'+esc(copy)+'</div>'+
+    '</button>';
+  return '<div class="details details-panel">'+
+    copyBlock+
+    (run.length
+      ? '<div class="details-title">Chart run</div>'+
+        '<div class="details-run-list">'+
+          run.map(x=>{
+            const extras=[];
+            if(x.peak)extras.push('Peak: '+esc(x.peak));
+            if(x.weeks)extras.push('Weeks: '+esc(x.weeks));
+            return '<button class="run-jump details-run-card" data-date="'+esc(x.date)+'">'+
+              '<div class="details-run-head">'+
+                '<span>'+esc(fmtShort(x.date))+'</span>'+
+                '<span class="details-run-pos">'+esc(x.position)+'</span>'+
+              '</div>'+
+              '<div class="details-run-meta">'+extras.map(v=>'<span>'+v+'</span>').join('')+'</div>'+
+            '</button>';
+          }).join('')+
+        '</div>'
+      : '<div class="details-empty">No chart run available.</div>')+
+  '</div>';
+}
+const DISPLAY_CASE_EXCEPTIONS=new Map([
+  ['P!NK','P!nk'],['AC/DC','AC/DC'],['T.A.T.U.','t.A.T.u.'],['WILL.I.AM','will.i.am'],
+  ['*NSYNC','*NSYNC'],['NSYNC','*NSYNC'],['OUTKAST','OutKast'],['JAY Z','JAY Z'],['JAY-Z','JAY Z'],
+  ['ABBA','ABBA'],['U2','U2'],['R.E.M.','R.E.M.'],['TLC','TLC'],['BTS','BTS'],['M.I.A.','M.I.A.'],
+  ['N.E.R.D.','N.E.R.D.'],['N.E.R.D','N.E.R.D.'],['INXS','INXS'],['UB40','UB40'],['D12','D12'],
+  ['RBD','RBD'],['CSS','CSS'],['S.H.E','S.H.E'],['T.I.','T.I.'],['DMX','DMX'],['OMG','OMG'],['LL COOL J','LL Cool J'],
+  ['3LW','3LW'],['2NE1','2NE1'],['4 NON BLONDES','4 Non Blondes']
+]);
+const DISPLAY_SMALL_WORDS=new Set(['a','an','and','as','at','but','by','for','from','in','into','nor','of','on','or','the','to','vs','with']);
+function smartDisplayCase(value,{artist=false}={}){
+  const raw=String(value??'').trim();
+  if(!raw)return raw;
+  const exception=DISPLAY_CASE_EXCEPTIONS.get(raw.toUpperCase());
+  if(exception)return exception;
+  const letters=raw.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/g)||[];
+  if(!letters.length)return raw;
+  const isAllCaps=letters.every(ch=>ch===ch.toUpperCase());
+  if(!isAllCaps)return raw;
+
+  const parts=raw.split(/(\s+)/);
+  let wordIndex=0;
+  const wordCount=parts.filter(p=>!/^\s+$/.test(p)).length;
+  return parts.map(part=>{
+    if(/^\s+$/.test(part))return part;
+    const tokenException=DISPLAY_CASE_EXCEPTIONS.get(part.toUpperCase());
+    if(tokenException){wordIndex++;return tokenException}
+    const idx=wordIndex++;
+    return part.split(/([\-\/])/).map(piece=>{
+      if(piece==='-'||piece==='/')return piece;
+      return piece.replace(/[A-Za-zÀ-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)*/g,word=>{
+        const lower=word.toLocaleLowerCase();
+        if(!artist&&idx>0&&idx<wordCount-1&&DISPLAY_SMALL_WORDS.has(lower))return lower;
+        return lower.replace(/(^|['’])[A-Za-zÀ-ÖØ-öø-ÿ]/g,m=>m.toLocaleUpperCase());
+      });
+    }).join('');
+  }).join('');
+}
+function displayTitle(name){return smartDisplayCase(visibleChartTitle(name))}
+function displayArtist(name){return smartDisplayCase(name,{artist:true})}
+function visibleChartTitle(name){
+  const raw=String(name||'');
+  return raw
+    .replace(/\s*[\(\[]\s*(?:with|feat\.?|ft\.?|featuring)\s+[^\)\]]+[\)\]]?\s*$/i,'')
+    .replace(/\s+(?:with|feat\.?|ft\.?|featuring)\s+.+$/i,'')
+    .trim()||raw;
+}
+
+const appleSongCreditCache=new Map();
+async function resolveAppleSongCredit(e,chartDate=''){
+  const title=String(e?.name||'').trim(),artist=String(e?.artist||'').trim();
+  if(!title||!artist)return null;
+  const key=comparable(artist)+'|'+comparable(artworkSearchTitle('song',title))+'|'+String(chartDate||'').slice(0,4);
+  if(appleSongCreditCache.has(key))return appleSongCreditCache.get(key);
+  const job=(async()=>{
+    try{
+      const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),12000);
+      const r=await fetch(SUPABASE_URL+'/functions/v1/apple-song-credits',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'apikey':SUPABASE_ANON_JWT,
+          'Authorization':'Bearer '+SUPABASE_ANON_JWT
+        },
+        body:JSON.stringify({mode:'track',name:title,artist,chartDate}),
+        signal:ctrl.signal
+      });
+      clearTimeout(timer);
+      if(!r.ok)return null;
+      const d=await r.json();
+      return d&&d.found?d:null;
+    }catch{return null}
+  })();
+  appleSongCreditCache.set(key,job);
+  const out=await job;
+  appleSongCreditCache.set(key,Promise.resolve(out));
+  return out;
+}
+function songCreditHtml(primary,credit){
+  const base=weeklyArtistLink(primary);
+  const collaborators=Array.isArray(credit?.collaborators)?credit.collaborators.filter(Boolean):[];
+  if(!collaborators.length)return base;
+  const joiner=String(credit?.joiner||' feat. ');
+  if(joiner.trim()==='&'){
+    return base+' & '+collaborators.map(x=>weeklyArtistLink(x)).join(' & ');
+  }
+  return base+' feat. '+collaborators.map(x=>weeklyArtistLink(x)).join(', ');
+}
+async function hydrateSongCredits(rows,chartDate){
+  const nodes=[...content.querySelectorAll('[data-song-credit]')];
+  if(!nodes.length)return;
+  const byKey=new Map();
+  for(const node of nodes){
+    const key=node.dataset.creditKey;
+    if(!byKey.has(key))byKey.set(key,[]);
+    byKey.get(key).push(node);
+  }
+  const entries=[...byKey.keys()].map(k=>rows.find(e=>itemKey(e)===k)).filter(Boolean);
+  let cursor=0;
+  async function worker(){
+    while(cursor<entries.length){
+      const e=entries[cursor++];
+      const credit=await resolveAppleSongCredit(e,chartDate);
+      if(!credit)continue;
+      const html=songCreditHtml(e.artist,credit);
+      for(const node of byKey.get(itemKey(e))||[])if(node.isConnected)node.innerHTML=html;
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(6,entries.length)},()=>worker()));
+}
+window.resolveAppleSongCredit=resolveAppleSongCredit;
+window.appleSongCreditCache=appleSongCreditCache;
+
+function weeklySkeleton(kind='song'){
+  const artist=kind==='artist';
+  const rows=Array.from({length:7},(_,i)=>{
+    const one=i===0;
+    return '<article class="chart-card skeleton-card">'+
+      '<div class="desktop-row">'+
+        '<div class="rank-wrap"><div class="sk sk-rank"></div></div>'+
+        '<div class="sk sk-cover '+(artist?'sk-circle ':'')+(one?'sk-cover-one':'')+'"></div>'+
+        '<div class="diff-wrap"><div class="sk sk-diff"></div></div>'+
+        '<div class="entry"><div class="sk sk-title"></div>'+(artist?'':'<div class="sk sk-sub"></div>')+'</div>'+
+        '<div class="right"><div class="sk sk-metric"></div><div class="sk sk-action"></div></div>'+
+      '</div>'+
+      '<div class="mobile-row">'+
+        '<div class="m-rank"><div class="sk sk-rank-mobile"></div><div class="sk sk-diff-mobile"></div></div>'+
+        '<div class="sk sk-cover-mobile '+(artist?'sk-circle ':'')+(one?'sk-cover-mobile-one':'')+'"></div>'+
+        '<div class="m-entry"><div class="sk sk-title-mobile"></div>'+(artist?'':'<div class="sk sk-sub-mobile"></div>')+'<div class="sk sk-meta-mobile"></div></div>'+
+        '<div class="m-actions"><div class="sk sk-action-mobile"></div></div>'+
+      '</div>'+
+    '</article>';
+  }).join('');
+  return '<div class="skeleton-list" aria-hidden="true">'+rows+'</div>';
+}
+
+function renderRows(data,date){
+  const cfg=charts[state.active],all=data.entriesByDate[date]||[],rows=all.filter(e=>state.filters.has('all')||state.filters.has(diffType(e.diff)));
+  if(!rows.length){content.innerHTML='<div class="error">No entries match these filters.</div>';return}
+  content.innerHTML=rows.map(e=>{
+    const one=e.position===1,w1=e.weeksAt1||0,key=date+'|'+e.position+'|'+e.name+'|'+e.artist,open=state.details.has(key),award=awardsFor(e,all,state.active),copy=copyText(e,cfg,date,data);
+    const movementClass=colorClass(e.diff);
+    return '<article class="chart-card '+movementClass+(state.diffColors&&movementClass?' diff-colors-active':'')+'" data-key="'+esc(key)+'">'+
+      '<div class="desktop-row">'+
+        '<div class="rank-wrap"><div class="rank-num '+(one?'one':'')+'">'+e.position+'</div></div>'+
+        coverHtml(e,one,false)+
+        '<div class="diff-wrap">'+diffHtml(e.diff)+'</div>'+
+        '<div class="entry"><div class="entry-title '+(one?'one':'')+'">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="artist '+(one?'one':'')+'" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+(cfg.kind==='song'&&e.album?'<div class="album-ref '+(one?'one':'')+'">'+weeklyAlbumLink(e.album,e.artist)+'</div>':'')+'</div>'+
+        '<div class="right">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'" title="'+(award.gainer?'Greatest Gainer of the Week':'Gains In Performance')+'"><svg class="award-star-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.8l3.02 6.12 6.76.98-4.89 4.77 1.15 6.73L12 17.22 5.96 20.4l1.15-6.73L2.22 8.9l6.76-.98L12 1.8z"/></svg></span>':'')+
+          metricsHtml(e)+
+          '<div class="actions">'+
+          '<button class="action details-btn" aria-label="Toggle details" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="mobile-row">'+
+        '<div class="m-rank"><div class="m-rank-num">'+e.position+'</div><div class="m-diff">'+diffHtml(e.diff)+'</div></div>'+
+        coverHtml(e,one,true)+
+        '<div class="m-entry"><div class="m-title">'+weeklyEntityLink(e,cfg.kind,cfg.kind==='song'?displayTitle(e.name):displayArtist(e.name))+'</div>'+(cfg.kind!=='artist'?'<div class="m-artist" '+(cfg.kind==='song'?'data-song-credit data-credit-key="'+esc(itemKey(e))+'"':'')+'>'+weeklyArtistLink(e.artist)+'</div>':'')+(cfg.kind==='song'&&e.album?'<div class="m-album-ref">'+weeklyAlbumLink(e.album,e.artist)+'</div>':'')+mobileMetricsHtml(e)+'</div>'+
+        '<div class="m-actions">'+(award.hasStar?'<span class="award '+(award.gainer?'award-gainer':'award-performance')+'"><svg class="award-star-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 1.8l3.02 6.12 6.76.98-4.89 4.77 1.15 6.73L12 17.22 5.96 20.4l1.15-6.73L2.22 8.9l6.76-.98L12 1.8z"/></svg></span>':'')+'<button class="action details-btn" data-key="'+esc(key)+'">'+(open?'−':'+')+'</button></div>'+
+      '</div>'+
+      (open?detailHtml(e,cfg,data,date,copy):'')+
+    '</article>';
+  }).join('');
+
+  content.querySelectorAll('.copy-detail').forEach(b=>b.onclick=async()=>{
+    const text=b.dataset.copy||'';
+    try{
+      if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+      else{
+        const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+      }
+      const top=b.querySelector('.details-copy-top span');
+      if(top){const old=top.textContent;top.textContent='Copied!';setTimeout(()=>top.textContent=old,1200)}
+    }catch{}
+  });
+  content.querySelectorAll('.details-btn').forEach(b=>b.onclick=e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const k=b.dataset.key;
+    const card=b.closest('.chart-card');
+    if(!card)return;
+    const entry=rows.find(x=>(date+'|'+x.position+'|'+x.name+'|'+x.artist)===k);
+    if(!entry)return;
+
+    const isOpen=state.details.has(k);
+    if(isOpen){
+      state.details.delete(k);
+      card.querySelector('.details-panel')?.remove();
+      card.querySelectorAll('.details-btn').forEach(btn=>btn.textContent='+');
+      b.blur();
+      return;
+    }
+
+    state.details.add(k);
+    const template=document.createElement('template');
+    template.innerHTML=detailHtml(entry,cfg,data,date,copyText(entry,cfg,date,data)).trim();
+    const panel=template.content.firstElementChild;
+    if(panel){
+      card.appendChild(panel);
+      card.querySelectorAll('.details-btn').forEach(btn=>btn.textContent='−');
+
+      const copyBtn=panel.querySelector('.copy-detail');
+      if(copyBtn)copyBtn.onclick=async()=>{
+        const text=copyBtn.dataset.copy||'';
+        try{
+          if(navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
+          else{
+            const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+          }
+          const top=copyBtn.querySelector('.details-copy-top span');
+          if(top){const old=top.textContent;top.textContent='Copied!';setTimeout(()=>top.textContent=old,1200)}
+        }catch{}
+      };
+      panel.querySelectorAll('.run-jump').forEach(run=>run.onclick=()=>setDate(run.dataset.date,data));
+    }
+    b.blur();
+  });
+  content.querySelectorAll('.run-jump').forEach(b=>b.onclick=()=>setDate(b.dataset.date,data));
+  content.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const e=all.find(x=>itemKey(x)===b.dataset.entry);if(e)playEntry(e,b)});
+  hydrateImages(cfg,rows);
+  if(cfg.kind==='song')hydrateSongCredits(rows,date);
+}
+async function hydrateDropoutImages(cfg,outs){
+  const nodes=[...dropoutsEl.querySelectorAll('[data-dropout-image-key]')];
+  await Promise.all(nodes.map(async node=>{
+    const key=node.dataset.dropoutImageKey;
+    const e=outs.find(x=>itemKey(x)===key);
+    if(!e)return;
+    const url=await resolveImage(e,cfg);
+    if(url&&node.isConnected){
+      node.innerHTML='<img src="'+esc(url)+'" alt="'+esc(e.artist||e.name)+'" loading="lazy" decoding="async">';
+    }
+  }));
+}
+function renderDropouts(data,date){
+  const idx=data.dates.indexOf(date);
+  if(idx<=0){dropoutsEl.innerHTML='';return}
+
+  const prev=data.entriesByDate[data.dates[idx-1]]||[];
+  const curr=data.entriesByDate[date]||[];
+
+  // Same logic as daegoncharts: an item is a dropout only when the exact
+  // name + artist pair existed in the immediately previous week and is absent now.
+  const outs=prev.filter(prevEntry=>
+    !curr.some(currEntry=>
+      String(currEntry.name||'')===String(prevEntry.name||'') &&
+      String(currEntry.artist||'')===String(prevEntry.artist||'')
+    )
+  );
+
+  if(!outs.length){dropoutsEl.innerHTML='';return}
+
+  const cfg=charts[state.active];
+  dropoutsEl.innerHTML=
+    '<div class="dropouts">'+
+      '<div class="dropouts-title">DROP-OUTS</div>'+
+      '<div class="dropouts-list">'+
+        outs.map(e=>
+          '<div class="dropout">'+
+            '<div class="dropout-cover" data-dropout-image-key="'+esc(itemKey(e))+'">'+
+              '<i class="fas '+(cfg.kind==='album'?'fa-compact-disc':cfg.kind==='song'?'fa-music':'fa-user')+'"></i>'+
+            '</div>'+
+            '<div class="dropout-info">'+
+              '<div class="dropout-name">'+esc(e.name)+'</div>'+
+              (cfg.kind!=='artist'?'<div class="dropout-artist">'+esc(e.artist)+'</div>':'')+
+              '<div class="dropout-meta">'+
+                '<span>LW: <strong>#'+esc(e.position)+'</strong></span>'+
+                (e.peak?'<span>Peak: <strong>#'+esc(e.peak)+'</strong></span>':'')+
+                (e.weeks?'<span>Weeks: <strong>'+esc(e.weeks)+'</strong></span>':'')+
+              '</div>'+
+            '</div>'+
+          '</div>'
+        ).join('')+
+      '</div>'+
+    '</div>';
+
+  hydrateDropoutImages(cfg,outs);
+}
+function centerSelectedWeekOption(){
+  const selected=weekPickerMenu.querySelector('.selected');
+  if(!selected)return;
+  const target=selected.offsetTop-(weekPickerMenu.clientHeight-selected.offsetHeight)/2;
+  weekPickerMenu.scrollTop=Math.max(0,target);
+}
+function renderWeekPicker(data){
+  weekPickerLabel.textContent=fmtShort(state.date);
+  weekPickerMenu.innerHTML=data.dates.map(d=>'<button class="week-picker-option '+(d===state.date?'selected':'')+'" data-date="'+d+'">'+fmtShort(d)+'</button>').join('');
+  weekPickerMenu.querySelectorAll('.week-picker-option').forEach(btn=>{
+    btn.onclick=()=>{
+      weekPicker.classList.remove('open');
+      if(btn.dataset.date!==state.date)setDate(btn.dataset.date,data);
+    };
+  });
+  if(weekPicker.classList.contains('open')){
+    requestAnimationFrame(centerSelectedWeekOption);
+  }
+}
+function syncWeekButtons(data){
+  const idx=data.dates.indexOf(state.date),prev=idx>0?data.dates[idx-1]:null,next=idx>=0&&idx<data.dates.length-1?data.dates[idx+1]:null;
+  for(const id of ['prevBtn','prevBtnBottom']){const b=document.getElementById(id);b.disabled=!prev;b.onclick=()=>prev&&setDate(prev,data)}
+  for(const id of ['nextBtn','nextBtnBottom']){const b=document.getElementById(id);b.disabled=!next;b.onclick=()=>next&&setDate(next,data)}
+}
+function setDate(date,data,{routeMode='push',scroll=true}={}){
+  state.date=date;
+  updateBrowserRoute(state.active,date,routeMode==='replace');
+  dateLabel.textContent='Chart week of '+fmtDate(date);
+  renderWeekPicker(data);
+  renderNav();
+  syncWeekButtons(data);
+  renderRows(data,date);
+  renderDropouts(data,date);
+  if(scroll)window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function chartImageDateLabel(date){
+  try{
+    return new Date(date+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+  }catch{return date}
+}
+function chartImageDisplayName(e,kind){
+  return kind==='artist'?displayArtist(e.name):displayTitle(e.name);
+}
+function chartImageLastWeek(e){
+  if(e.diff==='NEW')return'NEW';
+  if(e.diff==='RE')return'RE';
+  const v=String(e.lastWeek??'').trim();
+  return !v||v==='0'?'-':v;
+}
+function chartImageRoundRect(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+function chartImageTrunc(ctx,text,maxW){
+  text=String(text||'');
+  if(ctx.measureText(text).width<=maxW)return text;
+  let t=text;
+  while(t.length&&ctx.measureText(t+'…').width>maxW)t=t.slice(0,-1);
+  return t+'…';
+}
+function chartImageLoad(url){
+  return new Promise(resolve=>{
+    if(!url){resolve(null);return}
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=()=>resolve(img);
+    img.onerror=()=>resolve(null);
+    img.src=url;
+  });
+}
+async function chartImageDownload(canvas,filename){
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png',1));
+  if(!blob)return;
+  try{
+    const file=new File([blob],filename,{type:'image/png'});
+    if(navigator.share&&navigator.canShare?.({files:[file]})){
+      try{await navigator.share({files:[file],title:filename});return}catch{}
+    }
+  }catch{}
+  const url=URL.createObjectURL(blob);
+  if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
+    window.open(url,'_blank');
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+    return;
+  }
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.rel='noopener';a.target='_blank';
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+
+const CHART_IMAGE_THEMES={
+  songs:{accent:'#00E676',accentDark:'#00C853'},
+  streamingSongs:{accent:'#00E676',accentDark:'#00C853'},
+  radioSongs:{accent:'#00E676',accentDark:'#00C853'},
+  digitalSongsSales:{accent:'#00E676',accentDark:'#00C853'},
+  albums:{accent:'#2979FF',accentDark:'#1565C0'},
+  topStreamingAlbums:{accent:'#2979FF',accentDark:'#1565C0'},
+  topAlbumSales:{accent:'#2979FF',accentDark:'#1565C0'},
+  artists:{accent:'#FF1744',accentDark:'#D50000'}
+};
+function chartImageTheme(id){return CHART_IMAGE_THEMES[id]||CHART_IMAGE_THEMES.songs}
+function chartImageWeeksAt1(entry){
+  const n=Number(entry?.weeksAt1||entry?.weeks_at_1||entry?.weeksAtNo1||0);
+  return Number.isFinite(n)&&n>0?n:0;
+}
+function chartImageFeatText(e){
+  const name=String(e?.name||'');
+  const m=name.match(/\s+(?:feat\.?|ft\.?|featuring)\s+(.+)$/i);
+  return m?('feat. '+m[1].trim()):null;
+}
+function chartImageMetalGradient(ctx,W,H){
+  const g=ctx.createLinearGradient(0,0,W,H);
+  g.addColorStop(0,'#0d0d0d');
+  g.addColorStop(.25,'#1a1a1a');
+  g.addColorStop(.5,'#2a2a2a');
+  g.addColorStop(.75,'#1a1a1a');
+  g.addColorStop(1,'#0d0d0d');
+  ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const r1=ctx.createRadialGradient(W*.2,H*.5,0,W*.2,H*.5,W*.5);
+  r1.addColorStop(0,'rgba(255,255,255,.03)');r1.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=r1;ctx.fillRect(0,0,W,H);
+  const r2=ctx.createRadialGradient(W*.8,H*.2,0,W*.8,H*.2,W*.4);
+  r2.addColorStop(0,'rgba(255,255,255,.04)');r2.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=r2;ctx.fillRect(0,0,W,H);
+}
+
+
+function splitChartHero(title){
+  const t=String(title||'').trim().toUpperCase();
+  const m=t.match(/^(.*?)(\d+)\s*$/);
+  return m?{label:m[1].trim(),number:m[2].trim()}:{label:t,number:''};
+}
+async function generateTop10ChartImage(entries,cfg,date){
+  const list=entries.slice(0,10);
+  const theme=chartImageTheme(state.active);
+  const accent=theme.accent;
+  const weeksAt1=chartImageWeeksAt1(list[0]);
+  const isArtist=cfg.kind==='artist';
+  const dateLabel=chartImageDateLabel(date);
+  const hero=splitChartHero(cfg.title);
+
+  const host=document.createElement('div');
+  host.style.cssText='position:fixed;top:0;left:0;width:1080px;opacity:0;pointer-events:none;z-index:-99999;overflow:hidden;';
+  const root=document.createElement('div');
+  root.style.cssText=[
+    'width:1080px',
+    'background:#0b0b0b',
+    'font-family:Inter,"Helvetica Neue",Arial,sans-serif',
+    'display:flex',
+    'flex-direction:column',
+    'position:relative'
+  ].join(';');
+
+  root.innerHTML=
+    '<div style="position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.02) 0%,transparent 28%,rgba(255,255,255,.05) 46%,transparent 63%,rgba(255,255,255,.02) 82%,transparent 100%);pointer-events:none;z-index:0"></div>'+
+    '<div style="background:'+accent+';padding:48px 60px 50px;position:relative;z-index:1">'+
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px">'+
+        '<div style="font-size:34px;font-weight:900;color:#000;line-height:1;letter-spacing:-.03em;text-transform:lowercase">daegon charts</div>'+
+        '<div style="text-align:right;padding-top:8px">'+
+          '<div style="font-size:16px;font-weight:500;color:#000;line-height:1.1;margin-bottom:5px">CHART DATED</div>'+
+          '<div style="font-size:26px;font-weight:900;color:#000;line-height:1">'+esc(dateLabel)+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div style="display:flex;align-items:flex-end;gap:14px;min-height:155px">'+
+        '<div style="border:10px solid #000;padding:18px 28px 14px;line-height:.86;font-size:112px;font-weight:900;color:#000;letter-spacing:-.055em;white-space:nowrap">'+esc(hero.label)+'</div>'+
+        (hero.number?'<div style="font-size:170px;font-weight:900;color:#000;line-height:.78;letter-spacing:-.075em;white-space:nowrap">'+esc(hero.number)+'</div>':'')+
+      '</div>'+
+    '</div>'+
+    '<div class="dc-img-content" style="padding:24px 54px 28px;display:flex;flex-direction:column;gap:0;position:relative;z-index:1;background:rgba(0,0,0,.12)">'+
+      '<div style="display:flex;align-items:center;padding:0 0 8px;border-bottom:1px solid '+accent+';margin-bottom:0">'+
+        '<div style="width:58px;flex-shrink:0"></div><div style="flex:1"></div>'+
+      '</div>'+
+    '</div>';
+
+  const contentEl=root.querySelector('.dc-img-content');
+
+  for(const entry of list){
+    const no1=Number(entry.position)===1;
+    const wrapper=document.createElement('div');
+
+    if(no1){
+      const pre=document.createElement('div');
+      pre.style.cssText='display:flex;align-items:center;margin:5px 0 2px';
+      const badge=document.createElement('div');
+
+      if(weeksAt1){
+        badge.style.cssText='background:'+accent+';color:#000;font-size:14px;font-weight:900;padding:8px 20px;border-radius:999px;letter-spacing:.03em;text-transform:uppercase;width:fit-content;margin-left:68px';
+        badge.textContent=weeksAt1+'  '+(weeksAt1===1?'WEEK':'WEEKS')+' AT NO. 1';
+      }else{
+        badge.style.marginLeft='68px';
+      }
+      pre.appendChild(badge);
+
+      const spacer=document.createElement('div');spacer.style.flex='1';pre.appendChild(spacer);
+      const lwHead=document.createElement('div');
+      lwHead.style.cssText='width:62px;font-size:12px;font-weight:800;color:'+accent+';text-transform:uppercase;letter-spacing:.02em;text-align:right;flex-shrink:0;line-height:1.05;padding-right:2px';
+      lwHead.innerHTML='LAST<br>WEEK';
+      pre.appendChild(lwHead);
+      wrapper.appendChild(pre);
+    }
+
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;padding:'+(no1?'16px 0':'14px 0')+';border-bottom:1px solid '+accent+';position:relative;overflow:hidden';
+
+    if(no1){
+      const ghost=document.createElement('div');
+      ghost.style.cssText='position:absolute;left:6px;top:50%;transform:translateY(-50%);font-size:82px;font-weight:900;color:'+accent+';opacity:.16;line-height:1;pointer-events:none;z-index:0';
+      ghost.textContent='1';row.appendChild(ghost);
+    }
+
+    const pos=document.createElement('div');
+    pos.style.cssText='width:'+(no1?'72px':'58px')+';font-size:'+(no1?'52px':'28px')+';font-weight:'+(no1?'800':'500')+';color:'+(no1?accent:'#fff')+';line-height:1;text-align:left;flex-shrink:0;position:relative;z-index:1';
+    pos.textContent=String(entry.position);row.appendChild(pos);
+
+    const titleWrap=document.createElement('div');
+    titleWrap.style.cssText='flex:1;min-width:0;text-align:left;position:relative;z-index:1';
+    const title=document.createElement('div');
+    title.style.cssText='font-size:'+(no1?'30px':'25px')+';font-weight:900;color:#fff;line-height:1.04;letter-spacing:-.02em;text-align:left;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-transform:uppercase';
+    title.textContent=chartImageDisplayName(entry,cfg.kind);
+    titleWrap.appendChild(title);row.appendChild(titleWrap);
+
+    if(!isArtist){
+      const artistWrap=document.createElement('div');
+      artistWrap.style.cssText='flex-shrink:0;text-align:right;margin-left:14px;margin-right:18px;max-width:360px;position:relative;z-index:1';
+      const artist=document.createElement('div');
+      artist.style.cssText='font-size:'+(no1?'27px':'24px')+';color:#f1f1f1;line-height:1.08;white-space:nowrap;overflow:hidden;text-overflow:ellipsis';
+      artist.textContent=displayArtist(entry.artist);
+      artistWrap.appendChild(artist);
+
+      const feat=chartImageFeatText(entry);
+      if(feat){
+        const f=document.createElement('div');
+        f.style.cssText=artist.style.cssText;
+        f.textContent=feat;
+        artistWrap.appendChild(f);
+      }
+      row.appendChild(artistWrap);
+    }else{
+      const spacer=document.createElement('div');spacer.style.flex='1';row.appendChild(spacer);
+    }
+
+    const lw=document.createElement('div');
+    lw.style.cssText='width:62px;font-size:'+(no1?'22px':'18px')+';font-weight:800;color:'+accent+';text-align:right;flex-shrink:0;position:relative;z-index:1;padding-right:2px';
+    lw.textContent=chartImageLastWeek(entry);
+    row.appendChild(lw);
+
+    wrapper.appendChild(row);
+    contentEl.appendChild(wrapper);
+  }
+
+  host.appendChild(root);
+  document.body.appendChild(host);
+
+  try{
+    await document.fonts.ready;
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    if(!window.htmlToImage?.toPng) throw new Error('html-to-image did not load');
+    const dataUrl=await window.htmlToImage.toPng(root,{
+      width:1080,
+      pixelRatio:2,
+      backgroundColor:'#0b0b0b',
+      cacheBust:true
+    });
+    const img=new Image();
+    await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=dataUrl});
+    const canvas=document.createElement('canvas');
+    canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
+    canvas.getContext('2d').drawImage(img,0,0);
+    return canvas;
+  }finally{
+    host.remove();
+  }
+}
+async function generateFullChartImage(entries,cfg,date){
+  const titleText=String(cfg.title||'').toUpperCase();
+  const dateLabel=chartImageDateLabel(date);
+  const kind=cfg.kind;
+  const accent='#FF6D00'; // original daegoncharts Full Chart uses orange
+  const W=1800;
+  const PAD=56;
+  const isArtist=kind==='artist';
+  const F='"Daegon Grotesk","Helvetica Neue",Arial,sans-serif';
+  const col1=entries.slice(1,51);
+  const col2=entries.slice(51,100);
+  const ROW_H=30;
+  const totalW=W-PAD*2;
+  const gap=48;
+  const chartColW=(totalW-gap)/2;
+  const LX=PAD;
+  const RX=PAD+chartColW+gap;
+  const maxRows=Math.max(col1.length,col2.length);
+  const headerH=320;
+  const chartH=maxRows*ROW_H+40;
+  const footerH=52;
+  const H=headerH+chartH+footerH+20;
+
+  const isMobile=navigator.maxTouchPoints>0;
+  const pixelRatio=isMobile?1:2;
+  const canvas=document.createElement('canvas');
+  canvas.width=W*pixelRatio;canvas.height=H*pixelRatio;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(pixelRatio,pixelRatio);
+  ctx.textBaseline='top';
+
+  ctx.fillStyle='#f5f5f0';ctx.fillRect(0,0,W,H);
+
+  ctx.textAlign='center';ctx.fillStyle='#1a365d';ctx.font='900 64px '+F;
+  ctx.fillText(titleText,W/2,28);
+  ctx.fillStyle='#000';ctx.font='400 22px '+F;ctx.fillText(dateLabel,W/2,102);
+  ctx.fillStyle=accent;ctx.fillRect(W/2-120,134,240,3);
+  ctx.textAlign='left';
+
+  const top=entries[0];
+  if(top){
+    const artSize=140,artX=PAD,artY=160;
+    let artUrl='';
+    try{artUrl=await resolveImage(top,cfg)}catch{}
+    const art=await chartImageLoad(artUrl);
+    if(art){
+      ctx.save();chartImageRoundRect(ctx,artX,artY,artSize,artSize,8);ctx.clip();
+      ctx.drawImage(art,artX,artY,artSize,artSize);ctx.restore();
+    }else{
+      const grad=ctx.createLinearGradient(artX,artY,artX+artSize,artY+artSize);
+      grad.addColorStop(0,accent);grad.addColorStop(1,'#b84900');
+      ctx.fillStyle=grad;chartImageRoundRect(ctx,artX,artY,artSize,artSize,8);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='900 56px '+F;ctx.textAlign='center';
+      ctx.fillText('1',artX+artSize/2,artY+artSize/2-28);ctx.textAlign='left';
+    }
+
+    const detX=artX+artSize+28;
+    const detW=totalW-artSize-28;
+    ctx.fillStyle='#000';ctx.font='900 40px '+F;
+    ctx.fillText(chartImageTrunc(ctx,chartImageDisplayName(top,kind),detW),detX,artY);
+
+    if(!isArtist){
+      ctx.fillStyle='#555';ctx.font='400 24px '+F;
+      let artistStr=displayArtist(top.artist);
+      const feat=chartImageFeatText(top); if(feat)artistStr+=' '+feat;
+      ctx.fillText(chartImageTrunc(ctx,artistStr,detW),detX,artY+48);
+    }
+
+    const statsY=artY+(isArtist?50:84);
+    const stats=[
+      {label:'LAST WEEK',value:chartImageLastWeek(top)},
+      ...(chartImageWeeksAt1(top)?[{label:'WEEKS AT #1',value:String(chartImageWeeksAt1(top))}]:[]),
+      {label:'PEAK',value:String(top.peak||'-')},
+      {label:'WEEKS ON CHART',value:String(top.weeks||'-')}
+    ];
+    let sx=detX;
+    for(const s of stats){
+      ctx.fillStyle='#888';ctx.font='700 10px '+F;ctx.fillText(s.label,sx,statsY);
+      ctx.fillStyle='#000';ctx.font='900 22px '+F;ctx.fillText(s.value,sx,statsY+14);
+      sx+=120;
+    }
+  }
+
+  const chartTopY=headerH+16;
+  function drawHeaders(x0,cw){
+    let hy=chartTopY;
+    const colNumW=38,colLW=42,colTitleW=cw*.40,colArtW=cw*.28,colPkW=34;
+    ctx.fillStyle='#888';ctx.font='800 11px '+F;
+    let hx=x0;
+    ctx.fillText('#',hx,hy);hx+=colNumW;
+    ctx.fillText('LW',hx,hy);hx+=colLW;
+    ctx.fillText('TITLE',hx,hy);hx+=colTitleW;
+    ctx.fillText('ARTIST'+(isArtist?'':'(S)'),hx,hy);hx+=colArtW;
+    ctx.fillText('PK',hx,hy);hx+=colPkW;
+    ctx.fillText('WK',hx,hy);
+    hy+=12;ctx.strokeStyle='#ccc';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x0,hy);ctx.lineTo(x0+cw,hy);ctx.stroke();
+    return hy+8;
+  }
+  const y1=drawHeaders(LX,chartColW);
+  const y2=drawHeaders(RX,chartColW);
+
+  function drawEntries(list,x0,cw,startY){
+    const colNumW=38,colLW=42,colTitleW=cw*.40,colArtW=cw*.28,colPkW=34;
+    let cy=startY;
+    for(const entry of list){
+      const top3=Number(entry.position)<=3;
+      let cx=x0;
+      if(top3){
+        ctx.fillStyle=accent;chartImageRoundRect(ctx,cx,cy+3,28,22,3);ctx.fill();
+        ctx.fillStyle='#fff';ctx.font='900 13px '+F;
+      }else{
+        ctx.fillStyle='#000';ctx.font='900 15px '+F;
+      }
+      ctx.textAlign='center';ctx.fillText(String(entry.position),cx+14,cy+6);ctx.textAlign='left';cx+=colNumW;
+
+      const isNew=entry.diff==='NEW'||entry.diff==='RE';
+      ctx.fillStyle=isNew?'#16a34a':'#999';ctx.font=(isNew?'800 13px ':'700 14px ')+F;
+      ctx.fillText(chartImageLastWeek(entry),cx+4,cy+7);cx+=colLW;
+
+      ctx.fillStyle=top3?'#000':'#222';ctx.font=(top3?'900 16px ':'700 14px ')+F;
+      ctx.fillText(chartImageTrunc(ctx,chartImageDisplayName(entry,kind),colTitleW-8),cx+4,cy+5);cx+=colTitleW;
+
+      if(!isArtist){
+        ctx.fillStyle='#999';ctx.font='400 13px '+F;
+        ctx.fillText(chartImageTrunc(ctx,displayArtist(entry.artist),colArtW-8),cx+4,cy+7);
+      }
+      cx+=colArtW;
+
+      ctx.fillStyle=Number(entry.peak)===1?accent:'#999';ctx.font='700 14px '+F;
+      ctx.textAlign='center';ctx.fillText(String(entry.peak||'-'),cx+colPkW/2,cy+7);ctx.textAlign='left';cx+=colPkW;
+      ctx.fillStyle='#999';ctx.font='700 14px '+F;ctx.textAlign='center';
+      ctx.fillText(String(entry.weeks||'-'),cx+17,cy+7);ctx.textAlign='left';
+
+      cy+=ROW_H;ctx.strokeStyle='#e5e5e5';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(x0,cy-2);ctx.lineTo(x0+cw,cy-2);ctx.stroke();
+    }
+  }
+
+  drawEntries(col1,LX,chartColW,y1);
+  drawEntries(col2,RX,chartColW,y2);
+
+  const footerY=H-footerH;
+  ctx.fillStyle='#e5e5e5';ctx.fillRect(PAD,footerY,W-PAD*2,1);
+  ctx.fillStyle='#999';ctx.font='600 12px '+F;ctx.textAlign='left';
+  ctx.fillText('daegoncharts.com.br',PAD,footerY+16);
+  ctx.textAlign='right';ctx.fillText(entries.length+' ENTRIES',W-PAD,footerY+16);
+
+  return canvas;
+}
+async function runChartImage(mode){
+  const tools=document.getElementById('chartImageTools');
+  const btn=document.getElementById('chartImageBtn');
+  const data=state.cache.get(state.active);
+  if(!data||!state.date)return;
+  const entries=data.entriesByDate[state.date]||[];
+  if(!entries.length)return;
+  const cfg=charts[state.active];
+  tools.classList.remove('open');
+  btn.classList.add('generating');
+  const old=btn.innerHTML;
+  btn.innerHTML='<i class="fas fa-spinner fa-spin"></i><span>Generating...</span>';
+  try{
+    await document.fonts?.ready;
+    const canvas=mode==='full'
+      ? await generateFullChartImage(entries,cfg,state.date)
+      : await generateTop10ChartImage(entries,cfg,state.date);
+    await chartImageDownload(canvas,'daegon-'+state.active+'-'+state.date+'-'+mode+'.png');
+  }catch(err){
+    console.error('Failed to generate chart image',err);
+    alert('Could not generate this chart image.');
+  }finally{
+    btn.innerHTML=old;
+    btn.classList.remove('generating');
+  }
+}
+async function loadChart(id,requestedDate=null,{routeMode='push',scroll=true}={}){
+  state.active=id;state.details.clear();chartTitle.textContent=charts[id].title;content.innerHTML=weeklySkeleton(charts[id].kind);dropoutsEl.innerHTML='';
+  try{
+    const data=await loadWeekly(id);if(!data.dates.length)throw new Error('No dates');
+    let date=requestedDate&&data.entriesByDate[requestedDate]?requestedDate:data.dates[data.dates.length-1];state.date=date;
+    updateBrowserRoute(id,date,routeMode==='replace');
+    renderWeekPicker(data);
+    dateLabel.textContent='Chart week of '+fmtDate(date);renderNav();syncWeekButtons(data);renderRows(data,date);renderDropouts(data,date);
+  }catch(e){content.innerHTML='<div class="error">This chart did not load.<br><button class="gold-btn" style="margin-top:12px" id="retryChart">Try again</button></div>';document.getElementById('retryChart').onclick=()=>{state.cache.delete(state.active);loadChart(state.active,state.date,{routeMode:'replace'})}}
+}
+
+
+const chartImageTools=document.getElementById('chartImageTools');
+const chartImageBtn=document.getElementById('chartImageBtn');
+const chartImageMenu=document.getElementById('chartImageMenu');
+chartImageBtn.onclick=e=>{
+  e.preventDefault();e.stopPropagation();
+  const open=chartImageTools.classList.toggle('open');
+  chartImageBtn.setAttribute('aria-expanded',open?'true':'false');
+};
+chartImageMenu.querySelectorAll('[data-image-mode]').forEach(b=>b.onclick=e=>{
+  e.preventDefault();e.stopPropagation();
+  runChartImage(b.dataset.imageMode);
+});
+document.addEventListener('click',e=>{
+  if(!chartImageTools.contains(e.target)){
+    chartImageTools.classList.remove('open');
+    chartImageBtn.setAttribute('aria-expanded','false');
+  }
+});
+
+document.getElementById('filters').querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
+  const k=b.dataset.filter;if(k==='all')state.filters=new Set(['all']);else{state.filters.delete('all');if(state.filters.has(k))state.filters.delete(k);else state.filters.add(k);if(!state.filters.size)state.filters.add('all')}
+  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',state.filters.has(x.dataset.filter)));
+  const data=state.cache.get(state.active);if(data)renderRows(data,state.date);
+});
+document.getElementById('colorToggle').onclick=()=>{state.diffColors=!state.diffColors;document.getElementById('colorToggle').classList.toggle('active',state.diffColors);const data=state.cache.get(state.active);if(data)renderRows(data,state.date)};
+document.getElementById('themeToggle').onclick=()=>{const dark=document.documentElement.classList.toggle('dark');try{localStorage.setItem('theme',dark?'dark':'light')}catch{}document.querySelector('#themeToggle i').className='fas '+(dark?'fa-sun':'fa-moon')};
+document.querySelector('#themeToggle i').className='fas '+(document.documentElement.classList.contains('dark')?'fa-sun':'fa-moon');
+const backTop=document.getElementById('backTop');window.addEventListener('scroll',()=>backTop.style.display=window.scrollY>300?'flex':'none');backTop.onclick=()=>window.scrollTo({top:0,behavior:'smooth'});
+
+mobileMoreCharts.onclick=()=>{
+  const open=mobileChartMenu.classList.toggle('open');
+  mobileMoreCharts.textContent=open?'− Less':'+ More Charts';
+};
+
+let lastWeekPickerTouch=0;
+weekPickerButton.addEventListener('click',function(e){
+  if(Date.now()-lastWeekPickerTouch<700)return;
+  e.preventDefault();
+  e.stopPropagation();
+  const open=weekPicker.classList.toggle('open');
+  if(open){
+    requestAnimationFrame(centerSelectedWeekOption);
+  }
+});
+
+weekPickerButton.addEventListener('touchend',function(e){
+  lastWeekPickerTouch=Date.now();
+  e.preventDefault();
+  e.stopPropagation();
+  const open=weekPicker.classList.toggle('open');
+  if(open){
+    requestAnimationFrame(centerSelectedWeekOption);
+  }
+},{passive:false});
+
+document.addEventListener('click',function(e){
+  if(!weekPicker.contains(e.target)) weekPicker.classList.remove('open');
+});
+
+window.addEventListener('popstate',()=>{
+  if(window.DaegonPortal&&window.DaegonPortal.handles())return;
+  const route=parseRoute();
+  loadChart(route.id,route.date,{routeMode:'replace',scroll:false});
+});
+const initialRoute=parseRoute();
+renderNav();
+if(/\/chart\//.test(location.pathname)){
+  loadChart(initialRoute.id,initialRoute.date,{routeMode:'replace',scroll:false});
+}
+</script>
+<script src="/portal.js?v=20261001-artist-progressive-3"></script>
+</body>
+</html>
