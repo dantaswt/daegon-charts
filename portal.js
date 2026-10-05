@@ -732,10 +732,63 @@ function detailRunGrid(title,chartId,runs){
   '</section>';
 }
 
+
+function albumTrackHistorySection(album,albumArtist,songsData){
+  if(!songsData)return '';
+  const albumKey=slugify(album||'');
+  const artistKey=slugify(albumArtist||'');
+  const tracks=new Map();
+  for(const date of songsData.dates||[]){
+    for(const e of songsData.entriesByDate?.[date]||[]){
+      if(!e.album||slugify(e.album)!==albumKey)continue;
+      if(artistKey&&slugify(e.artist||'')!==artistKey)continue;
+      const key=itemKey(e);
+      let t=tracks.get(key);
+      if(!t){
+        t={name:e.name,artist:e.artist||albumArtist,runs:[],peak:999,weeks:0,weeksAt1:0,first:date};
+        tracks.set(key,t);
+      }
+      const pos=Number(e.position)||999;
+      t.runs.push({...e,date});
+      t.weeks++;
+      if(pos<t.peak)t.peak=pos;
+      if(pos===1)t.weeksAt1++;
+    }
+  }
+  const list=[...tracks.values()].sort((a,b)=>a.first.localeCompare(b.first)||a.peak-b.peak||a.name.localeCompare(b.name));
+  if(!list.length)return '';
+  const no1=list.filter(t=>t.peak===1).length;
+  const top10=list.filter(t=>t.peak<=10).length;
+  const summary='<section class="orig-album-track-summary">'+
+    '<div class="orig-detail-section-head"><h2>Tracks</h2></div>'+
+    '<div class="orig-album-summary-grid">'+
+      detailStat('Entries',list.length,true)+
+      detailStat("#1's",no1)+
+      detailStat('Top 10',top10)+
+    '</div>'+
+  '</section>';
+  const cards=list.map((t,i)=>{
+    const song={name:t.name,artist:t.artist};
+    const href=appHref(entityPath(song,'song'));
+    return '<article class="orig-album-track-card">'+
+      '<div class="orig-album-track-head">'+
+        '<div class="orig-album-track-index">'+(i+1)+'</div>'+
+        '<div class="orig-album-track-title-wrap">'+
+          '<a class="orig-album-track-title portal-link" href="'+href+'" data-portal-link="'+entityPath(song,'song')+'">'+esc(typeof visibleChartTitle==='function'?visibleChartTitle(t.name):t.name)+'</a>'+
+          '<div class="orig-album-track-meta">Peak #'+t.peak+' · '+t.weeks+' week'+(t.weeks===1?'':'s')+(t.weeksAt1?' · '+t.weeksAt1+' week'+(t.weeksAt1===1?'':'s')+' at #1':'')+'</div>'+
+        '</div>'+
+      '</div>'+
+      detailRunGrid('Daegon 100','songs',t.runs)+
+    '</article>';
+  }).join('');
+  return summary+'<section class="orig-album-tracks-list">'+cards+'</section>';
+}
+
 async function renderItemDetailExact(kind,slug,found){
   const ids=kind==='song'?['songs','digitalSongsSales','streamingSongs','radioSongs']:['albums','topStreamingAlbums','topAlbumSales'];
   const labels={songs:'Hot 100',digitalSongsSales:'Digital Songs Sales',streamingSongs:'Streaming Songs',radioSongs:'Radio Songs',albums:'Top 100 Albums',topStreamingAlbums:'Top Streaming Albums',topAlbumSales:'Top Album Sales'};
   const datasets=await Promise.all(ids.map(id=>loadWeekly(id).catch(()=>null)));
+  const albumSongsData=kind==='album'?await loadWeekly('songs').catch(()=>null):null;
   const grids=[];
   for(let i=0;i<ids.length;i++){
     const data=datasets[i];if(!data)continue;
@@ -775,6 +828,7 @@ async function renderItemDetailExact(kind,slug,found){
     '<section class="orig-detail-runs"><div class="orig-detail-section-head"><h2>Chart Runs</h2></div>'+
       grids.map(g=>detailRunGrid(g.title,g.id,g.runs)).join('')+
     '</section>'+
+    (kind==='album'?albumTrackHistorySection(found.name,found.artist,albumSongsData):'')+
   '</div>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(found.name+' — '+(found.artist||''),found.name+' chart history on Daegon Charts.',entityPath(found,kind));
   bindLinks();hydratePortalImages();bindDetailActions(found.name);
