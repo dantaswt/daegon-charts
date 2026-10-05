@@ -4327,3 +4327,113 @@ body:not(.portal-mode) #portalPage{
     padding-top:96px!important;
   }
 }
+
+
+/* Album detail — track summary and song chart history */
+.orig-album-track-summary{
+  margin-top:28px;
+}
+.orig-album-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  margin-top:12px;
+}
+.orig-album-tracks-list{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:14px;
+}
+.orig-album-track-card{
+  border:1px solid var(--border);
+  background:var(--card);
+  padding:16px;
+}
+.orig-album-track-head{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+.orig-album-track-index{
+  width:34px;
+  height:34px;
+  flex:0 0 34px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--accent);
+  color:#000;
+  font-weight:900;
+  font-size:13px;
+}
+.orig-album-track-title-wrap{
+  min-width:0;
+}
+.orig-album-track-title{
+  color:var(--foreground);
+  font-size:16px;
+  line-height:1.2;
+  font-weight:800;
+  text-decoration:none;
+}
+.orig-album-track-title:hover{
+  color:var(--accent);
+}
+.orig-album-track-meta{
+  margin-top:3px;
+  color:var(--muted-foreground);
+  font-size:12px;
+  line-height:1.35;
+}
+.orig-album-track-card .orig-run-card{
+  margin:0;
+  border:0;
+  border-top:1px solid var(--border);
+  padding:12px 0 0;
+  background:transparent;
+}
+.orig-album-track-card .orig-run-title{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:var(--muted-foreground);
+}
+@media(max-width:767px){
+  .orig-album-track-summary{
+    margin-top:20px;
+  }
+  .orig-album-summary-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:7px;
+  }
+  .orig-album-summary-grid .orig-detail-stat{
+    padding:10px 6px;
+  }
+  .orig-album-summary-grid .orig-detail-stat-label{
+    font-size:8px;
+  }
+  .orig-album-summary-grid .orig-detail-stat-value{
+    font-size:20px;
+  }
+  .orig-album-track-card{
+    padding:12px;
+  }
+  .orig-album-track-head{
+    gap:9px;
+    margin-bottom:10px;
+  }
+  .orig-album-track-index{
+    width:30px;
+    height:30px;
+    flex-basis:30px;
+    font-size:12px;
+  }
+  .orig-album-track-title{
+    font-size:14px;
+  }
+  .orig-album-track-meta{
+    font-size:10px;
+  }
+}
