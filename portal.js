@@ -7,8 +7,8 @@ const periodLimits={songs:100,albums:100,artists:50};
 const PORTAL_SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
 const officialYearEnd={
   yearEndSongs:{kind:'song',title:'Daegon 100',weeklyId:'songs'},
-  yearEndArtists:{kind:'artist',title:'Daegon Artists 50',weeklyId:'artists'},
-  yearEndAlbums:{kind:'album',title:'Daegon Albums 100',weeklyId:'albums'},
+  yearEndArtists:{kind:'artist',title:'Artist 50',weeklyId:'artists'},
+  yearEndAlbums:{kind:'album',title:'Top 100 Albums',weeklyId:'albums'},
   yearEndRadio:{kind:'song',title:'Radio Songs',weeklyId:'radioSongs'},
   yearEndStreamingSongs:{kind:'song',title:'Streaming Songs',weeklyId:'streamingSongs'},
   yearEndTopStreamingAlbums:{kind:'album',title:'Top Streaming Albums',weeklyId:'topStreamingAlbums'},
@@ -16,7 +16,7 @@ const officialYearEnd={
   yearEndDigitalSongsSales:{kind:'song',title:'Digital Songs Sales',weeklyId:'digitalSongsSales'},
   yearEndNewArtists:{kind:'artist',title:'Top New Artists',weeklyId:'artists'},
   yecHot100Artists:{kind:'artist',title:'Daegon 100 — Artists',weeklyId:'songs'},
-  yecTop100AlbumsArtists:{kind:'artist',title:'Daegon Albums 100 — Artists',weeklyId:'albums'},
+  yecTop100AlbumsArtists:{kind:'artist',title:'Top 100 Albums — Artists',weeklyId:'albums'},
   yecArtist50Female:{kind:'artist',title:'Top Artists — Female',weeklyId:'artists'},
   yecArtist50Male:{kind:'artist',title:'Top Artists — Male',weeklyId:'artists'},
   yecArtist50DuoGroup:{kind:'artist',title:'Top Artists — Duo/Group',weeklyId:'artists'},
@@ -24,8 +24,8 @@ const officialYearEnd={
 };
 const officialGoat={
   goatSongs:{kind:'song',title:'Greatest Daegon 100 Songs',weeklyId:'songs'},
-  goatArtists:{kind:'artist',title:'Greatest Daegon Artists 50',weeklyId:'artists'},
-  goatAlbums:{kind:'album',title:'Greatest Daegon Albums 100',weeklyId:'albums'},
+  goatArtists:{kind:'artist',title:'Greatest Artist 50',weeklyId:'artists'},
+  goatAlbums:{kind:'album',title:'Greatest Top 100 Albums',weeklyId:'albums'},
   goatRadio:{kind:'song',title:'Greatest of All Time Radio',weeklyId:'radioSongs'}
 };
 const exactYearEndIds=['yearEndSongs','yearEndArtists','yearEndAlbums','yearEndRadio','yearEndDigitalSongsSales','yearEndStreamingSongs','yearEndTopAlbumSales','yearEndTopStreamingAlbums','yecHot100Artists','yecArtist50Female','yecArtist50Male','yecArtist50DuoGroup','yearEndNewArtists','yecTop100AlbumsArtists','yecRadioSongsArtists'];
@@ -161,7 +161,7 @@ function ensureShell(){
     navEl.id='portalTopNav';
     navEl.className='portal-topnav';
     navEl.innerHTML=[
-      ['HOT 100','/chart/daegon-100'],['CHART BEAT','/chart-beat'],['YEAR-END CHARTS','/year-end'],
+      ['DAEGON 100','/chart/daegon-100'],['CHART BEAT','/chart-beat'],['YEAR-END CHARTS','/year-end'],
       ['DECADE-END','/decade-end'],['GREATEST OF ALL TIME','/goat'],['STATS','/stats'],
       ['AWARDS','/awards'],["#1'S",'/number-ones'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
@@ -326,7 +326,7 @@ function sideHtml(){
       '<a href="'+appHref('/goat/songs')+'" data-portal-link="/goat/songs">Songs</a><a href="'+appHref('/goat/artists')+'" data-portal-link="/goat/artists">Artists</a><a href="'+appHref('/goat/albums')+'" data-portal-link="/goat/albums">Albums</a>'+
     '</div></div>'+
     '<div class="ref-side-section"><button class="ref-side-toggle" data-side-toggle="yec"><span>Year-End Charts</span><i class="fas fa-chevron-down"></i></button><div class="ref-side-links ref-side-collapsible" data-side-panel="yec">'+
-      '<a href="'+appHref('/year-end/songs')+'" data-portal-link="/year-end/songs">Daegon 100</a><a href="'+appHref('/year-end/artists')+'" data-portal-link="/year-end/artists">Daegon Artists 50</a><a href="'+appHref('/year-end/albums')+'" data-portal-link="/year-end/albums">Daegon Albums 100</a>'+
+      '<a href="'+appHref('/year-end/songs')+'" data-portal-link="/year-end/songs">Daegon 100</a><a href="'+appHref('/year-end/artists')+'" data-portal-link="/year-end/artists">Artist 50</a><a href="'+appHref('/year-end/albums')+'" data-portal-link="/year-end/albums">Top 100 Albums</a>'+
     '</div></div>'+
     '<a href="'+appHref('/stats')+'" data-portal-link="/stats" class="ref-side-section ref-side-stat"><div class="ref-side-title">Stats</div></a>'+
     '<div id="refOnThisWeek"></div>'+
@@ -529,7 +529,7 @@ function catalogEditorial(kind){
   if(kind==='album')return editorialBlock(
     'Explore the Daegon Albums archive',
     [
-      'This directory collects albums that have charted in Daegon Albums 100. Each album page links its historical performance back to the weekly archive, including peak, weeks charted and available charting tracks.',
+      'This directory collects albums that have charted in Top 100 Albums. Each album page links its historical performance back to the weekly archive, including peak, weeks charted and available charting tracks.',
       'Album rankings are kept separate from song performance so catalog titles are not automatically boosted simply because an artist has a successful single. The project methodology explains how album performance and historical continuity are handled.'
     ],
     [['/methodology','Read the album methodology'],['/chart/daegon-albums-100','Open the current albums chart']]
@@ -537,7 +537,7 @@ function catalogEditorial(kind){
   return editorialBlock(
     'Explore artists across the Daegon archive',
     [
-      'The artist directory indexes performers who have appeared in Daegon Artists 50. Artist pages consolidate weekly chart history and connect an artist to charting songs and albums, making the directory a navigation layer for the wider archive.',
+      'The artist directory indexes performers who have appeared in Artist 50. Artist pages consolidate weekly chart history and connect an artist to charting songs and albums, making the directory a navigation layer for the wider archive.',
       'Artist credits are normalized so the archive follows the project’s main-artist rules and avoids splitting the same performer across aliases, capitalization differences or secondary featuring credits.'
     ],
     [['/methodology','Read the crediting methodology'],['/chart/daegon-artists-50','Open the current artists chart']]
@@ -569,7 +569,7 @@ async function renderHome(){
   const topSection=(active='songs')=>{
     const cfg=charts[active],l=latest(active),entries=l.entries.slice(0,5);
     return '<section class="ref-home-section"><div class="ref-section-banner"><span>Top Charts</span><a href="'+appHref(chartPath(active,l.date))+'">View Chart <i class="fas fa-arrow-right"></i></a></div>'+
-      '<div class="ref-home-tabs"><button data-home-tab="songs" class="'+(active==='songs'?'active':'')+'">DAEGON 100</button><button data-home-tab="albums" class="'+(active==='albums'?'active':'')+'">DAEGON ALBUMS 100</button><button data-home-tab="artists" class="'+(active==='artists'?'active':'')+'">DAEGON ARTISTS 50</button></div>'+
+      '<div class="ref-home-tabs"><button data-home-tab="songs" class="'+(active==='songs'?'active':'')+'">DAEGON 100</button><button data-home-tab="albums" class="'+(active==='albums'?'active':'')+'">TOP 100 ALBUMS</button><button data-home-tab="artists" class="'+(active==='artists'?'active':'')+'">ARTIST 50</button></div>'+
       '<div class="ref-top-grid">'+entries.map(e=>'<div class="ref-top-card"><div class="ref-top-art">'+refThumb(e,cfg.kind)+'<div class="ref-rank-badge">'+e.position+'</div></div><div class="ref-top-copy"><div class="ref-top-title">'+entityLink(e,cfg.kind)+'</div>'+(cfg.kind!=='artist'?'<div class="ref-top-sub">'+artistLink(e.artist)+'</div>':'')+'</div></div>').join('')+'</div></section>';
   };
 
@@ -1091,7 +1091,7 @@ async function computeNewArtistsExact(){
 }
 async function loadYecExact(chartId){
   if(chartId==='yecHot100Artists')return computeArtistAggregateExact('songs','Daegon 100 — Artists','points');
-  if(chartId==='yecTop100AlbumsArtists')return computeArtistAggregateExact('albums','Daegon Albums 100 — Artists','units');
+  if(chartId==='yecTop100AlbumsArtists')return computeArtistAggregateExact('albums','Top 100 Albums — Artists','units');
   if(chartId==='yecRadioSongsArtists')return computeArtistAggregateExact('radioSongs','Radio Songs — Artists','audience');
   if(chartId==='yecArtist50Female')return computeGenderYecExact('FEMALE');
   if(chartId==='yecArtist50Male')return computeGenderYecExact('MALE');
@@ -1178,10 +1178,10 @@ async function renderYearEndIndex(){
     {id:'yearEndSongs',title:'Daegon 100'},{id:'yearEndRadio',title:'Radio Songs'},{id:'yearEndDigitalSongsSales',title:'Digital Songs Sales'},{id:'yearEndStreamingSongs',title:'Streaming Songs'}
   ];
   const ALBUM_CHARTS=[
-    {id:'yearEndAlbums',title:'Daegon Albums 100'},{id:'yearEndTopAlbumSales',title:'Top Album Sales'},{id:'yearEndTopStreamingAlbums',title:'Top Streaming Albums'}
+    {id:'yearEndAlbums',title:'Top 100 Albums'},{id:'yearEndTopAlbumSales',title:'Top Album Sales'},{id:'yearEndTopStreamingAlbums',title:'Top Streaming Albums'}
   ];
   const ARTIST_CHARTS=[
-    {id:'yecHot100Artists',title:'Daegon 100 — Artists'},{id:'yecArtist50Female',title:'Top Artists — Female'},{id:'yecArtist50Male',title:'Top Artists — Male'},{id:'yecArtist50DuoGroup',title:'Top Artists — Duo/Group'},{id:'yearEndNewArtists',title:'Top New Artists'},{id:'yecTop100AlbumsArtists',title:'Daegon Albums 100 — Artists'},{id:'yecRadioSongsArtists',title:'Radio Songs — Artists'}
+    {id:'yecHot100Artists',title:'Daegon 100 — Artists'},{id:'yecArtist50Female',title:'Top Artists — Female'},{id:'yecArtist50Male',title:'Top Artists — Male'},{id:'yecArtist50DuoGroup',title:'Top Artists — Duo/Group'},{id:'yearEndNewArtists',title:'Top New Artists'},{id:'yecTop100AlbumsArtists',title:'Top 100 Albums — Artists'},{id:'yecRadioSongsArtists',title:'Radio Songs — Artists'}
   ];
   const draw=()=>{
     const main='<div class="orig-page">'+originalHero('YEAR-END CHARTS','Year-End Charts','Annual rankings generated from the weekly Daegon chart history')+
@@ -1195,8 +1195,8 @@ async function renderYearEndIndex(){
       )+
       originalYearControls('Year',years,selected,'year')+
       originalTop5('Daegon 100',(songs.entriesByYear[selected]||[]).slice(0,5),'song','/year-end/yearEndSongs')+
-      originalTop5('Daegon Albums 100',(albums.entriesByYear[selected]||[]).slice(0,5),'album','/year-end/yearEndAlbums')+
-      originalTop5('Daegon Artists 50',(artists.entriesByYear[selected]||[]).slice(0,5),'artist','/year-end/yearEndArtists')+
+      originalTop5('Top 100 Albums',(albums.entriesByYear[selected]||[]).slice(0,5),'album','/year-end/yearEndAlbums')+
+      originalTop5('Artist 50',(artists.entriesByYear[selected]||[]).slice(0,5),'artist','/year-end/yearEndArtists')+
       originalChartGrid('Songs',SONG_CHARTS,'/year-end/')+
       originalChartGrid('Albums',ALBUM_CHARTS,'/year-end/')+
       originalChartGrid('Artists',ARTIST_CHARTS,'/year-end/')+
@@ -1233,17 +1233,17 @@ async function renderDecadeIndex(){
       )+
       originalYearControls('Decade',decades.map(x=>x+'s'),selected+'s','decade')+
       originalTop5('Daegon 100',aggregate(data[0],'songs'),'song','/decade-end/songs?decade='+selected)+
-      originalTop5('Daegon Albums 100',aggregate(data[1],'albums'),'album','/decade-end/albums?decade='+selected)+
-      originalTop5('Daegon Artists 50',aggregate(data[2],'artists'),'artist','/decade-end/artists?decade='+selected)+
+      originalTop5('Top 100 Albums',aggregate(data[1],'albums'),'album','/decade-end/albums?decade='+selected)+
+      originalTop5('Artist 50',aggregate(data[2],'artists'),'artist','/decade-end/artists?decade='+selected)+
       originalChartGrid('Songs',[{id:'songs',title:'Daegon 100'},{id:'radio',title:'Radio Songs'},{id:'digital-songs-sales',title:'Digital Songs Sales'},{id:'streaming-songs',title:'Streaming Songs'}],'/decade-end/')+
-      originalChartGrid('Albums',[{id:'albums',title:'Daegon Albums 100'},{id:'top-album-sales',title:'Top Album Sales'},{id:'top-streaming-albums',title:'Top Streaming Albums'}],'/decade-end/')+
+      originalChartGrid('Albums',[{id:'albums',title:'Top 100 Albums'},{id:'top-album-sales',title:'Top Album Sales'},{id:'top-streaming-albums',title:'Top Streaming Albums'}],'/decade-end/')+
       originalChartGrid('Artists',[
-        {id:'artists',title:'Daegon Artists 50'},
+        {id:'artists',title:'Artist 50'},
         {id:'hot100Artists',title:'Daegon 100 — Artists'},
         {id:'artistFemale',title:'Top Artists — Female'},
         {id:'artistMale',title:'Top Artists — Male'},
         {id:'artistDuoGroup',title:'Top Artists — Duo/Group'},
-        {id:'albumsArtists',title:'Daegon Albums 100 — Artists'}
+        {id:'albumsArtists',title:'Top 100 Albums — Artists'}
       ],'/decade-end/')+
     '</div>';
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Decade-End Charts','The definitive decade-end rankings across every chart.','/decade-end');
@@ -1469,12 +1469,12 @@ async function renderPeriod(type,chartSeg){
 
 
 const decadeArtistViews={
-  artists:{title:'Daegon Artists 50',source:'artists',metric:'units'},
+  artists:{title:'Artist 50',source:'artists',metric:'units'},
   hot100Artists:{title:'Daegon 100 — Artists',source:'songs',metric:'points'},
   artistFemale:{title:'Top Artists — Female',source:'artists',metric:'units',category:'FEMALE'},
   artistMale:{title:'Top Artists — Male',source:'artists',metric:'units',category:'MALE'},
   artistDuoGroup:{title:'Top Artists — Duo/Group',source:'artists',metric:'units',category:'GROUP'},
-  albumsArtists:{title:'Daegon Albums 100 — Artists',source:'albums',metric:'units'}
+  albumsArtists:{title:'Top 100 Albums — Artists',source:'albums',metric:'units'}
 };
 async function aggregateDecadeArtists(sourceId,metricField,predicate,category){
   const data=await loadWeekly(sourceId);
@@ -1522,13 +1522,13 @@ async function renderDecadeDetailExact(chartSeg){
   const title=artistView?.title||charts[weeklyId].title;
   const navItems=[
     ['songs','Daegon 100'],
-    ['albums','Daegon Albums 100'],
-    ['artists','Daegon Artists 50'],
+    ['albums','Top 100 Albums'],
+    ['artists','Artist 50'],
     ['hot100Artists','Daegon 100 — Artists'],
     ['artistFemale','Top Artists — Female'],
     ['artistMale','Top Artists — Male'],
     ['artistDuoGroup','Top Artists — Duo/Group'],
-    ['albumsArtists','Daegon Albums 100 — Artists']
+    ['albumsArtists','Top 100 Albums — Artists']
   ];
 
   const draw=async()=>{
