@@ -426,7 +426,7 @@ function ensureShell(){
     accountBtn.id='portalAccountBtn';
     accountBtn.className='portal-account-btn';
     accountBtn.type='button';
-    accountBtn.onclick=dcShowAuthModal;
+    accountBtn.onclick=()=>_dcAuthUser?go('/my-daegon'):dcShowAuthModal();
     head.insertBefore(accountBtn,theme);
     dcSyncAccountButton();
     document.querySelector('.site-header').appendChild(mobileMenu);
@@ -527,7 +527,7 @@ function setMeta(title,desc,path,exactTitle=false){
   const d=document.querySelector('meta[name="description"]');if(d)d.content=desc;
   let robots=document.querySelector('meta[name="robots"]');
   if(!robots){robots=document.createElement('meta');robots.name='robots';document.head.appendChild(robots)}
-  const noindexPaths=new Set(['/search','/chart-battle','/awards']);
+  const noindexPaths=new Set(['/search','/chart-battle','/awards','/my-daegon']);
   robots.content=noindexPaths.has(path)?'noindex,follow':'index,follow,max-image-preview:large';
   const c=document.querySelector('link[rel="canonical"]');if(c)c.href='https://daegoncharts.com.br'+path;
   const u=document.querySelector('meta[property="og:url"]');if(u)u.content='https://daegoncharts.com.br'+path;
