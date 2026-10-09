@@ -5113,3 +5113,87 @@ body.global-bars-weekly .theme-btn:hover{
     z-index:1!important;
   }
 }
+
+
+/* Header action group structural fix */
+.portal-header-actions{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  gap:12px!important;
+  width:auto!important;
+  min-width:max-content!important;
+  flex:0 0 auto!important;
+}
+.portal-header-actions .portal-account-btn{
+  margin:0!important;
+  padding:8px 0!important;
+  width:auto!important;
+  min-width:max-content!important;
+  white-space:nowrap!important;
+}
+.portal-header-actions .theme-btn{
+  position:static!important;
+  margin:0!important;
+  padding:0!important;
+  width:32px!important;
+  height:32px!important;
+  min-width:32px!important;
+  max-width:32px!important;
+  flex:0 0 32px!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:#f5f5f5!important;
+}
+.portal-header-actions .theme-btn:hover,
+.portal-header-actions .theme-btn:focus,
+.portal-header-actions .theme-btn:active{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:var(--accent)!important;
+}
+
+@media(min-width:768px){
+  body.global-site-shell .header-inner,
+  body.global-bars-weekly .header-inner{
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+  }
+  body.global-site-shell .portal-header-actions,
+  body.global-bars-weekly .portal-header-actions{
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    align-self:center!important;
+  }
+  body.global-site-shell .portal-account-btn,
+  body.global-bars-weekly .portal-account-btn,
+  body.global-site-shell .theme-btn,
+  body.global-bars-weekly .theme-btn{
+    grid-column:auto!important;
+    grid-row:auto!important;
+    justify-self:auto!important;
+  }
+}
+
+@media(max-width:767px){
+  .portal-header-actions{
+    display:flex!important;
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    gap:4px!important;
+  }
+  .portal-header-actions .portal-account-btn{
+    display:none!important;
+  }
+  .portal-header-actions .theme-btn{
+    display:flex!important;
+    width:44px!important;
+    height:44px!important;
+    min-width:44px!important;
+    max-width:44px!important;
+    flex:0 0 44px!important;
+  }
+}
