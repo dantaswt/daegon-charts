@@ -445,24 +445,29 @@ async function dcPublishChartWeek(chartDate,handle,statusEl){
 }
 async function renderGlobalCharts(){
   loading('Daegon Global');
-  const sb=dcSupabaseClient();
+  const sb=dcSupabaseClient(),params=new URLSearchParams(location.search);
+  const mode=params.get('mode')==='picks'?'picks':'listening';
   const {data:dates}=await sb.from('daegon_global_chart').select('chart_date').order('chart_date',{ascending:false}).limit(250);
   const unique=[...new Set((dates||[]).map(x=>x.chart_date))];
-  const selected=new URLSearchParams(location.search).get('date')||unique[0]||'';
-  const types=[['songs','Global Songs 100'],['albums','Global Albums 50'],['artists','Global Artists 50']];
+  const selected=params.get('date')||unique[0]||'';
+  const types=mode==='picks'
+    ?[['picks_songs','Global Picks — Songs'],['picks_albums','Global Picks — Albums'],['picks_artists','Global Picks — Artists']]
+    :[['songs','Global Songs 100'],['albums','Global Albums 50'],['artists','Global Artists 50']];
   const groups={};
   for(const [type] of types){
-    const {data}=selected?await sb.from('daegon_global_chart').select('*').eq('chart_date',selected).eq('chart_type',type).order('total_points',{ascending:false}).limit(type==='songs'?100:50):{data:[]};
+    const {data}=selected?await sb.from('daegon_global_chart').select('*').eq('chart_date',selected).eq('chart_type',type).order('total_points',{ascending:false}).limit(type.includes('songs')?100:50):{data:[]};
     groups[type]=data||[];
   }
   const list=(rows,label)=>'<section class="global-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>Community points</span></div><div class="global-chart-list">'+rows.slice(0,20).map((x,i)=>'<div><b>'+(i+1)+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+Number(x.total_points||0).toLocaleString(undefined,{maximumFractionDigits:2})+' pts</em><i>'+x.voters+' voter'+(x.voters===1?'':'s')+'</i></div>').join('')+'</div></section>';
-  const main='<main class="global-page"><header class="mag-index-head"><div class="mag-kicker">Community consensus</div><h1>Daegon Global</h1><p>The combined weekly chart of Daegon users. Each public personal chart contributes position-based Daegon Community Points — raw play counts never let one heavy listener dominate everyone else.</p></header>'+
-    '<section class="global-formula"><strong>Community Points</strong><code>100 × e<sup>-0.06 × (rank - 1)</sup></code><span>#1 = 100 points. Every user contributes one ranked ballot per published week.</span></section>'+
+  const main='<main class="global-page"><header class="mag-index-head"><div class="mag-kicker">Community consensus</div><h1>Daegon Global</h1><p>'+(mode==='picks'?'What Daegon users deliberately chose for their weekly personal rankings.':'The combined weekly chart of public listening charts. Position points normalize influence so one heavy listener cannot dominate everyone else.')+'</p></header>'+
+    '<div class="global-mode-switch"><button data-global-mode="listening" class="'+(mode==='listening'?'active':'')+'">Global Listening</button><button data-global-mode="picks" class="'+(mode==='picks'?'active':'')+'">Global Picks</button></div>'+
+    '<section class="global-formula"><strong>Community Points</strong><code>100 × e<sup>-0.06 × (rank - 1)</sup></code><span>#1 = 100 points. Each published chart contributes one position-based ballot per week.</span></section>'+
     (unique.length?'<div class="myp-datebar"><label>Week</label><select id="globalDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div>':'<div class="my-empty-inline">Daegon Global will appear as users publish their first charts.</div>')+
     (selected?types.map(([t,l])=>list(groups[t],l)).join(''):'')+
   '</main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Daegon Global','Community-powered songs, albums and artists charts from Daegon users.','/global');bindLinks();
-  const sel=portalEl.querySelector('#globalDateSelect');if(sel)sel.onchange=()=>{const u=new URL(location.href);u.searchParams.set('date',sel.value);history.replaceState({},'',u.pathname+u.search);renderGlobalCharts()};
+  portalEl.querySelectorAll('[data-global-mode]').forEach(b=>b.onclick=()=>{const u=new URL(location.href);u.searchParams.set('mode',b.dataset.globalMode);if(selected)u.searchParams.set('date',selected);history.replaceState({},'',u.pathname+u.search);renderGlobalCharts()});
+  const sel=portalEl.querySelector('#globalDateSelect');if(sel)sel.onchange=()=>{const u=new URL(location.href);u.searchParams.set('date',sel.value);u.searchParams.set('mode',mode);history.replaceState({},'',u.pathname+u.search);renderGlobalCharts()};
 }
 async function renderPublicChart(slug,date){
   loading('Public Chart');
@@ -478,14 +483,14 @@ async function renderPublicChart(slug,date){
   if(userIds.length){const p=await sb.from('community_profiles').select('user_id,display_name,profile_slug').in('user_id',userIds);profiles=p.data||[]}
   const pm=new Map(profiles.map(x=>[x.user_id,x]));
   const groups={};for(const e of entries||[])(groups[e.chart_type]??=[]).push(e);
-  const labels={songs:'Songs 100',albums:'Albums 50',artists:'Artists 50',digital_song_sales_7d:'Digital Songs Sales · 7D',top_album_sales_7d:'Top Album Sales · 7D',streaming_songs_28d:'Streaming Songs · 28D',top_streaming_albums_28d:'Top Streaming Albums · 28D',artists_28d:'Artists · 28D'};
-  const chart=(type)=>{const rows=groups[type]||[];if(!rows.length)return'';return '<section class="public-chart-block"><div class="mag-section-head"><h2>'+labels[type]+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,25).map(x=>'<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+x.streams+' plays</i></div>').join('')+'</div></section>'};
+  const labels={songs:'Songs 100',albums:'Albums 50',artists:'Artists 50',digital_song_sales_7d:'Digital Songs Sales · 7D',top_album_sales_7d:'Top Album Sales · 7D',streaming_songs_28d:'Streaming Songs · 28D',top_streaming_albums_28d:'Top Streaming Albums · 28D',artists_28d:'Artists · 28D',picks_songs:'My Picks — Songs',picks_albums:'My Picks — Albums',picks_artists:'My Picks — Artists'};
+  const chart=(type)=>{const rows=groups[type]||[];if(!rows.length)return'';const isPick=type.startsWith('picks_');return '<section class="public-chart-block"><div class="mag-section-head"><h2>'+labels[type]+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,25).map(x=>'<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+(isPick?Number(x.points||0).toFixed(1)+' pts':x.streams+' plays')+'</i></div>').join('')+'</div></section>'};
   const byParent=new Map();for(const c of comments||[]){const k=c.parent_id||0;(byParent.get(k)??byParent.set(k,[]).get(k)).push(c)}
   const renderComment=(c,depth=0)=>'<article class="chart-comment depth-'+Math.min(depth,3)+'"><div class="chart-comment-head"><strong>'+esc(pm.get(c.user_id)?.display_name||'Daegon reader')+'</strong><span>'+new Date(c.created_at).toLocaleString()+'</span></div><p>'+esc(c.body)+'</p>'+(_dcAuthUser?'<button data-reply-comment="'+c.id+'">Reply</button>':'')+(byParent.get(c.id)||[]).map(x=>renderComment(x,depth+1)).join('')+'</article>';
   const roots=(byParent.get(0)||[]).map(x=>renderComment(x)).join('');
   const commentForm=_dcAuthUser?'<form id="publicChartCommentForm" class="dc-comment-form"><textarea id="publicChartCommentBody" maxlength="2500" required placeholder="Comment on this chart…"></textarea><input id="publicChartParent" type="hidden"><div><span id="publicChartReplyLabel">Commenting on '+esc(ownerProfile?.display_name||slug)+'’s chart.</span><button type="submit">Post</button></div><div id="publicChartCommentStatus"></div></form>':'<div class="dc-comment-signin"><p>Sign in to comment on this chart.</p><button data-chart-signin>Sign in</button></div>';
   const main='<main class="public-chart-page"><header class="public-chart-hero"><div class="mag-kicker">Public My Charts</div><h1>'+esc(ownerProfile?.display_name||slug)+'</h1><p>Chart week ending '+fmtDate(date)+'</p><a href="'+appHref('/global')+'" data-portal-link="/global">See Daegon Global →</a></header>'+
-    ['songs','albums','artists','digital_song_sales_7d','streaming_songs_28d','top_album_sales_7d','top_streaming_albums_28d','artists_28d'].map(chart).join('')+
+    ['songs','albums','artists','digital_song_sales_7d','streaming_songs_28d','top_album_sales_7d','top_streaming_albums_28d','artists_28d','picks_songs','picks_albums','picks_artists'].map(chart).join('')+
     '<section class="chart-comments"><div class="mag-section-head"><h2>Chart discussion</h2><span>'+(comments||[]).length+' comments</span></div>'+commentForm+'<div class="chart-comment-tree">'+(roots||'<div class="my-empty-inline">No comments yet.</div>')+'</div></section></main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta((ownerProfile?.display_name||slug)+' — My Charts '+fmtDate(date),'A public Daegon personal chart week.','/u/'+slug+'/charts/'+date);bindLinks();
   portalEl.querySelector('[data-chart-signin]')?.addEventListener('click',dcShowAuthModal);
