@@ -415,7 +415,7 @@ async function renderForum(){
   const ids=[...new Set((topics||[]).map(x=>x.user_id))];let profiles=[];
   if(ids.length){const p=await sb.from('community_profiles').select('user_id,display_name').in('user_id',ids);profiles=p.data||[]}
   const pm=new Map(profiles.map(x=>[x.user_id,x]));
-  const rows=(topics||[]).map(t=>'<article class="forum-topic '+(t.status==='pending'?'pending':'')+'"><div class="forum-cat">'+esc(t.category)+'</div><h2>'+esc(t.title)+'</h2><p>'+esc(t.body.slice(0,220))+(t.body.length>220?'…':'')+'</p><div>By '+esc(pm.get(t.user_id)?.display_name||'Daegon reader')+' · '+new Date(t.created_at).toLocaleDateString('en-US')+(t.status==='pending'?' · Awaiting moderation':'')+'</div></article>').join('');
+  const rows=(topics||[]).map(t=>'<a class="forum-topic '+(t.status==='pending'?'pending':'')+'" href="'+appHref('/forum/'+t.id)+'" data-portal-link="/forum/'+t.id+'"><div class="forum-cat">'+esc(t.category)+'</div><h2>'+esc(t.title)+'</h2><p>'+esc(t.body.slice(0,220))+(t.body.length>220?'…':'')+'</p><div>By '+esc(pm.get(t.user_id)?.display_name||'Daegon reader')+' · '+new Date(t.created_at).toLocaleDateString('en-US')+(t.status==='pending'?' · Awaiting moderation':'')+'</div></a>').join('');
   const compose=_dcAuthUser?'<form id="forumTopicForm" class="forum-compose"><div class="mag-kicker">Start a discussion</div><select id="forumCategory"><option value="general">General</option><option value="charts">Charts</option><option value="reviews">Reviews</option><option value="industry">Industry</option><option value="artists">Artists</option><option value="off-topic">Off-topic</option></select><input id="forumTitle" maxlength="140" required placeholder="Topic title"><textarea id="forumBody" maxlength="6000" required placeholder="What do you want to discuss?"></textarea><button type="submit">Submit for moderation</button><div id="forumStatus"></div></form>':'<div class="dc-comment-signin"><p>Sign in to start a topic.</p><button data-forum-signin>Sign in</button></div>';
   const main='<main class="forum-page"><header class="mag-index-head"><div class="mag-kicker">Daegon Community</div><h1>Forum</h1><p>Charts, pop history, reviews, industry news and music arguments — with accounts and moderation from day one.</p></header>'+compose+'<section class="forum-list">'+(rows||'<div class="my-empty-inline">No approved topics yet.</div>')+'</section></main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Forum','Daegon community forum for charts, reviews, artists and music-industry discussion.','/forum');bindLinks();
@@ -428,6 +428,34 @@ async function renderForum(){
     if(error){status.textContent=error.message;return}status.textContent='Submitted for moderation.';form.reset();setTimeout(renderForum,700);
   };
 }
+
+async function renderForumTopic(id){
+  loading('Forum');
+  const sb=dcSupabaseClient();
+  const {data:topic,error}=await sb.from('forum_topics').select('id,user_id,category,title,body,status,created_at').eq('id',Number(id)).maybeSingle();
+  if(error||!topic){renderNotFound();return}
+  const {data:posts}=await sb.from('forum_posts').select('id,user_id,parent_id,body,status,created_at').eq('topic_id',Number(id)).order('created_at',{ascending:true});
+  const ids=[...new Set([topic.user_id,...(posts||[]).map(x=>x.user_id)])];let profiles=[];
+  if(ids.length){const p=await sb.from('community_profiles').select('user_id,display_name').in('user_id',ids);profiles=p.data||[]}
+  const pm=new Map(profiles.map(x=>[x.user_id,x]));
+  const visible=(posts||[]).filter(x=>x.status==='approved'||(_dcAuthUser&&x.user_id===_dcAuthUser.id));
+  const reply=_dcAuthUser&&topic.status!=='locked'
+    ? '<form id="forumReplyForm" class="forum-compose reply"><textarea id="forumReplyBody" maxlength="4000" required placeholder="Write a reply…"></textarea><button type="submit">Reply</button><div id="forumReplyStatus"></div></form>'
+    : topic.status==='locked'?'<div class="my-empty-inline">This topic is locked.</div>':'<div class="dc-comment-signin"><p>Sign in to reply.</p><button data-forum-signin>Sign in</button></div>';
+  const rows=visible.length?visible.map(x=>'<article class="forum-post '+(x.status==='pending'?'pending':'')+'"><div class="forum-post-head"><strong>'+esc(pm.get(x.user_id)?.display_name||'Daegon reader')+'</strong><span>'+new Date(x.created_at).toLocaleDateString('en-US')+(x.status==='pending'?' · Awaiting moderation':'')+'</span></div><p>'+esc(x.body)+'</p></article>').join(''):'<div class="my-empty-inline">No approved replies yet.</div>';
+  const main='<main class="forum-page"><a class="cb-back" href="'+appHref('/forum')+'" data-portal-link="/forum">← Forum</a><article class="forum-topic-detail"><div class="forum-cat">'+esc(topic.category)+'</div><h1>'+esc(topic.title)+'</h1><div class="forum-topic-meta">By '+esc(pm.get(topic.user_id)?.display_name||'Daegon reader')+' · '+new Date(topic.created_at).toLocaleDateString('en-US')+(topic.status==='pending'?' · Awaiting moderation':'')+'</div><p>'+esc(topic.body)+'</p></article><section class="forum-replies"><div class="mag-section-head"><h2>Replies</h2><span>'+visible.length+'</span></div>'+reply+'<div class="forum-post-list">'+rows+'</div></section></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(topic.title,'Daegon forum discussion: '+topic.title,'/forum/'+id);bindLinks();
+  portalEl.querySelector('[data-forum-signin]')?.addEventListener('click',dcShowAuthModal);
+  const form=portalEl.querySelector('#forumReplyForm');
+  if(form)form.onsubmit=async e=>{
+    e.preventDefault();const st=portalEl.querySelector('#forumReplyStatus');st.textContent='Submitting…';
+    await dcEnsureProfile(_dcAuthUser);
+    const {error:ins}=await sb.from('forum_posts').insert({topic_id:Number(id),user_id:_dcAuthUser.id,body:portalEl.querySelector('#forumReplyBody').value.trim(),status:'pending'});
+    if(ins){st.textContent=ins.message;return}
+    st.textContent='Submitted for moderation.';form.reset();setTimeout(()=>renderForumTopic(id),700);
+  };
+}
+
 function renderPlans(){
   const plan=(name,price,tag,features,featured=false)=>'<article class="plan-card '+(featured?'featured':'')+'"><div class="mag-kicker">'+tag+'</div><h2>'+name+'</h2><div class="plan-price">'+price+'</div><ul>'+features.map(x=>'<li>'+x+'</li>').join('')+'</ul><button data-plan="'+name.toLowerCase()+'" '+(name==='Free'?'disabled':'')+'>'+(name==='Free'?'Included':'Choose '+name)+'</button></article>';
   const main='<main class="plans-page"><header class="mag-index-head"><div class="mag-kicker">Membership</div><h1>Choose your Daegon</h1><p>Core charts and journalism stay open. Paid plans are designed around personalization, deeper history and community tools.</p></header><div class="plan-grid">'+
@@ -2796,6 +2824,7 @@ async function renderRoute(){
     else if(p[0]==='features')await renderEditorialIndex('features');
     else if(p[0]==='reviews')renderReviews();
     else if(p[0]==='community')renderCommunity();
+    else if(p[0]==='forum'&&p[1])await renderForumTopic(p[1]);
     else if(p[0]==='forum')await renderForum();
     else if(p[0]==='plans')renderPlans();
     else if(p[0]==='my-daegon')await renderMyDaegon();
