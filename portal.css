@@ -4804,3 +4804,14 @@ body:not(.portal-mode) #portalPage{
  .mag-global-promo{align-items:flex-start;flex-direction:column}.global-formula{grid-template-columns:1fr}.global-chart-list>div{grid-template-columns:36px minmax(0,1fr) 80px}.global-chart-list i{grid-column:2/-1;text-align:left}
  .myp-publish{grid-template-columns:1fr}.public-chart-page,.global-page{padding:20px 14px 56px}.public-chart-hero h1{font-size:34px}.chart-comment.depth-1{margin-left:14px}.chart-comment.depth-2{margin-left:28px}.chart-comment.depth-3{margin-left:42px}
 }
+
+.mag-global-home{margin:28px 0;padding:22px;border-top:4px solid var(--foreground);background:var(--card)}
+.mag-global-home-intro{margin:0 0 16px;color:var(--muted-foreground);font-size:13px}
+.mag-global-home-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.mag-global-home-grid article{border:1px solid var(--border);background:var(--background);padding:14px}
+.mag-global-home-grid h3{font-family:Georgia,"Times New Roman",serif;font-size:21px;margin:0 0 10px}
+.mag-global-home-grid ol{list-style:none;padding:0;margin:0}
+.mag-global-home-grid li{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.mag-global-home-grid li:last-child{border-bottom:0}
+.mag-global-home-grid strong,.mag-global-home-grid small{display:block}.mag-global-home-grid small{font-size:10px;color:var(--muted-foreground);margin-top:2px}.mag-global-home-grid em{font-style:normal;font-size:10px;font-weight:900;white-space:nowrap}
+@media(max-width:767px){.mag-global-home-grid{grid-template-columns:1fr}}
