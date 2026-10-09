@@ -3951,6 +3951,22 @@ function runEntries(e,data,date){
   for(const d of data.dates){if(d>date)break;for(const x of data.entriesByDate[d]||[])if(itemKey(x)===k)arr.push({date:d,...x})}
   return arr;
 }
+function runTimeline(e,data,date){
+  const k=itemKey(e),tokens=[];
+  const dates=data.dates.filter(d=>d<=date);
+  let started=false,gap=0;
+  for(const d of dates){
+    const hit=(data.entriesByDate[d]||[]).find(x=>itemKey(x)===k);
+    if(hit){
+      if(started&&gap>0)tokens.push({type:'gap',weeks:gap});
+      tokens.push({type:'position',date:d,position:hit.position});
+      started=true;gap=0;
+    }else if(started){
+      gap++;
+    }
+  }
+  return tokens;
+}
 function wordOrdinal(n){
   const w=['zeroth','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth','eleventh','twelfth','thirteenth','fourteenth','fifteenth','sixteenth','seventeenth','eighteenth','nineteenth','twentieth'];
   return n>=0&&n<=20?w[n]:n+'th';
@@ -4444,6 +4460,7 @@ function detailStatsFields(e,cfg,run){
 }
 function detailHtml(e,cfg,data,date,copy){
   const run=runEntries(e,data,date);
+  const timeline=runTimeline(e,data,date);
   const stats=detailStatsFields(e,cfg,run);
   const copyBlock=
     '<button class="details-copy copy-detail" type="button" data-copy="'+esc(copy)+'">'+
@@ -4454,7 +4471,10 @@ function detailHtml(e,cfg,data,date,copy){
     ? '<section class="details-section">'+
         '<div class="details-section-head"><i class="fas fa-chart-line"></i><span>Chart Run</span></div>'+
         '<div class="details-run-strip" role="list">'+
-          run.map(x=>'<button class="run-jump details-run-chip '+(Number(x.position)===1?'is-no1':'')+'" data-date="'+esc(x.date)+'" title="'+esc(fmtShort(x.date))+' · #'+esc(x.position)+'" role="listitem">'+esc(x.position)+'</button>').join('')+
+          timeline.map(x=>x.type==='gap'
+            ? '<span class="details-run-chip is-gap" title="'+x.weeks+' week'+(x.weeks===1?'':'s')+' outside the chart" role="listitem">'+x.weeks+'X</span>'
+            : '<button class="run-jump details-run-chip '+(Number(x.position)===1?'is-no1':'')+'" data-date="'+esc(x.date)+'" title="'+esc(fmtShort(x.date))+' · #'+esc(x.position)+'" role="listitem">'+esc(x.position)+'</button>'
+          ).join('')+
         '</div>'+
       '</section>'
     : '<div class="details-empty">No chart run available.</div>';
