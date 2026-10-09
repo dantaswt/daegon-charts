@@ -1796,6 +1796,111 @@ async function renderGoat(chartSeg){
 
 const CHART_BEAT_ARTICLES=[
   {
+    slug:'umbrella-rihanna-2007',
+    category:'Chart Rewind',
+    headline:'How “Umbrella” turned Rihanna into the defining pop star of summer 2007',
+    seoTitle:'Rihanna “Umbrella” in 2007: How the Hit Changed Her Career',
+    socialTitle:'The summer “Umbrella” changed Rihanna’s career',
+    dek:'Contemporary reporting, Rihanna’s own comments and the scale of the song’s international run show why 2007 became a turning point.',
+    byline:'Daegon Charts Editorial',
+    published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    body:[
+      '<p>By the end of 2007, “Umbrella” was no longer simply another successful Rihanna single. Contemporary coverage was already treating it as the record that changed the scale of her career. The song arrived alongside the visual reinvention of <em>Good Girl Gone Bad</em> and quickly became a reference point for the year’s pop culture.</p>',
+      '<h2>A hit that became bigger than its release campaign</h2><p>In August 2007, <em>The Guardian</em> described “Umbrella” as the soundtrack to Britain’s unusually wet summer and noted its ten-week run at No. 1 in the UK. That run made it the longest-lasting UK chart-topper in more than a decade at the time and the longest by a female artist since Whitney Houston’s “I Will Always Love You.”</p>',
+      '<p>The coincidence between the title and the weather became part of the song’s public story, but Rihanna herself framed the record more personally. In a December 2007 interview, she said she did not expect to tire of performing it because of what it meant to her and described the response of crowds singing it back as overwhelming.</p>',
+      '<h2>Rihanna fought for the song</h2><p>The song had circulated before reaching her. In a 2008 interview looking back on the previous year, Rihanna recalled becoming determined that “Umbrella” should be hers after hearing it. Songwriter The-Dream and producer Tricky Stewart had considered other artists, but Rihanna’s recording ultimately became the definitive version.</p>',
+      '<p>That history matters because it complicates the idea that a career-defining record is always designed for one singer from the beginning. “Umbrella” became inseparable from Rihanna because of the finished performance, the visual identity of the era and the scale of the public response.</p>',
+      '<h2>Why it belongs in chart history</h2><p>For chart research, “Umbrella” is useful because it combines several different kinds of evidence: sustained weekly success, international reach, a recognizable visual era and contemporary testimony from the artist herself. The chart tells us that the record lasted. Contemporary reporting helps explain why people kept talking about it.</p>',
+      '<div class="cb-sources"><h2>Sources</h2><ul><li><a href="https://www.theguardian.com/music/2007/aug/26/popandrock" target="_blank" rel="noopener">The Guardian, “Singing in the rain” — Aug. 25, 2007</a></li><li><a href="https://www.theguardian.com/music/2007/dec/09/5" target="_blank" rel="noopener">The Guardian, interview with Rihanna — Dec. 9, 2007</a></li><li><a href="https://www.theguardian.com/music/2008/may/23/urban" target="_blank" rel="noopener">The Guardian, “Sweetness and steel” — May 23, 2008</a></li></ul></div>'
+    ].join('')
+  },
+  {
+    slug:'britney-spears-blackout-2007',
+    category:'Chart Analysis',
+    headline:'Britney Spears’ “Blackout” arrived in chaos. The music told a different story.',
+    seoTitle:'Britney Spears “Blackout” in 2007: Reviews, Context and Impact',
+    socialTitle:'In 2007, Britney’s headlines and her music were telling two different stories',
+    dek:'Contemporary reviews reveal how critics separated the turmoil surrounding Britney Spears from the sound of one of 2007’s boldest pop albums.',
+    byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    body:[
+      '<p>Few major pop albums have arrived beneath as much non-musical attention as Britney Spears’ <em>Blackout</em>. By October 2007, coverage of Spears’ personal life was constant. Yet the reviews published as the album arrived reveal a striking split: critics were often disturbed by the circumstances around the singer while responding positively to the record itself.</p>',
+      '<h2>The release date itself became news</h2><p>In October 2007, the album’s release was moved forward. Sony BMG publicly pointed to demand, while Jive Records cited unauthorized leaks of songs and unfinished material. Even before critics could assess the finished record, the mechanics of getting <em>Blackout</em> into stores had become part of its story.</p>',
+      '<h2>Critics heard ambition behind the noise</h2><p>Alexis Petridis’ contemporary review for <em>The Guardian</em> called the album bold and exciting even while questioning whether the public conversation around Spears would overwhelm the music. Another review that same weekend focused on the striking disconnect between the club-focused production and the events dominating tabloid coverage.</p>',
+      '<p>That contrast is central to understanding the album historically. <em>Blackout</em> was not received merely as a celebrity document. Its production, electronic textures and tightly constructed dance-pop attracted serious critical attention at the moment of release.</p>',
+      '<h2>“Gimme More” changed the comeback conversation</h2><p>Weeks before the album appeared, contemporary coverage had already noticed that “Gimme More” was being received more favorably than many expected. The song provided a musical counterpoint to a year in which coverage of Spears was overwhelmingly personal.</p>',
+      '<p>Chart history should therefore avoid reducing the era to either extreme. The turmoil was real and unavoidable in contemporary reporting; so was the fact that the record itself earned praise. Both belong in an accurate reconstruction of 2007 pop culture.</p>',
+      '<div class="cb-sources"><h2>Sources</h2><ul><li><a href="https://www.theguardian.com/music/2007/oct/11/1" target="_blank" rel="noopener">The Guardian, album release moved forward — Oct. 11, 2007</a></li><li><a href="https://www.theguardian.com/music/2007/oct/26/popandrock.shopping" target="_blank" rel="noopener">The Guardian, <em>Blackout</em> review — Oct. 26, 2007</a></li><li><a href="https://www.theguardian.com/music/2007/oct/28/popandrock1" target="_blank" rel="noopener">The Observer, <em>Blackout</em> review — Oct. 28, 2007</a></li><li><a href="https://www.theguardian.com/music/musicblog/2007/oct/03/canbritneybounceback" target="_blank" rel="noopener">The Guardian, “Can Britney bounce back?” — Oct. 3, 2007</a></li></ul></div>'
+    ].join('')
+  },
+  {
+    slug:'amy-winehouse-back-to-black-america-2007',
+    category:'Chart Rewind',
+    headline:'How America discovered Amy Winehouse in 2007',
+    seoTitle:'Amy Winehouse “Back to Black” in America: The 2007 Breakthrough',
+    socialTitle:'The moment Amy Winehouse crossed from British acclaim to an American breakthrough',
+    dek:'Back to Black’s U.S. breakthrough unfolded alongside touring, awards attention and increasingly intense scrutiny of Amy Winehouse.',
+    byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    body:[
+      '<p>Amy Winehouse entered 2007 with critical recognition in Britain and an album that already carried a distinct musical identity. What changed during the year was scale. <em>Back to Black</em> moved from acclaimed British release to a major international success, while American audiences encountered Winehouse through records, live appearances and rapidly expanding press coverage.</p>',
+      '<h2>A U.S. debut that immediately attracted attention</h2><p>Contemporary reporting in March 2007 noted that <em>Back to Black</em> entered the U.S. album chart inside the Top 10 after Winehouse performed at South by Southwest. The American breakthrough arrived quickly enough to become news in Britain in its own right.</p>',
+      '<p>The album’s songs also carried a narrative unusually easy for audiences to connect with the singer’s interviews. Winehouse spoke openly in early 2007 about the experiences behind “Rehab” and about her relationship to drinking. Those comments are useful historical evidence because they predate much of the later mythology that formed around her.</p>',
+      '<h2>Success and concern grew at the same time</h2><p>By August, a planned North American tour had been postponed on medical advice. Contemporary coverage reported both the commercial success of the album and concerns over Winehouse’s health. This is one reason retrospective accounts need care: the career breakthrough and the personal crisis were not separate chronological chapters. They were unfolding together.</p>',
+      '<h2>The chart captures only part of the story</h2><p>The rankings show the acceleration of <em>Back to Black</em>. Reporting from 2007 shows what surrounded that acceleration: awards, performances, interviews, cancellations and a growing fascination with Winehouse as both an artist and public figure. A responsible chart history keeps the music at the center without pretending the surrounding context did not affect how the era was experienced.</p>',
+      '<div class="cb-sources"><h2>Sources</h2><ul><li><a href="https://www.theguardian.com/music/2007/mar/22/news.amywinehouse" target="_blank" rel="noopener">The Guardian, U.S. breakthrough — Mar. 22, 2007</a></li><li><a href="https://www.theguardian.com/music/2007/jan/28/popandrock.foodanddrink" target="_blank" rel="noopener">The Observer, Amy Winehouse interview — Jan. 28, 2007</a></li><li><a href="https://www.theguardian.com/music/2007/aug/22/amywinehouse" target="_blank" rel="noopener">The Guardian, North American tour postponement — Aug. 22, 2007</a></li></ul></div>'
+    ].join('')
+  },
+  {
+    slug:'beyonce-crazy-in-love-2003',
+    category:'Chart Rewind',
+    headline:'“Crazy in Love” was the moment Beyoncé’s solo career became undeniable',
+    seoTitle:'Beyoncé “Crazy in Love” in 2003: The Solo Breakthrough Explained',
+    socialTitle:'Before Beyoncé became Beyoncé, there was “Crazy in Love”',
+    dek:'Contemporary reviews and Beyoncé’s own account of making the song show how one single reframed her from Destiny’s Child star to solo force.',
+    byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    body:[
+      '<p>By 2003, Beyoncé Knowles was already famous. That is different from having an established solo identity. “Crazy in Love” became the record that collapsed the distinction. Contemporary coverage treated the song not as a tentative side project from a group member, but as a major pop event.</p>',
+      '<h2>The single arrived before the album had to prove itself</h2><p>A June 2003 review of <em>Dangerously in Love</em> observed that “Crazy in Love” was already surging through the U.S. charts while the album was being positioned as a major release. By the end of the year, British critics were describing Beyoncé as one of the defining figures of 2003 and repeatedly naming the single among the year’s best.</p>',
+      '<h2>Beyoncé recognized the track immediately</h2><p>In a December 2003 interview, Beyoncé recalled meeting producers while preparing the album and hearing Rich Harrison’s track months before recording it. Her account suggests that the core of “Crazy in Love” stood out before the full machinery of the solo campaign was in place.</p>',
+      '<p>That matters historically because the record did not simply benefit from Beyoncé’s existing fame. It supplied the evidence that the solo project could generate its own musical identity: the horn sample, the physical performance style and the Jay-Z feature all became inseparable from the new era.</p>',
+      '<h2>A chart event and a career event</h2><p>Some hits are important because of how high or how long they chart. Others mark a before-and-after point in an artist’s career. “Crazy in Love” did both. Later retrospectives would treat the release as one of the decisive moments in early-2000s R&amp;B and pop, but contemporary 2003 reporting already captured the sense that something had changed.</p>',
+      '<div class="cb-sources"><h2>Sources</h2><ul><li><a href="https://www.theguardian.com/music/2003/jun/27/popandrock.artsfeatures8" target="_blank" rel="noopener">The Guardian, <em>Dangerously in Love</em> review — June 26, 2003</a></li><li><a href="https://www.theguardian.com/music/2003/dec/14/popandrock1" target="_blank" rel="noopener">The Observer, Beyoncé interview — Dec. 14, 2003</a></li><li><a href="https://www.theguardian.com/music/2003/dec/18/popandrock" target="_blank" rel="noopener">The Guardian, 2003 year review — Dec. 18, 2003</a></li></ul></div>'
+    ].join('')
+  },
+  {
+    slug:'daddy-yankee-gasolina-2005',
+    category:'Chart Analysis',
+    headline:'“Gasolina” did more than cross over: it announced reggaetón as global pop',
+    seoTitle:'Daddy Yankee “Gasolina” in 2005: How Reggaetón Went Global',
+    socialTitle:'In 2005, “Gasolina” made reggaetón impossible for global pop to ignore',
+    dek:'Reporting from 2005 shows the speed at which Daddy Yankee and “Gasolina” moved from Puerto Rican phenomenon to international pop story.',
+    byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    body:[
+      '<p>By the middle of 2005, international journalists were no longer writing about reggaetón as a distant underground scene. They were explaining it to readers whose local clubs and charts were already reacting. At the center of that change was Daddy Yankee’s “Gasolina.”</p>',
+      '<h2>The record arrived with a movement behind it</h2><p>A May 2005 Los Angeles Times report described reggaetón as an urgent new force in Latin popular music and identified Daddy Yankee’s <em>Barrio Fino</em> as the movement’s blockbuster. “Gasolina” functioned as the most accessible calling card: a chorus that could travel even where Spanish-language urban music was unfamiliar to mainstream radio audiences.</p>',
+      '<p>By July and August, British coverage was documenting the same crossover from another direction. <em>The Guardian</em> called Daddy Yankee the first reggaetón artist breaking internationally at that scale and reported how “Gasolina” could transform a London dancefloor when played.</p>',
+      '<h2>Daddy Yankee was already thinking internationally</h2><p>The 2005 reporting also matters because it shows that the crossover was not merely accidental. Daddy Yankee discussed major international collaborators and was being positioned alongside U.S. hip-hop figures while performing to huge audiences across Latin America.</p>',
+      '<h2>Why 2005 matters</h2><p>Later Latin-pop breakthroughs make it easy to treat reggaetón’s global presence as inevitable. It was not. “Gasolina” belongs in chart history because it records a moment when audiences in different markets were learning the sound almost simultaneously. The charts capture the spread; contemporary journalism captures the surprise.</p>',
+      '<div class="cb-sources"><h2>Sources</h2><ul><li><a href="https://www.latimes.com/archives/la-xpm-2005-may-02-et-reggaeton2-story.html" target="_blank" rel="noopener">Los Angeles Times, “It’s an urgent reggaeton situation” — May 2, 2005</a></li><li><a href="https://www.theguardian.com/music/2005/jul/03/popandrock.shopping" target="_blank" rel="noopener">The Observer, <em>Barrio Fino</em> review — July 2, 2005</a></li><li><a href="https://www.theguardian.com/music/2005/aug/01/popandrock" target="_blank" rel="noopener">The Guardian, “Party on” — Aug. 1, 2005</a></li></ul></div>'
+    ].join('')
+  },
+  {
+    slug:'rbd-us-crossover-2006',
+    category:'Chart Rewind',
+    headline:'RBD’s 2006 U.S. arrival showed the scale of Spanish-language teen pop',
+    seoTitle:'RBD in 2006: How the Mexican Group Broke Into the U.S. Market',
+    socialTitle:'Tens of thousands in Los Angeles: the scale of RBD’s U.S. breakthrough',
+    dek:'A contemporary Los Angeles Times report captured the group’s first major U.S. tour as both a pop phenomenon and a Latino crossover moment.',
+    byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    body:[
+      '<p>RBD’s expansion into the United States in 2006 challenged a familiar assumption about crossover: that success required switching languages or softening a distinctly Latin identity. When the Mexican group opened its first U.S. tour in Los Angeles, the response was already massive.</p>',
+      '<h2>A television phenomenon became a live-music phenomenon</h2><p>RBD originated through the Mexican television series <em>Rebelde</em>, but by March 2006 the scale of the audience exceeded the normal boundaries of a television tie-in. A contemporary Los Angeles Times report from the Los Angeles Memorial Coliseum described tens of thousands of fans chanting the group’s name at the opening of the U.S. tour.</p>',
+      '<p>The scene is useful historical evidence because it documents the audience before later nostalgia could reshape the story. The screams, merchandise, choreography and arena-scale presentation were already part of RBD’s identity while the group was still in its original run.</p>',
+      '<h2>Crossover without abandoning Spanish</h2><p>The importance of RBD in a multi-market chart history is not simply that the group became popular with Latino listeners in the United States. It is that a Spanish-language pop act could generate a mass youth phenomenon visible inside the world’s largest music market while remaining culturally tied to Mexico and Latin America.</p>',
+      '<h2>Why this belongs beside U.S. and European pop stories</h2><p>Global pop history can become distorted when English-language success is treated as the only measure of international relevance. RBD’s 2006 U.S. tour offers a different kind of evidence: physical crowds, a cross-border fan culture and commercial momentum that were unmistakable even when mainstream English-language coverage treated the phenomenon as something new.</p>',
+      '<div class="cb-sources"><h2>Sources</h2><ul><li><a href="https://www.latimes.com/archives/la-xpm-2006-mar-20-et-rbd20-story.html" target="_blank" rel="noopener">Los Angeles Times, “¡Viva la revolucion! — of RBD, that is” — Mar. 20, 2006</a></li></ul></div>'
+    ].join('')
+  },
+  {
     slug:'editorial-standards',
     category:'Behind the Charts',
     headline:'How Daegon Charts investigates chart history',
@@ -1817,7 +1922,7 @@ const CHART_BEAT_ARTICLES=[
       '<p class="cb-source-note">Readers can review the <a href="/methodology">methodology</a> or submit a documented correction through the <a href="/contact">contact page</a>.</p>'
     ].join('')
   }
-];
+]
 
 function setChartBeatArticleMeta(a){
   setMeta(a.seoTitle,a.dek,'/chart-beat/'+a.slug,true);
