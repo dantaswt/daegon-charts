@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const PORTAL_ROUTES=new Set(['','songs','albums','artists','number-ones','stats','year-end','decade-end','goat','chart-beat','awards','chart-battle','search','song','album','artist']);
+const PORTAL_ROUTES=new Set(['','news','features','songs','albums','artists','number-ones','stats','year-end','decade-end','goat','chart-beat','awards','chart-battle','search','song','album','artist']);
 const mainChartIds={song:'songs',album:'albums',artist:'artists'};
 const periodLimits={songs:100,albums:100,artists:50};
 const PORTAL_SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
@@ -161,9 +161,8 @@ function ensureShell(){
     navEl.id='portalTopNav';
     navEl.className='portal-topnav';
     navEl.innerHTML=[
-      ['DAEGON 100','/chart/daegon-100'],['CHART BEAT','/chart-beat'],['YEAR-END CHARTS','/year-end'],
-      ['DECADE-END','/decade-end'],['GREATEST OF ALL TIME','/goat'],['STATS','/stats'],
-      ['AWARDS','/awards'],["#1'S",'/number-ones'],['ABOUT','/about']
+      ['NEWS','/news'],['CHART BEAT','/chart-beat'],['FEATURES','/features'],['CHARTS','/chart/daegon-100'],
+      ['YEAR-END','/year-end'],['GOAT','/goat'],['STATS','/stats'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     const theme=document.getElementById('themeToggle');
     head.insertBefore(navEl,theme);
@@ -184,9 +183,8 @@ function ensureShell(){
     mobileMenu.id='portalMobileMenu';
     mobileMenu.className='portal-mobile-drawer';
     mobileMenu.innerHTML=[
-      ['HOT 100','/chart/daegon-100'],['CHART BEAT','/chart-beat'],['YEAR-END CHARTS','/year-end'],
-      ['DECADE-END','/decade-end'],['GREATEST OF ALL TIME','/goat'],['STATS','/stats'],
-      ['AWARDS','/awards'],["#1'S",'/number-ones'],['ABOUT','/about']
+      ['NEWS','/news'],['CHART BEAT','/chart-beat'],['FEATURES','/features'],['CHARTS','/chart/daegon-100'],
+      ['YEAR-END','/year-end'],['GOAT','/goat'],['STATS','/stats'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     mobileBtn.setAttribute('aria-expanded','false');
     mobileMenu.setAttribute('aria-hidden','true');
@@ -297,6 +295,8 @@ function routeSkeletonMeta(parts){
     first==='song'||first==='songs'?'Songs':
     first==='number-ones'?'Number Ones':
     first==='chart-beat'?'Chart Beat':
+    first==='news'?'Music News':
+    first==='features'?'Features':
     first==='stats'?'Stats':
     first==='search'?'Search':
     first==='chart-battle'?'Chart Battle':
@@ -544,92 +544,76 @@ function catalogEditorial(kind){
   );
 }
 
+
+async function renderEditorialIndex(kind){
+  loading(kind==='news'?'Music News':'Features');
+  await loadPublishedChartBeatArticles();
+  const all=[...CHART_BEAT_ARTICLES];
+  const featureCats=new Set(['Chart Analysis','Chart Rewind','Behind the Charts']);
+  const items=kind==='features'?all.filter(a=>featureCats.has(a.category)):all.filter(a=>!featureCats.has(a.category));
+  const list=(items.length?items:all);
+  const main='<main class="mag-index"><header class="mag-index-head"><div class="mag-kicker">Daegon</div><h1>'+(kind==='news'?'Music News':'Features')+'</h1><p>'+(kind==='news'?'Chart-driven music news, weekly developments and stories from across pop culture.':'Long-form music stories, historical reporting and analysis from the Daegon archive.')+'</p></header>'+
+    '<div class="mag-index-grid">'+list.map((a,i)=>'<article class="mag-index-card '+(i===0?'lead':'')+'"><a href="'+appHref('/chart-beat/'+a.slug)+'" data-portal-link="/chart-beat/'+a.slug+'">'+
+      '<div class="mag-index-art">'+(a.photo?.url?'<img src="'+escAttr(a.photo.url)+'" alt="'+escAttr(a.photo.alt||a.headline)+'">':'<div class="cb-media-box" data-portal-image data-kind="'+escAttr(a?.media?.primary?.kind||'artist')+'" data-name="'+escAttr(a?.media?.primary?.name||a.headline)+'" data-artist="'+escAttr(a?.media?.primary?.artist||'')+'"></div>')+'</div>'+
+      '<div class="mag-index-copy"><div class="mag-kicker">'+esc(a.category)+'</div><h2>'+esc(a.headline)+'</h2><p>'+esc(a.dek||'')+'</p><span>'+fmtDate(a.published)+'</span></div></a></article>').join('')+
+    '</div></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(kind==='news'?'Music News':'Features',kind==='news'?'Music news and chart-driven reporting from Daegon Charts.':'Long-form music features and historical analysis from Daegon Charts.','/'+kind);bindLinks();hydratePortalImages();
+}
+
 async function renderHome(){
   loading('Home');
-  // Match the real daegoncharts home loader: only the three primary charts are blocking.
+  await loadPublishedChartBeatArticles();
   const ids=['songs','albums','artists'];
   const all=await Promise.all(ids.map(async id=>{try{return await loadWeekly(id)}catch{return {chartId:id,dates:[],entriesByDate:{}}}}));
   const byId=Object.fromEntries(ids.map((id,i)=>[id,all[i]]));
-  const mainIds=['songs','albums','artists'];
   const latest=id=>{const d=byId[id],date=d.dates[d.dates.length-1]||'';return{date,entries:d.entriesByDate[date]||[]}};
+  const songLatest=latest('songs'),latestDate=songLatest.date;
   const no1s=ids.map(id=>{const l=latest(id);return{id,date:l.date,e:l.entries[0]||null}});
-  const artistsData=byId.artists,firstTimers=[];
-  for(const d of [...artistsData.dates].reverse()){
-    for(const e of artistsData.entriesByDate[d]||[]){
-      if(e.diff==='NEW'&&!firstTimers.some(x=>x.name===e.name)){firstTimers.push({...e,date:d});if(firstTimers.length>=4)break}
-    }
-    if(firstTimers.length>=4)break;
-  }
-  const songLatest=latest('songs');
-  const latestDate=songLatest.date;
-  const currentYear=latestDate?Number(latestDate.slice(0,4)):new Date().getFullYear();
-  const years=[];
-  for(let y=currentYear;y>=2000;y--)years.push(y);
+  const stories=[...CHART_BEAT_ARTICLES];
+  const lead=stories[0]||null,secondary=stories.slice(1,5),moreStories=stories.slice(5,9);
 
-  const topSection=(active='songs')=>{
-    const cfg=charts[active],l=latest(active),entries=l.entries.slice(0,5);
-    return '<section class="ref-home-section"><div class="ref-section-banner"><span>Top Charts</span><a href="'+appHref(chartPath(active,l.date))+'">View Chart <i class="fas fa-arrow-right"></i></a></div>'+
-      '<div class="ref-home-tabs"><button data-home-tab="songs" class="'+(active==='songs'?'active':'')+'">DAEGON 100</button><button data-home-tab="albums" class="'+(active==='albums'?'active':'')+'">TOP 100 ALBUMS</button><button data-home-tab="artists" class="'+(active==='artists'?'active':'')+'">ARTIST 50</button></div>'+
-      '<div class="ref-top-grid">'+entries.map(e=>'<div class="ref-top-card"><div class="ref-top-art">'+refThumb(e,cfg.kind)+'<div class="ref-rank-badge">'+e.position+'</div></div><div class="ref-top-copy"><div class="ref-top-title">'+entityLink(e,cfg.kind)+'</div>'+(cfg.kind!=='artist'?'<div class="ref-top-sub">'+artistLink(e.artist)+'</div>':'')+'</div></div>').join('')+'</div></section>';
+  const storyArt=(a,cls='')=>{
+    if(a?.photo?.url)return '<div class="mag-story-art '+cls+'"><img src="'+escAttr(a.photo.url)+'" alt="'+escAttr(a.photo.alt||a.headline)+'" loading="eager"></div>';
+    const m=a?.media?.primary;
+    return '<div class="mag-story-art cb-media-box '+cls+'" data-portal-image data-kind="'+escAttr(m?.kind||'artist')+'" data-name="'+escAttr(m?.name||a?.headline||'Daegon Charts')+'" data-artist="'+escAttr(m?.artist||m?.name||'')+'"></div>';
   };
+  const storyLink=a=>appHref('/chart-beat/'+a.slug);
 
-  const numberOnes='<section class="ref-home-section"><div class="ref-section-banner"><span>No. 1 This Week</span><a href="'+appHref('/number-ones')+'" data-portal-link="/number-ones">View All <i class="fas fa-arrow-right"></i></a></div><div class="ref-home-no1-grid">'+
-    no1s.filter(x=>x.e).map(x=>'<div class="ref-home-no1"><div class="ref-home-no1-body">'+refThumb(x.e,charts[x.id].kind)+'<div><div class="ref-no1-chart">'+esc(charts[x.id].title)+'</div><div class="ref-no1-title">'+entityLink(x.e,charts[x.id].kind)+'</div>'+(charts[x.id].kind!=='artist'?'<div class="ref-no1-artist">'+artistLink(x.e.artist)+'</div>':'')+'</div></div><a href="'+appHref(chartPath(x.id,x.date))+'" class="ref-no1-view">View Chart →</a></div>').join('')+
-    '</div></section>';
+  const hero=lead?'<section class="mag-lead"><a href="'+storyLink(lead)+'" data-portal-link="/chart-beat/'+lead.slug+'">'+
+    storyArt(lead,'lead')+
+    '<div class="mag-lead-copy"><div class="mag-kicker">'+esc(lead.category)+'</div><h1>'+esc(lead.headline)+'</h1><p>'+esc(lead.dek||'')+'</p><div class="mag-meta">By '+esc(lead.byline||'Daegon Charts Editorial')+' · '+fmtDate(lead.published)+'</div></div>'+
+  '</a></section>':'';
 
-  const first='<section class="ref-home-section"><div class="ref-section-banner"><span>First-Timers</span><a href="'+appHref('/artists')+'" data-portal-link="/artists">View All <i class="fas fa-arrow-right"></i></a></div><div class="ref-first-grid">'+
-    firstTimers.map(e=>'<div class="ref-first-card"><div class="ref-first-chart">'+esc(charts.artists.title)+'</div><div class="ref-first-art">'+refThumb(e,'artist')+'<span>DEBUT</span></div><div class="ref-first-copy"><div class="ref-first-pos">NO. '+e.position+'</div><div class="ref-first-title">'+entityLink(e,'artist')+'</div><a href="'+appHref(chartPath('artists',e.date))+'" class="ref-first-see">See Chart</a></div></div>').join('')+
-    '</div></section>';
+  const secondaryHtml=secondary.length?'<section class="mag-latest"><div class="mag-section-head"><h2>Latest</h2><a href="'+appHref('/news')+'" data-portal-link="/news">More stories →</a></div><div class="mag-latest-grid">'+
+    secondary.map(a=>'<article class="mag-story-card"><a href="'+storyLink(a)+'" data-portal-link="/chart-beat/'+a.slug+'">'+storyArt(a)+
+      '<div class="mag-kicker">'+esc(a.category)+'</div><h3>'+esc(a.headline)+'</h3><p>'+esc(a.dek||'')+'</p><span class="mag-meta">'+fmtDate(a.published)+'</span></a></article>').join('')+
+  '</div></section>':'';
 
-  const beatDates=[...byId.songs.dates].reverse().slice(0,3);
-  const beat='<section class="ref-home-section"><div class="ref-section-banner"><span>Chart Beat</span><a href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat">View All <i class="fas fa-arrow-right"></i></a></div><div class="ref-beat-list">'+
-    beatDates.map(d=>{const es=byId.songs.entriesByDate[d]||[],e=es[0];return e?'<a href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat" class="ref-beat-card"><div class="ref-beat-art">'+refThumb({name:e.artist,artist:e.artist},'artist')+'</div><div class="ref-beat-copy"><div class="ref-no1-chart">'+esc(charts.songs.title)+'</div><div class="ref-beat-title">'+esc(e.name)+' leads the '+esc(charts.songs.title)+'</div><div class="ref-beat-date">'+fmtDate(d)+'</div></div></a>':''}).join('')+
-    '</div></section>';
+  const weeklyStory=latestDate?'<section class="mag-weekly-promo"><div><div class="mag-kicker">Chart Beat Weekly</div><h2>The stories behind this week’s Daegon 100</h2><p>Movement, new peaks, debuts, historical milestones and — from June 2017 onward — sales, streaming and airplay analysis.</p></div><a href="'+appHref('/chart-beat/weekly/'+latestDate)+'" data-portal-link="/chart-beat/weekly/'+latestDate+'">Read '+fmtDate(latestDate)+' →</a></section>':'';
 
-  const main='<div class="ref-home-hero"><div>CHARTS</div><h1>daegon charts</h1><p>Weekly music charts, year-end rankings & greatest of all time lists</p></div>'+
-    editorialBlock(
-      'An independent weekly music chart and historical archive',
-      [
-        'Daegon Charts follows songs, albums and artists week by week, preserving movement, peaks, weeks charted and long-term chart runs in one continuous archive. The main rankings are original Daegon Charts outputs rather than copies of a commercial chart.',
-        'Beyond the current week, the site generates year-end and all-time rankings from the underlying weekly history. That means the archive can be explored from several angles while keeping the same underlying chart record.'
-      ],
-      [['/methodology','Read the methodology'],['/about','About the project']]
-    )+
-    '<div id="refTopCharts">'+topSection('songs')+'</div>'+numberOnes+first+beat+
-    '<a href="'+appHref('/chart-battle')+'" data-portal-link="/chart-battle" class="ref-battle-float"><span>VS</span><div><small>New Mini-Game!</small><strong>Play Chart Battle 🏆</strong></div></a>';
+  const chartCards='<section class="mag-charts"><div class="mag-section-head"><h2>This Week’s Charts</h2><a href="'+appHref('/chart/daegon-100')+'">View Daegon 100 →</a></div><div class="mag-chart-grid">'+
+    no1s.filter(x=>x.e).map(x=>'<article class="mag-chart-card">'+refThumb(x.e,charts[x.id].kind)+'<div class="mag-chart-copy"><div class="mag-kicker">'+esc(charts[x.id].title)+'</div><div class="mag-chart-rank">No. 1</div><h3>'+entityLink(x.e,charts[x.id].kind)+'</h3>'+(charts[x.id].kind!=='artist'?'<p>'+artistLink(x.e.artist)+'</p>':'')+'<a class="mag-chart-link" href="'+appHref(chartPath(x.id,x.date))+'">Full chart →</a></div></article>').join('')+
+  '</div></section>';
 
-  setMode(true);portalEl.innerHTML=shellHtml(main,true);setMeta('Daegon Charts — Weekly Music Charts & Historical Archive','Weekly music charts, year-end rankings and greatest of all time lists.','/',true);
-  bindLinks();hydratePortalImages();bindHomeSidebar();
+  const archiveDates=(byId.songs.dates||[]).filter(d=>d<latestDate).slice(-4).reverse();
+  const archive='<section class="mag-archive"><div class="mag-section-head"><h2>From the Archive</h2><a href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat">Explore Chart Beat →</a></div><div class="mag-archive-grid">'+
+    archiveDates.map(d=>{const e=(byId.songs.entriesByDate[d]||[])[0];return e?'<a class="mag-archive-card" href="'+appHref('/chart-beat/weekly/'+d)+'" data-portal-link="/chart-beat/weekly/'+d+'"><div class="mag-archive-date">'+fmtDate(d)+'</div><strong>'+esc(portalText(e.name))+'</strong><span>'+esc(portalArtist(e.artist))+' led the Daegon 100</span><em>Revisit the week →</em></a>':''}).join('')+
+  '</div></section>';
 
-  let active='songs';
-  const bindTabs=()=>{
-    portalEl.querySelectorAll('[data-home-tab]').forEach(btn=>btn.onclick=()=>{
-      active=btn.dataset.homeTab;
-      document.getElementById('refTopCharts').innerHTML=topSection(active);
-      bindLinks();
-      hydratePortalImages();
-      bindTabs();
-    });
-  };
-  bindTabs();
+  const features=moreStories.length?'<section class="mag-features"><div class="mag-section-head"><h2>Features</h2><a href="'+appHref('/features')+'" data-portal-link="/features">All features →</a></div><div class="mag-feature-list">'+
+    moreStories.map(a=>'<a href="'+storyLink(a)+'" data-portal-link="/chart-beat/'+a.slug+'" class="mag-feature-row">'+storyArt(a,'small')+'<div><div class="mag-kicker">'+esc(a.category)+'</div><h3>'+esc(a.headline)+'</h3><p>'+esc(a.dek||'')+'</p></div></a>').join('')+
+  '</div></section>':'';
 
-  const on=document.getElementById('refOnThisWeek');
-  if(on){
-    let selected=years[Math.min(new Date().getDay(),years.length-1)]||currentYear;
-    const drawOn=()=>{
-      const items=mainIds.map(id=>{
-        const d=byId[id],target=latestDate?new Date(latestDate+'T00:00:00'):new Date();target.setFullYear(selected);
-        let best='',diff=Infinity;
-        for(const dt of d.dates){const dd=Math.abs(new Date(dt+'T00:00:00')-target);if(dd<diff){diff=dd;best=dt}}
-        const e=(d.entriesByDate[best]||[])[0];return{id,date:best,e};
-      });
-      on.innerHTML='<div class="ref-side-section ref-on-week"><div class="ref-side-title">On This Week</div><div class="ref-year-scroll">'+years.map(y=>'<button data-on-year="'+y+'" class="'+(y===selected?'active':'')+'">'+y+'</button>').join('')+'</div><div class="ref-on-list">'+items.filter(x=>x.e).map(x=>'<div class="ref-on-item">'+refThumb(x.e,charts[x.id].kind)+'<div><div class="ref-no1-chart">'+esc(charts[x.id].title)+'</div><div class="ref-on-title">'+entityLink(x.e,charts[x.id].kind)+'</div>'+(charts[x.id].kind!=='artist'?'<div class="ref-on-artist">'+artistLink(x.e.artist)+'</div>':'')+'</div></div>').join('')+'</div><a class="ref-on-view" href="'+appHref(chartPath('songs',items[0]?.date||latestDate))+'">View Full Chart <i class="fas fa-arrow-right"></i></a></div>';
-      bindLinks();hydratePortalImages();on.querySelectorAll('[data-on-year]').forEach(b=>b.onclick=()=>{selected=Number(b.dataset.onYear);drawOn()});
-    };
-    drawOn();
-  }
+  const main='<main class="mag-home">'+
+    '<div class="mag-brandline"><span>Music. Charts. Culture.</span><p>Independent music journalism powered by the Daegon Charts archive.</p></div>'+
+    hero+secondaryHtml+weeklyStory+chartCards+features+archive+
+    '<section class="mag-about-strip"><div><div class="mag-kicker">About Daegon</div><h2>Music journalism with its own chart archive.</h2><p>Daegon combines original weekly rankings, historical research and source-backed reporting to explain what is happening in music — and how today connects to the past.</p></div><div><a href="'+appHref('/methodology')+'">Methodology →</a><a href="'+appHref('/about')+'">About the project →</a></div></section>'+
+  '</main>';
+
+  setMode(true);portalEl.innerHTML=shellHtml(main);
+  setMeta('Daegon Charts — Music News, Charts & Culture','Music news, chart analysis, historical reporting and original weekly rankings from Daegon Charts.','/',true);
+  bindLinks();hydratePortalImages();
 }
-
 async function renderCatalog(kind){
   const id=chartIdForKind(kind);
   loading(labelFor(kind)+'s');
@@ -2404,6 +2388,8 @@ async function renderRoute(){
   loading(skeleton.title,skeleton.kind);
   try{
     if(!p.length){await renderHome()}
+    else if(p[0]==='news')await renderEditorialIndex('news');
+    else if(p[0]==='features')await renderEditorialIndex('features');
     else if(p[0]==='songs')await renderCatalog('song');
     else if(p[0]==='albums')await renderCatalog('album');
     else if(p[0]==='artists')await renderCatalog('artist');
