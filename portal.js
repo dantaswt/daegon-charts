@@ -1951,6 +1951,7 @@ async function loadPublishedChartBeatArticles(){
         published:String(x.published_at||'').slice(0,10),modified:String(x.updated_at||x.published_at||'').slice(0,10),
         image:x.hero_image||'https://i.imgur.com/jaBZ19n.png',
         photo:x.hero_image?{url:x.hero_image,alt:x.hero_alt||x.headline,credit:x.hero_credit||'',license:x.hero_license||'',source:x.hero_source||'',note:''}:null,
+        media:x.media_name?{primary:{kind:x.media_kind||'artist',name:x.media_name,artist:x.media_artist||x.media_name,caption:x.media_name}}:null,
         body:(x.body_html||'')+sourcesHtml
       };
     });
