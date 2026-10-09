@@ -4641,3 +4641,39 @@ body:not(.portal-mode) #portalPage{
  .mag-static-grid,.mag-community-grid{grid-template-columns:1fr}
  .review-pillars{grid-template-columns:1fr}
 }
+
+.portal-account-btn{display:flex;align-items:center;gap:6px;border:0;background:transparent;color:#d1d5db;font-size:10px;font-weight:850;letter-spacing:.06em;padding:8px 4px;white-space:nowrap}
+.portal-account-btn:hover{color:#fff}.portal-account-btn i{font-size:14px}
+.dc-auth-modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px}
+.dc-auth-card{position:relative;width:min(460px,100%);background:var(--card);border:1px solid var(--border);padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.35)}
+.dc-auth-card h2{font-family:Georgia,"Times New Roman",serif;font-size:28px;margin:6px 0 8px}
+.dc-auth-card p{color:var(--muted-foreground);line-height:1.55}
+.dc-auth-card small{display:block;margin-top:16px;color:var(--muted-foreground);font-size:11px;line-height:1.45}
+.dc-auth-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:var(--foreground);font-size:28px;line-height:1}
+#dcMagicForm{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+#dcMagicForm label{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
+#dcMagicForm input{min-height:44px;border:1px solid var(--border);background:var(--background);color:var(--foreground);padding:10px 12px}
+#dcMagicForm button{margin-top:4px}.dc-auth-status{min-height:18px;font-size:12px;color:var(--muted-foreground)}
+.dc-auth-actions{margin-top:18px}
+.dc-comments{margin-top:34px;padding-top:20px;border-top:4px solid var(--foreground)}
+.dc-comments-head h2{font-family:Georgia,"Times New Roman",serif;font-size:28px;margin:5px 0 6px}
+.dc-comments-head p{margin:0;color:var(--muted-foreground);font-size:13px}
+.dc-comment-form{margin:18px 0;border:1px solid var(--border);background:var(--card);padding:14px}
+.dc-comment-form textarea{width:100%;min-height:110px;resize:vertical;border:1px solid var(--border);background:var(--background);color:var(--foreground);padding:12px;font:inherit;line-height:1.5}
+.dc-comment-form>div{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:8px}
+.dc-comment-form span,#dcCommentStatus{font-size:11px;color:var(--muted-foreground)}
+.dc-comment-form button,.dc-comment-signin button{border:0;background:var(--accent);color:#000;font-weight:900;padding:10px 14px;text-transform:uppercase;font-size:11px;letter-spacing:.06em}
+.dc-comment-signin{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:18px 0;padding:14px;border:1px solid var(--border);background:var(--card)}
+.dc-comment-signin p{margin:0;font-size:13px}
+.dc-comment-list{display:flex;flex-direction:column}
+.dc-comment{padding:16px 0;border-bottom:1px solid var(--border)}
+.dc-comment.pending{opacity:.68}
+.dc-comment-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.dc-comment-head strong{font-size:13px}.dc-comment-head span{font-size:10px;color:var(--muted-foreground)}
+.dc-comment p{font-size:14px;line-height:1.6;margin:8px 0 0;white-space:pre-wrap}
+.dc-comment button{margin-top:8px;border:0;background:transparent;color:var(--muted-foreground);padding:0;font-size:10px;text-transform:uppercase;font-weight:800}
+.dc-comment-empty,.dc-comment-loading{padding:18px 0;color:var(--muted-foreground);font-size:13px}
+@media(max-width:767px){
+ .portal-account-btn span{display:none}
+ .dc-comment-form>div,.dc-comment-signin,.dc-comment-head{align-items:flex-start;flex-direction:column}
+}
