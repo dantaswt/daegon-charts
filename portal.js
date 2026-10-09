@@ -306,7 +306,7 @@ function dcSaturdayFor(ts){
   const out=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+add));
   return out.toISOString().slice(0,10);
 }
-function dcPersonalChartWeek(events){
+function dcPersonalChartWeek(events,settings={formula_mode:'standard',plays_weight:100,minute_weight:1.5,active_day_weight:18}){
   const songs=new Map(),albums=new Map(),artists=new Map();
   for(const e of events){
     const day=String(e.played_at||'').slice(0,10),ms=Number(e.ms_played||0);
@@ -325,7 +325,9 @@ function dcPersonalChartWeek(events){
   const rank=(map,limit)=>{
     const list=[...map.values()].map(x=>{
       const active=x.days.size;
-      const score=x.streams*100+(x.listening_ms/60000)*1.5+active*18;
+      const score=settings.formula_mode==='plays_only'
+        ? x.streams*100
+        : x.streams*Number(settings.plays_weight??100)+(x.listening_ms/60000)*Number(settings.minute_weight??1.5)+active*Number(settings.active_day_weight??18);
       return {...x,active_days:active,score};
     }).sort((a,b)=>b.score-a.score||b.streams-a.streams||b.listening_ms-a.listening_ms).slice(0,limit);
     return list.map((x,i)=>({...x,rank:i+1}));
@@ -335,6 +337,8 @@ function dcPersonalChartWeek(events){
 async function dcImportSpotifyHistory(file,statusEl){
   const user=await dcRequireUser();if(!user)return;
   const sb=dcSupabaseClient();
+  const {data:chartSettings}=await sb.from('user_chart_settings').select('*').eq('user_id',user.id).maybeSingle();
+  const settings=chartSettings||{formula_mode:'standard',plays_weight:100,minute_weight:1.5,active_day_weight:18};
   statusEl.textContent='Reading Spotify history…';
   let raw;
   try{raw=JSON.parse(await file.text())}catch{statusEl.textContent='This file is not valid JSON.';return}
@@ -362,7 +366,7 @@ async function dcImportSpotifyHistory(file,statusEl){
   const dates=[...weeks.keys()].sort();
   const hist={songs:new Map(),albums:new Map(),artists:new Map()};
   for(const date of dates){
-    const charts=dcPersonalChartWeek(weeks.get(date));
+    const charts=dcPersonalChartWeek(weeks.get(date),settings);
     for(const type of ['songs','albums','artists']){
       const output=[];
       for(const x of charts[type]){
@@ -699,10 +703,11 @@ async function renderMyCharts(){
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal music charts generated from your listening history.','/my-charts');portalEl.querySelector('[data-my-signin]').onclick=dcShowAuthModal;return;
   }
   const sb=dcSupabaseClient();
-  const [{data:dates},{data:lastfmConn},{data:profile}]=await Promise.all([
+  const [{data:dates},{data:lastfmConn},{data:profile},{data:chartSettings}]=await Promise.all([
     sb.from('personal_chart_entries').select('chart_date').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').order('chart_date',{ascending:false}).limit(250),
     sb.from('user_streaming_connections').select('account_name,status,last_synced_at').eq('user_id',_dcAuthUser.id).eq('provider','lastfm').maybeSingle(),
-    sb.from('community_profiles').select('display_name,profile_slug,charts_public').eq('user_id',_dcAuthUser.id).maybeSingle()
+    sb.from('community_profiles').select('display_name,profile_slug,charts_public').eq('user_id',_dcAuthUser.id).maybeSingle(),
+    sb.from('user_chart_settings').select('*').eq('user_id',_dcAuthUser.id).maybeSingle()
   ]);
   const unique=[...new Set((dates||[]).map(x=>x.chart_date))];
   const params=new URLSearchParams(location.search);
@@ -719,7 +724,7 @@ async function renderMyCharts(){
     const {data:events}=await sb.from('user_listening_events')
       .select('provider,played_at,track_name,artist_name,album_name,ms_played')
       .eq('user_id',_dcAuthUser.id).gte('played_at',range.start).lte('played_at',range.end).order('played_at',{ascending:true});
-    const charts=dcPersonalChartWeek(events||[]);
+    const charts=dcPersonalChartWeek(events||[],chartSettings||{formula_mode:'standard',plays_weight:100,minute_weight:1.5,active_day_weight:18});
     songs=charts.songs.map(x=>({...x,movement:'—'}));
     albums=charts.albums.map(x=>({...x,movement:'—'}));
     artists=charts.artists.map(x=>({...x,movement:'—'}));
@@ -734,7 +739,7 @@ async function renderMyCharts(){
 
   const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Your listening, charted</div><h1>My Charts</h1><p>Personal rankings with explicit 7-day and 28-day tracking windows.</p></header>'+
     connection+
-    '<section class="myp-formula-hero"><div><div class="mag-kicker">Daegon Standard</div><h2>Personal Daegon Score</h2><p><strong>Last.fm:</strong> plays + active listening days. <strong>Spotify imports:</strong> plays + listening time + active days when duration data is available.</p></div><code>Score = plays × 100 + listening minutes × 1.5 + active days × 18</code><small>Last.fm does not provide listening duration through recent scrobbles, so minutes contribute 0 for Last.fm-only data. We never invent a duration metric.</small></section>'+
+    '<section class="myp-formula-hero"><div><div class="mag-kicker">'+esc((chartSettings?.formula_mode||'standard')==='standard'?'Daegon Standard':'Personal Formula')+'</div><h2>Personal Daegon Score</h2><p>Choose the official Standard formula, pure play count, or your own weights. Standard remains the comparison baseline across Daegon.</p></div><form id="mypFormulaForm" class="myp-formula-form"><label>Mode<select id="mypFormulaMode"><option value="standard" '+((chartSettings?.formula_mode||'standard')==='standard'?'selected':'')+'>Standard</option><option value="plays_only" '+(chartSettings?.formula_mode==='plays_only'?'selected':'')+'>Plays Only</option><option value="custom" '+(chartSettings?.formula_mode==='custom'?'selected':'')+'>Custom</option></select></label><label>Play weight<input id="mypPlaysWeight" type="number" step="0.1" min="0" max="1000" value="'+Number(chartSettings?.plays_weight??100)+'"></label><label>Minute weight<input id="mypMinuteWeight" type="number" step="0.1" min="0" max="100" value="'+Number(chartSettings?.minute_weight??1.5)+'"></label><label>Active-day weight<input id="mypDayWeight" type="number" step="0.1" min="0" max="500" value="'+Number(chartSettings?.active_day_weight??18)+'"></label><button>Save formula</button><div id="mypFormulaStatus"></div></form><code>Score = plays × '+Number(chartSettings?.plays_weight??100)+' + listening minutes × '+Number(chartSettings?.minute_weight??1.5)+' + active days × '+Number(chartSettings?.active_day_weight??18)+'</code><small>Last.fm recent scrobbles do not include duration, so listening minutes contribute 0 for Last.fm-only plays. Changing the formula affects the next sync/rebuild.</small></section>'+
     '<section class="myp-import secondary"><div><h2>Spotify history import</h2><p>Optional: upload a Spotify Extended Streaming History JSON file to add duration-aware listening data.</p></div><label>Choose JSON<input id="mypHistoryFile" type="file" accept=".json,application/json"></label><div id="mypImportStatus"></div></section>'+
     (selected?'<section class="myp-publish"><div><div class="mag-kicker">Share & contribute</div><h2>Publish this week</h2><p>Publishing makes this chart shareable, enables friend comments and contributes its position points to Daegon Global. Your raw listening history stays private.</p></div><div class="myp-publish-controls"><input id="mypPublicHandle" maxlength="40" placeholder="Public handle" value="'+escAttr(profile?.profile_slug||'')+'"><button id="mypPublishWeek">Publish week</button><div id="mypPublishStatus"></div></div></section>':'')+
     (unique.length?'<div class="myp-controls"><div class="myp-window-tabs"><button data-window="7" class="'+(windowDays===7?'active':'')+'">7 Days</button><button data-window="28" class="'+(windowDays===28?'active':'')+'">28 Days</button></div><div class="myp-datebar"><label>Chart week ending</label><select id="mypDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div></div>':'<div class="my-empty-inline">Connect Last.fm or import listening history to generate your first personal chart.</div>')+
@@ -746,6 +751,7 @@ async function renderMyCharts(){
   '</main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal 7-day and 28-day Daegon charts generated from your listening history.','/my-charts');bindLinks();
 
+  const ff=portalEl.querySelector('#mypFormulaForm');if(ff)ff.onsubmit=async e=>{e.preventDefault();const st=portalEl.querySelector('#mypFormulaStatus'),formula_mode=portalEl.querySelector('#mypFormulaMode').value,plays_weight=Number(portalEl.querySelector('#mypPlaysWeight').value),minute_weight=Number(portalEl.querySelector('#mypMinuteWeight').value),active_day_weight=Number(portalEl.querySelector('#mypDayWeight').value);st.textContent='Saving…';const {error}=await sb.from('user_chart_settings').upsert({user_id:_dcAuthUser.id,formula_mode,plays_weight,minute_weight,active_day_weight,updated_at:new Date().toISOString()},{onConflict:'user_id'});st.textContent=error?error.message:'Saved. Sync Last.fm again to rebuild with this formula.';if(!error)setTimeout(renderMyCharts,500)};
   const lfmStatus=portalEl.querySelector('#mypLastfmStatus');
   portalEl.querySelectorAll('[data-lfm-sync]').forEach(btn=>btn.onclick=async()=>{
     const username=portalEl.querySelector('#mypLastfmUser')?.value.trim();
