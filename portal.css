@@ -4724,3 +4724,40 @@ body:not(.portal-mode) #portalPage{
  .my-alert-list a{flex-direction:column}
  .my-alert-list span{text-align:left}
 }
+
+.my-quick-links{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 24px}
+.my-quick-links a{display:block;border:1px solid var(--border);background:var(--card);padding:15px;color:var(--foreground);text-decoration:none}
+.my-quick-links strong,.my-quick-links span{display:block}.my-quick-links strong{font-size:14px}.my-quick-links span{font-size:11px;color:var(--muted-foreground);margin-top:4px}
+.myp-import{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;border:1px solid var(--border);background:var(--card);padding:18px;margin-bottom:20px}
+.myp-import h2{font-family:Georgia,"Times New Roman",serif;font-size:24px;margin:0 0 6px}.myp-import p{margin:0;color:var(--muted-foreground);line-height:1.5}
+.myp-import label{display:flex;align-items:center;gap:8px;border:1px solid var(--border);padding:10px 12px;font-size:11px;font-weight:900;text-transform:uppercase;cursor:pointer}
+.myp-import input{max-width:220px}.myp-import #mypImportStatus{grid-column:1/-1;font-size:12px;color:var(--muted-foreground)}
+.myp-datebar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0 6px}.myp-datebar label{font-size:11px;font-weight:900;text-transform:uppercase}.myp-datebar select{min-height:40px;background:var(--card);border:1px solid var(--border);color:var(--foreground);padding:8px 10px}
+.myp-chart-list{display:flex;flex-direction:column;border:1px solid var(--border);background:var(--card)}
+.myp-chart-list>div{display:grid;grid-template-columns:44px minmax(0,1fr) 70px 180px;gap:10px;align-items:center;padding:11px 13px;border-bottom:1px solid var(--border)}
+.myp-chart-list>div:last-child{border-bottom:0}.myp-chart-list b{font-size:20px}.myp-chart-list span{min-width:0}.myp-chart-list strong,.myp-chart-list small{display:block}.myp-chart-list strong{font-size:13px}.myp-chart-list small{font-size:11px;color:var(--muted-foreground);margin-top:2px}
+.myp-chart-list em{font-style:normal;font-size:11px;font-weight:800}.myp-chart-list i{font-style:normal;font-size:11px;color:var(--muted-foreground);text-align:right}
+.myp-method{margin-top:28px;border:1px solid var(--border);background:var(--card);padding:18px}.myp-method h2{font-family:Georgia,"Times New Roman",serif;margin:0 0 8px}.myp-method p{color:var(--muted-foreground);line-height:1.5}.myp-method code{display:block;padding:12px;background:var(--background);border:1px solid var(--border);overflow:auto}
+
+.forum-page,.plans-page{max-width:1180px;margin:0 auto;padding:28px 18px 72px}
+.forum-compose{display:grid;grid-template-columns:170px minmax(0,1fr);gap:10px;border:1px solid var(--border);background:var(--card);padding:16px;margin-bottom:20px}
+.forum-compose .mag-kicker{grid-column:1/-1}.forum-compose select,.forum-compose input,.forum-compose textarea{background:var(--background);border:1px solid var(--border);color:var(--foreground);padding:10px;font:inherit}
+.forum-compose textarea{grid-column:1/-1;min-height:120px;resize:vertical}.forum-compose button{grid-column:1/-1;justify-self:start;border:0;background:var(--accent);color:#000;font-size:11px;font-weight:900;text-transform:uppercase;padding:10px 14px}
+.forum-compose #forumStatus,.forum-compose #forumReplyStatus{grid-column:1/-1;font-size:11px;color:var(--muted-foreground)}
+.forum-compose.reply{display:block;margin:0 0 18px}.forum-compose.reply textarea{width:100%;display:block;margin-bottom:10px}
+.forum-list{display:flex;flex-direction:column}
+.forum-topic{display:block;padding:17px 0;border-bottom:1px solid var(--border);color:var(--foreground);text-decoration:none}.forum-topic.pending{opacity:.68}
+.forum-cat{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+.forum-topic h2{font-family:Georgia,"Times New Roman",serif;font-size:24px;margin:5px 0 6px}.forum-topic p{font-size:13px;line-height:1.5;color:var(--muted-foreground);margin:0 0 7px}.forum-topic>div:last-child{font-size:10px;color:var(--muted-foreground)}
+.forum-topic-detail{border-top:4px solid var(--foreground);padding:18px 0 24px}.forum-topic-detail h1{font-family:Georgia,"Times New Roman",serif;text-transform:none;font-size:42px;line-height:1.05;margin:7px 0 8px}.forum-topic-detail>p{font-size:16px;line-height:1.65;white-space:pre-wrap}.forum-topic-meta{font-size:11px;color:var(--muted-foreground)}
+.forum-post{padding:16px 0;border-bottom:1px solid var(--border)}.forum-post.pending{opacity:.68}.forum-post-head{display:flex;justify-content:space-between;gap:14px}.forum-post-head strong{font-size:13px}.forum-post-head span{font-size:10px;color:var(--muted-foreground)}.forum-post p{white-space:pre-wrap;line-height:1.55;margin:8px 0 0}
+.plan-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.plan-card{border:1px solid var(--border);background:var(--card);padding:22px}.plan-card.featured{border:2px solid var(--accent)}
+.plan-card h2{font-family:Georgia,"Times New Roman",serif;font-size:30px;margin:5px 0}.plan-price{font-size:22px;font-weight:900;margin:10px 0 16px}.plan-card ul{padding-left:18px;color:var(--muted-foreground);line-height:1.55;font-size:13px}.plan-card button{width:100%;margin-top:10px;border:0;background:var(--accent);color:#000;padding:11px;font-weight:900;text-transform:uppercase;font-size:11px}.plan-card button:disabled{background:var(--muted);color:var(--muted-foreground)}
+.plan-note{margin-top:18px;border:1px solid var(--border);background:var(--card);padding:16px}.plan-note p{margin:5px 0 0;color:var(--muted-foreground)}
+@media(max-width:767px){
+ .my-quick-links,.plan-grid{grid-template-columns:1fr}
+ .myp-import{grid-template-columns:1fr}.myp-import #mypImportStatus{grid-column:auto}
+ .myp-chart-list>div{grid-template-columns:36px minmax(0,1fr) 48px}.myp-chart-list i{grid-column:2/-1;text-align:left}
+ .forum-page,.plans-page{padding:20px 14px 56px}.forum-compose{grid-template-columns:1fr}.forum-compose textarea,.forum-compose .mag-kicker,.forum-compose button,.forum-compose #forumStatus{grid-column:auto}
+ .forum-topic-detail h1{font-size:32px}.forum-post-head{flex-direction:column;gap:3px}
+}
