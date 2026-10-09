@@ -5000,3 +5000,78 @@ body:not(.portal-mode) #portalPage{
 .saas-limit-note{border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:13px 0;margin:12px 0}
 .saas-limit-note a{color:var(--foreground);font-weight:900}
 @media(max-width:767px){.saas-upgrade-panel{align-items:flex-start;flex-direction:column}.saas-upgrade-panel a{width:100%;text-align:center}.saas-current-plan{align-items:flex-start;flex-direction:column;gap:3px}}
+
+
+/* Header account + theme alignment fix */
+.site-header .theme-btn,
+body.global-site-shell .theme-btn,
+body.global-bars-weekly .theme-btn{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:#f5f5f5!important;
+}
+.site-header .theme-btn:hover,
+.site-header .theme-btn:focus,
+.site-header .theme-btn:active,
+body.global-site-shell .theme-btn:hover,
+body.global-bars-weekly .theme-btn:hover{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+  color:var(--accent)!important;
+}
+.site-header .theme-btn i{
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+@media(min-width:768px){
+  body.global-site-shell .header-inner,
+  body.global-bars-weekly .header-inner{
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto 36px!important;
+    align-items:center!important;
+    column-gap:12px!important;
+    row-gap:0!important;
+  }
+
+  body.global-site-shell .brand,
+  body.global-bars-weekly .brand{
+    grid-column:1!important;
+    grid-row:1!important;
+  }
+
+  body.global-site-shell .portal-topnav,
+  body.global-bars-weekly .portal-topnav{
+    grid-column:2!important;
+    grid-row:1!important;
+  }
+
+  body.global-site-shell .portal-account-btn,
+  body.global-bars-weekly .portal-account-btn{
+    grid-column:3!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    align-self:center!important;
+    margin:0!important;
+  }
+
+  body.global-site-shell .theme-btn,
+  body.global-bars-weekly .theme-btn{
+    grid-column:4!important;
+    grid-row:1!important;
+    justify-self:end!important;
+    align-self:center!important;
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    max-width:32px!important;
+    flex:0 0 32px!important;
+    margin:0!important;
+    padding:0!important;
+    background:transparent!important;
+    border:0!important;
+  }
+}
