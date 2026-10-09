@@ -1003,7 +1003,14 @@ function ensureShell(){
     accountBtn.className='portal-account-btn';
     accountBtn.type='button';
     accountBtn.onclick=()=>_dcAuthUser?go('/my-daegon'):dcShowAuthModal();
-    head.insertBefore(accountBtn,theme);
+
+    const headerActions=document.createElement('div');
+    headerActions.id='portalHeaderActions';
+    headerActions.className='portal-header-actions';
+    headerActions.appendChild(accountBtn);
+    if(theme)headerActions.appendChild(theme);
+    head.appendChild(headerActions);
+
     dcSyncAccountButton();
     document.querySelector('.site-header').appendChild(mobileMenu);
   }
