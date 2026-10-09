@@ -4495,3 +4495,11 @@ body:not(.portal-mode) #portalPage{
 .cb-sources{margin-top:46px;padding-top:20px;border-top:2px solid var(--foreground)}
 .cb-sources h2{font-family:inherit;font-size:14px;text-transform:uppercase;letter-spacing:.09em;margin:0 0 12px}
 .cb-sources ul{margin:0;padding-left:20px}.cb-sources li{font-size:14px;line-height:1.6;margin:7px 0}.cb-sources a{color:var(--accent);word-break:break-word}
+
+.cb-article-visual{max-width:800px;margin:24px auto 30px}
+.cb-article-visual .cb-media-box,.cb-inline-visual .cb-media-box{width:100%;background:var(--muted);overflow:hidden}
+.cb-article-visual .cb-media-box{aspect-ratio:16/9}
+.cb-inline-visual{margin:28px 0 30px}
+.cb-inline-visual .cb-media-box{aspect-ratio:16/9}
+.cb-media-box img{width:100%;height:100%;object-fit:cover;display:block}
+.cb-article-visual figcaption,.cb-inline-visual figcaption{margin-top:7px;font-size:11px;line-height:1.4;color:var(--muted-foreground)}
