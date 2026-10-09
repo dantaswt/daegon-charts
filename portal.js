@@ -2006,7 +2006,7 @@ async function renderChartBeatHome(){
   const lead=CHART_BEAT_ARTICLES[0],rest=CHART_BEAT_ARTICLES.slice(1);
   const main='<main class="cb-home">'+
     '<header class="cb-mast"><div><div class="cb-eyebrow">Journalism from the archive</div><h1>Chart Beat</h1><p>Records, historical context and the stories behind the rankings.</p></div>'+
-      '<a class="cb-desk-link" href="'+appHref('/chart-beat/data-desk')+'" data-portal-link="/chart-beat/data-desk">Weekly Data Desk →</a></header>'+
+      '<div class="cb-mast-actions"><a class="cb-desk-link" href="'+appHref('/chart-beat/weekly')+'" data-portal-link="/chart-beat/weekly">Weekly Coverage →</a><a class="cb-desk-link" href="'+appHref('/chart-beat/data-desk')+'" data-portal-link="/chart-beat/data-desk">Data Desk →</a></div></header>'+
     (lead?chartBeatCard(lead,true):'')+
     (rest.length?'<section class="cb-grid">'+rest.map(a=>chartBeatCard(a)).join('')+'</section>':'')+
     '<section class="cb-sections"><h2>Coverage</h2><div class="cb-section-grid">'+
@@ -2036,6 +2036,157 @@ function renderChartBeatArticle(slug){
   setMode(true);portalEl.innerHTML=shellHtml(main);setChartBeatArticleMeta(a);bindLinks();hydratePortalImages();hydrateChartBeatMetaImage(a);
   const copy=portalEl.querySelector('[data-copy-article]');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText(location.href);copy.innerHTML='<i class="fas fa-check"></i> Link copied'}catch{}};
 }
+
+const CHART_BEAT_DATA_ERA='2017-06-24';
+function cbMetricNum(v){
+  if(v===null||v===undefined)return null;
+  const raw=String(v).trim();if(!raw)return null;
+  const n=Number(raw.replace(/,/g,'').replace(/[^0-9.+-]/g,''));
+  return Number.isFinite(n)?n:null;
+}
+function cbMetricDisplay(v){
+  const n=cbMetricNum(v);if(n===null)return '—';
+  return new Intl.NumberFormat('en-US',{maximumFractionDigits:n>=1000?0:1}).format(n);
+}
+function cbEntryMap(list){const m=new Map();for(const e of list||[])m.set(itemKey(e),e);return m}
+function cbHistoricalPeak(data,key,date){
+  let peak=Infinity;
+  for(const d of data.dates||[]){if(d>=date)break;for(const e of data.entriesByDate[d]||[])if(itemKey(e)===key)peak=Math.min(peak,Number(e.position)||999)}
+  return peak;
+}
+function cbDistinctNo1sForArtist(data,artist,date){
+  const seen=new Set(),target=creditNorm(artist);
+  for(const d of data.dates||[]){if(d>date)break;for(const e of data.entriesByDate[d]||[])if(e.position===1&&creditNorm(e.artist)===target)seen.add(itemKey(e))}
+  return seen.size;
+}
+function cbTop10sForArtist(data,artist,date){
+  const seen=new Set(),target=creditNorm(artist);
+  for(const d of data.dates||[]){if(d>date)break;for(const e of data.entriesByDate[d]||[])if(e.position<=10&&creditNorm(e.artist)===target)seen.add(itemKey(e))}
+  return seen.size;
+}
+function cbLargestMetricGain(current,previous,field){
+  const pm=cbEntryMap(previous),rows=[];
+  for(const e of current||[]){
+    const p=pm.get(itemKey(e));if(!p)continue;
+    const now=cbMetricNum(e[field]),before=cbMetricNum(p[field]);
+    if(now===null||before===null)continue;
+    const delta=now-before;if(delta>0)rows.push({entry:e,now,before,delta,field});
+  }
+  return rows.sort((a,b)=>b.delta-a.delta)[0]||null;
+}
+function cbComponentLeader(component,date){
+  if(!component)return null;
+  const list=component.entriesByDate?.[date]||[];
+  return list[0]||null;
+}
+function buildWeeklyStoryEngine(songs,date,components={}){
+  const dates=songs?.dates||[],ix=dates.indexOf(date),prevDate=ix>0?dates[ix-1]:null;
+  const current=songs?.entriesByDate?.[date]||[],previous=prevDate?songs.entriesByDate?.[prevDate]||[]:[];
+  const prevMap=cbEntryMap(previous),leader=current[0]||null,prevLeader=previous[0]||null;
+  const isDataEra=date>=CHART_BEAT_DATA_ERA;
+  const debuts=current.filter(e=>e.diff==='NEW').sort((a,b)=>a.position-b.position);
+  const reentries=current.filter(e=>e.diff==='RE').sort((a,b)=>a.position-b.position);
+  const gainers=current.filter(e=>String(e.diff).startsWith('▲')).map(e=>({...e,move:toInt(String(e.diff).slice(1))})).sort((a,b)=>b.move-a.move||a.position-b.position);
+  const newPeaks=current.filter(e=>{
+    if(e.diff==='NEW')return false;
+    const old=cbHistoricalPeak(songs,itemKey(e),date);
+    return Number.isFinite(old)&&e.position<old;
+  }).sort((a,b)=>a.position-b.position);
+  const artistCounts=new Map(),albumCounts=new Map();
+  for(const e of current){
+    const a=String(e.artist||'').trim();if(a)artistCounts.set(a,(artistCounts.get(a)||0)+1);
+    const al=String(e.album||'').trim();if(al){const k=al+'||'+a;const x=albumCounts.get(k)||{album:al,artist:a,count:0,entries:[]};x.count++;x.entries.push(e);albumCounts.set(k,x)}
+  }
+  const mostEntries=[...artistCounts.entries()].sort((a,b)=>b[1]-a[1])[0]||null;
+  const albumBomb=[...albumCounts.values()].filter(x=>x.count>=3).sort((a,b)=>b.count-a.count)[0]||null;
+  const salesGain=isDataEra?cbLargestMetricGain(current,previous,'sales'):null;
+  const streamsGain=isDataEra?cbLargestMetricGain(current,previous,'streams'):null;
+  const airplayGain=isDataEra?(cbLargestMetricGain(current,previous,'airplay')||cbLargestMetricGain(current,previous,'audience')):null;
+  const componentLeaders=isDataEra?{
+    sales:cbComponentLeader(components.digitalSongsSales,date),
+    streams:cbComponentLeader(components.streamingSongs,date),
+    radio:cbComponentLeader(components.radioSongs,date)
+  }:{};
+  const leaderNo1s=leader?cbDistinctNo1sForArtist(songs,leader.artist,date):0;
+  const leaderTop10s=leader?cbTop10sForArtist(songs,leader.artist,date):0;
+  const leaderChanged=!!leader&&!!prevLeader&&itemKey(leader)!==itemKey(prevLeader);
+  const headline=leader
+    ? (leaderChanged
+      ? esc(portalText(leader.name))+' takes No. 1 as '+esc(portalArtist(leader.artist))+' leads a changing Daegon 100'
+      : esc(portalText(leader.name))+' holds No. 1 on the Daegon 100')
+    :'Daegon 100 weekly briefing';
+  return {date,prevDate,current,previous,leader,prevLeader,isDataEra,debuts,reentries,gainers,newPeaks,mostEntries,albumBomb,salesGain,streamsGain,airplayGain,componentLeaders,leaderNo1s,leaderTop10s,leaderChanged,headline};
+}
+function cbStoryMetricCard(label,x){
+  if(!x)return '';
+  return '<div class="cb-number-card"><span>'+esc(label)+'</span><strong>'+esc(portalText(x.entry.name))+'</strong><small>'+esc(portalArtist(x.entry.artist))+' · +'+cbMetricDisplay(x.delta)+'</small></div>';
+}
+function cbWeeklyStoryHtml(story){
+  const L=story.leader;
+  let html='<section class="cb-weekly-story">'+
+    '<div class="cb-weekly-label">Weekly Story Engine · '+(story.isDataEra?'Data Era':'Archive Era')+'</div>'+
+    '<h2>'+story.headline+'</h2>'+
+    (L?'<p class="cb-weekly-lead"><strong>'+esc(portalText(L.name))+'</strong> by '+esc(portalArtist(L.artist))+' is No. 1 for the chart dated '+fmtDate(story.date)+'. It has spent '+(L.weeksAt1||1)+' week'+((L.weeksAt1||1)===1?'':'s')+' at No. 1 and '+(L.weeks||1)+' week'+((L.weeks||1)===1?'':'s')+' on the chart.</p>':'')+
+    '<div class="cb-story-grid">'+
+      '<article><div class="cb-kicker">The Big Story</div><h3>'+(story.leaderChanged?'A new leader takes over':'The No. 1 story')+'</h3><p>'+
+      (L?(story.leaderChanged&&story.prevLeader
+        ? '<strong>'+esc(portalText(L.name))+'</strong> replaces <strong>'+esc(portalText(story.prevLeader.name))+'</strong> at No. 1. '+esc(portalArtist(L.artist))+' now has '+story.leaderNo1s+' distinct No. 1 '+(story.leaderNo1s===1?'song':'songs')+' and '+story.leaderTop10s+' Top 10 '+(story.leaderTop10s===1?'entry':'entries')+' in the tracked Daegon 100 history through this week.'
+        : '<strong>'+esc(portalText(L.name))+'</strong> remains the week’s central chart story. '+esc(portalArtist(L.artist))+' has '+story.leaderNo1s+' distinct No. 1 '+(story.leaderNo1s===1?'song':'songs')+' in the archive through this date.'):'No leader available.')+
+      '</p></article>'+
+      '<article><div class="cb-kicker">History Watch</div><h3>'+story.newPeaks.length+' new peak'+(story.newPeaks.length===1?'':'s')+'</h3><p>'+
+      (story.newPeaks.length?story.newPeaks.slice(0,5).map(e=>'<strong>'+esc(portalText(e.name))+'</strong> (#'+e.position+')').join(' · '):'No returning entry sets a new career peak this week.')+
+      '</p></article>'+
+      '<article><div class="cb-kicker">New & Notable</div><h3>'+story.debuts.length+' debut'+(story.debuts.length===1?'':'s')+'</h3><p>'+
+      (story.debuts.length?story.debuts.slice(0,6).map(e=>'<strong>'+esc(portalText(e.name))+'</strong> (#'+e.position+')').join(' · '):'No first-time entries this week.')+
+      '</p></article>'+
+      '<article><div class="cb-kicker">Rising</div><h3>'+(story.gainers[0]?'Largest climb: +'+story.gainers[0].move:'No major climb')+'</h3><p>'+
+      (story.gainers[0]?'<strong>'+esc(portalText(story.gainers[0].name))+'</strong> by '+esc(portalArtist(story.gainers[0].artist))+' rises to No. '+story.gainers[0].position+'.':'No upward movement is available for this week.')+
+      '</p></article>'+
+    '</div>';
+  if(story.isDataEra){
+    html+='<section class="cb-by-numbers"><div class="cb-kicker">By the Numbers</div><h3>Sales, streaming and airplay</h3>'+
+      '<div class="cb-number-grid">'+
+        cbStoryMetricCard('Biggest sales gain',story.salesGain)+
+        cbStoryMetricCard('Biggest streaming gain',story.streamsGain)+
+        cbStoryMetricCard('Biggest airplay gain',story.airplayGain)+
+        (story.componentLeaders.sales?'<div class="cb-number-card"><span>Digital Songs Sales No. 1</span><strong>'+esc(portalText(story.componentLeaders.sales.name))+'</strong><small>'+esc(portalArtist(story.componentLeaders.sales.artist))+'</small></div>':'')+
+        (story.componentLeaders.streams?'<div class="cb-number-card"><span>Streaming Songs No. 1</span><strong>'+esc(portalText(story.componentLeaders.streams.name))+'</strong><small>'+esc(portalArtist(story.componentLeaders.streams.artist))+'</small></div>':'')+
+        (story.componentLeaders.radio?'<div class="cb-number-card"><span>Radio Songs No. 1</span><strong>'+esc(portalText(story.componentLeaders.radio.name))+'</strong><small>'+esc(portalArtist(story.componentLeaders.radio.artist))+'</small></div>':'')+
+      '</div>'+
+      '<p class="cb-data-note">Component changes are calculated only when comparable numeric values are present in consecutive Daegon chart weeks. They describe the project’s stored chart data and should not be presented as third-party certified industry totals.</p></section>';
+  }else{
+    html+='<div class="cb-archive-note"><strong>Archive Era:</strong> sales, streaming and airplay breakdowns are intentionally omitted before '+fmtDate(CHART_BEAT_DATA_ERA)+'. Coverage is based on ranking trajectory, historical records and documented context.</div>';
+  }
+  if(story.albumBomb||story.mostEntries){
+    html+='<section class="cb-weekly-extra"><div class="cb-kicker">Chart Density</div><h3>Multiple entries</h3><p>'+
+      (story.albumBomb?'<strong>'+esc(story.albumBomb.album)+'</strong> by '+esc(portalArtist(story.albumBomb.artist))+' places '+story.albumBomb.count+' tracks on the chart. ':'')+
+      (story.mostEntries?'<strong>'+esc(portalArtist(story.mostEntries[0]))+'</strong> has the most simultaneous entries this week ('+story.mostEntries[1]+').':'')+
+      '</p></section>';
+  }
+  if(story.reentries.length)html+='<section class="cb-weekly-extra"><div class="cb-kicker">Returns</div><h3>Back on the chart</h3><p>'+story.reentries.slice(0,6).map(e=>'<strong>'+esc(portalText(e.name))+'</strong> (#'+e.position+')').join(' · ')+'</p></section>';
+  return html+'</section>';
+}
+async function renderChartBeatWeekly(dateArg){
+  clearChartBeatArticleMeta();
+  loading('Chart Beat Weekly');
+  const [songs,digital,streaming,radio]=await Promise.all([
+    loadWeekly('songs'),
+    loadWeekly('digitalSongsSales').catch(()=>null),
+    loadWeekly('streamingSongs').catch(()=>null),
+    loadWeekly('radioSongs').catch(()=>null)
+  ]);
+  const dates=songs?.dates||[];let date=dateArg&&dates.includes(dateArg)?dateArg:dates[dates.length-1];
+  const draw=()=>{
+    const story=buildWeeklyStoryEngine(songs,date,{digitalSongsSales:digital,streamingSongs:streaming,radioSongs:radio});
+    const main='<main class="cb-weekly-page"><header class="cb-weekly-head"><a class="cb-back" href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat">← Chart Beat</a><div class="cb-kicker">Weekly Coverage</div><h1>Chart Beat Weekly</h1><p>'+fmtDate(date)+'</p></header>'+
+      '<div class="cb-week-picker"><label>Chart week</label><select id="cbWeeklyDate">'+[...dates].reverse().slice(0,180).map(d=>'<option value="'+escAttr(d)+'" '+(d===date?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div>'+
+      cbWeeklyStoryHtml(story)+
+      '<div class="cb-editorial-warning"><strong>Editorial workflow:</strong> this engine identifies potential stories and verified calculations from the Daegon archive. Historical superlatives, outside causes and quotations still require editorial research before publication as a reported article.</div>'+
+    '</main>';
+    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat Weekly — '+fmtDate(date),'Weekly Daegon 100 story briefing with chart movement, records and, from June 2017, sales, streaming and airplay analysis.','/chart-beat/weekly/'+date);bindLinks();
+    const sel=document.getElementById('cbWeeklyDate');if(sel)sel.onchange=()=>{date=sel.value;history.replaceState({},'',appHref('/chart-beat/weekly/'+date));draw()};
+  };draw();
+}
 async function renderChartBeatDataDesk(){
   clearChartBeatArticleMeta();
   loading('Weekly Data Desk');
@@ -2063,6 +2214,7 @@ async function renderChartBeatDataDesk(){
 async function renderChartBeat(){
   const p=routeParts();
   if(p[1]==='data-desk')return renderChartBeatDataDesk();
+  if(p[1]==='weekly')return renderChartBeatWeekly(p[2]||'');
   if(p[1])return renderChartBeatArticle(p[1]);
   return renderChartBeatHome();
 }
