@@ -1793,31 +1793,134 @@ async function renderGoat(chartSeg){
   draw();
 }
 
-async function renderChartBeat(){
-  loading('Chart Beat');
+
+const CHART_BEAT_ARTICLES=[
+  {
+    slug:'editorial-standards',
+    category:'Behind the Charts',
+    headline:'How Daegon Charts investigates chart history',
+    seoTitle:'How Daegon Charts Researches Music Chart History',
+    socialTitle:'What does it take to investigate a chart record?',
+    dek:'A look at the research rules behind historical claims, artist credits, chart continuity and source verification at Daegon Charts.',
+    byline:'Daegon Charts Editorial',
+    published:'2026-10-08',
+    modified:'2026-10-08',
+    image:'https://i.imgur.com/jaBZ19n.png',
+    body:[
+      '<p>A chart fact can look simple on the surface. A song is No. 1, an artist enters the Top 10 or an album returns to the ranking. Historical reporting starts after that observation: the archive has to be checked for earlier appearances, alternate credits, duplicate versions and continuity errors before a claim can be described as a record.</p>',
+      '<h2>Start with a question, not a superlative</h2><p>Daegon Charts treats phrases such as “first,” “most,” “longest” and “biggest” as claims that require a complete comparison set. If the underlying period has not been checked, the wording should remain narrower: “the highest position in the current run,” for example, rather than “the biggest ever.”</p>',
+      '<h2>Identity matters</h2><p>Historical chart research can be distorted by spelling variants, featured credits, remixes and duplicated recordings. Before counting entries or No. 1s, artist and title identities are normalized according to the project’s credit rules. The goal is to avoid manufacturing a record through inconsistent metadata.</p>',
+      '<h2>Continuity comes before storytelling</h2><p>NEW, RE, LW, Peak and Weeks on Chart depend on the previous history of an entry. A broken weekly run can turn a continuation into a false re-entry or reset a peak. For that reason, continuity problems are treated as data-quality issues before they become editorial material.</p>',
+      '<h2>Contemporary sources add context</h2><p>When an article discusses a release era, interview, performance or public statement, the preferred approach is to cite a real source from that period or clearly identify a later retrospective source. Quotation and paraphrase must remain attributable. Daegon Charts does not invent statements, anonymous insiders or reconstructed dialogue.</p>',
+      '<h2>Correlation is not automatically causation</h2><p>A chart rise after an awards performance, video release or viral moment can be reported as a sequence of events. Claiming that one event caused the movement requires stronger evidence. Articles should distinguish what the ranking shows from what external reporting or direct statements establish.</p>',
+      '<h2>Corrections remain part of the archive</h2><p>Historical reconstruction is subject to revision when better evidence appears. Material changes to published findings should be reflected in the article’s updated date and, where appropriate, a correction note.</p>',
+      '<p class="cb-source-note">Readers can review the <a href="/methodology">methodology</a> or submit a documented correction through the <a href="/contact">contact page</a>.</p>'
+    ].join('')
+  }
+];
+
+function setChartBeatArticleMeta(a){
+  setMeta(a.seoTitle,a.dek,'/chart-beat/'+a.slug,true);
+  document.title=a.seoTitle+' | Daegon Charts';
+  const ensure=(sel,tag,attrs)=>{
+    let el=document.querySelector(sel);
+    if(!el){el=document.createElement(tag);Object.entries(attrs||{}).forEach(([k,v])=>el.setAttribute(k,v));document.head.appendChild(el)}
+    return el;
+  };
+  const ogType=ensure('meta[property="og:type"]','meta',{'property':'og:type'});ogType.content='article';
+  const ogImage=ensure('meta[property="og:image"]','meta',{'property':'og:image'});ogImage.content=a.image;
+  const twCard=ensure('meta[name="twitter:card"]','meta',{'name':'twitter:card'});twCard.content='summary_large_image';
+  const twTitle=ensure('meta[name="twitter:title"]','meta',{'name':'twitter:title'});twTitle.content=a.socialTitle||a.headline;
+  const twDesc=ensure('meta[name="twitter:description"]','meta',{'name':'twitter:description'});twDesc.content=a.dek;
+  const twImage=ensure('meta[name="twitter:image"]','meta',{'name':'twitter:image'});twImage.content=a.image;
+  document.querySelector('meta[property="og:title"]').content=a.socialTitle||a.headline;
+  document.querySelector('meta[property="og:description"]').content=a.dek;
+  let ld=document.getElementById('chartBeatArticleSchema');
+  if(!ld){ld=document.createElement('script');ld.type='application/ld+json';ld.id='chartBeatArticleSchema';document.head.appendChild(ld)}
+  ld.textContent=JSON.stringify({
+    '@context':'https://schema.org','@type':'Article',
+    headline:a.headline,description:a.dek,image:[a.image],
+    datePublished:a.published,dateModified:a.modified,
+    author:{'@type':'Organization',name:a.byline,url:'https://daegoncharts.com.br/about'},
+    publisher:{'@type':'Organization',name:'Daegon Charts',url:'https://daegoncharts.com.br/'},
+    mainEntityOfPage:'https://daegoncharts.com.br/chart-beat/'+a.slug
+  });
+}
+function clearChartBeatArticleMeta(){
+  const ld=document.getElementById('chartBeatArticleSchema');if(ld)ld.remove();
+  const ogType=document.querySelector('meta[property="og:type"]');if(ogType)ogType.content='website';
+}
+function chartBeatCard(a,lead=false){
+  return '<article class="cb-card '+(lead?'cb-lead':'')+'">'+
+    '<a class="cb-card-link" href="'+appHref('/chart-beat/'+a.slug)+'" data-portal-link="/chart-beat/'+a.slug+'">'+
+      '<div class="cb-card-art"><img src="'+escAttr(a.image)+'" alt="" loading="eager"></div>'+
+      '<div class="cb-card-copy"><div class="cb-kicker">'+esc(a.category)+'</div><h2>'+esc(a.headline)+'</h2><p>'+esc(a.dek)+'</p>'+
+      '<div class="cb-meta">By '+esc(a.byline)+' · '+fmtDate(a.published)+'</div></div>'+
+    '</a></article>';
+}
+async function renderChartBeatHome(){
+  clearChartBeatArticleMeta();
+  const lead=CHART_BEAT_ARTICLES[0],rest=CHART_BEAT_ARTICLES.slice(1);
+  const main='<main class="cb-home">'+
+    '<header class="cb-mast"><div><div class="cb-eyebrow">Journalism from the archive</div><h1>Chart Beat</h1><p>Records, historical context and the stories behind the rankings.</p></div>'+
+      '<a class="cb-desk-link" href="'+appHref('/chart-beat/data-desk')+'" data-portal-link="/chart-beat/data-desk">Weekly Data Desk →</a></header>'+
+    (lead?chartBeatCard(lead,true):'')+
+    (rest.length?'<section class="cb-grid">'+rest.map(a=>chartBeatCard(a)).join('')+'</section>':'')+
+    '<section class="cb-sections"><h2>Coverage</h2><div class="cb-section-grid">'+
+      '<div><strong>Chart Beat Weekly</strong><span>The most important chart story of the week.</span></div>'+
+      '<div><strong>Chart Rewind</strong><span>Historical weeks revisited with contemporary sources.</span></div>'+
+      '<div><strong>Chart Records</strong><span>Verified milestones, streaks and career achievements.</span></div>'+
+      '<div><strong>Chart Analysis</strong><span>Long-form investigations across eras and markets.</span></div>'+
+      '<div><strong>Ask Daegon</strong><span>Reader questions answered with archive research.</span></div>'+
+      '<div><strong>Behind the Charts</strong><span>Methodology, corrections and research standards.</span></div>'+
+    '</div></section>'+
+  '</main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat','Chart journalism, historical research, records and analysis from the Daegon Charts archive.','/chart-beat');bindLinks();
+}
+function renderChartBeatArticle(slug){
+  clearChartBeatArticleMeta();
+  const a=CHART_BEAT_ARTICLES.find(x=>x.slug===slug);if(!a){renderNotFound();return}
+  const main='<main class="cb-article">'+
+    '<a class="cb-back" href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat">← Chart Beat</a>'+
+    '<header><div class="cb-kicker">'+esc(a.category)+'</div><h1>'+esc(a.headline)+'</h1><p class="cb-dek">'+esc(a.dek)+'</p>'+
+      '<div class="cb-byline">By <strong>'+esc(a.byline)+'</strong><br><span>Published '+fmtDate(a.published)+(a.modified!==a.published?' · Updated '+fmtDate(a.modified):'')+'</span></div>'+
+    '</header>'+
+    '<div class="cb-share" aria-label="Share article"><button data-copy-article><i class="fas fa-link"></i> Copy link</button></div>'+
+    '<div class="cb-article-body">'+a.body+'</div>'+
+    '<footer class="cb-article-footer"><strong>Corrections & sourcing</strong><p>Source-backed corrections are welcome. Include the chart date and a reliable reference when possible.</p><a href="/contact">Contact the editorial desk →</a></footer>'+
+  '</main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setChartBeatArticleMeta(a);bindLinks();
+  const copy=portalEl.querySelector('[data-copy-article]');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText(location.href);copy.innerHTML='<i class="fas fa-check"></i> Link copied'}catch{}};
+}
+async function renderChartBeatDataDesk(){
+  clearChartBeatArticleMeta();
+  loading('Weekly Data Desk');
   const ids=['songs','albums','artists','radioSongs','streamingSongs','digitalSongsSales','topStreamingAlbums','topAlbumSales'];
   const data=await Promise.all(ids.map(async id=>{try{return await loadWeekly(id)}catch{return null}}));
   let active='songs',date=(data[0]?.dates||[]).slice(-1)[0]||'';
   const draw=()=>{
     const d=data[ids.indexOf(active)],dates=[...(d?.dates||[])].reverse(),entries=d?.entriesByDate?.[date]||[],no1=entries[0],debuts=entries.filter(x=>x.diff==='NEW').slice(0,5);
     const mover=[...entries].filter(x=>String(x.diff).startsWith('▲')).sort((a,b)=>toInt(String(b.diff).slice(1))-toInt(String(a.diff).slice(1)))[0];
-    const top10=entries.slice(0,10),returners=entries.filter(x=>x.diff==='RE').slice(0,5),steady=entries.filter(x=>String(x.diff)==='0').slice(0,5);
-    const article='<article class="orig-beat-article">'+
-      '<div class="editorial-kicker">Weekly analysis</div>'+
-      (no1?'<h2>'+esc(no1.name)+' leads the '+esc(charts[active].title)+'</h2><p><strong>'+esc(no1.artist||no1.name)+'</strong> holds No. 1 for the chart week of '+fmtDate(date)+'. The chart below is read from the same weekly dataset used throughout the archive, so movement and historical runs remain directly traceable to the source week.</p>':'')+
-      (top10.length?'<h3>Inside the Top 10</h3><p>The week’s Top 10 contains '+top10.length+' entries. '+top10.slice(0,3).map((x,i)=>(i+1)+'. <strong>'+esc(portalText(x.name))+'</strong>').join(' · ')+' lead the upper tier.</p>':'')+
-      (debuts.length?'<h3>New entries</h3><p>'+debuts.map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+' '+(debuts.length===1?'makes':'make')+' a first chart appearance this week.</p>':'')+
-      (returners.length?'<h3>Returns</h3><p>'+returners.map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+' return to the ranking after appearing in an earlier week.</p>':'')+
-      (mover?'<h3>Biggest upward move</h3><p><strong>'+esc(portalText(mover.name))+'</strong> posts the strongest climb among the entries shown this week ('+esc(mover.diff)+').</p>':'')+
-      (steady.length?'<h3>Holding position</h3><p>'+steady.slice(0,3).map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+' remain at the same rank as the previous chart week.</p>':'')+
-      '<div class="beat-method-note"><strong>About Chart Beat:</strong> this page summarizes movements already present in the Daegon weekly chart. It does not add a separate editorial score to the rankings. <a href="'+appHref('/methodology')+'">Read the methodology →</a></div>'+
-    '</article>';
-    const main='<div class="orig-beat-layout"><aside class="orig-beat-side"><h2>Chart Beat</h2><div class="orig-beat-charts">'+ids.map(id=>'<button data-beat-chart="'+id+'" class="'+(id===active?'active':'')+'"><i class="fas '+(charts[id].icon||'fa-chart-bar')+'"></i>'+esc(charts[id].title)+'</button>').join('')+'</div><h3>Weeks</h3><div class="orig-beat-weeks">'+dates.slice(0,80).map(x=>'<button data-beat-date="'+x+'" class="'+(x===date?'active':'')+'">'+fmtDate(x)+'</button>').join('')+'</div></aside><main class="orig-beat-main"><div class="orig-beat-title"><h1>Chart Beat</h1><p>'+esc(charts[active].title)+' · '+fmtDate(date)+'</p></div><div class="orig-beat-actions"><a href="'+appHref(chartPath(active,date))+'" class="orig-view"><i class="fas fa-chart-bar"></i> View Raw Chart</a></div>'+article+'</main></div>';
-    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat','Weekly analysis of No. 1s, debuts, returns and movement across Daegon Charts.','/chart-beat');bindLinks();
+    const top10=entries.slice(0,10),returners=entries.filter(x=>x.diff==='RE').slice(0,5);
+    const article='<article class="orig-beat-article"><div class="editorial-kicker">Automated data summary</div>'+
+      '<h2>Weekly signals</h2><p>This page surfaces movements for research. It is not a reported Chart Beat article and does not make historical-record claims.</p>'+
+      (no1?'<h3>No. 1</h3><p><strong>'+esc(no1.name)+'</strong> — '+esc(no1.artist||'')+'.</p>':'')+
+      (top10.length?'<h3>Top 10</h3><p>'+top10.slice(0,5).map((x,i)=>(i+1)+'. <strong>'+esc(portalText(x.name))+'</strong>').join(' · ')+'</p>':'')+
+      (debuts.length?'<h3>Debuts to investigate</h3><p>'+debuts.map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+'</p>':'')+
+      (returners.length?'<h3>Re-entries to investigate</h3><p>'+returners.map(x=>'<strong>'+esc(portalText(x.name))+'</strong>').join(', ')+'</p>':'')+
+      (mover?'<h3>Largest upward movement</h3><p><strong>'+esc(portalText(mover.name))+'</strong> ('+esc(mover.diff)+').</p>':'')+
+      '<div class="beat-method-note"><strong>Research tool:</strong> movements shown here require editorial verification before they become record or causal claims.</div></article>';
+    const main='<div class="orig-beat-layout"><aside class="orig-beat-side"><a class="cb-back" href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat">← Chart Beat</a><h2>Data Desk</h2><div class="orig-beat-charts">'+ids.map(id=>'<button data-beat-chart="'+id+'" class="'+(id===active?'active':'')+'">'+esc(charts[id].title)+'</button>').join('')+'</div><h3>Weeks</h3><div class="orig-beat-weeks">'+dates.slice(0,80).map(x=>'<button data-beat-date="'+x+'" class="'+(x===date?'active':'')+'">'+fmtDate(x)+'</button>').join('')+'</div></aside><main class="orig-beat-main"><div class="orig-beat-title"><h1>Weekly Data Desk</h1><p>'+esc(charts[active].title)+' · '+fmtDate(date)+'</p></div>'+article+'</main></div>';
+    setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Weekly Data Desk','Automated weekly chart movements used as a research aid by Chart Beat.','/chart-beat/data-desk');bindLinks();
     portalEl.querySelectorAll('[data-beat-chart]').forEach(b=>b.onclick=()=>{active=b.dataset.beatChart;const dd=data[ids.indexOf(active)];date=(dd?.dates||[]).slice(-1)[0]||'';draw()});
     portalEl.querySelectorAll('[data-beat-date]').forEach(b=>b.onclick=()=>{date=b.dataset.beatDate;draw()});
-  };
-  draw();
+  };draw();
+}
+async function renderChartBeat(){
+  const p=routeParts();
+  if(p[1]==='data-desk')return renderChartBeatDataDesk();
+  if(p[1])return renderChartBeatArticle(p[1]);
+  return renderChartBeatHome();
 }
 
 async function renderAwards(){
