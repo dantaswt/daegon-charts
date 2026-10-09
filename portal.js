@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const PORTAL_ROUTES=new Set(['','news','features','songs','albums','artists','number-ones','stats','year-end','decade-end','goat','chart-beat','awards','chart-battle','search','song','album','artist']);
+const PORTAL_ROUTES=new Set(['','news','features','reviews','trending','community','ai','songs','albums','artists','number-ones','stats','year-end','decade-end','goat','chart-beat','awards','chart-battle','search','song','album','artist']);
 const mainChartIds={song:'songs',album:'albums',artist:'artists'};
 const periodLimits={songs:100,albums:100,artists:50};
 const PORTAL_SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
@@ -161,8 +161,8 @@ function ensureShell(){
     navEl.id='portalTopNav';
     navEl.className='portal-topnav';
     navEl.innerHTML=[
-      ['NEWS','/news'],['CHART BEAT','/chart-beat'],['FEATURES','/features'],['CHARTS','/chart/daegon-100'],
-      ['YEAR-END','/year-end'],['GOAT','/goat'],['STATS','/stats'],['ABOUT','/about']
+      ['NEWS','/news'],['TRENDING','/trending'],['CHART BEAT','/chart-beat'],['FEATURES','/features'],['REVIEWS','/reviews'],
+      ['CHARTS','/chart/daegon-100'],['COMMUNITY','/community'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     const theme=document.getElementById('themeToggle');
     head.insertBefore(navEl,theme);
@@ -183,8 +183,8 @@ function ensureShell(){
     mobileMenu.id='portalMobileMenu';
     mobileMenu.className='portal-mobile-drawer';
     mobileMenu.innerHTML=[
-      ['NEWS','/news'],['CHART BEAT','/chart-beat'],['FEATURES','/features'],['CHARTS','/chart/daegon-100'],
-      ['YEAR-END','/year-end'],['GOAT','/goat'],['STATS','/stats'],['ABOUT','/about']
+      ['NEWS','/news'],['TRENDING','/trending'],['CHART BEAT','/chart-beat'],['FEATURES','/features'],['REVIEWS','/reviews'],
+      ['CHARTS','/chart/daegon-100'],['COMMUNITY','/community'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     mobileBtn.setAttribute('aria-expanded','false');
     mobileMenu.setAttribute('aria-hidden','true');
@@ -296,7 +296,11 @@ function routeSkeletonMeta(parts){
     first==='number-ones'?'Number Ones':
     first==='chart-beat'?'Chart Beat':
     first==='news'?'Music News':
+    first==='trending'?'Trending':
     first==='features'?'Features':
+    first==='reviews'?'Reviews':
+    first==='community'?'Community':
+    first==='ai'?'AI at Daegon':
     first==='stats'?'Stats':
     first==='search'?'Search':
     first==='chart-battle'?'Chart Battle':
@@ -545,6 +549,42 @@ function catalogEditorial(kind){
 }
 
 
+
+function renderDaegonAIPage(){
+  const main='<main class="mag-static"><header class="mag-index-head"><div class="mag-kicker">Transparency</div><h1>AI at Daegon</h1><p>How artificial intelligence supports research, analysis and publishing — and where human editorial judgment remains essential.</p></header>'+
+  '<section class="mag-static-grid">'+
+    '<article><h2>What AI does</h2><p>Daegon uses AI to help inspect chart history, detect unusual movements, surface possible records, organize source material, summarize long timelines and prepare editorial drafts. It also helps connect historical chart data with contemporary reporting.</p></article>'+
+    '<article><h2>What AI does not decide alone</h2><p>AI output is not treated as a source. Claims about records, dates, quotations, releases, industry events and causation require verification against the Daegon archive or external sources before publication.</p></article>'+
+    '<article><h2>Historical reconstruction</h2><p>Historical Daegon charts are reconstructed editorial datasets. AI can assist with reconciliation and anomaly detection, but the project distinguishes reconstructed chart history from externally reported historical facts.</p></article>'+
+    '<article><h2>News and trending topics</h2><p>Social-media conversation can trigger a story, but virality is not evidence. Daegon seeks a primary source or reliable reporting before presenting a claim as fact and separates public reaction from verified information.</p></article>'+
+    '<article><h2>Corrections</h2><p>Because both data work and AI-assisted research can contain errors, Daegon treats corrections as part of the editorial process. Material factual changes should be reflected in the article and its updated date.</p></article>'+
+    '<article><h2>Why use AI?</h2><p>The goal is not to publish more words. It is to make a large music archive useful: identify patterns humans might miss, revisit thousands of chart weeks and build richer context around music history.</p></article>'+
+  '</section></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('AI at Daegon','How Daegon Charts uses AI for music research, chart analysis and editorial production.','/ai');bindLinks();
+}
+function renderCommunity(){
+  const main='<main class="mag-community"><header class="mag-index-head"><div class="mag-kicker">Daegon Community</div><h1>Music is better when people argue about it.</h1><p>A future home for chart debates, reviews, reactions and music discussion. Accounts and moderated comments are being built before public posting opens.</p></header>'+
+  '<section class="mag-community-grid"><article><div class="mag-kicker">Coming first</div><h2>Article discussions</h2><p>Logged-in readers will be able to discuss Chart Beat, reviews and news beneath each story.</p></article>'+
+  '<article><div class="mag-kicker">Community standards</div><h2>Discussion without chaos</h2><p>Comments will launch with accounts, reporting tools and moderation. Anonymous posting will not be enabled.</p></article>'+
+  '<article><div class="mag-kicker">Next</div><h2>Profiles & favorites</h2><p>Accounts can later support followed artists, saved charts, favorite songs and personalized alerts.</p></article></section></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Daegon Community','Community discussions, music reactions and future member features at Daegon Charts.','/community');bindLinks();
+}
+async function renderTrending(){
+  loading('Trending');await loadPublishedChartBeatArticles();
+  const items=CHART_BEAT_ARTICLES.filter(a=>a.category==='Industry Watch'||a.category==='News'||a.category==='Chart Beat').slice(0,18);
+  const main='<main class="mag-index"><header class="mag-index-head"><div class="mag-kicker">The Conversation</div><h1>Trending</h1><p>What music fans and the industry are talking about — verified, contextualized and connected to the charts when the data adds something useful.</p></header>'+
+    '<div class="mag-index-grid">'+items.map((a,i)=>'<article class="mag-index-card '+(i===0?'lead':'')+'"><a href="'+appHref('/chart-beat/'+a.slug)+'" data-portal-link="/chart-beat/'+a.slug+'">'+
+      '<div class="mag-index-art">'+(a.photo?.url?'<img src="'+escAttr(a.photo.url)+'" alt="'+escAttr(a.photo.alt||a.headline)+'">':'<div class="cb-media-box" data-portal-image data-kind="'+escAttr(a?.media?.primary?.kind||'artist')+'" data-name="'+escAttr(a?.media?.primary?.name||a.headline)+'" data-artist="'+escAttr(a?.media?.primary?.artist||'')+'"></div>')+'</div>'+
+      '<div class="mag-index-copy"><div class="mag-kicker">'+esc(a.category)+'</div><h2>'+esc(a.headline)+'</h2><p>'+esc(a.dek||'')+'</p><span>'+fmtDate(a.published)+'</span></div></a></article>').join('')+
+    '</div></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Trending','Music hot topics, industry conversation and chart context from Daegon Charts.','/trending');bindLinks();hydratePortalImages();
+}
+function renderReviews(){
+  const main='<main class="mag-reviews"><header class="mag-index-head"><div class="mag-kicker">Criticism</div><h1>Reviews</h1><p>Albums and songs reviewed with musical context, historical perspective and a Chart Outlook — without pretending popularity and quality are the same thing.</p></header>'+
+    '<section class="review-manifesto"><h2>The Daegon review system</h2><div class="review-pillars"><div><strong>Review</strong><span>Critical assessment of the music.</span></div><div><strong>Highlights</strong><span>Standout tracks and creative choices.</span></div><div><strong>Context</strong><span>Where the release sits in the artist’s career.</span></div><div><strong>Chart Outlook</strong><span>Data-informed commercial expectations, clearly separated from the review score.</span></div></div><p>No review has been published yet. The section is live now so the first releases can enter a consistent format instead of being retrofitted later.</p></section></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Reviews','Music reviews, album criticism and chart outlooks from Daegon Charts.','/reviews');bindLinks();
+}
+
 async function renderEditorialIndex(kind){
   loading(kind==='news'?'Music News':'Features');
   await loadPublishedChartBeatArticles();
@@ -607,7 +647,7 @@ async function renderHome(){
   const main='<main class="mag-home">'+
     '<div class="mag-brandline"><span>Music. Charts. Culture.</span><p>Independent music journalism powered by the Daegon Charts archive.</p></div>'+
     hero+secondaryHtml+weeklyStory+chartCards+features+archive+
-    '<section class="mag-about-strip"><div><div class="mag-kicker">About Daegon</div><h2>Music journalism with its own chart archive.</h2><p>Daegon combines original weekly rankings, historical research and source-backed reporting to explain what is happening in music — and how today connects to the past.</p></div><div><a href="'+appHref('/methodology')+'">Methodology →</a><a href="'+appHref('/about')+'">About the project →</a></div></section>'+
+    '<section class="mag-about-strip"><div><div class="mag-kicker">About Daegon</div><h2>Music journalism with its own chart archive.</h2><p>Daegon combines original weekly rankings, historical research and source-backed reporting to explain what is happening in music — and how today connects to the past.</p></div><div><a href="'+appHref('/methodology')+'">Methodology →</a><a href="'+appHref('/ai')+'" data-portal-link="/ai">How we use AI →</a><a href="'+appHref('/about')+'">About the project →</a></div></section>'+
   '</main>';
 
   setMode(true);portalEl.innerHTML=shellHtml(main);
@@ -2390,7 +2430,11 @@ async function renderRoute(){
   try{
     if(!p.length){await renderHome()}
     else if(p[0]==='news')await renderEditorialIndex('news');
+    else if(p[0]==='trending')await renderTrending();
     else if(p[0]==='features')await renderEditorialIndex('features');
+    else if(p[0]==='reviews')renderReviews();
+    else if(p[0]==='community')renderCommunity();
+    else if(p[0]==='ai')renderDaegonAIPage();
     else if(p[0]==='songs')await renderCatalog('song');
     else if(p[0]==='albums')await renderCatalog('album');
     else if(p[0]==='artists')await renderCatalog('artist');
