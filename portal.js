@@ -645,10 +645,11 @@ async function renderPublicProfile(slug){
   const sb=dcSupabaseClient();
   const {data:profile}=await sb.from('community_profiles').select('user_id,display_name,profile_slug,avatar_url,bio,charts_public').eq('profile_slug',slug).maybeSingle();
   if(!profile){renderNotFound();return}
-  const [{data:weeks},{data:reviews},{data:ratings}]=await Promise.all([
+  const [{data:weeks},{data:reviews},{data:ratings},{data:lists}]=await Promise.all([
     sb.from('public_chart_weeks').select('id,chart_date').eq('user_id',profile.user_id).eq('is_public',true).order('chart_date',{ascending:false}).limit(20),
     sb.from('album_reviews').select('id,album_name,artist_name,body,created_at').eq('user_id',profile.user_id).eq('status','approved').order('created_at',{ascending:false}).limit(5),
-    sb.from('album_ratings').select('score').eq('user_id',profile.user_id)
+    sb.from('album_ratings').select('score').eq('user_id',profile.user_id),
+    sb.from('user_music_lists').select('id,title,description,list_type').eq('user_id',profile.user_id).eq('is_public',true).order('updated_at',{ascending:false}).limit(6)
   ]);
   let following=false;
   if(_dcAuthUser&&_dcAuthUser.id!==profile.user_id){
@@ -667,6 +668,7 @@ async function renderPublicProfile(slug){
     '<section class="public-profile-grid"><div><strong>'+(weeks||[]).length+'</strong><span>Published weeks</span></div><div><strong>'+(reviews||[]).length+'</strong><span>Recent reviews</span></div><div><strong>'+(avg??'—')+'</strong><span>Average rating</span></div></section>'+
     (badges.length?'<section class="profile-badges"><div class="mag-section-head"><h2>Badges</h2><span>Activity milestones</span></div><div>'+badges.map(x=>'<span>'+x+'</span>').join('')+'</div></section>':'')+
     '<section class="profile-weeks"><div class="mag-section-head"><h2>Chart archive</h2><span>Public weeks</span></div><div class="profile-week-grid">'+((weeks||[]).map(w=>'<a href="'+appHref('/u/'+slug+'/charts/'+w.chart_date)+'" data-portal-link="/u/'+slug+'/charts/'+w.chart_date+'"><strong>'+fmtDate(w.chart_date)+'</strong><span>Open chart →</span></a>').join('')||'<div class="my-empty-inline">No public charts yet.</div>')+'</div></section>'+
+    (lists?.length?'<section class="community-directory"><div class="mag-section-head"><h2>Lists</h2><span>Public</span></div><div class="community-grid">'+lists.map(x=>'<a href="'+appHref('/list/'+x.id)+'" data-portal-link="/list/'+x.id+'"><div class="mag-kicker">'+esc(x.list_type)+'</div><h2>'+esc(x.title)+'</h2><p>'+esc(x.description||'')+'</p><span>Open list →</span></a>').join('')+'</div></section>':'')+
     '<section class="community-review-feed"><div class="mag-section-head"><h2>Reviews</h2><span>Latest</span></div>'+((reviews||[]).map(r=>'<article><h2>'+esc(r.album_name)+'</h2><p>'+esc(r.body)+'</p><span>'+esc(r.artist_name||'')+' · '+new Date(r.created_at).toLocaleDateString()+'</span></article>').join('')||'<div class="my-empty-inline">No reviews yet.</div>')+'</section></main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta((profile.display_name||slug)+' — Daegon','Public music profile, charts and reviews.','/u/'+slug);bindLinks();
   const fb=portalEl.querySelector('#publicProfileFollow');if(fb)fb.onclick=async()=>{if(following)await sb.from('user_follows_social').delete().eq('follower_id',_dcAuthUser.id).eq('followed_id',profile.user_id);else await sb.from('user_follows_social').insert({follower_id:_dcAuthUser.id,followed_id:profile.user_id});renderPublicProfile(slug)};
@@ -1327,17 +1329,20 @@ async function renderCommunity(slug=''){
       groups[type]=data||[];
     }
     let joined=false;
+    const isOwner=_dcAuthUser?.id===c.owner_id;
     if(_dcAuthUser)joined=(members||[]).some(x=>x.user_id===_dcAuthUser.id);
     const chart=(rows,label)=>'<section class="global-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>'+(latest?fmtDate(latest):'No chart yet')+'</span></div><div class="global-chart-list">'+rows.slice(0,15).map((x,i)=>'<div><b>'+(i+1)+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+Number(x.total_points||0).toFixed(1)+' pts</em><i>'+x.voters+' voters</i></div>').join('')+'</div></section>';
     const activeClub=clubs?.[0];
     const main='<main class="global-page"><header class="mag-index-head"><div class="mag-kicker">Daegon Community</div><h1>'+esc(c.name)+'</h1><p>'+esc(c.description||'A music community on Daegon.')+'</p><div class="public-profile-actions">'+(_dcAuthUser?'<button id="communityJoin" class="'+(joined?'':'primary')+'">'+(joined?'Leave community':'Join community')+'</button>':'<button data-community-signin class="primary">Sign in to join</button>')+'<a href="'+appHref('/forum')+'" data-portal-link="/forum">Open forum</a></div></header>'+
       '<section class="public-profile-grid"><div><strong>'+(members||[]).length+'</strong><span>Members</span></div><div><strong>'+esc(c.category)+'</strong><span>Category</span></div><div><strong>'+(latest?fmtDate(latest):'—')+'</strong><span>Latest chart</span></div></section>'+
+      (isOwner?'<form id="albumClubForm" class="album-club-form"><div class="mag-kicker">Start an Album Club</div><input name="album" maxlength="180" placeholder="Album" required><input name="artist" maxlength="180" placeholder="Artist"><input name="starts" type="date" value="'+new Date().toISOString().slice(0,10)+'" required><input name="ends" type="date"><textarea name="prompt" maxlength="1000" placeholder="Discussion prompt"></textarea><button>Set Album Club</button><div id="albumClubStatus"></div></form>':'')+
       (activeClub?'<section class="community-album-club"><div class="mag-kicker">Album Club</div><h2>'+esc(activeClub.album_name)+'</h2><p>'+esc(activeClub.artist_name||'')+(activeClub.prompt?' — '+esc(activeClub.prompt):'')+'</p><span>'+fmtDate(activeClub.starts_on)+(activeClub.ends_on?' → '+fmtDate(activeClub.ends_on):'')+'</span></section>':'')+
       (latest?types.map(([t,l])=>chart(groups[t],l)).join(''):'<div class="my-empty-inline">Community charts will appear when members publish personal charts.</div>')+
     '</main>';
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta(c.name+' — Community',c.description||'Daegon music community.','/community/'+slug);bindLinks();
     portalEl.querySelector('[data-community-signin]')?.addEventListener('click',dcShowAuthModal);
     const jb=portalEl.querySelector('#communityJoin');if(jb)jb.onclick=async()=>{if(joined)await sb.from('music_community_members').delete().eq('community_id',c.id).eq('user_id',_dcAuthUser.id);else await sb.from('music_community_members').insert({community_id:c.id,user_id:_dcAuthUser.id,role:'member'});renderCommunity(slug)};
+    const acf=portalEl.querySelector('#albumClubForm');if(acf)acf.onsubmit=async e=>{e.preventDefault();const fd=new FormData(acf),album=String(fd.get('album')||'').trim(),artist=String(fd.get('artist')||'').trim(),starts_on=String(fd.get('starts')||''),ends_on=String(fd.get('ends')||'')||null,prompt=String(fd.get('prompt')||'').trim(),st=portalEl.querySelector('#albumClubStatus');st.textContent='Saving…';const {error}=await sb.from('community_album_clubs').insert({community_id:c.id,album_key:slugify(album)+'--'+slugify(artist),album_name:album,artist_name:artist||null,starts_on,ends_on,prompt:prompt||null,created_by:_dcAuthUser.id});if(error){st.textContent=error.message;return}renderCommunity(slug)};
     return;
   }
   const {data:communities}=await sb.from('music_communities').select('*').eq('is_public',true).order('created_at',{ascending:false}).limit(50);
@@ -1346,7 +1351,7 @@ async function renderCommunity(slug=''){
     '<section class="community-directory"><div class="mag-section-head"><h2>Communities</h2><span>'+(communities||[]).length+'</span></div><div class="community-grid">'+((communities||[]).map(c=>'<a href="'+appHref('/community/'+c.slug)+'" data-portal-link="/community/'+c.slug+'"><div class="mag-kicker">'+esc(c.category)+'</div><h2>'+esc(c.name)+'</h2><p>'+esc(c.description||'')+'</p><span>Open community →</span></a>').join('')||'<div class="my-empty-inline">No communities yet. Create the first one.</div>')+'</div></section></main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Daegon Community','Music communities, group charts, album clubs and discussion on Daegon.','/community');bindLinks();
   portalEl.querySelector('[data-community-signin]')?.addEventListener('click',dcShowAuthModal);
-  const form=portalEl.querySelector('#communityCreateForm');if(form)form.onsubmit=async e=>{e.preventDefault();const fd=new FormData(form),name=String(fd.get('name')||'').trim(),category=String(fd.get('category')||'general').trim(),description=String(fd.get('description')||'').trim(),slug=slugify(name),st=portalEl.querySelector('#communityCreateStatus');st.textContent='Creating…';const {data:c,error}=await sb.from('music_communities').insert({owner_id:_dcAuthUser.id,slug,name,category,description,is_public:true}).select('id').single();if(error){st.textContent=error.message;return}await sb.from('music_community_members').insert({community_id:c.id,user_id:_dcAuthUser.id,role:'member'});go('/community/'+slug)};
+  const form=portalEl.querySelector('#communityCreateForm');if(form)form.onsubmit=async e=>{e.preventDefault();const fd=new FormData(form),name=String(fd.get('name')||'').trim(),category=String(fd.get('category')||'general').trim(),description=String(fd.get('description')||'').trim(),slug=slugify(name),st=portalEl.querySelector('#communityCreateStatus');st.textContent='Creating…';const {data:c,error}=await sb.from('music_communities').insert({owner_id:_dcAuthUser.id,slug,name,category,description,is_public:true}).select('id').single();if(error){st.textContent=error.message;return}await sb.from('music_community_members').insert({community_id:c.id,user_id:_dcAuthUser.id,role:'owner'});go('/community/'+slug)};
 }
 async function renderTrending(){
   loading('Trending');await loadPublishedChartBeatArticles();
