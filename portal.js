@@ -441,9 +441,9 @@ async function renderGlobalCharts(){
     groups[type]=data||[];
   }
   const list=(rows,label)=>'<section class="global-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>Community points</span></div><div class="global-chart-list">'+rows.slice(0,20).map((x,i)=>'<div><b>'+(i+1)+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+Number(x.total_points||0).toLocaleString(undefined,{maximumFractionDigits:2})+' units</em><i>'+x.voters+' voter'+(x.voters===1?'':'s')+'</i></div>').join('')+'</div></section>';
-  const main='<main class="global-page"><header class="mag-index-head"><div class="mag-kicker">Community consensus</div><h1>Daegon Global</h1><p>'+(mode==='picks'?'What Daegon users deliberately chose for their weekly personal rankings.':'The combined weekly chart of public listening charts. Position points normalize influence so one heavy listener cannot dominate everyone else.')+'</p></header>'+
+  const main='<main class="global-page"><header class="mag-index-head"><div class="mag-kicker">Community consensus</div><h1>Daegon Global</h1><p>'+(mode==='picks'?'What Daegon users deliberately chose for their weekly personal rankings.':'The combined weekly chart of public listening charts. Position-based community scoring normalizes influence so one heavy listener cannot dominate everyone else.')+'</p></header>'+
     '<div class="global-mode-switch"><button data-global-mode="listening" class="'+(mode==='listening'?'active':'')+'">Global Listening</button><button data-global-mode="picks" class="'+(mode==='picks'?'active':'')+'">Global Picks</button></div>'+
-    '<section class="global-formula"><strong>Community Points</strong><code>100 × e<sup>-0.06 × (rank - 1)</sup></code><span>#1 = 100 points. Each published chart contributes one position-based ballot per week.</span></section>'+
+    '<section class="global-formula"><strong>Community Score</strong><code>100 × e<sup>-0.06 × (rank - 1)</sup></code><span>#1 = 100 score. Each published chart contributes one position-based ballot per week.</span></section>'+
     (unique.length?'<div class="myp-datebar"><label>Week</label><select id="globalDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div>':'<div class="my-empty-inline">Daegon Global will appear as users publish their first charts.</div>')+
     (selected?types.map(([t,l])=>list(groups[t],l)).join(''):'')+
   '</main>';
@@ -718,7 +718,15 @@ async function renderMyCharts(){
     stream28=songs;albumStream28=albums;artists28=artists;
   }
 
-  const top=(rows,label)=>'<section class="myp-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,10).map(x=>'<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+x.streams+' plays'+(Number(x.listening_ms||0)>0?' · '+Math.round(Number(x.listening_ms||0)/60000)+' min':'')+' · '+x.active_days+' active day'+(x.active_days===1?'':'s')+'</i></div>').join('')+'</div></section>';
+  const top=(rows,label)=>{
+    const isMain=/^My (Songs|Albums|Artists)/.test(label);
+    return '<section class="myp-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,10).map(x=>{
+      const meta=isMain
+        ? Number(x.units||0).toLocaleString(undefined,{maximumFractionDigits:1})+' Units · 7D '+Number(x.consumption_7d||0)+' · 28D '+Number(x.consumption_28d||0)
+        : x.streams+' plays'+(Number(x.listening_ms||0)>0?' · '+Math.round(Number(x.listening_ms||0)/60000)+' min':'');
+      return '<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+meta+'</i></div>';
+    }).join('')+'</div></section>';
+  };
 
   const connection='<section class="myp-connect"><div class="myp-connect-copy"><div class="mag-kicker">Recommended</div><h2>Connect Last.fm</h2><p>Enter your Last.fm username and Daegon will pull your scrobbles directly. No Spotify export is required. Sync 7 days for the weekly chart or 28 days for a broader listening window.</p>'+
     (lastfmConn?'<div class="myp-connected"><i class="fas fa-check-circle"></i><span>Linked to <strong>'+esc(lastfmConn.account_name||'Last.fm')+'</strong>'+(lastfmConn.last_synced_at?' · last synced '+new Date(lastfmConn.last_synced_at).toLocaleString():'')+'</span></div>':'')+
@@ -732,7 +740,7 @@ async function renderMyCharts(){
     (unique.length?'<div class="myp-controls"><div class="myp-window-tabs"><button data-window="7" class="'+(windowDays===7?'active':'')+'">7 Days</button><button data-window="28" data-premium-window="'+(can28?'0':'1')+'" class="'+(windowDays===28?'active':'')+'">28 Days'+(can28?'':' · Fan')+'</button></div><div class="myp-datebar"><label>Chart week ending</label><select id="mypDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div></div>':'<div class="my-empty-inline">Connect Last.fm or import listening history to generate your first personal chart.</div>')+
     (selected?'<div class="myp-window-note"><strong>'+windowDays+'-Day Tracking</strong><span>'+(windowDays===7?'Weekly chart ending '+fmtDate(selected):'Rolling 28-day window ending '+fmtDate(selected))+'</span></div>'+(windowDays===7?dcPersonalChartBeatHtml(songs,selected):'')+
       (windowDays===7?top(songs||[],'My Songs 100')+top(albums||[],'My Albums 50')+top(artists||[],'My Artists 50')+
-        '<div class="myp-component-head"><div class="mag-kicker">Component Charts</div><h2>How your week breaks down</h2><p>7-day play strength and rolling 28-day streaming strength, shown separately.</p></div>'+
+        '<div class="myp-component-head"><div class="mag-kicker">Component Charts</div><h2>How your week breaks down</h2><p>Your own 7-day and rolling 28-day listening consumption, shown separately.</p></div>'+
         top(digital||[],'Digital Songs Sales · 7 Days')+top(albumSales||[],'Top Album Sales · 7 Days')+top(stream28||[],'Streaming Songs · 28 Days')+top(albumStream28||[],'Top Streaming Albums · 28 Days')+top(artists28||[],'Artists · 28 Days')
       :top(stream28.length?stream28:songs,'Streaming Songs · 28 Days')+top(albumStream28.length?albumStream28:albums,'Top Streaming Albums · 28 Days')+top(artists28.length?artists28:artists,'Artists · 28 Days')):'')+
   '</main>';
@@ -839,7 +847,7 @@ async function renderPlans(){
     '<div class="saas-current-plan"><span>Current plan</span><strong>'+esc(current.charAt(0).toUpperCase()+current.slice(1))+'</strong><small>'+esc(state.status||'active')+'</small></div>'+
     '<div class="plan-grid">'+
     plan('Free','R$ 0','Discover + participate',['Daegon charts, Chart Beat and editorial','7-day personal charts','My Picks and public profile','Ratings, reviews, forum and comments','Join communities','Up to 3 music lists'])+
-    plan('Fan','Price to be set','For chart lovers',['Everything in Free','28-day personal charts','Full Year-End personal charts','Taste Match','Custom chart formulas','Unlimited lists + more communities','Export and advanced Personal Chart Beat'],true)+
+    plan('Fan','Price to be set','For chart lovers',['Everything in Free','28-day personal charts','Full Year-End personal charts','Taste Match','Transparent Daegon Units breakdown','Unlimited lists + more communities','Export and advanced Personal Chart Beat'],true)+
     plan('Insider','Price to be set','Power user',['Everything in Fan','Personal Decade-End','Personal GOAT','AI deep dives and music-history analysis','Advanced comparisons and exports','Early access to Daegon Labs'])+
     '</div><section class="saas-billing-note"><div class="mag-kicker">Billing architecture</div><h2>Stripe Billing is connected in test mode.</h2><p>The SaaS entitlement system is live. Checkout will be switched on after Fan and Insider prices are defined; until then no paid charge is created.</p></section></main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Plans','Daegon Free, Fan and Insider SaaS plans.','/plans');bindLinks();
