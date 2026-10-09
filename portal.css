@@ -4437,3 +4437,57 @@ body:not(.portal-mode) #portalPage{
     font-size:10px;
   }
 }
+
+
+/* Chart Beat editorial newsroom */
+.cb-home,.cb-article{max-width:1120px;margin:0 auto;padding:36px 18px 72px}
+.cb-mast{display:flex;align-items:end;justify-content:space-between;gap:24px;padding:26px 0 22px;border-top:5px solid var(--foreground);border-bottom:1px solid var(--border);margin-bottom:30px}
+.cb-eyebrow,.cb-kicker{font-size:11px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.cb-mast h1{font-family:Georgia,"Times New Roman",serif;font-size:56px;line-height:.95;margin:6px 0 8px;letter-spacing:-.04em}
+.cb-mast p{margin:0;color:var(--muted-foreground);font-size:16px}
+.cb-desk-link,.cb-back{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--foreground);text-decoration:none}
+.cb-desk-link:hover,.cb-back:hover{color:var(--accent)}
+.cb-card{border-bottom:1px solid var(--border)}
+.cb-card-link{display:grid;grid-template-columns:280px minmax(0,1fr);gap:26px;padding:24px 0;color:inherit;text-decoration:none}
+.cb-card.cb-lead .cb-card-link{grid-template-columns:minmax(320px,46%) minmax(0,1fr);padding-top:0}
+.cb-card-art{aspect-ratio:16/9;overflow:hidden;background:var(--muted)}
+.cb-card-art img{width:100%;height:100%;object-fit:cover}
+.cb-card h2{font-family:Georgia,"Times New Roman",serif;font-size:28px;line-height:1.08;margin:7px 0 10px;letter-spacing:-.025em}
+.cb-card.cb-lead h2{font-size:40px}
+.cb-card p{color:var(--muted-foreground);font-size:15px;line-height:1.55;margin:0 0 16px}
+.cb-meta,.cb-byline{font-size:12px;color:var(--muted-foreground)}
+.cb-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;margin-top:24px}
+.cb-grid .cb-card-link{grid-template-columns:1fr}.cb-grid .cb-card h2{font-size:24px}
+.cb-sections{margin-top:44px;padding-top:20px;border-top:3px solid var(--foreground)}
+.cb-sections>h2{font-family:Georgia,"Times New Roman",serif;font-size:28px;margin:0 0 18px}
+.cb-section-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cb-section-grid div{border:1px solid var(--border);padding:18px;background:var(--card)}
+.cb-section-grid strong{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
+.cb-section-grid span{display:block;font-size:13px;line-height:1.45;color:var(--muted-foreground)}
+.cb-article{max-width:900px}
+.cb-article>header{max-width:800px;margin:28px auto 0;padding-bottom:26px;border-bottom:1px solid var(--border)}
+.cb-article h1{font-family:Georgia,"Times New Roman",serif;font-size:52px;line-height:1.02;letter-spacing:-.04em;margin:8px 0 16px}
+.cb-dek{font-size:20px;line-height:1.45;color:var(--muted-foreground);margin:0 0 22px}
+.cb-byline strong{color:var(--foreground)}.cb-byline span{line-height:1.6}
+.cb-share{max-width:800px;margin:14px auto 0;display:flex;justify-content:flex-end}
+.cb-share button{border:1px solid var(--border);background:var(--card);color:var(--foreground);padding:8px 11px;font-size:12px;font-weight:800}
+.cb-article-body{max-width:720px;margin:28px auto 0}
+.cb-article-body p{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.78;margin:0 0 22px}
+.cb-article-body h2{font-family:Georgia,"Times New Roman",serif;font-size:28px;line-height:1.2;margin:38px 0 12px}
+.cb-article-body a,.cb-article-footer a{color:var(--accent)}
+.cb-source-note{padding-top:20px;border-top:1px solid var(--border)}
+.cb-article-footer{max-width:720px;margin:44px auto 0;padding:18px;border:1px solid var(--border);background:var(--card)}
+.cb-article-footer strong{font-size:13px;text-transform:uppercase;letter-spacing:.08em}
+.cb-article-footer p{font-size:13px;line-height:1.55;color:var(--muted-foreground)}
+@media(max-width:767px){
+ .cb-home,.cb-article{padding:24px 14px 56px}
+ .cb-mast{align-items:flex-start;flex-direction:column}
+ .cb-mast h1{font-size:43px}
+ .cb-card-link,.cb-card.cb-lead .cb-card-link{grid-template-columns:1fr;gap:14px}
+ .cb-card.cb-lead h2{font-size:31px}.cb-card h2{font-size:24px}
+ .cb-grid{grid-template-columns:1fr}
+ .cb-section-grid{grid-template-columns:1fr 1fr}
+ .cb-article h1{font-size:38px}.cb-dek{font-size:18px}
+ .cb-article-body p{font-size:17px}
+}
+@media(max-width:480px){.cb-section-grid{grid-template-columns:1fr}}
