@@ -4971,3 +4971,10 @@ body:not(.portal-mode) #portalPage{
 .community-album-club{border-top:10px solid var(--foreground);border-bottom:1px solid var(--border);padding:16px 0;margin:26px 0}.community-album-club h2{font-family:Georgia,"Times New Roman",serif;font-size:38px;line-height:1;letter-spacing:-.035em;margin:6px 0}.community-album-club p{font-size:14px;line-height:1.55;max-width:800px}.community-album-club>span{font-size:10px;color:var(--muted-foreground);font-weight:900;text-transform:uppercase}
 @media(max-width:900px){.community-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.community-grid>a:nth-child(3n){border-right:1px solid var(--border)}.community-grid>a:nth-child(2n){border-right:0}}
 @media(max-width:767px){.community-create-form{grid-template-columns:1fr}.community-create-form textarea,.community-create-form button{grid-column:1;grid-row:auto}.community-grid{grid-template-columns:1fr}.community-grid>a,.community-grid>a:nth-child(2n),.community-grid>a:nth-child(3n){border-right:0}}
+
+.myp-formula-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;align-items:end}
+.myp-formula-form label{display:flex;flex-direction:column;gap:5px;font-size:9px;font-weight:950;text-transform:uppercase;letter-spacing:.05em}
+.myp-formula-form select,.myp-formula-form input{min-height:40px;border:1px solid var(--foreground);background:var(--background);color:var(--foreground);padding:8px;font:inherit}
+.myp-formula-form button{grid-column:1/-1;border:0;background:var(--accent);color:#000;padding:10px;font-size:10px;font-weight:950;text-transform:uppercase}
+.myp-formula-form>div{grid-column:1/-1;min-height:16px;font-size:10px;color:var(--muted-foreground)}
+@media(max-width:767px){.myp-formula-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
