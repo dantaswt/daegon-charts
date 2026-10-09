@@ -5212,12 +5212,10 @@ body.global-bars-weekly .theme-btn:hover{
 @media(max-width:767px){
   .details-run-strip{
     display:flex!important;
-    flex-wrap:nowrap!important;
-    overflow-x:auto!important;
-    overflow-y:hidden!important;
-    gap:7px!important;
-    padding:4px 2px 8px!important;
-    scrollbar-width:thin;
+    flex-wrap:wrap!important;
+    overflow:visible!important;
+    gap:6px!important;
+    padding:4px 0 8px!important;
   }
 }
 
