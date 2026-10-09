@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How to Read Music Charts — Daegon Charts Guide</title>
+<meta name="description" content="Learn chart positions, peaks, re-entries, weeks on chart and how to interpret Daegon Charts historical rankings.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://daegoncharts.com.br/chart-guide">
+<meta property="og:url" content="https://daegoncharts.com.br/chart-guide">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Daegon Charts">
+<meta property="og:title" content="How to Read Music Charts">
+<meta property="og:description" content="A practical guide to weekly rankings, chart movement and historical music data.">
+<meta property="og:image" content="https://i.imgur.com/jaBZ19n.png">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0f0f0f">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+<noscript>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</noscript>
+<style>
+@font-face{
+  font-family:"Daegon Grotesk";
+  src:url("https://raw.githubusercontent.com/RandomMaerks/Overused-Grotesk/master/fonts/variable/OverusedGrotesk-VF.woff2") format("woff2-variations");
+  font-style:normal;
+  font-weight:300 900;
+  font-display:swap;
+}
+
+:root{--bg:#e8e8e8;--fg:#1a1a1a;--card:#fff;--muted:#6b7280;--border:#d4d4d4;--accent:#FF6D00}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--fg:#f5f5f5;--card:#0f0f0f;--muted:#9ca3af;--border:#2a2a2a}}html.dark{--bg:#1a1a1a;--fg:#f5f5f5;--card:#0f0f0f;--muted:#9ca3af;--border:#2a2a2a}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--fg);font-family:"Daegon Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif}a{color:var(--accent)}
+header{background:#0f0f0f;border-bottom:1px solid #2a2a2a}.head{max-width:980px;margin:auto;padding:16px;display:flex;justify-content:space-between;gap:16px;align-items:center}.brand{color:#f5f5f5;font-weight:800;text-decoration:none}.back{color:#cbd5e1;text-decoration:none;font-size:13px}
+main{max-width:900px;margin:0 auto;padding:42px 18px 64px}.eyebrow{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--accent)}h1{font-size:42px;line-height:1.05;margin:8px 0 18px}h2{font-size:20px;margin:30px 0 10px}p,li{font-size:15px;line-height:1.75}p{margin:10px 0}ul{padding-left:22px}.card{background:var(--card);border:1px solid var(--border);padding:22px;margin:20px 0}.muted{color:var(--muted)}footer{border-top:1px solid var(--border);padding:24px 16px;text-align:center;color:var(--muted);font-size:12px}.links{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-bottom:10px}.links a{text-decoration:none;font-weight:700}
+.brand{display:flex;align-items:center;gap:9px!important;color:#f5f5f5!important}
+.brand-mark{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#090909;font-size:15px;font-weight:900;letter-spacing:-.05em;transform:skewX(-7deg);box-shadow:3px 3px 0 #ffd54a}
+.brand-word{font-size:20px;font-weight:900;letter-spacing:-.035em;text-transform:lowercase}
+h1{position:relative;padding-bottom:12px}
+h1::after{content:"";position:absolute;left:0;bottom:0;width:64px;height:3px;background:linear-gradient(90deg,var(--accent),#ffd54a)}
+.card{position:relative;border-left:3px solid var(--accent)!important;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.card::before{content:"";position:absolute;left:-3px;top:-1px;bottom:-1px;width:3px;background:linear-gradient(180deg,var(--accent),#ffd54a)}
+h2{position:relative}
+h2::before{content:"";display:inline-block;width:7px;height:7px;background:var(--accent);margin-right:8px;vertical-align:2px;box-shadow:2px 2px 0 #ffd54a}
+.links a{color:var(--accent)}
+@media(max-width:640px){main{padding-top:30px}h1{font-size:32px}.head{padding:13px 14px}.card{padding:16px}.brand{gap:7px!important}.brand-mark{width:23px;height:23px;font-size:13px;box-shadow:2px 2px 0 #ffd54a}.brand-word{font-size:17px}}
+
+.global-static-header{position:sticky;top:0;z-index:100;background:linear-gradient(to bottom,#0f0f0f,#161616);border-bottom:1px solid #2a2a2a}
+.global-static-header .head{position:relative;max-width:1280px;width:100%;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.global-static-header .menu-toggle{display:none;background:transparent;border:0;color:#f5f5f5;width:44px;height:44px;align-items:center;justify-content:center;padding:0}
+.global-static-header .hamb{width:22px;height:16px;display:flex;flex-direction:column;justify-content:space-between}
+.global-static-header .hamb span{display:block;width:22px;height:2px;background:#f5f5f5}
+.global-static-header .brand{display:flex;align-items:center;gap:9px;color:#f5f5f5!important;text-decoration:none;white-space:nowrap}
+.global-static-header .brand-mark{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;background:#FF6D00;color:#090909;font-size:15px;font-weight:900;letter-spacing:-.05em;transform:skewX(-7deg);box-shadow:3px 3px 0 #ffd54a;flex:0 0 26px}
+.global-static-header .brand-word{font-size:20px;font-weight:900;letter-spacing:-.035em;text-transform:lowercase}
+.global-static-header .theme-btn{width:44px;height:44px;border:1px solid var(--border);background:var(--card);color:var(--fg);display:flex;align-items:center;justify-content:center;font-size:18px}
+.global-static-header .mobile-drawer{display:none;position:absolute;left:0;right:0;top:100%;background:#0f0f0f;border-top:1px solid #2a2a2a;padding:10px 16px 14px}
+.global-static-header .mobile-drawer.open{display:block}
+.global-static-header .mobile-drawer a{display:block;padding:10px 0;border-bottom:1px solid #2a2a2a;color:#9ca3af!important;text-decoration:none;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+
+@media(max-width:767px){
+  .global-static-header .head{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;min-height:62px;padding:9px 14px;gap:8px}
+  .global-static-header .menu-toggle{display:flex;grid-column:1;grid-row:1;justify-self:start}
+  .global-static-header .brand{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:max-content;max-width:calc(100% - 132px);gap:7px;z-index:10}
+  .global-static-header .brand-mark{width:23px;height:23px;flex-basis:23px;font-size:13px;box-shadow:2px 2px 0 #ffd54a}
+  .global-static-header .brand-word{font-size:18px;line-height:1;font-weight:800;letter-spacing:.02em}
+  .global-static-header .theme-btn{grid-column:3;grid-row:1;justify-self:end;z-index:20}
+  .global-static-header .back{display:none}
+}
+
+body{padding-top:68px!important}
+.global-static-header{
+  position:fixed!important;top:0!important;left:0!important;right:0!important;width:100%!important;z-index:1000!important;
+  background:linear-gradient(to bottom,#0f0f0f,#161616)!important;border-bottom:1px solid #2a2a2a!important
+}
+.global-static-header .head{
+  position:relative!important;max-width:1280px!important;width:100%!important;min-height:68px!important;margin:0 auto!important;padding:12px 16px!important;
+  display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;align-items:center!important;gap:16px!important
+}
+.global-static-header .brand{grid-column:1!important;position:static!important;transform:none!important;justify-self:start!important;display:flex!important;align-items:center!important;gap:9px!important;white-space:nowrap!important}
+.global-static-header .global-topnav{grid-column:2!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:20px!important;min-width:0!important}
+.global-static-header .global-topnav a{color:#9ca3af!important;text-decoration:none!important;font-size:13px!important;line-height:1!important;font-weight:800!important;letter-spacing:.045em!important;text-transform:uppercase!important;white-space:nowrap!important}
+.global-static-header .global-topnav a:hover{color:#f5f5f5!important}
+.global-static-header .theme-btn{grid-column:3!important;justify-self:end!important}
+.global-static-header .back{display:none!important}
+.global-static-header .menu-toggle{display:none!important}
+
+@media(max-width:767px){
+  body{padding-top:62px!important}
+  .global-static-header .head{
+    height:62px!important;min-height:62px!important;padding:9px 14px!important;
+    grid-template-columns:44px minmax(0,1fr) 44px!important;gap:8px!important
+  }
+  .global-static-header .global-topnav{display:none!important}
+  .global-static-header .menu-toggle{
+    display:flex!important;position:static!important;grid-column:1!important;grid-row:1!important;justify-self:start!important;
+    width:44px!important;height:44px!important;margin:0!important;padding:0!important;align-items:center!important;justify-content:center!important;
+    background:transparent!important;border:0!important;color:#f5f5f5!important
+  }
+  .global-static-header .brand{
+    position:static!important;grid-column:2!important;grid-row:1!important;justify-self:center!important;align-self:center!important;
+    transform:none!important;width:max-content!important;max-width:none!important;margin:0!important;padding:0!important;gap:7px!important
+  }
+  .global-static-header .brand-mark{
+    width:23px!important;height:23px!important;min-width:23px!important;max-width:23px!important;flex:0 0 23px!important;
+    font-size:13px!important;box-shadow:2px 2px 0 #ffd54a!important
+  }
+  .global-static-header .brand-word{font-size:18px!important;line-height:1!important;font-weight:800!important;letter-spacing:.02em!important}
+  .global-static-header .theme-btn{
+    position:static!important;grid-column:3!important;grid-row:1!important;justify-self:end!important;
+    width:44px!important;height:44px!important;min-width:44px!important;max-width:44px!important;margin:0!important;padding:0!important
+  }
+  .global-static-header .mobile-drawer{top:62px!important;position:fixed!important}
+}
+
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"Daegon Charts Methodology","url":"https://daegoncharts.com.br/chart-guide","description":"How Daegon Charts builds weekly rankings and historical reconstructions.","isPartOf":{"@type":"WebSite","name":"Daegon Charts","url":"https://daegoncharts.com.br/"}}
+</script>
+<style id="billboard-mobile-heading-scale-v39">
+@media(max-width:767px){
+  main h1,.orig-about-hero h1{
+    font-size:38px!important;
+    line-height:.96!important;
+    letter-spacing:-.035em!important;
+  }
+}
+@media(max-width:430px){
+  main h1,.orig-about-hero h1{font-size:36px!important}
+}
+</style>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5838624736955714" crossorigin="anonymous"></script>
+</head>
+<body>
+<header class="global-static-header">
+<div class="head">
+  <button class="menu-toggle" id="globalMenuToggle" type="button" aria-label="Menu" aria-expanded="false"><span class="hamb"><span></span><span></span><span></span></span></button>
+  <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">D</span><span class="brand-word">aegon charts</span></a>
+  <nav class="global-topnav" aria-label="Primary">
+  <a href="/chart/daegon-100">DAEGON 100</a>
+  <a href="/chart-beat">CHART BEAT</a>
+  <a href="/year-end">YEAR-END CHARTS</a>
+  <a href="/decade-end">DECADE-END</a>
+  <a href="/goat">GREATEST OF ALL TIME</a>
+  <a href="/stats">STATS</a>
+  <a href="/awards">AWARDS</a>
+  <a href="/number-ones">#1'S</a>
+  <a href="/about">ABOUT</a>
+</nav>
+  <button class="theme-btn" id="globalThemeToggle" type="button" aria-label="Toggle theme"><i class="fas fa-moon"></i></button>
+</div>
+<nav class="mobile-drawer" id="globalMobileDrawer">
+  <a href="/chart/daegon-100">DAEGON 100</a>
+  <a href="/chart-beat">CHART BEAT</a>
+  <a href="/year-end">YEAR-END CHARTS</a>
+  <a href="/decade-end">DECADE-END</a>
+  <a href="/goat">GREATEST OF ALL TIME</a>
+  <a href="/stats">STATS</a>
+  <a href="/awards">AWARDS</a>
+  <a href="/number-ones">#1'S</a>
+  <a href="/about">ABOUT</a>
+</nav>
+</header>
+<main>
+<div class="eyebrow">Editorial guide · Daegon Charts</div>
+<h1>How to read a music chart</h1>
+<p>A weekly ranking tells a story about a specific moment in music. The position is only the starting point: movement, longevity, peaks and historical context help explain why a title matters.</p>
+<h2>Position and chart date</h2>
+<p>Each numbered row compares eligible songs, albums or artists within the same chart and dated week. A number one indicates first place in that week's ranking; it does not mean the title was the most successful across the entire year. Always check the chart date before comparing two entries.</p>
+<h2>Last week (LW) and movement</h2>
+<p>LW refers to the position in the previous chart week. An upward movement means an entry improved its rank; a downward movement means it fell. A stable indicator means the rank did not change. A missing LW does not, by itself, prove a title was newly released: it might be a debut or a return after an absence.</p>
+<h2>NEW versus RE</h2>
+<p>NEW indicates a first appearance within the specific chart's tracked history. RE indicates a re-entry by a title that appeared earlier, left the ranking and subsequently returned. The distinction depends on consistent identity matching. An alternate artist spelling, remix credit or duplicate recording must not create a false debut.</p>
+<h2>Peak, weeks on chart and weeks at No. 1</h2>
+<p>Peak records the highest position a title has attained up to that point. Weeks on Chart counts its appearances in the relevant chart; this differs from calendar weeks since release if the title has spent time outside the ranking. Weeks at No. 1 counts appearances at the top and need not describe an uninterrupted run.</p>
+<h2>Why longevity matters</h2>
+<p>A debut at number one and a twenty-week climb to the top represent different trajectories. Looking at a single rank obscures the length of a hit's life. Compare a song's peak, its total chart weeks and its sequence of weekly positions before drawing conclusions about sustained success.</p>
+<h2>Illustrative example: a re-entry</h2>
+<div class="card"><p><strong>Fictional example — not a Daegon Charts result.</strong> A song debuts at No. 18, reaches No. 4, spends eleven weeks on the chart, disappears for two weeks and then returns at No. 37. That return should be marked RE, retaining the earlier No. 4 peak and the accumulated weeks count rather than being presented as NEW.</p></div>
+<h2>Historical reconstructions are editorial models</h2>
+<p>Historical pages may cover periods before comparable streaming statistics existed. Daegon Charts uses era-appropriate evidence and its own editorial rules to construct a continuous archive. That makes the reconstructions useful for exploring musical history, but their ranks and modeled scores are not official certified sales or a reproduction of another chart provider's historical rankings.</p>
+<h2>Different markets, different contexts</h2>
+<p>An international ranking may reflect evidence from multiple markets. A song that was particularly prominent in Brazil or Latin America can coexist with releases that were especially visible in the United States, Europe or Asia. The resulting comparison depends on the project's regional weighting and source quality, which can differ by historical period.</p>
+<h2>How to compare charts fairly</h2>
+<p>Start with entries within the same weekly ranking, then check year-end results for cumulative performance. Use the greatest-of-all-time lists for longer-term comparisons while remembering that historical consumption formats changed dramatically between downloads and streaming. A chart's number one, a year-end number one and an all-time leader are three distinct achievements.</p>
+<h2>Corrections and attribution</h2>
+<p>Spelling variants, duplicate versions, album associations and absent weeks can affect a historical record. Daegon Charts reviews those issues as part of its editorial maintenance. If you identify a possible error, include the artist, song or album title, chart date and a reliable supporting reference in your <a href="/contact">correction request</a>.</p>
+<p>For more information, read the <a href="/methodology">ranking methodology</a>, browse <a href="/chart/daegon-100">Daegon 100</a> or visit the <a href="/about">About page</a>.</p>
+</main><footer><div class="links"><a href="/about">About</a><a href="/methodology">Methodology</a><a href="/privacy">Privacy</a><a href="/contact">Contact</a><a href="/terms">Terms</a></div><div>Daegon Charts — independent music charts and historical archive.</div></footer><script>
+(function globalHeaderInit(){
+  const menu=document.getElementById('globalMenuToggle');
+  const drawer=document.getElementById('globalMobileDrawer');
+  const theme=document.getElementById('globalThemeToggle');
+  const closeMenu=()=>{
+    if(drawer){
+      drawer.classList.remove('open');
+      drawer.setAttribute('aria-hidden','true');
+    }
+    if(menu)menu.setAttribute('aria-expanded','false');
+    document.documentElement.classList.remove('menu-open');
+    document.body.classList.remove('menu-open');
+    if(document.body.style.overflow==='hidden')document.body.style.removeProperty('overflow');
+  };
+  if(menu&&drawer){
+    drawer.setAttribute('aria-hidden','true');
+    menu.addEventListener('click',function(){
+      const open=!drawer.classList.contains('open');
+      closeMenu();
+      if(open){
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden','false');
+        menu.setAttribute('aria-expanded','true');
+      }
+    });
+    drawer.querySelectorAll('a').forEach(link=>link.addEventListener('click',closeMenu));
+    window.addEventListener('pageshow',closeMenu);
+    window.addEventListener('popstate',closeMenu);
+  }
+  if(theme){
+    theme.addEventListener('click',function(){
+      const dark=document.documentElement.classList.toggle('dark');
+      try{localStorage.setItem('theme',dark?'dark':'light')}catch(e){}
+      const i=theme.querySelector('i');
+      if(i)i.className='fas '+(dark?'fa-sun':'fa-moon');
+    });
+  }
+})();
+</script>
+</body></html>
