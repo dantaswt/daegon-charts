@@ -1794,7 +1794,7 @@ async function renderGoat(chartSeg){
 }
 
 
-const CHART_BEAT_ARTICLES=[
+let CHART_BEAT_ARTICLES=[
   {
     slug:'umbrella-rihanna-2007',
     category:'Chart Rewind',
@@ -1938,6 +1938,42 @@ const CHART_BEAT_ARTICLES=[
 
 
 
+
+let chartBeatCmsLoaded=false;
+async function loadPublishedChartBeatArticles(){
+  if(chartBeatCmsLoaded)return;
+  chartBeatCmsLoaded=true;
+  try{
+    if(typeof SUPABASE_URL==='undefined'||typeof SUPABASE_KEY==='undefined')return;
+    const articleUrl=SUPABASE_URL+'/rest/v1/chart_beat_articles?select=*&status=eq.published&order=published_at.desc';
+    const ar=await fetch(articleUrl,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,Accept:'application/json'}});
+    if(!ar.ok)return;
+    const rows=await ar.json();if(!Array.isArray(rows)||!rows.length)return;
+    const ids=rows.map(x=>x.id).filter(Boolean);
+    let sourceRows=[];
+    if(ids.length){
+      const sourceUrl=SUPABASE_URL+'/rest/v1/chart_beat_sources?select=*&article_id=in.('+ids.join(',')+')&order=source_date.asc';
+      const sr=await fetch(sourceUrl,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+SUPABASE_KEY,Accept:'application/json'}});
+      if(sr.ok)sourceRows=await sr.json();
+    }
+    const byArticle=new Map();
+    for(const s of sourceRows||[]){const a=byArticle.get(s.article_id)||[];a.push(s);byArticle.set(s.article_id,a)}
+    const cms=rows.map(x=>{
+      const sources=byArticle.get(x.id)||[];
+      const sourcesHtml=sources.length?'<div class="cb-sources"><h2>Sources</h2><ul>'+sources.map(s=>'<li><a href="'+escAttr(s.url)+'" target="_blank" rel="noopener">'+esc(s.publisher? s.publisher+', '+s.title : s.title)+(s.source_date?' — '+esc(s.source_date):'')+'</a></li>').join('')+'</ul></div>':'';
+      return {
+        slug:x.slug,category:x.category,headline:x.headline,seoTitle:x.seo_title||x.headline,
+        socialTitle:x.social_title||x.headline,dek:x.dek||'',byline:x.byline||'Daegon Charts Editorial',
+        published:String(x.published_at||'').slice(0,10),modified:String(x.updated_at||x.published_at||'').slice(0,10),
+        image:x.hero_image||'https://i.imgur.com/jaBZ19n.png',
+        photo:x.hero_image?{url:x.hero_image,alt:x.hero_alt||x.headline,credit:x.hero_credit||'',license:x.hero_license||'',source:x.hero_source||'',note:''}:null,
+        body:(x.body_html||'')+sourcesHtml
+      };
+    });
+    const cmsSlugs=new Set(cms.map(x=>x.slug));
+    CHART_BEAT_ARTICLES=[...cms,...CHART_BEAT_ARTICLES.filter(x=>!cmsSlugs.has(x.slug))];
+  }catch(e){console.warn('Chart Beat CMS fallback',e)}
+}
 function cbPhotoFigure(a){
   const p=a?.photo;if(!p)return cbMediaFigure(a?.media?.primary,'cb-article-visual cb-hero-visual');
   return '<figure class="cb-article-visual cb-hero-visual cb-photo-figure">'+
@@ -2002,6 +2038,7 @@ function chartBeatCard(a,lead=false){
     '</a></article>';
 }
 async function renderChartBeatHome(){
+  await loadPublishedChartBeatArticles();
   clearChartBeatArticleMeta();
   const lead=CHART_BEAT_ARTICLES[0],rest=CHART_BEAT_ARTICLES.slice(1);
   const main='<main class="cb-home">'+
@@ -2020,7 +2057,8 @@ async function renderChartBeatHome(){
   '</main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat','Chart journalism, historical research, records and analysis from the Daegon Charts archive.','/chart-beat');bindLinks();hydratePortalImages();
 }
-function renderChartBeatArticle(slug){
+async function renderChartBeatArticle(slug){
+  await loadPublishedChartBeatArticles();
   clearChartBeatArticleMeta();
   const a=CHART_BEAT_ARTICLES.find(x=>x.slug===slug);if(!a){renderNotFound();return}
   const main='<main class="cb-article">'+
