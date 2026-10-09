@@ -4,4 +4,5 @@
 /contact /contact.html 200
 /terms /terms.html 200
 /chart-guide /chart-guide.html 200
+/chart-beat/* /index.html 200
 /chart/* /index.html 200
