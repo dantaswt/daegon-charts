@@ -4491,3 +4491,7 @@ body:not(.portal-mode) #portalPage{
  .cb-article-body p{font-size:17px}
 }
 @media(max-width:480px){.cb-section-grid{grid-template-columns:1fr}}
+
+.cb-sources{margin-top:46px;padding-top:20px;border-top:2px solid var(--foreground)}
+.cb-sources h2{font-family:inherit;font-size:14px;text-transform:uppercase;letter-spacing:.09em;margin:0 0 12px}
+.cb-sources ul{margin:0;padding-left:20px}.cb-sources li{font-size:14px;line-height:1.6;margin:7px 0}.cb-sources a{color:var(--accent);word-break:break-word}
