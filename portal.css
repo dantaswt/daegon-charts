@@ -4815,3 +4815,111 @@ body:not(.portal-mode) #portalPage{
 .mag-global-home-grid li:last-child{border-bottom:0}
 .mag-global-home-grid strong,.mag-global-home-grid small{display:block}.mag-global-home-grid small{font-size:10px;color:var(--muted-foreground);margin-top:2px}.mag-global-home-grid em{font-style:normal;font-size:10px;font-weight:900;white-space:nowrap}
 @media(max-width:767px){.mag-global-home-grid{grid-template-columns:1fr}}
+
+
+/* Editorial magazine system 2026 */
+.mag-home,.global-page,.public-chart-page,.my-daegon,.mag-index,.mag-reviews,.mag-community,.forum-page,.plans-page{max-width:1240px}
+.mag-brandline{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;align-items:end;border-top:10px solid var(--foreground);padding-top:14px;margin-bottom:24px}
+.mag-brandline span{font-family:Georgia,"Times New Roman",serif;font-size:clamp(42px,6vw,84px);line-height:.9;font-weight:900;letter-spacing:-.05em}
+.mag-brandline p{font-size:13px;line-height:1.55;color:var(--muted-foreground);max-width:440px;margin:0 0 4px auto}
+.mag-section-head{border-top:4px solid var(--foreground);padding-top:10px;margin-bottom:10px}
+.mag-section-head h2{font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1;text-transform:uppercase;letter-spacing:-.02em;font-weight:950;margin:0}
+.mag-section-head a,.mag-section-head span{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.mag-kicker{font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.09em;color:var(--accent)}
+.mag-lead{border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:24px}
+.mag-lead>a{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(300px,.8fr);gap:24px;align-items:end}
+.mag-lead-copy{padding-bottom:4px}
+.mag-lead-copy h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(42px,5.5vw,76px);line-height:.92;letter-spacing:-.045em;margin:8px 0 12px;text-wrap:balance}
+.mag-lead-copy p{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.45;color:var(--muted-foreground);margin:0 0 12px}
+.mag-story-card h3,.mag-feature-row h3{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.025em}
+.mag-latest-grid{gap:18px}.mag-story-card{border-top:1px solid var(--border);padding-top:10px}
+.mag-story-card h3{font-size:24px;line-height:1.05;margin:7px 0}
+.mag-story-card p{font-size:12px;line-height:1.5}
+.mag-weekly-promo{border-top:8px solid var(--accent);border-bottom:1px solid var(--border);background:transparent;padding:18px 0;margin:30px 0}
+.mag-weekly-promo h2{font-family:Georgia,"Times New Roman",serif;font-size:34px;line-height:1;margin:5px 0 8px;letter-spacing:-.03em}
+
+.mag-chart-grid{gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.mag-chart-card{border:0;border-right:1px solid var(--border);background:transparent;padding:16px}
+.mag-chart-card:last-child{border-right:0}
+.mag-chart-card .mag-chart-rank{font-family:Arial,Helvetica,sans-serif;font-size:52px;line-height:.88;font-weight:1000;letter-spacing:-.07em;margin:10px 0 5px}
+.mag-chart-card h3{font-family:Georgia,"Times New Roman",serif;font-size:25px;line-height:1;letter-spacing:-.03em;margin:6px 0}
+.mag-chart-card p{font-size:12px}
+.mag-chart-link{font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.04em}
+
+.mag-global-home{background:transparent;border-top:10px solid var(--foreground);padding:14px 0 0}
+.mag-global-home>.mag-section-head{border-top:0;padding-top:0}
+.mag-global-home>.mag-section-head h2{font-family:Georgia,"Times New Roman",serif;font-size:38px;text-transform:none;letter-spacing:-.035em}
+.mag-global-home-intro{font-family:Georgia,"Times New Roman",serif;font-size:16px;line-height:1.45;max-width:820px}
+.mag-global-home-grid{gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.mag-global-home-grid article{border:0;border-right:1px solid var(--border);background:transparent;padding:16px}
+.mag-global-home-grid article:last-child{border-right:0}
+.mag-global-home-grid h3{font-family:Arial,Helvetica,sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.04em;font-weight:950}
+.mag-global-home-grid li{align-items:flex-start;padding:11px 0}
+.mag-global-home-grid li::before{content:counter(list-item);font-weight:950;font-size:18px;line-height:1;margin-right:8px}
+.mag-global-home-grid li span{flex:1}
+.mag-global-home-grid strong{font-family:Georgia,"Times New Roman",serif;font-size:16px;line-height:1.05}
+.mag-global-home-grid em{font-size:10px;padding-top:2px}
+
+.mag-index-head{border-top:10px solid var(--foreground);padding-top:12px;margin-bottom:22px}
+.mag-index-head h1{font-family:Georgia,"Times New Roman",serif;font-size:clamp(48px,7vw,86px);line-height:.9;letter-spacing:-.055em;text-transform:none;margin:7px 0 10px}
+.mag-index-head p{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.45;max-width:760px;color:var(--muted-foreground);margin:0}
+.global-page .mag-index-head h1,.my-daegon .mag-index-head h1{font-size:clamp(52px,8vw,92px)}
+
+.global-formula{border:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:transparent;padding:14px 0}
+.global-formula strong{font-size:11px;letter-spacing:.08em}
+.global-formula code{border:0;background:transparent;font-family:Georgia,"Times New Roman",serif;font-size:22px;padding:0}
+.global-chart-section{margin-top:34px}
+.global-chart-section>.mag-section-head h2{font-size:13px}
+.global-chart-list{border:0;border-top:1px solid var(--border);background:transparent}
+.global-chart-list>div{grid-template-columns:58px minmax(0,1fr) 120px 78px;padding:13px 0;border-bottom:1px solid var(--border)}
+.global-chart-list>div>b{font-size:34px;line-height:.8;letter-spacing:-.06em}
+.global-chart-list strong{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.05}
+.global-chart-list small{font-size:11px}
+.global-chart-list em{font-size:11px;text-align:right}
+.global-chart-list i{font-size:10px}
+
+.myp-connect,.myp-formula-hero,.myp-import,.myp-publish,.myp-method{background:transparent;border:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:18px 0}
+.myp-connect{border-top:8px solid var(--accent)}
+.myp-connect h2,.myp-publish h2,.myp-formula-hero h2{font-family:Georgia,"Times New Roman",serif;font-size:32px;line-height:1;letter-spacing:-.03em}
+.myp-connect-form input,.myp-publish-controls input,.myp-datebar select{border:1px solid var(--foreground);border-radius:0}
+.myp-connect-form button,.myp-publish-controls button,.myp-window-tabs button{border-radius:0}
+.myp-formula-hero code{border:0;border-left:4px solid var(--accent);background:transparent;font-family:Georgia,"Times New Roman",serif;font-size:19px;justify-content:flex-start;text-align:left}
+.myp-controls{border-top:4px solid var(--foreground);padding-top:12px}
+.myp-window-tabs{border:0;border-bottom:1px solid var(--border);background:transparent}
+.myp-window-tabs button{border:0;border-right:0;border-bottom:3px solid transparent;background:transparent;padding:10px 14px}
+.myp-window-tabs button.active{background:transparent;color:var(--foreground);border-bottom-color:var(--accent)}
+.myp-window-note{border:0;background:transparent;padding:8px 0}
+.myp-chart-section{margin-top:30px}
+.myp-chart-section>.mag-section-head{margin-bottom:0}
+.myp-chart-list{border:0;border-top:1px solid var(--border);background:transparent}
+.myp-chart-list>div{grid-template-columns:64px minmax(0,1fr) 74px 190px;padding:13px 0;border-bottom:1px solid var(--border)}
+.myp-chart-list>div>b{font-size:34px;line-height:.8;letter-spacing:-.06em}
+.myp-chart-list strong{font-family:Georgia,"Times New Roman",serif;font-size:18px;line-height:1.05}
+.myp-chart-list small{font-size:11px}
+.myp-chart-list em{font-size:10px;text-align:center}
+.myp-chart-list i{font-size:10px}
+.myp-component-head{border-top:10px solid var(--foreground);padding-top:12px}
+.myp-component-head h2{font-size:36px;line-height:1;letter-spacing:-.035em}
+.myp-component-head p{font-family:Georgia,"Times New Roman",serif;font-size:15px;line-height:1.45}
+
+.public-chart-hero{border-top:10px solid var(--foreground);border-bottom:1px solid var(--border);padding:14px 0 20px}
+.public-chart-hero h1{font-size:clamp(50px,8vw,92px);letter-spacing:-.055em}
+.public-chart-hero p{font-family:Georgia,"Times New Roman",serif;font-size:18px}
+.public-chart-block>.mag-section-head{margin-bottom:0}
+.chart-comments{border-top:10px solid var(--foreground)}
+.chart-comment{border-left:1px solid var(--border)}
+.chart-comment-head strong{font-family:Georgia,"Times New Roman",serif;font-size:15px}
+
+@media(max-width:767px){
+ .mag-brandline{grid-template-columns:1fr;gap:10px}
+ .mag-brandline span{font-size:48px}.mag-brandline p{margin:0}
+ .mag-lead>a{grid-template-columns:1fr;gap:12px}
+ .mag-lead-copy h1{font-size:42px}
+ .mag-chart-grid,.mag-global-home-grid{border-bottom:0}
+ .mag-chart-card,.mag-global-home-grid article{border-right:0;border-bottom:1px solid var(--border);padding:14px 0}
+ .global-chart-list>div,.myp-chart-list>div{grid-template-columns:46px minmax(0,1fr) 62px;padding:12px 0}
+ .global-chart-list>div>b,.myp-chart-list>div>b{font-size:28px}
+ .global-chart-list em{grid-column:auto}.global-chart-list i,.myp-chart-list i{grid-column:2/-1;text-align:left}
+ .myp-connect,.myp-formula-hero,.myp-publish{padding:16px 0}
+ .public-chart-hero h1{font-size:44px}
+}
