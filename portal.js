@@ -539,6 +539,8 @@ async function renderMyHistory(){
     setMode(true);portalEl.innerHTML=shellHtml(main);portalEl.querySelector('[data-my-signin]').onclick=dcShowAuthModal;return;
   }
   const sb=dcSupabaseClient(),params=new URLSearchParams(location.search),mode=params.get('mode')||'year',type=params.get('type')||'songs';
+  const need=mode==='year'?'yec':mode==='decade'?'decade_end':'goat',required=mode==='year'?'Fan':'Insider';
+  if(!(await dcHasFeature(need))){setMode(true);portalEl.innerHTML=shellHtml(dcUpgradePanel(mode==='year'?'Personal Year-End':mode==='decade'?'Personal Decade-End':'Personal GOAT','Long-term personal chart history is part of Daegon '+required+'.',required));bindLinks();return}
   const {data}=await sb.from('personal_chart_period_totals').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type',type);
   const rows=data||[],years=[...new Set(rows.map(x=>x.year))].sort((a,b)=>b-a),decades=[...new Set(rows.map(x=>x.decade))].sort((a,b)=>b-a);
   let period=params.get('period')||String(mode==='year'?(years[0]||''):mode==='decade'?(decades[0]||''):'all');
@@ -568,6 +570,7 @@ async function renderTasteMatch(slug=''){
     setMode(true);portalEl.innerHTML=shellHtml(main);portalEl.querySelector('[data-my-signin]').onclick=dcShowAuthModal;return;
   }
   const sb=dcSupabaseClient();
+  if(!(await dcHasFeature('taste_match'))){setMode(true);portalEl.innerHTML=shellHtml(dcUpgradePanel('Taste Match','Compare your listening identity and latest public charts with another Daegon member.','Fan'));bindLinks();return}
   if(!slug){
     const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Compare listeners</div><h1>Taste Match</h1><p>Enter a public Daegon handle to compare your latest Songs charts.</p></header><form id="tasteMatchForm" class="taste-match-form"><input id="tasteMatchHandle" placeholder="Public handle" required><button>Compare</button></form></main>';
     setMode(true);portalEl.innerHTML=shellHtml(main);portalEl.querySelector('#tasteMatchForm').onsubmit=e=>{e.preventDefault();go('/compare/'+slugify(portalEl.querySelector('#tasteMatchHandle').value))};return;
@@ -687,11 +690,12 @@ async function renderMyLists(){
     setMode(true);portalEl.innerHTML=shellHtml(main);portalEl.querySelector('[data-my-signin]').onclick=dcShowAuthModal;return;
   }
   const sb=dcSupabaseClient(),{data:lists}=await sb.from('user_music_lists').select('*').eq('user_id',_dcAuthUser.id).order('updated_at',{ascending:false});
+  const listLimit=await dcFeatureLimit('music_lists'),canCreateList=listLimit===null||(lists||[]).length<listLimit;
   const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Rank & curate</div><h1>My Lists</h1><p>Best albums, favorite songs, artist rankings or any music list you want to publish.</p></header>'+
-    '<form id="myListCreate" class="community-create-form"><input name="title" maxlength="120" placeholder="List title" required><select name="type"><option value="mixed">Mixed</option><option value="songs">Songs</option><option value="albums">Albums</option><option value="artists">Artists</option></select><textarea name="description" maxlength="1200" placeholder="Description"></textarea><button>Create list</button><div id="myListStatus"></div></form>'+
+    (canCreateList?'<form id="myListCreate" class="community-create-form"><input name="title" maxlength="120" placeholder="List title" required><select name="type"><option value="mixed">Mixed</option><option value="songs">Songs</option><option value="albums">Albums</option><option value="artists">Artists</option></select><textarea name="description" maxlength="1200" placeholder="Description"></textarea><button>Create list</button><div id="myListStatus"></div></form>':'<div class="saas-limit-note">Your current plan includes '+listLimit+' lists. <a href="'+appHref('/plans')+'" data-portal-link="/plans">Upgrade for unlimited lists →</a></div>')+
     '<section class="community-directory"><div class="mag-section-head"><h2>Your lists</h2><span>'+(lists||[]).length+'</span></div><div class="community-grid">'+((lists||[]).map(x=>'<a href="'+appHref('/list/'+x.id)+'" data-portal-link="/list/'+x.id+'"><div class="mag-kicker">'+esc(x.list_type)+'</div><h2>'+esc(x.title)+'</h2><p>'+esc(x.description||'')+'</p><span>'+(x.is_public?'Public':'Private')+' →</span></a>').join('')||'<div class="my-empty-inline">Create your first list.</div>')+'</div></section></main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Lists','Create and publish ranked music lists.','/my-lists');bindLinks();
-  portalEl.querySelector('#myListCreate').onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target),title=String(fd.get('title')||'').trim(),type=String(fd.get('type')||'mixed'),description=String(fd.get('description')||'').trim(),st=portalEl.querySelector('#myListStatus');const {data,error}=await sb.from('user_music_lists').insert({user_id:_dcAuthUser.id,slug:slugify(title),title,description,list_type:type,is_public:true}).select('id').single();if(error){st.textContent=error.message;return}go('/list/'+data.id)};
+  const listForm=portalEl.querySelector('#myListCreate');if(listForm)listForm.onsubmit=async e=>{e.preventDefault();const fd=new FormData(e.target),title=String(fd.get('title')||'').trim(),type=String(fd.get('type')||'mixed'),description=String(fd.get('description')||'').trim(),st=portalEl.querySelector('#myListStatus');const {data,error}=await sb.from('user_music_lists').insert({user_id:_dcAuthUser.id,slug:slugify(title),title,description,list_type:type,is_public:true}).select('id').single();if(error){st.textContent=error.message;return}go('/list/'+data.id)};
 }
 async function renderMusicList(id){
   loading('Music List');const sb=dcSupabaseClient();
@@ -711,6 +715,9 @@ async function renderMyCharts(){
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal music charts generated from your listening history.','/my-charts');portalEl.querySelector('[data-my-signin]').onclick=dcShowAuthModal;return;
   }
   const sb=dcSupabaseClient();
+  const saas=await dcSaasState();
+  const can28=!!saas.features.get('personal_charts_28d')?.enabled;
+  const canCustomFormula=!!saas.features.get('custom_formula')?.enabled;
   const [{data:dates},{data:lastfmConn},{data:profile},{data:chartSettings}]=await Promise.all([
     sb.from('personal_chart_entries').select('chart_date').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').order('chart_date',{ascending:false}).limit(250),
     sb.from('user_streaming_connections').select('account_name,status,last_synced_at').eq('user_id',_dcAuthUser.id).eq('provider','lastfm').maybeSingle(),
@@ -720,7 +727,8 @@ async function renderMyCharts(){
   const unique=[...new Set((dates||[]).map(x=>x.chart_date))];
   const params=new URLSearchParams(location.search);
   const selected=params.get('date')||unique[0]||'';
-  const windowDays=params.get('window')==='28'?28:7;
+  const requestedWindow=params.get('window')==='28'?28:7;
+  const windowDays=requestedWindow===28&&can28?28:7;
 
   let songs=[],albums=[],artists=[],digital=[],albumSales=[],stream28=[],albumStream28=[],artists28=[];
   if(selected&&windowDays===7){
@@ -747,10 +755,10 @@ async function renderMyCharts(){
 
   const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Your listening, charted</div><h1>My Charts</h1><p>Personal rankings with explicit 7-day and 28-day tracking windows.</p></header>'+
     connection+
-    '<section class="myp-formula-hero"><div><div class="mag-kicker">'+esc((chartSettings?.formula_mode||'standard')==='standard'?'Daegon Standard':'Personal Formula')+'</div><h2>Personal Daegon Score</h2><p>Choose the official Standard formula, pure play count, or your own weights. Standard remains the comparison baseline across Daegon.</p></div><form id="mypFormulaForm" class="myp-formula-form"><label>Mode<select id="mypFormulaMode"><option value="standard" '+((chartSettings?.formula_mode||'standard')==='standard'?'selected':'')+'>Standard</option><option value="plays_only" '+(chartSettings?.formula_mode==='plays_only'?'selected':'')+'>Plays Only</option><option value="custom" '+(chartSettings?.formula_mode==='custom'?'selected':'')+'>Custom</option></select></label><label>Play weight<input id="mypPlaysWeight" type="number" step="0.1" min="0" max="1000" value="'+Number(chartSettings?.plays_weight??100)+'"></label><label>Minute weight<input id="mypMinuteWeight" type="number" step="0.1" min="0" max="100" value="'+Number(chartSettings?.minute_weight??1.5)+'"></label><label>Active-day weight<input id="mypDayWeight" type="number" step="0.1" min="0" max="500" value="'+Number(chartSettings?.active_day_weight??18)+'"></label><button>Save formula</button><div id="mypFormulaStatus"></div></form><code>Score = plays × '+Number(chartSettings?.plays_weight??100)+' + listening minutes × '+Number(chartSettings?.minute_weight??1.5)+' + active days × '+Number(chartSettings?.active_day_weight??18)+'</code><small>Last.fm recent scrobbles do not include duration, so listening minutes contribute 0 for Last.fm-only plays. Changing the formula affects the next sync/rebuild.</small></section>'+
+    '<section class="myp-formula-hero"><div><div class="mag-kicker">'+esc((chartSettings?.formula_mode||'standard')==='standard'?'Daegon Standard':'Personal Formula')+'</div><h2>Personal Daegon Score</h2><p>Choose the official Standard formula, pure play count, or your own weights. Standard remains the comparison baseline across Daegon.</p></div><form id="mypFormulaForm" class="myp-formula-form"><label>Mode<select id="mypFormulaMode"><option value="standard" '+((chartSettings?.formula_mode||'standard')==='standard'?'selected':'')+'>Standard</option><option value="plays_only" '+(chartSettings?.formula_mode==='plays_only'?'selected':'')+'>Plays Only</option><option value="custom" '+(chartSettings?.formula_mode==='custom'?'selected':'')+' '+(canCustomFormula?'':'disabled')+'>Custom'+(canCustomFormula?'':' · Fan')+'</option></select></label><label>Play weight<input id="mypPlaysWeight" '+(canCustomFormula?'':'disabled')+' type="number" step="0.1" min="0" max="1000" value="'+Number(chartSettings?.plays_weight??100)+'"></label><label>Minute weight<input id="mypMinuteWeight" '+(canCustomFormula?'':'disabled')+' type="number" step="0.1" min="0" max="100" value="'+Number(chartSettings?.minute_weight??1.5)+'"></label><label>Active-day weight<input id="mypDayWeight" '+(canCustomFormula?'':'disabled')+' type="number" step="0.1" min="0" max="500" value="'+Number(chartSettings?.active_day_weight??18)+'"></label><button>Save formula</button><div id="mypFormulaStatus"></div></form><code>Score = plays × '+Number(chartSettings?.plays_weight??100)+' + listening minutes × '+Number(chartSettings?.minute_weight??1.5)+' + active days × '+Number(chartSettings?.active_day_weight??18)+'</code><small>Last.fm recent scrobbles do not include duration, so listening minutes contribute 0 for Last.fm-only plays. Changing the formula affects the next sync/rebuild.</small></section>'+
     '<section class="myp-import secondary"><div><h2>Spotify history import</h2><p>Optional: upload a Spotify Extended Streaming History JSON file to add duration-aware listening data.</p></div><label>Choose JSON<input id="mypHistoryFile" type="file" accept=".json,application/json"></label><div id="mypImportStatus"></div></section>'+
     (selected?'<section class="myp-publish"><div><div class="mag-kicker">Share & contribute</div><h2>Publish this week</h2><p>Publishing makes this chart shareable, enables friend comments and contributes its position points to Daegon Global. Your raw listening history stays private.</p></div><div class="myp-publish-controls"><input id="mypPublicHandle" maxlength="40" placeholder="Public handle" value="'+escAttr(profile?.profile_slug||'')+'"><button id="mypPublishWeek">Publish week</button><div id="mypPublishStatus"></div></div></section>':'')+
-    (unique.length?'<div class="myp-controls"><div class="myp-window-tabs"><button data-window="7" class="'+(windowDays===7?'active':'')+'">7 Days</button><button data-window="28" class="'+(windowDays===28?'active':'')+'">28 Days</button></div><div class="myp-datebar"><label>Chart week ending</label><select id="mypDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div></div>':'<div class="my-empty-inline">Connect Last.fm or import listening history to generate your first personal chart.</div>')+
+    (unique.length?'<div class="myp-controls"><div class="myp-window-tabs"><button data-window="7" class="'+(windowDays===7?'active':'')+'">7 Days</button><button data-window="28" data-premium-window="'+(can28?'0':'1')+'" class="'+(windowDays===28?'active':'')+'">28 Days'+(can28?'':' · Fan')+'</button></div><div class="myp-datebar"><label>Chart week ending</label><select id="mypDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div></div>':'<div class="my-empty-inline">Connect Last.fm or import listening history to generate your first personal chart.</div>')+
     (selected?'<div class="myp-window-note"><strong>'+windowDays+'-Day Tracking</strong><span>'+(windowDays===7?'Weekly chart ending '+fmtDate(selected):'Rolling 28-day window ending '+fmtDate(selected))+'</span></div>'+(windowDays===7?dcPersonalChartBeatHtml(songs,selected):'')+
       (windowDays===7?top(songs||[],'My Songs 100')+top(albums||[],'My Albums 50')+top(artists||[],'My Artists 50')+
         '<div class="myp-component-head"><div class="mag-kicker">Component Charts</div><h2>How your week breaks down</h2><p>7-day play strength and rolling 28-day streaming strength, shown separately.</p></div>'+
@@ -759,7 +767,7 @@ async function renderMyCharts(){
   '</main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal 7-day and 28-day Daegon charts generated from your listening history.','/my-charts');bindLinks();
 
-  const ff=portalEl.querySelector('#mypFormulaForm');if(ff)ff.onsubmit=async e=>{e.preventDefault();const st=portalEl.querySelector('#mypFormulaStatus'),formula_mode=portalEl.querySelector('#mypFormulaMode').value,plays_weight=Number(portalEl.querySelector('#mypPlaysWeight').value),minute_weight=Number(portalEl.querySelector('#mypMinuteWeight').value),active_day_weight=Number(portalEl.querySelector('#mypDayWeight').value);st.textContent='Saving…';const {error}=await sb.from('user_chart_settings').upsert({user_id:_dcAuthUser.id,formula_mode,plays_weight,minute_weight,active_day_weight,updated_at:new Date().toISOString()},{onConflict:'user_id'});st.textContent=error?error.message:'Saved. Sync Last.fm again to rebuild with this formula.';if(!error)setTimeout(renderMyCharts,500)};
+  const ff=portalEl.querySelector('#mypFormulaForm');if(ff)ff.onsubmit=async e=>{e.preventDefault();const st=portalEl.querySelector('#mypFormulaStatus'),formula_mode=portalEl.querySelector('#mypFormulaMode').value;if(formula_mode==='custom'&&!canCustomFormula){st.innerHTML='Custom formulas are a Fan feature. <a href="'+appHref('/plans')+'" data-portal-link="/plans">Compare plans →</a>';bindLinks();return}const plays_weight=Number(portalEl.querySelector('#mypPlaysWeight').value),minute_weight=Number(portalEl.querySelector('#mypMinuteWeight').value),active_day_weight=Number(portalEl.querySelector('#mypDayWeight').value);st.textContent='Saving…';const {error}=await sb.from('user_chart_settings').upsert({user_id:_dcAuthUser.id,formula_mode,plays_weight,minute_weight,active_day_weight,updated_at:new Date().toISOString()},{onConflict:'user_id'});st.textContent=error?error.message:'Saved. Sync Last.fm again to rebuild with this formula.';if(!error)setTimeout(renderMyCharts,500)};
   const lfmStatus=portalEl.querySelector('#mypLastfmStatus');
   portalEl.querySelectorAll('[data-lfm-sync]').forEach(btn=>btn.onclick=async()=>{
     const username=portalEl.querySelector('#mypLastfmUser')?.value.trim();
@@ -772,7 +780,7 @@ async function renderMyCharts(){
   const file=portalEl.querySelector('#mypHistoryFile'),st=portalEl.querySelector('#mypImportStatus');
   if(file)file.onchange=()=>{const f=file.files?.[0];if(f)dcImportSpotifyHistory(f,st)};
   const sel=portalEl.querySelector('#mypDateSelect');if(sel)sel.onchange=()=>{const u=new URL(location.href);u.searchParams.set('date',sel.value);u.searchParams.set('window',String(windowDays));history.replaceState({},'',u.pathname+u.search);renderMyCharts()};
-  portalEl.querySelectorAll('[data-window]').forEach(btn=>btn.onclick=()=>{const u=new URL(location.href);u.searchParams.set('window',btn.dataset.window);if(selected)u.searchParams.set('date',selected);history.replaceState({},'',u.pathname+u.search);renderMyCharts()});
+  portalEl.querySelectorAll('[data-window]').forEach(btn=>btn.onclick=()=>{if(btn.dataset.premiumWindow==='1'){go('/plans');return}const u=new URL(location.href);u.searchParams.set('window',btn.dataset.window);if(selected)u.searchParams.set('date',selected);history.replaceState({},'',u.pathname+u.search);renderMyCharts()});
 }
 
 async function renderForum(){
@@ -823,14 +831,49 @@ async function renderForumTopic(id){
   };
 }
 
-function renderPlans(){
-  const plan=(name,price,tag,features,featured=false)=>'<article class="plan-card '+(featured?'featured':'')+'"><div class="mag-kicker">'+tag+'</div><h2>'+name+'</h2><div class="plan-price">'+price+'</div><ul>'+features.map(x=>'<li>'+x+'</li>').join('')+'</ul><button data-plan="'+name.toLowerCase()+'" '+(name==='Free'?'disabled':'')+'>'+(name==='Free'?'Included':'Choose '+name)+'</button></article>';
-  const main='<main class="plans-page"><header class="mag-index-head"><div class="mag-kicker">Membership</div><h1>Choose your Daegon</h1><p>Core charts and journalism stay open. Paid plans are designed around personalization, deeper history and community tools.</p></header><div class="plan-grid">'+
-    plan('Free','R$ 0','Start here',['Daegon charts and editorial portal','My Daegon follows and favorites','Forum participation','Basic My Charts import'])+
-    plan('Fan','Coming soon','For chart lovers',['Everything in Free','Full personal chart archive','Year-End personal charts','Expanded listening stats','Custom public profile'],true)+
-    plan('Insider','Coming soon','Power user',['Everything in Fan','Personal GOAT and decade-end charts','Advanced export and comparisons','Early access to new Daegon labs','Insider community badge'])+
-    '</div><div class="plan-note"><strong>Billing is not active yet.</strong><p>The membership model is ready in Daegon, but checkout will only be enabled after the payment provider is connected and prices are finalized.</p></div></main>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Plans','Daegon Free, Fan and Insider membership plans.','/plans');bindLinks();
+let _dcSaasStateCache=null;
+async function dcSaasState(force=false){
+  if(!_dcAuthUser)return {plan:'free',status:'active',features:new Map()};
+  if(_dcSaasStateCache&&!force)return _dcSaasStateCache;
+  const sb=dcSupabaseClient();
+  const [{data:membership},{data:allFeatures}]=await Promise.all([
+    sb.from('user_memberships').select('*').eq('user_id',_dcAuthUser.id).maybeSingle(),
+    sb.from('saas_plan_features').select('plan,feature_key,enabled,limit_value')
+  ]);
+  const valid=new Set(['active','trialing']);
+  const plan=membership&&valid.has(membership.status)?membership.plan:'free';
+  const features=new Map((allFeatures||[]).filter(x=>x.plan===plan).map(x=>[x.feature_key,x]));
+  return (_dcSaasStateCache={plan,status:membership?.status||'active',membership:membership||null,features});
+}
+async function dcHasFeature(feature){
+  if(!_dcAuthUser)return false;
+  const s=await dcSaasState();return !!s.features.get(feature)?.enabled;
+}
+async function dcFeatureLimit(feature){
+  if(!_dcAuthUser)return 0;
+  const s=await dcSaasState(),x=s.features.get(feature);
+  return x?.enabled?(x.limit_value??null):0;
+}
+function dcUpgradePanel(title,copy,plan='Fan'){
+  return '<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Daegon '+plan+'</div><h1>'+esc(title)+'</h1><p>'+esc(copy)+'</p></header><section class="saas-upgrade-panel"><div><div class="mag-kicker">Premium feature</div><h2>Unlock with '+esc(plan)+'</h2><p>Your public charts and editorial access stay free. Upgrade only when you want deeper personal analytics and power-user tools.</p></div><a href="'+appHref('/plans')+'" data-portal-link="/plans">Compare plans →</a></section></main>';
+}
+
+async function renderPlans(){
+  const state=_dcAuthUser?await dcSaasState(true):{plan:'free',status:'active',membership:null};
+  const current=state.plan||'free';
+  const plan=(name,price,tag,features,featured=false)=>{
+    const key=name.toLowerCase(),isCurrent=key===current;
+    return '<article class="plan-card '+(featured?'featured ':'')+(isCurrent?'current':'')+'"><div class="mag-kicker">'+tag+'</div><h2>'+name+'</h2><div class="plan-price">'+price+'</div><ul>'+features.map(x=>'<li>'+x+'</li>').join('')+'</ul><button data-plan="'+key+'" '+(isCurrent||key==='free'?'disabled':'')+'>'+(isCurrent?'Current plan':key==='free'?'Included':'Choose '+name)+'</button></article>';
+  };
+  const main='<main class="plans-page"><header class="mag-index-head"><div class="mag-kicker">Daegon SaaS</div><h1>Choose your Daegon</h1><p>The publication stays open. Membership unlocks deeper personal history, comparisons, formulas and power-user intelligence.</p></header>'+
+    '<div class="saas-current-plan"><span>Current plan</span><strong>'+esc(current.charAt(0).toUpperCase()+current.slice(1))+'</strong><small>'+esc(state.status||'active')+'</small></div>'+
+    '<div class="plan-grid">'+
+    plan('Free','R$ 0','Discover + participate',['Daegon charts, Chart Beat and editorial','7-day personal charts','My Picks and public profile','Ratings, reviews, forum and comments','Join communities','Up to 3 music lists'])+
+    plan('Fan','Price to be set','For chart lovers',['Everything in Free','28-day personal charts','Full Year-End personal charts','Taste Match','Custom chart formulas','Unlimited lists + more communities','Export and advanced Personal Chart Beat'],true)+
+    plan('Insider','Price to be set','Power user',['Everything in Fan','Personal Decade-End','Personal GOAT','AI deep dives and music-history analysis','Advanced comparisons and exports','Early access to Daegon Labs'])+
+    '</div><section class="saas-billing-note"><div class="mag-kicker">Billing architecture</div><h2>Stripe Billing is connected in test mode.</h2><p>The SaaS entitlement system is live. Checkout will be switched on after Fan and Insider prices are defined; until then no paid charge is created.</p></section></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Plans','Daegon Free, Fan and Insider SaaS plans.','/plans');bindLinks();
+  portalEl.querySelectorAll('[data-plan]').forEach(b=>b.onclick=()=>{const st=document.createElement('div');st.className='plan-inline-status';st.textContent='Checkout is ready for configuration; price activation is the remaining billing step.';b.closest('.plan-card').appendChild(st)});
 }
 async function renderMyDaegon(){
   loading('My Daegon');
@@ -1351,9 +1394,14 @@ async function renderCommunity(slug=''){
     const acf=portalEl.querySelector('#albumClubForm');if(acf)acf.onsubmit=async e=>{e.preventDefault();const fd=new FormData(acf),album=String(fd.get('album')||'').trim(),artist=String(fd.get('artist')||'').trim(),starts_on=String(fd.get('starts')||''),ends_on=String(fd.get('ends')||'')||null,prompt=String(fd.get('prompt')||'').trim(),st=portalEl.querySelector('#albumClubStatus');st.textContent='Saving…';const {error}=await sb.from('community_album_clubs').insert({community_id:c.id,album_key:slugify(album)+'--'+slugify(artist),album_name:album,artist_name:artist||null,starts_on,ends_on,prompt:prompt||null,created_by:_dcAuthUser.id});if(error){st.textContent=error.message;return}renderCommunity(slug)};
     return;
   }
-  const {data:communities}=await sb.from('music_communities').select('*').eq('is_public',true).order('created_at',{ascending:false}).limit(50);
+  const [{data:communities},{data:ownCommunities}]=await Promise.all([
+    sb.from('music_communities').select('*').eq('is_public',true).order('created_at',{ascending:false}).limit(50),
+    _dcAuthUser?sb.from('music_communities').select('id').eq('owner_id',_dcAuthUser.id):Promise.resolve({data:[]})
+  ]);
+  const communityLimit=_dcAuthUser?await dcFeatureLimit('communities_create'):0;
+  const canCreateCommunity=_dcAuthUser&&(communityLimit===null||(ownCommunities||[]).length<communityLimit);
   const main='<main class="mag-community"><header class="mag-index-head"><div class="mag-kicker">Daegon Community</div><h1>Find your music people.</h1><p>Join communities, combine public personal charts into group rankings, discuss releases in the forum and participate in Album Clubs.</p></header>'+
-    (_dcAuthUser?'<form id="communityCreateForm" class="community-create-form"><input name="name" maxlength="80" placeholder="Community name" required><input name="category" maxlength="50" placeholder="Category (pop, K-pop, charts…)" required><textarea name="description" maxlength="1000" placeholder="What is this community about?"></textarea><button>Create community</button><div id="communityCreateStatus"></div></form>':'<div class="dc-comment-signin"><p>Sign in to create or join communities.</p><button data-community-signin>Sign in</button></div>')+
+    (_dcAuthUser?(canCreateCommunity?'<form id="communityCreateForm" class="community-create-form"><input name="name" maxlength="80" placeholder="Community name" required><input name="category" maxlength="50" placeholder="Category (pop, K-pop, charts…)" required><textarea name="description" maxlength="1000" placeholder="What is this community about?"></textarea><button>Create community</button><div id="communityCreateStatus"></div></form>':'<div class="saas-limit-note">Your current plan has reached its community creation limit. <a href="'+appHref('/plans')+'" data-portal-link="/plans">Upgrade →</a></div>'):'<div class="dc-comment-signin"><p>Sign in to create or join communities.</p><button data-community-signin>Sign in</button></div>')+
     '<section class="community-directory"><div class="mag-section-head"><h2>Communities</h2><span>'+(communities||[]).length+'</span></div><div class="community-grid">'+((communities||[]).map(c=>'<a href="'+appHref('/community/'+c.slug)+'" data-portal-link="/community/'+c.slug+'"><div class="mag-kicker">'+esc(c.category)+'</div><h2>'+esc(c.name)+'</h2><p>'+esc(c.description||'')+'</p><span>Open community →</span></a>').join('')||'<div class="my-empty-inline">No communities yet. Create the first one.</div>')+'</div></section></main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Daegon Community','Music communities, group charts, album clubs and discussion on Daegon.','/community');bindLinks();
   portalEl.querySelector('[data-community-signin]')?.addEventListener('click',dcShowAuthModal);
