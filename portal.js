@@ -1804,6 +1804,7 @@ const CHART_BEAT_ARTICLES=[
     dek:'Contemporary reporting, Rihanna’s own comments and the scale of the song’s international run show why 2007 became a turning point.',
     byline:'Daegon Charts Editorial',
     published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    media:{"primary":{"kind":"song","name":"Umbrella","artist":"Rihanna","caption":"“Umbrella” — Rihanna"},"secondary":{"kind":"album","name":"Good Girl Gone Bad","artist":"Rihanna","caption":"Good Girl Gone Bad — Rihanna"}},
     body:[
       '<p>By the end of 2007, “Umbrella” was no longer simply another successful Rihanna single. Contemporary coverage was already treating it as the record that changed the scale of her career. The song arrived alongside the visual reinvention of <em>Good Girl Gone Bad</em> and quickly became a reference point for the year’s pop culture.</p>',
       '<h2>A hit that became bigger than its release campaign</h2><p>In August 2007, <em>The Guardian</em> described “Umbrella” as the soundtrack to Britain’s unusually wet summer and noted its ten-week run at No. 1 in the UK. That run made it the longest-lasting UK chart-topper in more than a decade at the time and the longest by a female artist since Whitney Houston’s “I Will Always Love You.”</p>',
@@ -1822,6 +1823,7 @@ const CHART_BEAT_ARTICLES=[
     socialTitle:'In 2007, Britney’s headlines and her music were telling two different stories',
     dek:'Contemporary reviews reveal how critics separated the turmoil surrounding Britney Spears from the sound of one of 2007’s boldest pop albums.',
     byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    media:{"primary":{"kind":"album","name":"Blackout","artist":"Britney Spears","caption":"Blackout — Britney Spears"},"secondary":{"kind":"song","name":"Gimme More","artist":"Britney Spears","caption":"“Gimme More” — Britney Spears"}},
     body:[
       '<p>Few major pop albums have arrived beneath as much non-musical attention as Britney Spears’ <em>Blackout</em>. By October 2007, coverage of Spears’ personal life was constant. Yet the reviews published as the album arrived reveal a striking split: critics were often disturbed by the circumstances around the singer while responding positively to the record itself.</p>',
       '<h2>The release date itself became news</h2><p>In October 2007, the album’s release was moved forward. Sony BMG publicly pointed to demand, while Jive Records cited unauthorized leaks of songs and unfinished material. Even before critics could assess the finished record, the mechanics of getting <em>Blackout</em> into stores had become part of its story.</p>',
@@ -1840,6 +1842,7 @@ const CHART_BEAT_ARTICLES=[
     socialTitle:'The moment Amy Winehouse crossed from British acclaim to an American breakthrough',
     dek:'Back to Black’s U.S. breakthrough unfolded alongside touring, awards attention and increasingly intense scrutiny of Amy Winehouse.',
     byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    media:{"primary":{"kind":"album","name":"Back to Black","artist":"Amy Winehouse","caption":"Back to Black — Amy Winehouse"},"secondary":{"kind":"song","name":"Rehab","artist":"Amy Winehouse","caption":"“Rehab” — Amy Winehouse"}},
     body:[
       '<p>Amy Winehouse entered 2007 with critical recognition in Britain and an album that already carried a distinct musical identity. What changed during the year was scale. <em>Back to Black</em> moved from acclaimed British release to a major international success, while American audiences encountered Winehouse through records, live appearances and rapidly expanding press coverage.</p>',
       '<h2>A U.S. debut that immediately attracted attention</h2><p>Contemporary reporting in March 2007 noted that <em>Back to Black</em> entered the U.S. album chart inside the Top 10 after Winehouse performed at South by Southwest. The American breakthrough arrived quickly enough to become news in Britain in its own right.</p>',
@@ -1857,6 +1860,7 @@ const CHART_BEAT_ARTICLES=[
     socialTitle:'Before Beyoncé became Beyoncé, there was “Crazy in Love”',
     dek:'Contemporary reviews and Beyoncé’s own account of making the song show how one single reframed her from Destiny’s Child star to solo force.',
     byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    media:{"primary":{"kind":"song","name":"Crazy in Love","artist":"Beyoncé","caption":"“Crazy in Love” — Beyoncé"},"secondary":{"kind":"album","name":"Dangerously in Love","artist":"Beyoncé","caption":"Dangerously in Love — Beyoncé"}},
     body:[
       '<p>By 2003, Beyoncé Knowles was already famous. That is different from having an established solo identity. “Crazy in Love” became the record that collapsed the distinction. Contemporary coverage treated the song not as a tentative side project from a group member, but as a major pop event.</p>',
       '<h2>The single arrived before the album had to prove itself</h2><p>A June 2003 review of <em>Dangerously in Love</em> observed that “Crazy in Love” was already surging through the U.S. charts while the album was being positioned as a major release. By the end of the year, British critics were describing Beyoncé as one of the defining figures of 2003 and repeatedly naming the single among the year’s best.</p>',
@@ -1874,6 +1878,7 @@ const CHART_BEAT_ARTICLES=[
     socialTitle:'In 2005, “Gasolina” made reggaetón impossible for global pop to ignore',
     dek:'Reporting from 2005 shows the speed at which Daddy Yankee and “Gasolina” moved from Puerto Rican phenomenon to international pop story.',
     byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    media:{"primary":{"kind":"song","name":"Gasolina","artist":"Daddy Yankee","caption":"“Gasolina” — Daddy Yankee"},"secondary":{"kind":"album","name":"Barrio Fino","artist":"Daddy Yankee","caption":"Barrio Fino — Daddy Yankee"}},
     body:[
       '<p>By the middle of 2005, international journalists were no longer writing about reggaetón as a distant underground scene. They were explaining it to readers whose local clubs and charts were already reacting. At the center of that change was Daddy Yankee’s “Gasolina.”</p>',
       '<h2>The record arrived with a movement behind it</h2><p>A May 2005 Los Angeles Times report described reggaetón as an urgent new force in Latin popular music and identified Daddy Yankee’s <em>Barrio Fino</em> as the movement’s blockbuster. “Gasolina” functioned as the most accessible calling card: a chorus that could travel even where Spanish-language urban music was unfamiliar to mainstream radio audiences.</p>',
@@ -1891,6 +1896,7 @@ const CHART_BEAT_ARTICLES=[
     socialTitle:'Tens of thousands in Los Angeles: the scale of RBD’s U.S. breakthrough',
     dek:'A contemporary Los Angeles Times report captured the group’s first major U.S. tour as both a pop phenomenon and a Latino crossover moment.',
     byline:'Daegon Charts Editorial',published:'2026-10-08',modified:'2026-10-08',image:'https://i.imgur.com/jaBZ19n.png',
+    media:{"primary":{"kind":"artist","name":"RBD","artist":"RBD","caption":"RBD"},"secondary":{"kind":"album","name":"Nuestro Amor","artist":"RBD","caption":"Nuestro Amor — RBD"}},
     body:[
       '<p>RBD’s expansion into the United States in 2006 challenged a familiar assumption about crossover: that success required switching languages or softening a distinctly Latin identity. When the Mexican group opened its first U.S. tour in Los Angeles, the response was already massive.</p>',
       '<h2>A television phenomenon became a live-music phenomenon</h2><p>RBD originated through the Mexican television series <em>Rebelde</em>, but by March 2006 the scale of the audience exceeded the normal boundaries of a television tie-in. A contemporary Los Angeles Times report from the Los Angeles Memorial Coliseum described tens of thousands of fans chanting the group’s name at the opening of the U.S. tour.</p>',
@@ -1924,6 +1930,23 @@ const CHART_BEAT_ARTICLES=[
   }
 ]
 
+
+function cbMediaFigure(m,cls='cb-article-visual'){
+  if(!m)return '';
+  return '<figure class="'+cls+'"><div class="cb-media-box" data-portal-image data-kind="'+escAttr(m.kind)+'" data-name="'+escAttr(m.name)+'" data-artist="'+escAttr(m.artist||m.name)+'"></div>'+(m.caption?'<figcaption>'+esc(m.caption)+'</figcaption>':'')+'</figure>';
+}
+async function hydrateChartBeatMetaImage(a){
+  const m=a?.media?.primary;if(!m)return;
+  try{
+    const url=await resolveImage({name:m.name,artist:m.artist||m.name},{kind:m.kind});
+    if(!url)return;
+    a.image=url;
+    const og=document.querySelector('meta[property="og:image"]');if(og)og.content=url;
+    const tw=document.querySelector('meta[name="twitter:image"]');if(tw)tw.content=url;
+    const ld=document.getElementById('chartBeatArticleSchema');
+    if(ld){try{const data=JSON.parse(ld.textContent||'{}');data.image=[url];ld.textContent=JSON.stringify(data)}catch{}}
+  }catch{}
+}
 function setChartBeatArticleMeta(a){
   setMeta(a.seoTitle,a.dek,'/chart-beat/'+a.slug,true);
   document.title=a.seoTitle+' | Daegon Charts';
@@ -1958,7 +1981,7 @@ function clearChartBeatArticleMeta(){
 function chartBeatCard(a,lead=false){
   return '<article class="cb-card '+(lead?'cb-lead':'')+'">'+
     '<a class="cb-card-link" href="'+appHref('/chart-beat/'+a.slug)+'" data-portal-link="/chart-beat/'+a.slug+'">'+
-      '<div class="cb-card-art"><img src="'+escAttr(a.image)+'" alt="" loading="eager"></div>'+
+      '<div class="cb-card-art cb-media-box" data-portal-image data-kind="'+escAttr(a?.media?.primary?.kind||'artist')+'" data-name="'+escAttr(a?.media?.primary?.name||a.headline)+'" data-artist="'+escAttr(a?.media?.primary?.artist||a?.media?.primary?.name||'')+'"></div>'+
       '<div class="cb-card-copy"><div class="cb-kicker">'+esc(a.category)+'</div><h2>'+esc(a.headline)+'</h2><p>'+esc(a.dek)+'</p>'+
       '<div class="cb-meta">By '+esc(a.byline)+' · '+fmtDate(a.published)+'</div></div>'+
     '</a></article>';
@@ -1980,7 +2003,7 @@ async function renderChartBeatHome(){
       '<div><strong>Behind the Charts</strong><span>Methodology, corrections and research standards.</span></div>'+
     '</div></section>'+
   '</main>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat','Chart journalism, historical research, records and analysis from the Daegon Charts archive.','/chart-beat');bindLinks();
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Chart Beat','Chart journalism, historical research, records and analysis from the Daegon Charts archive.','/chart-beat');bindLinks();hydratePortalImages();
 }
 function renderChartBeatArticle(slug){
   clearChartBeatArticleMeta();
@@ -1991,10 +2014,11 @@ function renderChartBeatArticle(slug){
       '<div class="cb-byline">By <strong>'+esc(a.byline)+'</strong><br><span>Published '+fmtDate(a.published)+(a.modified!==a.published?' · Updated '+fmtDate(a.modified):'')+'</span></div>'+
     '</header>'+
     '<div class="cb-share" aria-label="Share article"><button data-copy-article><i class="fas fa-link"></i> Copy link</button></div>'+
-    '<div class="cb-article-body">'+a.body+'</div>'+
+    cbMediaFigure(a?.media?.primary,'cb-article-visual cb-hero-visual')+
+    '<div class="cb-article-body">'+(a?.media?.secondary?a.body.replace('<h2>',cbMediaFigure(a.media.secondary,'cb-inline-visual')+'<h2>'):a.body)+'</div>'+
     '<footer class="cb-article-footer"><strong>Corrections & sourcing</strong><p>Source-backed corrections are welcome. Include the chart date and a reliable reference when possible.</p><a href="/contact">Contact the editorial desk →</a></footer>'+
   '</main>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setChartBeatArticleMeta(a);bindLinks();
+  setMode(true);portalEl.innerHTML=shellHtml(main);setChartBeatArticleMeta(a);bindLinks();hydratePortalImages();hydrateChartBeatMetaImage(a);
   const copy=portalEl.querySelector('[data-copy-article]');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText(location.href);copy.innerHTML='<i class="fas fa-check"></i> Link copied'}catch{}};
 }
 async function renderChartBeatDataDesk(){
