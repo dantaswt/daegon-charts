@@ -5220,3 +5220,18 @@ body.global-bars-weekly .theme-btn:hover{
     scrollbar-width:thin;
   }
 }
+
+
+/* Chart run outside-chart counters */
+.details-run-chip.is-gap{
+  border-color:var(--border)!important;
+  background:var(--muted)!important;
+  color:var(--muted-foreground)!important;
+  font-size:10px!important;
+  font-weight:800!important;
+  cursor:default!important;
+}
+.details-run-chip.is-gap:hover{
+  border-color:var(--border)!important;
+  color:var(--muted-foreground)!important;
+}
