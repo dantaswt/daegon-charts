@@ -1169,6 +1169,21 @@ async function renderHome(){
     no1s.filter(x=>x.e).map(x=>'<article class="mag-chart-card">'+refThumb(x.e,charts[x.id].kind)+'<div class="mag-chart-copy"><div class="mag-kicker">'+esc(charts[x.id].title)+'</div><div class="mag-chart-rank">No. 1</div><h3>'+entityLink(x.e,charts[x.id].kind)+'</h3>'+(charts[x.id].kind!=='artist'?'<p>'+artistLink(x.e.artist)+'</p>':'')+'<a class="mag-chart-link" href="'+appHref(chartPath(x.id,x.date))+'">Full chart →</a></div></article>').join('')+
   '</div></section>';
 
+  let globalHome='';
+  try{
+    const sb=dcSupabaseClient();
+    if(sb){
+      const {data:gd}=await sb.from('daegon_global_chart').select('chart_date').order('chart_date',{ascending:false}).limit(1);
+      const gdate=gd?.[0]?.chart_date||'';
+      if(gdate){
+        const defs=[['songs','Songs'],['albums','Albums'],['artists','Artists']];
+        const groups=await Promise.all(defs.map(([type])=>sb.from('daegon_global_chart').select('*').eq('chart_date',gdate).eq('chart_type',type).order('total_points',{ascending:false}).limit(5)));
+        globalHome='<section class="mag-global-home"><div class="mag-section-head"><div><div class="mag-kicker">Community-powered</div><h2>Daegon Global</h2></div><a href="'+appHref('/global')+'" data-portal-link="/global">Full Global charts →</a></div><p class="mag-global-home-intro">The combined chart of public Daegon user rankings for '+fmtDate(gdate)+'. Position points are summed across users.</p><div class="mag-global-home-grid">'+defs.map(([type,label],i)=>'<article><h3>Global '+label+'</h3><ol>'+(groups[i].data||[]).map(x=>'<li><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+Number(x.total_points||0).toLocaleString(undefined,{maximumFractionDigits:2})+' pts</em></li>').join('')+'</ol></article>').join('')+'</div></section>';
+      }
+    }
+  }catch(e){console.warn('Global home',e)}
+
+
   const archiveDates=(byId.songs.dates||[]).filter(d=>d<latestDate).slice(-4).reverse();
   const archive='<section class="mag-archive"><div class="mag-section-head"><h2>From the Archive</h2><a href="'+appHref('/chart-beat')+'" data-portal-link="/chart-beat">Explore Chart Beat →</a></div><div class="mag-archive-grid">'+
     archiveDates.map(d=>{const e=(byId.songs.entriesByDate[d]||[])[0];return e?'<a class="mag-archive-card" href="'+appHref('/chart-beat/weekly/'+d)+'" data-portal-link="/chart-beat/weekly/'+d+'"><div class="mag-archive-date">'+fmtDate(d)+'</div><strong>'+esc(portalText(e.name))+'</strong><span>'+esc(portalArtist(e.artist))+' led the Daegon 100</span><em>Revisit the week →</em></a>':''}).join('')+
@@ -1180,8 +1195,8 @@ async function renderHome(){
 
   const main='<main class="mag-home">'+
     '<div class="mag-brandline"><span>Music. Charts. Culture.</span><p>Independent music journalism powered by the Daegon Charts archive.</p></div>'+
-    hero+secondaryHtml+weeklyStory+chartCards+
-    '<section class="mag-global-promo"><div><div class="mag-kicker">Powered by listeners</div><h2>Daegon Global</h2><p>Public personal charts combine into community-wide Songs, Albums and Artists rankings. One user, one weekly ballot — heavy streaming alone cannot dominate the chart.</p></div><a href="'+appHref('/global')+'" data-portal-link="/global">Explore Daegon Global →</a></section>'+
+    hero+secondaryHtml+weeklyStory+chartCards+globalHome+
+    (globalHome?'':'<section class="mag-global-promo"><div><div class="mag-kicker">Powered by listeners</div><h2>Daegon Global</h2><p>Public personal charts combine into community-wide Songs, Albums and Artists rankings. One user, one weekly ballot — heavy streaming alone cannot dominate the chart.</p></div><a href="'+appHref('/global')+'" data-portal-link="/global">Explore Daegon Global →</a></section>')+
     features+archive+
     '<section class="mag-about-strip"><div><div class="mag-kicker">About Daegon</div><h2>Music journalism with its own chart archive.</h2><p>Daegon combines original weekly rankings, historical research and source-backed reporting to explain what is happening in music — and how today connects to the past.</p></div><div><a href="'+appHref('/methodology')+'">Methodology →</a><a href="'+appHref('/ai')+'" data-portal-link="/ai">How we use AI →</a><a href="'+appHref('/about')+'">About the project →</a></div></section>'+
   '</main>';
