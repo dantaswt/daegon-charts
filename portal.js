@@ -592,16 +592,22 @@ async function renderTasteMatch(slug=''){
 async function dcRenderAlbumCommunity(albumName,artistName){
   const host=portalEl.querySelector('#albumCommunityModule');if(!host)return;
   const sb=dcSupabaseClient(),key=slugify(albumName)+'--'+slugify(artistName||'');
-  const [{data:summary},{data:reviews},{data:mine}]=await Promise.all([
+  const [{data:summary},{data:reviews},{data:mine},{data:listenRows},{data:personalAlbumRows}]=await Promise.all([
     sb.from('album_rating_summary').select('*').eq('album_key',key).maybeSingle(),
     sb.from('album_reviews').select('*').eq('album_key',key).eq('status','approved').order('created_at',{ascending:false}).limit(20),
-    _dcAuthUser?sb.from('album_ratings').select('score').eq('user_id',_dcAuthUser.id).eq('album_key',key).maybeSingle():Promise.resolve({data:null})
+    _dcAuthUser?sb.from('album_ratings').select('score').eq('user_id',_dcAuthUser.id).eq('album_key',key).maybeSingle():Promise.resolve({data:null}),
+    _dcAuthUser?sb.from('user_listening_events').select('ms_played').eq('user_id',_dcAuthUser.id).eq('album_name',albumName).eq('artist_name',artistName):Promise.resolve({data:[]}),
+    _dcAuthUser?sb.from('personal_chart_entries').select('rank,peak,chart_date,streams').eq('user_id',_dcAuthUser.id).eq('chart_type','albums').eq('entity_key',key):Promise.resolve({data:[]})
   ]);
   const ids=[...new Set((reviews||[]).map(x=>x.user_id))];let profiles=[],votes=[];
   if(ids.length){const q=await sb.from('community_profiles').select('user_id,display_name,profile_slug').in('user_id',ids);profiles=q.data||[]}
   if(reviews?.length){const q=await sb.from('album_review_votes').select('review_id,user_id,helpful').in('review_id',reviews.map(x=>x.id));votes=q.data||[]}
   const pm=new Map(profiles.map(x=>[x.user_id,x])),help=new Map();for(const v of votes)if(v.helpful)help.set(v.review_id,(help.get(v.review_id)||0)+1);
-  host.innerHTML='<section class="album-community"><div class="album-score-grid"><div><span>Daegon User Score</span><strong>'+(summary?.user_score??'—')+'</strong><small>'+(summary?.ratings||0)+' ratings</small></div><div><span>Your Score</span><strong>'+(mine?.score??'—')+'</strong><small>0–100</small></div></div>'+
+  const personalPlays=(listenRows||[]).length;
+  const personalMinutes=Math.round((listenRows||[]).reduce((s,x)=>s+Number(x.ms_played||0),0)/60000);
+  const personalPeak=(personalAlbumRows||[]).length?Math.min(...personalAlbumRows.map(x=>Number(x.peak||x.rank||999))):null;
+  host.innerHTML='<section class="album-community"><div class="album-score-grid"><div><span>Daegon User Score</span><strong>'+(summary?.user_score??'—')+'</strong><small>'+(summary?.ratings||0)+' ratings</small></div><div><span>Your Score</span><strong>'+(mine?.score??'—')+'</strong><small>0–100</small></div><div><span>Your Listening</span><strong>'+(_dcAuthUser?personalPlays:'—')+'</strong><small>'+(_dcAuthUser?(personalMinutes?personalMinutes+' minutes':'plays tracked'):'sign in to compare')+'</small></div><div><span>Your Album Peak</span><strong>'+(personalPeak?'#'+personalPeak:'—')+'</strong><small>My Albums 50</small></div></div>'+
+    (_dcAuthUser&&mine?.score!=null&&personalPlays?'<div class="rating-listening-insight"><div class="mag-kicker">Listening × Rating</div><p>You rated <strong>'+esc(albumName)+'</strong> '+mine.score+'/100 and played tracks from it '+personalPlays+' times. Daegon keeps opinion and behavior as separate signals so they can be compared instead of conflated.</p></div>':'')+
     (_dcAuthUser?'<form id="albumRatingForm" class="album-rating-form"><input id="albumRatingValue" type="number" min="0" max="100" value="'+(mine?.score??'')+'" placeholder="0–100"><button>Rate album</button></form><form id="albumReviewForm" class="album-review-form"><textarea id="albumReviewBody" minlength="20" maxlength="10000" placeholder="Write your review…"></textarea><button>Publish review</button><div id="albumReviewStatus"></div></form>':'<div class="dc-comment-signin"><p>Sign in to rate and review this album.</p><button data-album-signin>Sign in</button></div>')+
     '<div class="mag-section-head"><h2>Community Reviews</h2><span>'+(reviews||[]).length+' shown</span></div><div class="album-review-list">'+((reviews||[]).map(r=>'<article><div><strong>'+esc(pm.get(r.user_id)?.display_name||'Daegon reader')+'</strong><span>'+new Date(r.created_at).toLocaleDateString()+'</span></div><p>'+esc(r.body)+'</p><button data-helpful-review="'+r.id+'">Helpful · '+(help.get(r.id)||0)+'</button></article>').join('')||'<div class="my-empty-inline">No reviews yet.</div>')+'</div></section>';
   host.querySelector('[data-album-signin]')?.addEventListener('click',dcShowAuthModal);
