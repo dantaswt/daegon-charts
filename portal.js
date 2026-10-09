@@ -1,7 +1,7 @@
 (function(){
 'use strict';
 
-const PORTAL_ROUTES=new Set(['','news','features','reviews','trending','community','forum','plans','ai','my-daegon','my-charts','songs','albums','artists','number-ones','stats','year-end','decade-end','goat','chart-beat','awards','chart-battle','search','song','album','artist']);
+const PORTAL_ROUTES=new Set(['','news','features','reviews','trending','community','forum','plans','global','u','ai','my-daegon','my-charts','songs','albums','artists','number-ones','stats','year-end','decade-end','goat','chart-beat','awards','chart-battle','search','song','album','artist']);
 const mainChartIds={song:'songs',album:'albums',artist:'artists'};
 const periodLimits={songs:100,albums:100,artists:50};
 const PORTAL_SHEET='https://docs.google.com/spreadsheets/d/1t6_7SOlspmNYrXq8PSfJ74frIdrWwQBFITQ3bQmRzeg/gviz/tq?tq=select%20*&tqx=out:csv&gid=';
@@ -405,6 +405,90 @@ function dcRangeStart(endDate,days){
   const start=new Date(end);start.setUTCDate(start.getUTCDate()-(days-1));start.setUTCHours(0,0,0,0);
   return {start:start.toISOString(),end:end.toISOString()};
 }
+
+function dcCommunityPoints(rank){
+  const r=Math.max(1,Number(rank)||1);
+  return Math.round((100*Math.exp(-0.06*(r-1)))*100)/100;
+}
+async function dcPublishChartWeek(chartDate,handle,statusEl){
+  const user=await dcRequireUser();if(!user||!chartDate)return;
+  const sb=dcSupabaseClient(),slug=slugify(handle);
+  if(slug.length<3){statusEl.textContent='Choose a public handle with at least 3 characters.';return}
+  const {data:conflict}=await sb.from('community_profiles').select('user_id').eq('profile_slug',slug).neq('user_id',user.id).maybeSingle();
+  if(conflict){statusEl.textContent='That public handle is already taken.';return}
+  const {error:profileErr}=await sb.from('community_profiles').update({profile_slug:slug,charts_public:true,updated_at:new Date().toISOString()}).eq('user_id',user.id);
+  if(profileErr){statusEl.textContent=profileErr.message;return}
+  const {data:week,error:weekErr}=await sb.from('public_chart_weeks').upsert({
+    user_id:user.id,profile_slug:slug,chart_date:chartDate,title:'My Charts — '+fmtDate(chartDate),is_public:true,updated_at:new Date().toISOString()
+  },{onConflict:'user_id,chart_date'}).select('id').single();
+  if(weekErr||!week){statusEl.textContent=weekErr?.message||'Could not publish chart.';return}
+  const types=['songs','albums','artists','digital_song_sales_7d','top_album_sales_7d','streaming_songs_28d','top_streaming_albums_28d','artists_28d'];
+  const {data:entries,error:eErr}=await sb.from('personal_chart_entries').select('*').eq('user_id',user.id).eq('chart_date',chartDate).in('chart_type',types);
+  if(eErr){statusEl.textContent=eErr.message;return}
+  await sb.from('public_chart_entries').delete().eq('chart_week_id',week.id);
+  const payload=(entries||[]).map(x=>({
+    chart_week_id:week.id,user_id:user.id,chart_type:x.chart_type,chart_date:x.chart_date,rank:x.rank,
+    entity_key:x.entity_key,entity_name:x.entity_name,artist_name:x.artist_name,
+    points:dcCommunityPoints(x.rank),streams:x.streams,listening_ms:x.listening_ms,active_days:x.active_days,movement:x.movement
+  }));
+  if(payload.length){
+    const {error:ins}=await sb.from('public_chart_entries').insert(payload);
+    if(ins){statusEl.textContent=ins.message;return}
+  }
+  const url=appHref('/u/'+slug+'/charts/'+chartDate);
+  statusEl.innerHTML='Published. <a href="'+url+'" data-portal-link="/u/'+slug+'/charts/'+chartDate+'">Open public chart →</a>';
+  bindLinks();
+}
+async function renderGlobalCharts(){
+  loading('Daegon Global');
+  const sb=dcSupabaseClient();
+  const {data:dates}=await sb.from('daegon_global_chart').select('chart_date').order('chart_date',{ascending:false}).limit(250);
+  const unique=[...new Set((dates||[]).map(x=>x.chart_date))];
+  const selected=new URLSearchParams(location.search).get('date')||unique[0]||'';
+  const types=[['songs','Global Songs 100'],['albums','Global Albums 50'],['artists','Global Artists 50']];
+  const groups={};
+  for(const [type] of types){
+    const {data}=selected?await sb.from('daegon_global_chart').select('*').eq('chart_date',selected).eq('chart_type',type).order('total_points',{ascending:false}).limit(type==='songs'?100:50):{data:[]};
+    groups[type]=data||[];
+  }
+  const list=(rows,label)=>'<section class="global-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>Community points</span></div><div class="global-chart-list">'+rows.slice(0,20).map((x,i)=>'<div><b>'+(i+1)+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+Number(x.total_points||0).toLocaleString(undefined,{maximumFractionDigits:2})+' pts</em><i>'+x.voters+' voter'+(x.voters===1?'':'s')+'</i></div>').join('')+'</div></section>';
+  const main='<main class="global-page"><header class="mag-index-head"><div class="mag-kicker">Community consensus</div><h1>Daegon Global</h1><p>The combined weekly chart of Daegon users. Each public personal chart contributes position-based Daegon Community Points — raw play counts never let one heavy listener dominate everyone else.</p></header>'+
+    '<section class="global-formula"><strong>Community Points</strong><code>100 × e<sup>-0.06 × (rank - 1)</sup></code><span>#1 = 100 points. Every user contributes one ranked ballot per published week.</span></section>'+
+    (unique.length?'<div class="myp-datebar"><label>Week</label><select id="globalDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div>':'<div class="my-empty-inline">Daegon Global will appear as users publish their first charts.</div>')+
+    (selected?types.map(([t,l])=>list(groups[t],l)).join(''):'')+
+  '</main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('Daegon Global','Community-powered songs, albums and artists charts from Daegon users.','/global');bindLinks();
+  const sel=portalEl.querySelector('#globalDateSelect');if(sel)sel.onchange=()=>{const u=new URL(location.href);u.searchParams.set('date',sel.value);history.replaceState({},'',u.pathname+u.search);renderGlobalCharts()};
+}
+async function renderPublicChart(slug,date){
+  loading('Public Chart');
+  const sb=dcSupabaseClient();
+  const {data:week}=await sb.from('public_chart_weeks').select('*').eq('profile_slug',slug).eq('chart_date',date).eq('is_public',true).maybeSingle();
+  if(!week){renderNotFound();return}
+  const [{data:entries},{data:comments},{data:ownerProfile}]=await Promise.all([
+    sb.from('public_chart_entries').select('*').eq('chart_week_id',week.id).order('rank'),
+    sb.from('public_chart_comments').select('*').eq('chart_week_id',week.id).eq('status','approved').order('created_at',{ascending:true}),
+    sb.from('community_profiles').select('user_id,display_name,profile_slug,avatar_url').eq('user_id',week.user_id).maybeSingle()
+  ]);
+  const userIds=[...new Set((comments||[]).map(x=>x.user_id))];let profiles=[];
+  if(userIds.length){const p=await sb.from('community_profiles').select('user_id,display_name,profile_slug').in('user_id',userIds);profiles=p.data||[]}
+  const pm=new Map(profiles.map(x=>[x.user_id,x]));
+  const groups={};for(const e of entries||[])(groups[e.chart_type]??=[]).push(e);
+  const labels={songs:'Songs 100',albums:'Albums 50',artists:'Artists 50',digital_song_sales_7d:'Digital Songs Sales · 7D',top_album_sales_7d:'Top Album Sales · 7D',streaming_songs_28d:'Streaming Songs · 28D',top_streaming_albums_28d:'Top Streaming Albums · 28D',artists_28d:'Artists · 28D'};
+  const chart=(type)=>{const rows=groups[type]||[];if(!rows.length)return'';return '<section class="public-chart-block"><div class="mag-section-head"><h2>'+labels[type]+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,25).map(x=>'<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+x.streams+' plays</i></div>').join('')+'</div></section>'};
+  const byParent=new Map();for(const c of comments||[]){const k=c.parent_id||0;(byParent.get(k)??byParent.set(k,[]).get(k)).push(c)}
+  const renderComment=(c,depth=0)=>'<article class="chart-comment depth-'+Math.min(depth,3)+'"><div class="chart-comment-head"><strong>'+esc(pm.get(c.user_id)?.display_name||'Daegon reader')+'</strong><span>'+new Date(c.created_at).toLocaleString()+'</span></div><p>'+esc(c.body)+'</p>'+(_dcAuthUser?'<button data-reply-comment="'+c.id+'">Reply</button>':'')+(byParent.get(c.id)||[]).map(x=>renderComment(x,depth+1)).join('')+'</article>';
+  const roots=(byParent.get(0)||[]).map(x=>renderComment(x)).join('');
+  const commentForm=_dcAuthUser?'<form id="publicChartCommentForm" class="dc-comment-form"><textarea id="publicChartCommentBody" maxlength="2500" required placeholder="Comment on this chart…"></textarea><input id="publicChartParent" type="hidden"><div><span id="publicChartReplyLabel">Commenting on '+esc(ownerProfile?.display_name||slug)+'’s chart.</span><button type="submit">Post</button></div><div id="publicChartCommentStatus"></div></form>':'<div class="dc-comment-signin"><p>Sign in to comment on this chart.</p><button data-chart-signin>Sign in</button></div>';
+  const main='<main class="public-chart-page"><header class="public-chart-hero"><div class="mag-kicker">Public My Charts</div><h1>'+esc(ownerProfile?.display_name||slug)+'</h1><p>Chart week ending '+fmtDate(date)+'</p><a href="'+appHref('/global')+'" data-portal-link="/global">See Daegon Global →</a></header>'+
+    ['songs','albums','artists','digital_song_sales_7d','streaming_songs_28d','top_album_sales_7d','top_streaming_albums_28d','artists_28d'].map(chart).join('')+
+    '<section class="chart-comments"><div class="mag-section-head"><h2>Chart discussion</h2><span>'+(comments||[]).length+' comments</span></div>'+commentForm+'<div class="chart-comment-tree">'+(roots||'<div class="my-empty-inline">No comments yet.</div>')+'</div></section></main>';
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta((ownerProfile?.display_name||slug)+' — My Charts '+fmtDate(date),'A public Daegon personal chart week.','/u/'+slug+'/charts/'+date);bindLinks();
+  portalEl.querySelector('[data-chart-signin]')?.addEventListener('click',dcShowAuthModal);
+  portalEl.querySelectorAll('[data-reply-comment]').forEach(b=>b.onclick=()=>{const p=portalEl.querySelector('#publicChartParent');if(p)p.value=b.dataset.replyComment;const l=portalEl.querySelector('#publicChartReplyLabel');if(l)l.textContent='Replying in thread. Click Post when ready.';portalEl.querySelector('#publicChartCommentBody')?.focus()});
+  const form=portalEl.querySelector('#publicChartCommentForm');
+  if(form)form.onsubmit=async e=>{e.preventDefault();const body=portalEl.querySelector('#publicChartCommentBody').value.trim(),parent=portalEl.querySelector('#publicChartParent').value||null,st=portalEl.querySelector('#publicChartCommentStatus');if(!body)return;st.textContent='Posting…';await dcEnsureProfile(_dcAuthUser);const {error}=await sb.from('public_chart_comments').insert({chart_week_id:week.id,user_id:_dcAuthUser.id,parent_id:parent?Number(parent):null,body,status:'approved'});if(error){st.textContent=error.message;return}renderPublicChart(slug,date)};
+}
 async function renderMyCharts(){
   loading('My Charts');
   if(!_dcAuthUser){
@@ -412,23 +496,21 @@ async function renderMyCharts(){
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal music charts generated from your listening history.','/my-charts');portalEl.querySelector('[data-my-signin]').onclick=dcShowAuthModal;return;
   }
   const sb=dcSupabaseClient();
-  const [{data:dates},{data:lastfmConn}]=await Promise.all([
+  const [{data:dates},{data:lastfmConn},{data:profile}]=await Promise.all([
     sb.from('personal_chart_entries').select('chart_date').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').order('chart_date',{ascending:false}).limit(250),
-    sb.from('user_streaming_connections').select('account_name,status,last_synced_at').eq('user_id',_dcAuthUser.id).eq('provider','lastfm').maybeSingle()
+    sb.from('user_streaming_connections').select('account_name,status,last_synced_at').eq('user_id',_dcAuthUser.id).eq('provider','lastfm').maybeSingle(),
+    sb.from('community_profiles').select('display_name,profile_slug,charts_public').eq('user_id',_dcAuthUser.id).maybeSingle()
   ]);
   const unique=[...new Set((dates||[]).map(x=>x.chart_date))];
   const params=new URLSearchParams(location.search);
   const selected=params.get('date')||unique[0]||'';
   const windowDays=params.get('window')==='28'?28:7;
 
-  let songs=[],albums=[],artists=[];
+  let songs=[],albums=[],artists=[],digital=[],albumSales=[],stream28=[],albumStream28=[],artists28=[];
   if(selected&&windowDays===7){
-    const results=await Promise.all([
-      sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').eq('chart_date',selected).order('rank').limit(100),
-      sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','albums').eq('chart_date',selected).order('rank').limit(50),
-      sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','artists').eq('chart_date',selected).order('rank').limit(50)
-    ]);
-    songs=results[0].data||[];albums=results[1].data||[];artists=results[2].data||[];
+    const types=['songs','albums','artists','digital_song_sales_7d','top_album_sales_7d','streaming_songs_28d','top_streaming_albums_28d','artists_28d'];
+    const results=await Promise.all(types.map(t=>sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type',t).eq('chart_date',selected).order('rank').limit(t==='songs'||t==='streaming_songs_28d'?100:50)));
+    songs=results[0].data||[];albums=results[1].data||[];artists=results[2].data||[];digital=results[3].data||[];albumSales=results[4].data||[];stream28=results[5].data||[];albumStream28=results[6].data||[];artists28=results[7].data||[];
   }else if(selected){
     const range=dcRangeStart(selected,28);
     const {data:events}=await sb.from('user_listening_events')
@@ -438,6 +520,7 @@ async function renderMyCharts(){
     songs=charts.songs.map(x=>({...x,movement:'—'}));
     albums=charts.albums.map(x=>({...x,movement:'—'}));
     artists=charts.artists.map(x=>({...x,movement:'—'}));
+    stream28=songs;albumStream28=albums;artists28=artists;
   }
 
   const top=(rows,label)=>'<section class="myp-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,10).map(x=>'<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+x.streams+' plays'+(Number(x.listening_ms||0)>0?' · '+Math.round(Number(x.listening_ms||0)/60000)+' min':'')+' · '+x.active_days+' active day'+(x.active_days===1?'':'s')+'</i></div>').join('')+'</div></section>';
@@ -450,8 +533,13 @@ async function renderMyCharts(){
     connection+
     '<section class="myp-formula-hero"><div><div class="mag-kicker">Daegon Standard</div><h2>Personal Daegon Score</h2><p><strong>Last.fm:</strong> plays + active listening days. <strong>Spotify imports:</strong> plays + listening time + active days when duration data is available.</p></div><code>Score = plays × 100 + listening minutes × 1.5 + active days × 18</code><small>Last.fm does not provide listening duration through recent scrobbles, so minutes contribute 0 for Last.fm-only data. We never invent a duration metric.</small></section>'+
     '<section class="myp-import secondary"><div><h2>Spotify history import</h2><p>Optional: upload a Spotify Extended Streaming History JSON file to add duration-aware listening data.</p></div><label>Choose JSON<input id="mypHistoryFile" type="file" accept=".json,application/json"></label><div id="mypImportStatus"></div></section>'+
+    (selected?'<section class="myp-publish"><div><div class="mag-kicker">Share & contribute</div><h2>Publish this week</h2><p>Publishing makes this chart shareable, enables friend comments and contributes its position points to Daegon Global. Your raw listening history stays private.</p></div><div class="myp-publish-controls"><input id="mypPublicHandle" maxlength="40" placeholder="Public handle" value="'+escAttr(profile?.profile_slug||'')+'"><button id="mypPublishWeek">Publish week</button><div id="mypPublishStatus"></div></div></section>':'')+
     (unique.length?'<div class="myp-controls"><div class="myp-window-tabs"><button data-window="7" class="'+(windowDays===7?'active':'')+'">7 Days</button><button data-window="28" class="'+(windowDays===28?'active':'')+'">28 Days</button></div><div class="myp-datebar"><label>Chart week ending</label><select id="mypDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div></div>':'<div class="my-empty-inline">Connect Last.fm or import listening history to generate your first personal chart.</div>')+
-    (selected?'<div class="myp-window-note"><strong>'+windowDays+'-Day Tracking</strong><span>'+(windowDays===7?'Weekly chart ending '+fmtDate(selected):'Rolling 28-day window ending '+fmtDate(selected))+'</span></div>'+top(songs||[],'My Songs '+(windowDays===7?'100':'100 · 28D'))+top(albums||[],'My Albums '+(windowDays===7?'50':'50 · 28D'))+top(artists||[],'My Artists '+(windowDays===7?'50':'50 · 28D')):'')+
+    (selected?'<div class="myp-window-note"><strong>'+windowDays+'-Day Tracking</strong><span>'+(windowDays===7?'Weekly chart ending '+fmtDate(selected):'Rolling 28-day window ending '+fmtDate(selected))+'</span></div>'+
+      (windowDays===7?top(songs||[],'My Songs 100')+top(albums||[],'My Albums 50')+top(artists||[],'My Artists 50')+
+        '<div class="myp-component-head"><div class="mag-kicker">Component Charts</div><h2>How your week breaks down</h2><p>7-day play strength and rolling 28-day streaming strength, shown separately.</p></div>'+
+        top(digital||[],'Digital Songs Sales · 7 Days')+top(albumSales||[],'Top Album Sales · 7 Days')+top(stream28||[],'Streaming Songs · 28 Days')+top(albumStream28||[],'Top Streaming Albums · 28 Days')+top(artists28||[],'Artists · 28 Days')
+      :top(stream28.length?stream28:songs,'Streaming Songs · 28 Days')+top(albumStream28.length?albumStream28:albums,'Top Streaming Albums · 28 Days')+top(artists28.length?artists28:artists,'Artists · 28 Days')):'')+
   '</main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal 7-day and 28-day Daegon charts generated from your listening history.','/my-charts');bindLinks();
 
@@ -463,6 +551,7 @@ async function renderMyCharts(){
     await dcSyncLastfm(username,Number(btn.dataset.lfmSync),lfmStatus);
     portalEl.querySelectorAll('[data-lfm-sync]').forEach(x=>x.disabled=false);
   });
+  const publish=portalEl.querySelector('#mypPublishWeek');if(publish)publish.onclick=async()=>{const handle=portalEl.querySelector('#mypPublicHandle')?.value.trim(),st=portalEl.querySelector('#mypPublishStatus');st.textContent='Publishing…';await dcPublishChartWeek(selected,handle,st)};
   const file=portalEl.querySelector('#mypHistoryFile'),st=portalEl.querySelector('#mypImportStatus');
   if(file)file.onchange=()=>{const f=file.files?.[0];if(f)dcImportSpotifyHistory(f,st)};
   const sel=portalEl.querySelector('#mypDateSelect');if(sel)sel.onchange=()=>{const u=new URL(location.href);u.searchParams.set('date',sel.value);u.searchParams.set('window',String(windowDays));history.replaceState({},'',u.pathname+u.search);renderMyCharts()};
@@ -595,7 +684,7 @@ function ensureShell(){
     navEl.className='portal-topnav';
     navEl.innerHTML=[
       ['NEWS','/news'],['TRENDING','/trending'],['CHART BEAT','/chart-beat'],['FEATURES','/features'],['REVIEWS','/reviews'],
-      ['CHARTS','/chart/daegon-100'],['FORUM','/forum'],['PLANS','/plans'],['ABOUT','/about']
+      ['CHARTS','/chart/daegon-100'],['GLOBAL','/global'],['FORUM','/forum'],['PLANS','/plans'],['ABOUT','/about']
     ].map(([l,p])=>'<a href="'+appHref(p)+'" data-portal-link="'+p+'">'+l+'</a>').join('');
     const theme=document.getElementById('themeToggle');
     head.insertBefore(navEl,theme);
@@ -741,6 +830,7 @@ function routeSkeletonMeta(parts){
     first==='reviews'?'Reviews':
     first==='community'?'Community':
     first==='forum'?'Forum':
+    first==='global'?'Daegon Global':
     first==='plans'?'Plans':
     first==='my-daegon'?'My Daegon':
     first==='my-charts'?'My Charts':
@@ -1090,7 +1180,9 @@ async function renderHome(){
 
   const main='<main class="mag-home">'+
     '<div class="mag-brandline"><span>Music. Charts. Culture.</span><p>Independent music journalism powered by the Daegon Charts archive.</p></div>'+
-    hero+secondaryHtml+weeklyStory+chartCards+features+archive+
+    hero+secondaryHtml+weeklyStory+chartCards+
+    '<section class="mag-global-promo"><div><div class="mag-kicker">Powered by listeners</div><h2>Daegon Global</h2><p>Public personal charts combine into community-wide Songs, Albums and Artists rankings. One user, one weekly ballot — heavy streaming alone cannot dominate the chart.</p></div><a href="'+appHref('/global')+'" data-portal-link="/global">Explore Daegon Global →</a></section>'+
+    features+archive+
     '<section class="mag-about-strip"><div><div class="mag-kicker">About Daegon</div><h2>Music journalism with its own chart archive.</h2><p>Daegon combines original weekly rankings, historical research and source-backed reporting to explain what is happening in music — and how today connects to the past.</p></div><div><a href="'+appHref('/methodology')+'">Methodology →</a><a href="'+appHref('/ai')+'" data-portal-link="/ai">How we use AI →</a><a href="'+appHref('/about')+'">About the project →</a></div></section>'+
   '</main>';
 
@@ -2888,6 +2980,8 @@ async function renderRoute(){
     else if(p[0]==='forum'&&p[1])await renderForumTopic(p[1]);
     else if(p[0]==='forum')await renderForum();
     else if(p[0]==='plans')renderPlans();
+    else if(p[0]==='global')await renderGlobalCharts();
+    else if(p[0]==='u'&&p[1]&&p[2]==='charts'&&p[3])await renderPublicChart(p[1],p[3]);
     else if(p[0]==='my-daegon')await renderMyDaegon();
     else if(p[0]==='my-charts')await renderMyCharts();
     else if(p[0]==='ai')renderDaegonAIPage();
