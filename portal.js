@@ -302,7 +302,7 @@ async function dcSyncSavedArticle(button,articleId){
 }
 
 function dcSaturdayFor(ts){
-  const d=new Date(ts);const day=d.getUTCDay();let add=(6-day+7)%7;if(day===6)add=7;
+  const d=new Date(ts);const day=d.getUTCDay();let add=(6-day+7)%7;if(day===5||day===6)add+=7;
   const out=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()+add));
   return out.toISOString().slice(0,10);
 }
