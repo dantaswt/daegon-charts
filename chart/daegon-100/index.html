@@ -3415,6 +3415,63 @@ html.dark .sk{
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
+
+    /* Compact chart-run + consumption statistics */
+    .details-panel{padding:16px!important}
+    .details-section{margin:0 0 20px}
+    .details-section-head{
+      display:flex;align-items:center;justify-content:center;gap:9px;
+      margin:0 0 12px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;
+      color:var(--foreground);
+    }
+    .details-section-head i{
+      width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;
+      background:var(--card);border:1px solid var(--border);color:var(--muted-foreground);
+    }
+    .details-run-strip{
+      display:flex;align-items:center;gap:7px;overflow-x:auto;
+      padding:4px 2px 8px;scrollbar-width:thin;
+    }
+    .details-run-chip{
+      width:38px;height:38px;min-width:38px;padding:0;
+      display:inline-flex;align-items:center;justify-content:center;
+      border:1px solid var(--border);background:var(--card);color:var(--foreground);
+      font-size:12px;font-weight:800;transition:.15s;
+    }
+    .details-run-chip:hover{border-color:var(--accent);color:var(--accent)}
+    .details-run-chip.is-no1{
+      border-color:var(--accent);color:var(--accent);
+      box-shadow:inset 0 -2px 0 rgba(255,109,0,.22);
+    }
+    .details-stats-grid{
+      display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;
+      max-width:760px;margin:0 auto;
+    }
+    .details-stat{
+      min-height:92px;padding:14px;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+      background:var(--card);border:1px solid var(--border);
+    }
+    .details-stat span{
+      font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;
+      color:var(--muted-foreground);
+    }
+    .details-stat strong{
+      margin-top:9px;font-size:24px;line-height:1;font-weight:850;color:var(--foreground);
+      font-variant-numeric:tabular-nums;
+    }
+    .details-stat.accent strong{color:var(--accent)}
+    .details-copy{margin:4px 0 0!important}
+    @media(max-width:767px){
+      .details-panel{padding:12px!important}
+      .details-section{margin-bottom:16px}
+      .details-section-head{justify-content:flex-start}
+      .details-run-chip{width:34px;height:34px;min-width:34px;font-size:11px}
+      .details-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+      .details-stat{min-height:78px;padding:10px}
+      .details-stat strong{font-size:20px}
+    }
+
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -4336,33 +4393,80 @@ function metricsHtml(e){
   '</div>';
 }
 function mobileMetricsHtml(e){const lw=e.lastWeek&&e.lastWeek!=='0'?e.lastWeek:'-';const w1=Number(e.weeksAt1||0);return '<div class="m-metrics"><span><b>LW</b> '+esc(lw)+'</span><span><b>PEAK</b> '+esc(e.peak||'-')+'</span><span><b>WEEKS ON CHART</b> '+esc(e.weeks||'-')+'</span></div>'+(w1>0?'<div class="m-weeks-no1"><b>WEEKS AT NO. 1</b> '+esc(w1)+'</div>':'')}
+function detailStatsFields(e,cfg,run){
+  const rows=[];
+  const push=(label,value,accent=false)=>{
+    const raw=String(value??'').trim();
+    if(!raw||raw==='-'||raw==='0')return;
+    rows.push({label,value:raw,accent});
+  };
+  const units=toInt(e.units),totalUnits=toInt(e.totalUnits);
+  if(cfg.id==='albums'||cfg.id==='artists'||cfg.id==='songs'){
+    push('Units',formatValue(e.units,cfg.id),true);
+    push('Total Units',formatValue(e.totalUnits,cfg.id),true);
+  }
+  if(cfg.id==='albums'){
+    push('Pure Sales',formatValue(e.sales,cfg.id));
+    push('SEA',formatValue(e.streams,cfg.id,true));
+  }else if(cfg.id==='artists'){
+    push('Sales',formatValue(e.sales,cfg.id));
+    push('Total Sales',formatValue(e.totalSales,cfg.id));
+    push('Streams',formatValue(e.streams,cfg.id,true));
+    push('Total Streams',formatValue(e.totalStreams,cfg.id,true));
+  }else if(cfg.id==='songs'){
+    push('Streams',formatValue(e.streams,cfg.id,true));
+    push('Sales',formatValue(e.sales,cfg.id));
+    if(e.airplay)push('Airplay',formatValue(e.airplay,cfg.id,true));
+  }else if(cfg.id==='radioSongs'){
+    push('Audience',formatValue(e.audience||e.units,cfg.id,true),true);
+  }else if(cfg.id==='topStreamingAlbums'||cfg.id==='streamingSongs'){
+    push('Streams',formatValue(e.streams||e.units,cfg.id,true),true);
+    push('Total Streams',formatValue(e.totalStreams,cfg.id,true));
+  }else if(cfg.id==='topAlbumSales'||cfg.id==='digitalSongsSales'){
+    push('Sales',formatValue(e.sales||e.units,cfg.id),true);
+    push('Total Sales',formatValue(e.totalSales,cfg.id));
+  }
+  const peak=run.length?Math.min(...run.map(x=>Number(x.position)||999)):Number(e.peak)||0;
+  const top1=run.filter(x=>Number(x.position)===1).length;
+  const top5=run.filter(x=>Number(x.position)<=5).length;
+  const top10=run.filter(x=>Number(x.position)<=10).length;
+  const top50=run.filter(x=>Number(x.position)<=50).length;
+  push('Peak',peak?'#'+peak:'');
+  push('Weeks at No. 1',top1);
+  push('Top 5',top5+' weeks');
+  push('Top 10',top10+' weeks');
+  push('Top 50',top50+' weeks');
+  push('Weeks on Chart',run.length+' weeks');
+
+  const cert=e.certification||((cfg.id==='songs'||cfg.id==='albums')?certification(totalUnits,cfg.kind):'');
+  if(cert)push('Certification',cert,true);
+  return rows;
+}
 function detailHtml(e,cfg,data,date,copy){
   const run=runEntries(e,data,date);
+  const stats=detailStatsFields(e,cfg,run);
   const copyBlock=
     '<button class="details-copy copy-detail" type="button" data-copy="'+esc(copy)+'">'+
       '<div class="details-copy-top"><span>Copy chart text</span><i class="fas fa-copy"></i></div>'+
       '<div class="details-copy-text">'+esc(copy)+'</div>'+
     '</button>';
-  return '<div class="details details-panel">'+
-    copyBlock+
-    (run.length
-      ? '<div class="details-title">Chart run</div>'+
-        '<div class="details-run-list">'+
-          run.map(x=>{
-            const extras=[];
-            if(x.peak)extras.push('Peak: '+esc(x.peak));
-            if(x.weeks)extras.push('Weeks: '+esc(x.weeks));
-            return '<button class="run-jump details-run-card" data-date="'+esc(x.date)+'">'+
-              '<div class="details-run-head">'+
-                '<span>'+esc(fmtShort(x.date))+'</span>'+
-                '<span class="details-run-pos">'+esc(x.position)+'</span>'+
-              '</div>'+
-              '<div class="details-run-meta">'+extras.map(v=>'<span>'+v+'</span>').join('')+'</div>'+
-            '</button>';
-          }).join('')+
-        '</div>'
-      : '<div class="details-empty">No chart run available.</div>')+
-  '</div>';
+  const runBlock=run.length
+    ? '<section class="details-section">'+
+        '<div class="details-section-head"><i class="fas fa-chart-line"></i><span>Chart Run</span></div>'+
+        '<div class="details-run-strip" role="list">'+
+          run.map(x=>'<button class="run-jump details-run-chip '+(Number(x.position)===1?'is-no1':'')+'" data-date="'+esc(x.date)+'" title="'+esc(fmtShort(x.date))+' · #'+esc(x.position)+'" role="listitem">'+esc(x.position)+'</button>').join('')+
+        '</div>'+
+      '</section>'
+    : '<div class="details-empty">No chart run available.</div>';
+  const statsBlock=stats.length
+    ? '<section class="details-section">'+
+        '<div class="details-section-head"><i class="fas fa-chart-bar"></i><span>Statistics</span></div>'+
+        '<div class="details-stats-grid">'+
+          stats.map(x=>'<div class="details-stat '+(x.accent?'accent':'')+'"><span>'+esc(x.label)+'</span><strong>'+esc(x.value)+'</strong></div>').join('')+
+        '</div>'+
+      '</section>'
+    : '';
+  return '<div class="details details-panel">'+runBlock+statsBlock+copyBlock+'</div>';
 }
 const DISPLAY_CASE_EXCEPTIONS=new Map([
   ['P!NK','P!nk'],['AC/DC','AC/DC'],['T.A.T.U.','t.A.T.u.'],['WILL.I.AM','will.i.am'],
