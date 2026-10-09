@@ -145,6 +145,111 @@ async function fetchCsv(url){
 }
 
 
+
+let _dcSupabase=null,_dcAuthUser=null,_dcAuthSub=null;
+function dcSupabaseClient(){
+  if(_dcSupabase)return _dcSupabase;
+  if(!window.supabase?.createClient||typeof SUPABASE_URL==='undefined'||typeof SUPABASE_KEY==='undefined')return null;
+  _dcSupabase=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+  });
+  return _dcSupabase;
+}
+function dcSafeDisplayName(user){
+  const email=String(user?.email||'reader');
+  const base=email.split('@')[0].replace(/[._-]+/g,' ').trim()||'Daegon reader';
+  return base.slice(0,40);
+}
+async function dcEnsureProfile(user){
+  const sb=dcSupabaseClient();if(!sb||!user)return null;
+  const {data}=await sb.from('community_profiles').select('user_id,display_name,avatar_url,bio').eq('user_id',user.id).maybeSingle();
+  if(data)return data;
+  const profile={user_id:user.id,display_name:dcSafeDisplayName(user)};
+  const {data:created,error}=await sb.from('community_profiles').insert(profile).select('user_id,display_name,avatar_url,bio').single();
+  if(error){console.warn('Profile create',error);return profile}
+  return created;
+}
+function dcAccountLabel(){return _dcAuthUser?'MY DAEGON':'SIGN IN'}
+function dcSyncAccountButton(){
+  const b=document.getElementById('portalAccountBtn');if(!b)return;
+  b.innerHTML='<i class="fas '+(_dcAuthUser?'fa-user-circle':'fa-user')+'"></i><span>'+dcAccountLabel()+'</span>';
+  b.setAttribute('aria-label',_dcAuthUser?'My Daegon account':'Sign in to Daegon');
+}
+function dcCloseAuthModal(){document.getElementById('dcAuthModal')?.remove()}
+function dcShowAuthModal(){
+  dcCloseAuthModal();
+  const wrap=document.createElement('div');wrap.id='dcAuthModal';wrap.className='dc-auth-modal';
+  wrap.innerHTML=_dcAuthUser
+    ? '<div class="dc-auth-card"><button class="dc-auth-close" data-auth-close>×</button><div class="mag-kicker">My Daegon</div><h2>'+esc(_dcAuthUser.email||'Signed in')+'</h2><p>You are signed in. Your account can participate in moderated article discussions.</p><div class="dc-auth-actions"><button class="portal-btn" data-auth-signout>Sign out</button></div></div>'
+    : '<div class="dc-auth-card"><button class="dc-auth-close" data-auth-close>×</button><div class="mag-kicker">Daegon Community</div><h2>Sign in by email</h2><p>We’ll send you a secure magic link. No password required.</p><form id="dcMagicForm"><label>Email</label><input id="dcMagicEmail" type="email" autocomplete="email" required placeholder="you@example.com"><button class="portal-btn active" type="submit">Send magic link</button><div id="dcAuthStatus" class="dc-auth-status"></div></form><small>By signing in, you agree to the site terms and community moderation rules.</small></div>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('[data-auth-close]').onclick=dcCloseAuthModal;
+  wrap.onclick=e=>{if(e.target===wrap)dcCloseAuthModal()};
+  const out=wrap.querySelector('[data-auth-signout]');
+  if(out)out.onclick=async()=>{const sb=dcSupabaseClient();if(sb)await sb.auth.signOut();_dcAuthUser=null;dcSyncAccountButton();dcCloseAuthModal();renderRoute()};
+  const form=wrap.querySelector('#dcMagicForm');
+  if(form)form.onsubmit=async e=>{
+    e.preventDefault();
+    const status=wrap.querySelector('#dcAuthStatus'),email=wrap.querySelector('#dcMagicEmail').value.trim();
+    status.textContent='Sending…';
+    const sb=dcSupabaseClient();if(!sb){status.textContent='Sign-in service unavailable.';return}
+    const {error}=await sb.auth.signInWithOtp({email});
+    status.textContent=error?error.message:'Check your inbox for the Daegon sign-in link.';
+  };
+}
+async function dcInitAuth(){
+  const sb=dcSupabaseClient();if(!sb)return;
+  try{
+    const {data}=await sb.auth.getSession();
+    _dcAuthUser=data?.session?.user||null;
+    dcSyncAccountButton();
+    if(_dcAuthUser)dcEnsureProfile(_dcAuthUser);
+    if(!_dcAuthSub){
+      const sub=sb.auth.onAuthStateChange(async(_event,session)=>{
+        _dcAuthUser=session?.user||null;dcSyncAccountButton();
+        if(_dcAuthUser)await dcEnsureProfile(_dcAuthUser);
+        const mount=document.getElementById('dcCommentsMount');
+        if(mount&&mount.dataset.articleId)dcRenderComments(Number(mount.dataset.articleId));
+      });
+      _dcAuthSub=sub?.data?.subscription||true;
+    }
+  }catch(e){console.warn('Auth init',e)}
+}
+async function dcRenderComments(articleId){
+  const mount=document.getElementById('dcCommentsMount');if(!mount||!articleId)return;
+  const sb=dcSupabaseClient();if(!sb){mount.innerHTML='<p class="dc-comment-empty">Comments are temporarily unavailable.</p>';return}
+  mount.dataset.articleId=String(articleId);
+  mount.innerHTML='<div class="dc-comment-loading">Loading discussion…</div>';
+  const {data:comments,error}=await sb.from('article_comments').select('id,user_id,parent_id,body,status,created_at').eq('article_id',articleId).order('created_at',{ascending:true});
+  if(error){mount.innerHTML='<p class="dc-comment-empty">Discussion could not load.</p>';return}
+  const ids=[...new Set((comments||[]).map(x=>x.user_id).filter(Boolean))];
+  let profiles=[];
+  if(ids.length){const p=await sb.from('community_profiles').select('user_id,display_name,avatar_url').in('user_id',ids);profiles=p.data||[]}
+  const pm=new Map(profiles.map(x=>[x.user_id,x]));
+  const visible=(comments||[]).filter(x=>x.status==='approved'||(_dcAuthUser&&x.user_id===_dcAuthUser.id));
+  const form=_dcAuthUser
+    ? '<form id="dcCommentForm" class="dc-comment-form"><textarea id="dcCommentBody" maxlength="2000" required placeholder="Join the discussion…"></textarea><div><span>Comments are reviewed before publication.</span><button type="submit">Post comment</button></div><div id="dcCommentStatus"></div></form>'
+    : '<div class="dc-comment-signin"><p>Sign in to join the discussion.</p><button type="button" data-comment-signin>Sign in</button></div>';
+  const rows=visible.length?visible.map(x=>{
+    const p=pm.get(x.user_id),mine=_dcAuthUser&&x.user_id===_dcAuthUser.id;
+    return '<article class="dc-comment '+(x.status!=='approved'?'pending':'')+'"><div class="dc-comment-head"><strong>'+esc(p?.display_name||'Daegon reader')+'</strong><span>'+new Date(x.created_at).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+(x.status!=='approved'?' · Awaiting moderation':'')+'</span></div><p>'+esc(x.body)+'</p>'+(mine?'<button data-delete-comment="'+x.id+'">Delete</button>':'')+'</article>';
+  }).join(''):'<p class="dc-comment-empty">No approved comments yet. Start the discussion.</p>';
+  mount.innerHTML='<section class="dc-comments"><div class="dc-comments-head"><div class="mag-kicker">Community</div><h2>Discussion</h2><p>Talk about the story, not the person. Comments are moderated.</p></div>'+form+'<div class="dc-comment-list">'+rows+'</div></section>';
+  const signin=mount.querySelector('[data-comment-signin]');if(signin)signin.onclick=dcShowAuthModal;
+  const formEl=mount.querySelector('#dcCommentForm');
+  if(formEl)formEl.onsubmit=async e=>{
+    e.preventDefault();const body=mount.querySelector('#dcCommentBody').value.trim(),st=mount.querySelector('#dcCommentStatus');
+    if(!body)return;st.textContent='Submitting…';
+    await dcEnsureProfile(_dcAuthUser);
+    const {error:insErr}=await sb.from('article_comments').insert({article_id:articleId,user_id:_dcAuthUser.id,body,status:'pending'});
+    if(insErr){st.textContent=insErr.message;return}
+    st.textContent='Submitted for moderation.';mount.querySelector('#dcCommentBody').value='';dcRenderComments(articleId);
+  };
+  mount.querySelectorAll('[data-delete-comment]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Delete this comment?'))return;
+    await sb.from('article_comments').delete().eq('id',Number(b.dataset.deleteComment));dcRenderComments(articleId);
+  });
+}
 function ensureShell(){
   weeklyEl=document.querySelector('.layout');
   if(weeklyEl&&!weeklyEl.id)weeklyEl.id='weeklyView';
@@ -216,6 +321,13 @@ function ensureShell(){
     searchBtn.innerHTML='<i class="fas fa-search"></i>';
     searchBtn.onclick=()=>go('/search');
     head.insertBefore(searchBtn,theme);
+    const accountBtn=document.createElement('button');
+    accountBtn.id='portalAccountBtn';
+    accountBtn.className='portal-account-btn';
+    accountBtn.type='button';
+    accountBtn.onclick=dcShowAuthModal;
+    head.insertBefore(accountBtn,theme);
+    dcSyncAccountButton();
     document.querySelector('.site-header').appendChild(mobileMenu);
   }
 }
@@ -1986,7 +2098,7 @@ async function loadPublishedChartBeatArticles(){
       const sources=byArticle.get(x.id)||[];
       const sourcesHtml=sources.length?'<div class="cb-sources"><h2>Sources</h2><ul>'+sources.map(s=>'<li><a href="'+escAttr(s.url)+'" target="_blank" rel="noopener">'+esc(s.publisher? s.publisher+', '+s.title : s.title)+(s.source_date?' — '+esc(s.source_date):'')+'</a></li>').join('')+'</ul></div>':'';
       return {
-        slug:x.slug,category:x.category,headline:x.headline,seoTitle:x.seo_title||x.headline,
+        cmsId:x.id,slug:x.slug,category:x.category,headline:x.headline,seoTitle:x.seo_title||x.headline,
         socialTitle:x.social_title||x.headline,dek:x.dek||'',byline:x.byline||'Daegon Charts Editorial',
         published:String(x.published_at||'').slice(0,10),modified:String(x.updated_at||x.published_at||'').slice(0,10),
         image:x.hero_image||'https://i.imgur.com/jaBZ19n.png',
@@ -2095,9 +2207,11 @@ async function renderChartBeatArticle(slug){
     cbPhotoFigure(a)+
     '<div class="cb-article-body">'+(a?.media?.secondary?a.body.replace('<h2>',cbMediaFigure(a.media.secondary,'cb-inline-visual')+'<h2>'):a.body)+'</div>'+
     '<footer class="cb-article-footer"><strong>Corrections & sourcing</strong><p>Source-backed corrections are welcome. Include the chart date and a reliable reference when possible.</p><a href="/contact">Contact the editorial desk →</a></footer>'+
+    '<div id="dcCommentsMount" data-article-id="'+(a.cmsId||'')+'"></div>'+
   '</main>';
   setMode(true);portalEl.innerHTML=shellHtml(main);setChartBeatArticleMeta(a);bindLinks();hydratePortalImages();hydrateChartBeatMetaImage(a);
   const copy=portalEl.querySelector('[data-copy-article]');if(copy)copy.onclick=async()=>{try{await navigator.clipboard.writeText(location.href);copy.innerHTML='<i class="fas fa-check"></i> Link copied'}catch{}};
+  if(a.cmsId)dcRenderComments(a.cmsId);
 }
 
 const CHART_BEAT_DATA_ERA='2017-06-24';
@@ -2495,6 +2609,7 @@ function onDocumentClick(e){
 
 window.DaegonPortal={handles:isHandled,route:renderRoute,go,activateWeeklyIfNeeded};
 ensureShell();
+dcInitAuth();
 try{
   const savedRoute=sessionStorage.getItem('dc_route');
   if(savedRoute){
