@@ -5075,3 +5075,41 @@ body.global-bars-weekly .theme-btn:hover{
     border:0!important;
   }
 }
+
+
+/* Header account-theme spacing hotfix */
+@media(min-width:768px){
+  body.global-site-shell .header-inner,
+  body.global-bars-weekly .header-inner{
+    grid-template-columns:auto minmax(0,1fr) max-content 32px!important;
+    column-gap:16px!important;
+  }
+
+  body.global-site-shell .portal-account-btn,
+  body.global-bars-weekly .portal-account-btn{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:7px!important;
+    width:auto!important;
+    min-width:max-content!important;
+    padding:8px 0!important;
+    margin:0!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+  }
+
+  body.global-site-shell .portal-account-btn span,
+  body.global-bars-weekly .portal-account-btn span{
+    display:inline-block!important;
+    overflow:visible!important;
+    white-space:nowrap!important;
+  }
+
+  body.global-site-shell .theme-btn,
+  body.global-bars-weekly .theme-btn{
+    margin-left:2px!important;
+    position:relative!important;
+    z-index:1!important;
+  }
+}
