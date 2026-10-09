@@ -4625,3 +4625,19 @@ body:not(.portal-mode) #portalPage{
  .mag-index-card.lead{grid-column:auto}
  .mag-index-head h1{font-size:38px}
 }
+
+.mag-static,.mag-community,.mag-reviews{max-width:1180px;margin:0 auto;padding:28px 18px 72px}
+.mag-static-grid,.mag-community-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.mag-static-grid article,.mag-community-grid article,.review-manifesto{border:1px solid var(--border);background:var(--card);padding:20px}
+.mag-static-grid h2,.mag-community-grid h2,.review-manifesto h2{font-family:Georgia,"Times New Roman",serif;font-size:24px;margin:0 0 10px}
+.mag-static-grid p,.mag-community-grid p,.review-manifesto p{margin:0;color:var(--muted-foreground);line-height:1.6}
+.review-pillars{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+.review-pillars div{border:1px solid var(--border);padding:14px;background:var(--background)}
+.review-pillars strong,.review-pillars span{display:block}
+.review-pillars strong{font-size:13px;margin-bottom:5px}
+.review-pillars span{font-size:12px;color:var(--muted-foreground);line-height:1.45}
+@media(max-width:767px){
+ .mag-static,.mag-community,.mag-reviews{padding:20px 14px 56px}
+ .mag-static-grid,.mag-community-grid{grid-template-columns:1fr}
+ .review-pillars{grid-template-columns:1fr}
+}
