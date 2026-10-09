@@ -310,7 +310,7 @@ function dcPersonalChartWeek(events){
   const songs=new Map(),albums=new Map(),artists=new Map();
   for(const e of events){
     const day=String(e.played_at||'').slice(0,10),ms=Number(e.ms_played||0);
-    if(ms<30000)continue;
+    if(e.provider!=='lastfm'&&ms<30000)continue;
     const sk=slugify(e.track_name)+'--'+slugify(e.artist_name);
     const ak=slugify(e.album_name||'')+'--'+slugify(e.artist_name);
     const rk=slugify(e.artist_name);
@@ -381,33 +381,94 @@ async function dcImportSpotifyHistory(file,statusEl){
   statusEl.textContent='Imported '+normalized.length.toLocaleString()+' plays and generated '+dates.length+' weekly chart'+(dates.length===1?'':'s')+'.';
   setTimeout(()=>renderMyCharts(),900);
 }
+
+async function dcSyncLastfm(username,days,statusEl){
+  const user=await dcRequireUser();if(!user)return;
+  const sb=dcSupabaseClient();
+  statusEl.textContent='Syncing Last.fm…';
+  const {data,error}=await sb.functions.invoke('sync-lastfm',{body:{username,days}});
+  if(error){
+    let msg=error.message||'Last.fm sync failed.';
+    try{
+      const ctx=await error.context?.json?.();
+      if(ctx?.error==='LASTFM_API_KEY_NOT_CONFIGURED')msg='Last.fm is ready in Daegon, but the Last.fm API key still needs to be configured on the server.';
+      else if(ctx?.error)msg=ctx.error;
+    }catch{}
+    statusEl.textContent=msg;return false;
+  }
+  if(data?.error){statusEl.textContent=data.error;return false}
+  statusEl.textContent='Synced '+Number(data?.scrobbles||0).toLocaleString()+' scrobbles across '+Number(data?.weeks||0)+' chart week'+(Number(data?.weeks||0)===1?'':'s')+'.';
+  setTimeout(renderMyCharts,650);return true;
+}
+function dcRangeStart(endDate,days){
+  const end=new Date(endDate+'T23:59:59Z');
+  const start=new Date(end);start.setUTCDate(start.getUTCDate()-(days-1));start.setUTCHours(0,0,0,0);
+  return {start:start.toISOString(),end:end.toISOString()};
+}
 async function renderMyCharts(){
   loading('My Charts');
   if(!_dcAuthUser){
-    const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Personal Charts</div><h1>My Charts</h1><p>Turn your own listening history into a Daegon-style chart archive.</p></header><div class="my-empty"><h2>Sign in to build your charts</h2><button data-my-signin>Sign in</button></div></main>';
+    const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Personal Charts</div><h1>My Charts</h1><p>Connect Last.fm or import Spotify history and turn your listening into Daegon-style charts.</p></header><div class="my-empty"><h2>Sign in to build your charts</h2><button data-my-signin>Sign in</button></div></main>';
     setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal music charts generated from your listening history.','/my-charts');portalEl.querySelector('[data-my-signin]').onclick=dcShowAuthModal;return;
   }
   const sb=dcSupabaseClient();
-  const {data:dates}=await sb.from('personal_chart_entries').select('chart_date').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').order('chart_date',{ascending:false}).limit(250);
+  const [{data:dates},{data:lastfmConn}]=await Promise.all([
+    sb.from('personal_chart_entries').select('chart_date').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').order('chart_date',{ascending:false}).limit(250),
+    sb.from('user_streaming_connections').select('account_name,status,last_synced_at').eq('user_id',_dcAuthUser.id).eq('provider','lastfm').maybeSingle()
+  ]);
   const unique=[...new Set((dates||[]).map(x=>x.chart_date))];
-  const selected=new URLSearchParams(location.search).get('date')||unique[0]||'';
-  const [{data:songs},{data:albums},{data:artists}]=selected?await Promise.all([
-    sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').eq('chart_date',selected).order('rank').limit(100),
-    sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','albums').eq('chart_date',selected).order('rank').limit(50),
-    sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','artists').eq('chart_date',selected).order('rank').limit(50)
-  ]):[{data:[]},{data:[]},{data:[]}];
-  const top=(rows,label)=>'<section class="myp-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,10).map(x=>'<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+x.streams+' streams · '+Math.round(Number(x.listening_ms||0)/60000)+' min</i></div>').join('')+'</div></section>';
-  const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Your listening, charted</div><h1>My Charts</h1><p>Weekly personal rankings generated from your own listening history.</p></header>'+
-    '<section class="myp-import"><div><h2>Import Spotify history</h2><p>Upload a Spotify Extended Streaming History JSON file. Plays under 30 seconds are excluded. Your file is processed into your private account data.</p></div><label>Choose JSON<input id="mypHistoryFile" type="file" accept=".json,application/json"></label><div id="mypImportStatus"></div></section>'+
-    (unique.length?'<div class="myp-datebar"><label>Chart week</label><select id="mypDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div>':'<div class="my-empty-inline">Import listening history to generate your first personal chart.</div>')+
-    (selected?top(songs||[],'My Songs 100')+top(albums||[],'My Albums 50')+top(artists||[],'My Artists 50'):'')+
-    '<section class="myp-method"><h2>Personal Daegon Score</h2><p>The first version combines valid streams, listening minutes and active listening days. It rewards repeated listening without letting a single binge session dominate the entire week.</p><code>score = streams × 100 + listening minutes × 1.5 + active days × 18</code></section>'+
+  const params=new URLSearchParams(location.search);
+  const selected=params.get('date')||unique[0]||'';
+  const windowDays=params.get('window')==='28'?28:7;
+
+  let songs=[],albums=[],artists=[];
+  if(selected&&windowDays===7){
+    const results=await Promise.all([
+      sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','songs').eq('chart_date',selected).order('rank').limit(100),
+      sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','albums').eq('chart_date',selected).order('rank').limit(50),
+      sb.from('personal_chart_entries').select('*').eq('user_id',_dcAuthUser.id).eq('chart_type','artists').eq('chart_date',selected).order('rank').limit(50)
+    ]);
+    songs=results[0].data||[];albums=results[1].data||[];artists=results[2].data||[];
+  }else if(selected){
+    const range=dcRangeStart(selected,28);
+    const {data:events}=await sb.from('user_listening_events')
+      .select('provider,played_at,track_name,artist_name,album_name,ms_played')
+      .eq('user_id',_dcAuthUser.id).gte('played_at',range.start).lte('played_at',range.end).order('played_at',{ascending:true});
+    const charts=dcPersonalChartWeek(events||[]);
+    songs=charts.songs.map(x=>({...x,movement:'—'}));
+    albums=charts.albums.map(x=>({...x,movement:'—'}));
+    artists=charts.artists.map(x=>({...x,movement:'—'}));
+  }
+
+  const top=(rows,label)=>'<section class="myp-chart-section"><div class="mag-section-head"><h2>'+label+'</h2><span>'+rows.length+' entries</span></div><div class="myp-chart-list">'+rows.slice(0,10).map(x=>'<div><b>'+x.rank+'</b><span><strong>'+esc(x.entity_name)+'</strong><small>'+esc(x.artist_name||'')+'</small></span><em>'+esc(x.movement||'')+'</em><i>'+x.streams+' plays'+(Number(x.listening_ms||0)>0?' · '+Math.round(Number(x.listening_ms||0)/60000)+' min':'')+' · '+x.active_days+' active day'+(x.active_days===1?'':'s')+'</i></div>').join('')+'</div></section>';
+
+  const connection='<section class="myp-connect"><div class="myp-connect-copy"><div class="mag-kicker">Recommended</div><h2>Connect Last.fm</h2><p>Enter your Last.fm username and Daegon will pull your scrobbles directly. No Spotify export is required. Sync 7 days for the weekly chart or 28 days for a broader listening window.</p>'+
+    (lastfmConn?'<div class="myp-connected"><i class="fas fa-check-circle"></i><span>Linked to <strong>'+esc(lastfmConn.account_name||'Last.fm')+'</strong>'+(lastfmConn.last_synced_at?' · last synced '+new Date(lastfmConn.last_synced_at).toLocaleString():'')+'</span></div>':'')+
+    '</div><div class="myp-connect-form"><input id="mypLastfmUser" maxlength="80" placeholder="Last.fm username" value="'+escAttr(lastfmConn?.account_name||'')+'"><div><button data-lfm-sync="7">Sync 7 Days</button><button data-lfm-sync="28">Sync 28 Days</button></div><div id="mypLastfmStatus"></div></div></section>';
+
+  const main='<main class="my-daegon"><header class="mag-index-head"><div class="mag-kicker">Your listening, charted</div><h1>My Charts</h1><p>Personal rankings with explicit 7-day and 28-day tracking windows.</p></header>'+
+    connection+
+    '<section class="myp-formula-hero"><div><div class="mag-kicker">Daegon Standard</div><h2>Personal Daegon Score</h2><p><strong>Last.fm:</strong> plays + active listening days. <strong>Spotify imports:</strong> plays + listening time + active days when duration data is available.</p></div><code>Score = plays × 100 + listening minutes × 1.5 + active days × 18</code><small>Last.fm does not provide listening duration through recent scrobbles, so minutes contribute 0 for Last.fm-only data. We never invent a duration metric.</small></section>'+
+    '<section class="myp-import secondary"><div><h2>Spotify history import</h2><p>Optional: upload a Spotify Extended Streaming History JSON file to add duration-aware listening data.</p></div><label>Choose JSON<input id="mypHistoryFile" type="file" accept=".json,application/json"></label><div id="mypImportStatus"></div></section>'+
+    (unique.length?'<div class="myp-controls"><div class="myp-window-tabs"><button data-window="7" class="'+(windowDays===7?'active':'')+'">7 Days</button><button data-window="28" class="'+(windowDays===28?'active':'')+'">28 Days</button></div><div class="myp-datebar"><label>Chart week ending</label><select id="mypDateSelect">'+unique.map(d=>'<option value="'+d+'" '+(d===selected?'selected':'')+'>'+fmtDate(d)+'</option>').join('')+'</select></div></div>':'<div class="my-empty-inline">Connect Last.fm or import listening history to generate your first personal chart.</div>')+
+    (selected?'<div class="myp-window-note"><strong>'+windowDays+'-Day Tracking</strong><span>'+(windowDays===7?'Weekly chart ending '+fmtDate(selected):'Rolling 28-day window ending '+fmtDate(selected))+'</span></div>'+top(songs||[],'My Songs '+(windowDays===7?'100':'100 · 28D'))+top(albums||[],'My Albums '+(windowDays===7?'50':'50 · 28D'))+top(artists||[],'My Artists '+(windowDays===7?'50':'50 · 28D')):'')+
   '</main>';
-  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal Daegon music charts generated from your listening history.','/my-charts');bindLinks();
+  setMode(true);portalEl.innerHTML=shellHtml(main);setMeta('My Charts','Personal 7-day and 28-day Daegon charts generated from your listening history.','/my-charts');bindLinks();
+
+  const lfmStatus=portalEl.querySelector('#mypLastfmStatus');
+  portalEl.querySelectorAll('[data-lfm-sync]').forEach(btn=>btn.onclick=async()=>{
+    const username=portalEl.querySelector('#mypLastfmUser')?.value.trim();
+    if(!username){lfmStatus.textContent='Enter your Last.fm username.';return}
+    portalEl.querySelectorAll('[data-lfm-sync]').forEach(x=>x.disabled=true);
+    await dcSyncLastfm(username,Number(btn.dataset.lfmSync),lfmStatus);
+    portalEl.querySelectorAll('[data-lfm-sync]').forEach(x=>x.disabled=false);
+  });
   const file=portalEl.querySelector('#mypHistoryFile'),st=portalEl.querySelector('#mypImportStatus');
   if(file)file.onchange=()=>{const f=file.files?.[0];if(f)dcImportSpotifyHistory(f,st)};
-  const sel=portalEl.querySelector('#mypDateSelect');if(sel)sel.onchange=()=>{const u=new URL(location.href);u.searchParams.set('date',sel.value);history.replaceState({},'',u.pathname+u.search);renderMyCharts()};
+  const sel=portalEl.querySelector('#mypDateSelect');if(sel)sel.onchange=()=>{const u=new URL(location.href);u.searchParams.set('date',sel.value);u.searchParams.set('window',String(windowDays));history.replaceState({},'',u.pathname+u.search);renderMyCharts()};
+  portalEl.querySelectorAll('[data-window]').forEach(btn=>btn.onclick=()=>{const u=new URL(location.href);u.searchParams.set('window',btn.dataset.window);if(selected)u.searchParams.set('date',selected);history.replaceState({},'',u.pathname+u.search);renderMyCharts()});
 }
+
 async function renderForum(){
   loading('Forum');
   const sb=dcSupabaseClient();
